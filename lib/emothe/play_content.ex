@@ -1,0 +1,346 @@
+defmodule Emothe.PlayContent do
+  @moduledoc """
+  The PlayContent context manages the structured content of plays:
+  characters, divisions (acts/scenes), and elements (speeches, verses, stage directions).
+  """
+
+  import Ecto.Query
+  alias Emothe.Repo
+  alias Emothe.PlayContent.{Character, Division, Element}
+
+  # --- Characters ---
+
+  def list_characters(play_id) do
+    Character
+    |> where(play_id: ^play_id)
+    |> order_by(:position)
+    |> Repo.all()
+  end
+
+  def get_character!(id), do: Repo.get!(Character, id)
+
+  def create_character(attrs) do
+    %Character{}
+    |> Character.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a character, silently skipping if the xml_id already exists for this play.
+  Used during TEI import where malformed files may contain duplicate xml:id entries.
+  Returns the existing character when a conflict is detected.
+  """
+  def create_character_unless_exists(attrs) do
+    play_id = attrs[:play_id] || attrs["play_id"]
+    xml_id = attrs[:xml_id] || attrs["xml_id"]
+
+    case find_character_by_xml_id(play_id, xml_id) do
+      nil -> create_character(attrs)
+      existing -> {:ok, existing}
+    end
+  end
+
+  def find_character_by_xml_id(play_id, xml_id) do
+    Repo.get_by(Character, play_id: play_id, xml_id: xml_id)
+  end
+
+  def change_character(%Character{} = character, attrs \\ %{}) do
+    Character.changeset(character, attrs)
+  end
+
+  def update_character(%Character{} = character, attrs) do
+    character |> Character.changeset(attrs) |> Repo.update()
+  end
+
+  def delete_character(%Character{} = character) do
+    Repo.delete(character)
+  end
+
+  def next_character_position(play_id) do
+    Character
+    |> where(play_id: ^play_id)
+    |> select([c], coalesce(max(c.position), -1) + 1)
+    |> Repo.one()
+  end
+
+  # --- Divisions ---
+
+  def list_divisions(play_id) do
+    Division
+    |> where(play_id: ^play_id)
+    |> order_by(:position)
+    |> Repo.all()
+  end
+
+  def list_top_divisions(play_id) do
+    Division
+    |> where(play_id: ^play_id)
+    |> where([d], is_nil(d.parent_id))
+    |> order_by(:position)
+    |> Repo.all()
+    |> Repo.preload(children: from(d in Division, order_by: d.position))
+  end
+
+  def get_division!(id), do: Repo.get!(Division, id)
+
+  def create_division(attrs) do
+    %Division{}
+    |> Division.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def change_division(%Division{} = division, attrs \\ %{}) do
+    Division.changeset(division, attrs)
+  end
+
+  def update_division(%Division{} = division, attrs) do
+    division |> Division.changeset(attrs) |> Repo.update()
+  end
+
+  def delete_division(%Division{} = division) do
+    Repo.delete(division)
+  end
+
+  def next_division_position(play_id, parent_id \\ nil) do
+    query = Division |> where(play_id: ^play_id)
+
+    query =
+      if parent_id,
+        do: where(query, parent_id: ^parent_id),
+        else: where(query, [d], is_nil(d.parent_id))
+
+    query |> select([d], coalesce(max(d.position), -1) + 1) |> Repo.one()
+  end
+
+  # --- Elements ---
+
+  def list_elements_for_division(division_id) do
+    Element
+    |> where(division_id: ^division_id)
+    |> where([e], is_nil(e.parent_id))
+    |> order_by(:position)
+    |> Repo.all()
+    |> Repo.preload([
+      :character,
+      children:
+        from(e in Element,
+          order_by: e.position,
+          preload: [
+            :character,
+            children:
+              ^from(c in Element,
+                order_by: c.position,
+                preload: [
+                  :character,
+                  children: ^from(v in Element, order_by: v.position, preload: :character)
+                ]
+              )
+          ]
+        )
+    ])
+  end
+
+  def list_all_elements(play_id) do
+    Element
+    |> where(play_id: ^play_id)
+    |> order_by(:position)
+    |> Repo.all()
+  end
+
+  def get_element!(id), do: Repo.get!(Element, id) |> Repo.preload(:character)
+
+  def create_element(attrs) do
+    %Element{}
+    |> Element.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def change_element(%Element{} = element, attrs \\ %{}) do
+    Element.changeset(element, attrs)
+  end
+
+  def update_element(%Element{} = element, attrs) do
+    element |> Element.changeset(attrs) |> Repo.update()
+  end
+
+  def delete_element(%Element{} = element) do
+    Repo.delete(element)
+  end
+
+  @doc """
+  Shifts positions of elements at or after `from_position` up by 1,
+  making room to insert a new element at `from_position`.
+  """
+  def shift_element_positions(division_id, parent_id, from_position) do
+    query =
+      Element
+      |> where(division_id: ^division_id)
+      |> where([e], e.position >= ^from_position)
+
+    query =
+      if parent_id,
+        do: where(query, parent_id: ^parent_id),
+        else: where(query, [e], is_nil(e.parent_id))
+
+    Repo.update_all(query, inc: [position: 1])
+  end
+
+  @doc """
+  Calculates the line number for a new verse line being inserted at `position`
+  within the given `parent_id` (line_group). Does NOT shift existing numbers —
+  call `shift_line_numbers/2` separately at save time.
+  """
+  def auto_line_number(play_id, parent_id, position) do
+    # Find the previous verse line in the same line_group (by position)
+    prev_number =
+      Element
+      |> where(parent_id: ^parent_id)
+      |> where(type: "verse_line")
+      |> where([e], e.position < ^position)
+      |> where([e], not is_nil(e.line_number))
+      |> order_by(desc: :position)
+      |> limit(1)
+      |> select([e], e.line_number)
+      |> Repo.one()
+
+    case prev_number do
+      nil ->
+        # First verse in group — check if there's a next sibling
+        next_number =
+          Element
+          |> where(parent_id: ^parent_id)
+          |> where(type: "verse_line")
+          |> where([e], e.position >= ^position)
+          |> where([e], not is_nil(e.line_number))
+          |> order_by(:position)
+          |> limit(1)
+          |> select([e], e.line_number)
+          |> Repo.one()
+
+        case next_number do
+          nil -> global_max_line_number(play_id) + 1
+          n -> n
+        end
+
+      n ->
+        n + 1
+    end
+  end
+
+  @doc """
+  Shifts all verse_line line_numbers >= `from_number` up by 1 in the given play.
+  Preserves split verse groupings since all parts share the same number.
+  """
+  def shift_line_numbers(play_id, from_number) do
+    Element
+    |> where(play_id: ^play_id)
+    |> where(type: "verse_line")
+    |> where([e], e.line_number >= ^from_number)
+    |> Repo.update_all(inc: [line_number: 1])
+  end
+
+  @doc """
+  Shifts all verse_line line_numbers > `deleted_number` down by 1 in the given play.
+  Only call this when the deleted verse was not part of a split verse.
+  """
+  def shift_line_numbers_down(play_id, deleted_number) do
+    Element
+    |> where(play_id: ^play_id)
+    |> where(type: "verse_line")
+    |> where([e], e.line_number > ^deleted_number)
+    |> Repo.update_all(inc: [line_number: -1])
+  end
+
+  @doc """
+  Returns true if there are other verse_lines in the play with the same line_number
+  (i.e. split verse partners).
+  """
+  def split_verse?(play_id, element_id, line_number) do
+    Element
+    |> where(play_id: ^play_id)
+    |> where(type: "verse_line")
+    |> where([e], e.line_number == ^line_number)
+    |> where([e], e.id != ^element_id)
+    |> Repo.exists?()
+  end
+
+  defp global_max_line_number(play_id) do
+    Element
+    |> where(play_id: ^play_id)
+    |> where(type: "verse_line")
+    |> where([e], not is_nil(e.line_number))
+    |> select([e], max(e.line_number))
+    |> Repo.one() || 0
+  end
+
+  def next_element_position(division_id, parent_id \\ nil) do
+    query = Element |> where(division_id: ^division_id)
+
+    query =
+      if parent_id,
+        do: where(query, parent_id: ^parent_id),
+        else: where(query, [e], is_nil(e.parent_id))
+
+    query |> select([e], coalesce(max(e.position), -1) + 1) |> Repo.one()
+  end
+
+  @doc """
+  Loads the full play content tree: divisions with nested elements.
+  Used for rendering the play text.
+  """
+  def load_play_content(play_id) do
+    divisions =
+      Division
+      |> where(play_id: ^play_id)
+      |> where([d], is_nil(d.parent_id))
+      |> order_by(:position)
+      |> Repo.all()
+      |> Repo.preload(children: from(d in Division, order_by: d.position))
+
+    # Load elements per division (including sub-divisions)
+    all_division_ids = collect_division_ids(divisions)
+
+    elements =
+      Element
+      |> where([e], e.division_id in ^all_division_ids)
+      |> where([e], is_nil(e.parent_id))
+      |> order_by(:position)
+      |> Repo.all()
+      |> Repo.preload([
+        :character,
+        children:
+          from(e in Element,
+            order_by: e.position,
+            preload: [
+              :character,
+              children: ^from(c in Element, order_by: c.position)
+            ]
+          )
+      ])
+
+    elements_by_division = Enum.group_by(elements, & &1.division_id)
+
+    attach_elements(divisions, elements_by_division)
+  end
+
+  defp collect_division_ids(divisions) do
+    Enum.flat_map(divisions, fn div ->
+      children = Map.get(div, :children, [])
+      children = if is_list(children), do: children, else: []
+      [div.id | collect_division_ids(children)]
+    end)
+  end
+
+  defp attach_elements(divisions, elements_by_division) do
+    Enum.map(divisions, fn div ->
+      children =
+        case div.children do
+          %Ecto.Association.NotLoaded{} -> []
+          children -> attach_elements(children, elements_by_division)
+        end
+
+      elements = Map.get(elements_by_division, div.id, [])
+      %{div | children: children, loaded_elements: elements}
+    end)
+  end
+end

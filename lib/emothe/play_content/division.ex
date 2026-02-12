@@ -1,0 +1,34 @@
+defmodule Emothe.PlayContent.Division do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
+
+  schema "play_divisions" do
+    field :type, :string
+    field :number, :integer
+    field :title, :string
+    field :position, :integer, default: 0
+
+    belongs_to :play, Emothe.Catalogue.Play
+    belongs_to :parent, __MODULE__
+    has_many :children, __MODULE__, foreign_key: :parent_id
+    has_many :elements, Emothe.PlayContent.Element
+
+    field :loaded_elements, {:array, :map}, virtual: true, default: []
+
+    timestamps(type: :utc_datetime)
+  end
+
+  def changeset(division, attrs) do
+    division
+    |> cast(attrs, [:type, :number, :title, :position, :play_id, :parent_id])
+    |> validate_required([:type])
+    |> validate_inclusion(:type, ~w(
+      acto escena prologo argumento dedicatoria elenco front jornada introduccion_editor
+      act scene prologue epilogue
+      acte scene prologue epilogue
+    ))
+  end
+end

@@ -161,40 +161,44 @@ Then visit:
 - [x] Admin play list with search and delete
 - [x] Admin play create/edit form
 - [x] Admin play detail page with structure overview and export buttons
-- [x] Admin TEI import page (file upload, server path, directory batch import)
+- [x] Admin TEI import page (file upload)
 - [x] Export controller (TEI-XML, HTML, PDF download endpoints)
 - [x] Authentication with bcrypt (registration, login, password reset, email confirmation)
 - [x] Role-based access control (`:admin`, `:researcher` roles)
 - [x] Admin route protection (requires admin role via plug + LiveView on_mount)
-- [x] Auth navbar (login/register/logout/settings links, admin link for admins)
 - [x] Compile & fix errors (all modules compile cleanly)
-- [x] TEI parser test suite (`test/emothe/import/tei_parser_test.exs`) - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding
+- [x] TEI parser test suite - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding
 - [x] Duplicate character xml_id handling in TEI importer (`create_character_unless_exists`)
 - [x] Manual play content editor at `/admin/plays/:id/content` - characters, divisions, elements with modal forms
+- [x] Navigation overhaul: two layouts (public app + admin), breadcrumbs, play context bar for admin play pages
+- [x] Collapsible sidebar with scroll spy (IntersectionObserver) on public play page
+- [x] Theme toggle (system/light/dark) in navbar
+- [x] EMOTHE home page with catalogue CTA
+- [x] "Edit in Admin" link on public play page for logged-in users
+- [x] DaisyUI component migration (catalogue, play show, admin pages)
 
 ## What Still Needs To Be Done
 
 ### High Priority
 - [ ] **Create initial admin user** - promote a registered user to admin via IEx: `Emothe.Accounts.get_user_by_email("...") |> Emothe.Accounts.User.role_changeset(%{role: "admin"}) |> Emothe.Repo.update()`
+- [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs)
+
 ### Medium Priority
-- [ ] **Table of contents** on public play page (links to acts/scenes)
 - [ ] **Aside detection** in TEI importer (currently defaults to false)
 - [ ] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.)
-- [ ] **Custom OTel spans** for TEI import, export, statistics computation
 - [ ] **Pagination** on catalogue pages for large collections
 - [ ] **Install Typst** for PDF export to work (`cargo install typst-cli` or download binary)
 
 ### Low Priority / Future
-- [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs)
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
 - [ ] **User management** admin page (list users, change roles)
 - [ ] **Activity log** - track who imported/edited what
 - [ ] **TEI validation** - validate exported XML against TEI schema
 - [ ] **Responsive mobile design** refinements
-- [ ] **Dark mode** support
 - [ ] **API endpoints** for programmatic access
 - [ ] **Batch export** - export multiple plays at once
+- [ ] **Custom OTel spans** for TEI import, export, statistics computation
 
 ## Key Decisions
 

@@ -1,6 +1,9 @@
 <header class="navbar bg-base-100 border-b border-base-300 px-4 sm:px-6 lg:px-8 min-h-0 py-2">
   <div class="flex-1 gap-3">
-    <a href="/" class="flex items-center gap-2 text-base-content hover:opacity-80 transition-opacity">
+    <a
+      href="/"
+      class="flex items-center gap-2 text-base-content hover:opacity-80 transition-opacity"
+    >
       <img src={~p"/images/logo.svg"} width="28" />
       <span class="text-sm font-bold tracking-tight">EMOTHE</span>
     </a>
@@ -22,7 +25,10 @@
           <span class="max-w-[8rem] truncate text-xs">{@current_user.email}</span>
           <.icon name="hero-chevron-down-micro" class="size-3" />
         </label>
-        <ul tabindex="0" class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-48 border border-base-300">
+        <ul
+          tabindex="0"
+          class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-48 border border-base-300"
+        >
           <li><a href="/users/settings">Settings</a></li>
           <li>
             <.link href={~p"/users/log-out"} method="delete">Log out</.link>

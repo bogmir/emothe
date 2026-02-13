@@ -52,7 +52,9 @@ defmodule EmotheWeb.PlayCatalogueLive do
               <h2 class="text-lg font-semibold text-base-content hover:text-primary">
                 {play.title}
               </h2>
-              <p :if={play.author_name} class="text-sm text-base-content/70 mt-1">{play.author_name}</p>
+              <p :if={play.author_name} class="text-sm text-base-content/70 mt-1">
+                {play.author_name}
+              </p>
             </div>
             <div class="text-right flex-shrink-0 ml-4">
               <span class="badge badge-primary badge-outline">{play.code}</span>

@@ -736,7 +736,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           <span :if={@element.speaker_label} class="font-medium">{@element.speaker_label}</span>
           <span :if={@element.content} class="text-sm text-base-content/80">
             {String.slice(@element.content || "", 0..80)}{if String.length(@element.content || "") >
-                                                               80, do: "..."}
+                                                               80,
+                                                             do: "..."}
           </span>
           <span :if={@element.verse_type} class="text-xs text-base-content/50 ml-2">
             ({@element.verse_type})

@@ -23,7 +23,11 @@ defmodule EmotheWeb.Components.PlayText do
           />
         </div>
 
-        <div :for={child <- Map.get(division, :children, [])} class="mb-6 scroll-mt-16" id={"div-#{child.id}"}>
+        <div
+          :for={child <- Map.get(division, :children, [])}
+          class="mb-6 scroll-mt-16"
+          id={"div-#{child.id}"}
+        >
           <.division_heading division={child} />
           <div :if={Map.has_key?(child, :loaded_elements)}>
             <.element_list

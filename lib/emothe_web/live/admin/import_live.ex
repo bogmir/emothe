@@ -204,8 +204,6 @@ defmodule EmotheWeb.Admin.ImportLive do
         </div>
       </div>
 
-
-
       <%!-- Success results --%>
       <div :if={@successes != []} class="card border border-base-300 bg-base-100 shadow-sm">
         <div class="card-body">

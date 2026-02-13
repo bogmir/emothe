@@ -71,7 +71,11 @@ defmodule EmotheWeb.Layouts do
     <nav :if={@items != []} aria-label="Breadcrumb" class="text-sm breadcrumbs py-0">
       <ul>
         <li :for={{item, idx} <- Enum.with_index(@items)}>
-          <.link :if={Map.get(item, :to) && idx < length(@items) - 1} navigate={item.to} class="hover:text-primary">
+          <.link
+            :if={Map.get(item, :to) && idx < length(@items) - 1}
+            navigate={item.to}
+            class="hover:text-primary"
+          >
             {item.label}
           </.link>
           <span :if={!Map.get(item, :to) || idx == length(@items) - 1} class="text-base-content/70">
@@ -94,7 +98,10 @@ defmodule EmotheWeb.Layouts do
       <.play_context_bar play={@play} active_tab={:content} />
   """
   attr :play, :map, required: true, doc: "the play struct"
-  attr :active_tab, :atom, default: nil, doc: "which tab is active (:overview, :metadata, :content, :public)"
+
+  attr :active_tab, :atom,
+    default: nil,
+    doc: "which tab is active (:overview, :metadata, :content, :public)"
 
   def play_context_bar(assigns) do
     ~H"""

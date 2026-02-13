@@ -67,8 +67,7 @@ defmodule EmotheWeb.PlayShowLive do
               class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-primary cursor-pointer"
             >
               <span class="flex items-center gap-2">
-                <.icon name="hero-list-bullet-micro" class="size-4" />
-                Contents
+                <.icon name="hero-list-bullet-micro" class="size-4" /> Contents
               </span>
               <.icon
                 name={if @sidebar_open, do: "hero-chevron-up-micro", else: "hero-chevron-down-micro"}
@@ -226,7 +225,9 @@ defmodule EmotheWeb.PlayShowLive do
                 class="flex items-center gap-3 p-3 bg-base-100/60 border border-base-300 rounded-box"
               >
                 <span class="font-semibold text-base-content">{char.name}</span>
-                <span :if={char.description} class="text-sm text-base-content/50">{char.description}</span>
+                <span :if={char.description} class="text-sm text-base-content/50">
+                  {char.description}
+                </span>
               </div>
             </div>
           </div>

@@ -121,7 +121,11 @@ Workflow used for deploys:
 
 - [.github/workflows/deploy-fly.yml](.github/workflows/deploy-fly.yml)
 
-On pushes to `main`, Actions will run `flyctl deploy --remote-only`.
+Deploy behavior:
+
+- CI workflow (`CI`) runs on pushes/PRs
+- Deploy workflow runs automatically only when `CI` succeeds for `main`
+- You can still trigger deploy manually with `workflow_dispatch`
 
 ## 7) Migrations
 
@@ -136,3 +140,29 @@ This runs DB migrations automatically at deploy time.
 - Fly free-tier limits can change; verify current plan before relying on it
 - For POC reliability, keep one app machine and small VM size initially
 - Add a custom domain later with `fly certs add <domain>` when ready
+
+## 9) Branch protection (recommended)
+
+To enforce CI/CD quality gates on `main` (similar to Jenkins protected branch policies):
+
+1. Go to GitHub repo → `Settings` → `Branches` → `Add branch protection rule`
+2. Branch name pattern: `main`
+3. Enable these rules:
+	- `Require a pull request before merging`
+	- `Require approvals` (suggested: 1)
+	- `Require status checks to pass before merging`
+	- `Require branches to be up to date before merging`
+	- `Require conversation resolution before merging`
+	- `Do not allow bypassing the above settings`
+
+Suggested required status checks:
+
+- `CI / test`
+
+Optional hardening:
+
+- Restrict who can push to matching branches
+- Require signed commits
+- Require linear history
+
+With this in place, merge to `main` is blocked unless CI is green, and deploy runs only after CI success (as configured in `.github/workflows/deploy-fly.yml`).

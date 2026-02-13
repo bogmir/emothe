@@ -6,13 +6,16 @@
     </a>
     <span class="text-base-content/30 hidden sm:inline">|</span>
     <nav class="hidden sm:flex items-center gap-1">
-      <a href="/plays" class="btn btn-ghost btn-xs">Catalogue</a>
+      <a href="/admin/plays" class="btn btn-ghost btn-xs">Plays</a>
+      <a href="/admin/plays/import" class="btn btn-ghost btn-xs">Import</a>
     </nav>
   </div>
   <div class="flex-none flex items-center gap-2">
+    <a href="/plays" class="btn btn-ghost btn-xs text-base-content/70">
+      <.icon name="hero-globe-alt-micro" class="size-3.5" /> Catalogue
+    </a>
     <.theme_toggle />
     <%= if assigns[:current_user] do %>
-      <a href="/admin/plays" class="btn btn-ghost btn-xs">Admin</a>
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-xs gap-1">
           <.icon name="hero-user-circle-micro" class="size-4" />
@@ -26,9 +29,6 @@
           </li>
         </ul>
       </div>
-    <% else %>
-      <a href="/users/register" class="btn btn-ghost btn-xs">Register</a>
-      <a href="/users/log-in" class="btn btn-primary btn-xs">Log in</a>
     <% end %>
   </div>
 </header>
@@ -39,6 +39,10 @@
       <.breadcrumbs items={@breadcrumbs} />
     </div>
   </div>
+<% end %>
+
+<%= if assigns[:play_context] do %>
+  <.play_context_bar play={@play_context.play} active_tab={@play_context.active_tab} />
 <% end %>
 
 <main class="flex-1">

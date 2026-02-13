@@ -18,7 +18,13 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
      |> assign(:play, play)
      |> assign(:characters, characters)
      |> assign(:divisions, divisions)
-     |> assign(:statistic, statistic)}
+     |> assign(:statistic, statistic)
+     |> assign(:breadcrumbs, [
+       %{label: "Admin", to: ~p"/admin/plays"},
+       %{label: "Plays", to: ~p"/admin/plays"},
+       %{label: play.title}
+     ])
+     |> assign(:play_context, %{play: play, active_tab: :overview})}
   end
 
   @impl true
@@ -38,28 +44,16 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
         </div>
         <div class="flex gap-2">
           <.link
-            navigate={~p"/admin/plays/#{@play.id}/edit"}
-            class="btn btn-sm btn-primary"
-          >
-            Edit Metadata
-          </.link>
-          <.link
-            navigate={~p"/admin/plays/#{@play.id}/content"}
-            class="btn btn-sm btn-secondary"
-          >
-            Edit Content
-          </.link>
-          <.link
             href={~p"/admin/plays/#{@play.id}/export/tei"}
             class="btn btn-sm btn-neutral"
           >
-            TEI-XML
+            Export TEI-XML
           </.link>
           <.link
-            navigate={~p"/plays/#{@play.code}"}
+            href={~p"/admin/plays/#{@play.id}/export/html"}
             class="btn btn-sm btn-outline"
           >
-            Public View
+            Export HTML
           </.link>
         </div>
       </div>

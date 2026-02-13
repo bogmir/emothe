@@ -29,7 +29,12 @@ defmodule EmotheWeb.PlayShowLive do
      |> assign(:play_sections, play_sections)
      |> assign(:show_line_numbers, true)
      |> assign(:show_stage_directions, true)
-     |> assign(:active_tab, :text)}
+     |> assign(:active_tab, :text)
+     |> assign(:sidebar_open, true)
+     |> assign(:breadcrumbs, [
+       %{label: "Catalogue", to: ~p"/plays"},
+       %{label: play.title}
+     ])}
   end
 
   @impl true
@@ -45,30 +50,47 @@ defmodule EmotheWeb.PlayShowLive do
     {:noreply, assign(socket, :active_tab, String.to_existing_atom(tab))}
   end
 
+  def handle_event("toggle_sidebar", _, socket) do
+    {:noreply, assign(socket, :sidebar_open, !socket.assigns.sidebar_open)}
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
     <div class="play-text-page min-h-screen">
-      <div class="max-w-7xl mx-auto px-4 py-8 lg:grid lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-8">
-        <aside id="play-sections-panel" class="mb-6 lg:mb-0 lg:sticky lg:top-6 lg:self-start">
-          <div class="rounded-xl border border-gray-300 bg-white/85 backdrop-blur-sm shadow-sm transition-shadow hover:shadow-md">
-            <div class="flex items-center gap-2 border-b border-gray-200 px-4 py-3">
-              <.icon name="hero-list-bullet" class="h-4 w-4 text-[#5E2D66]" />
-              <h2 class="text-sm font-semibold tracking-wide uppercase text-[#5E2D66]">
-                Play Navigation
-              </h2>
-            </div>
+      <div class="max-w-7xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-6">
+        <%!-- Sidebar toggle (mobile + desktop) --%>
+        <aside id="play-sections-panel" class="mb-4 lg:mb-0 lg:sticky lg:top-4 lg:self-start">
+          <div class="rounded-box border border-base-300 bg-base-100/90 backdrop-blur-sm shadow-sm">
+            <button
+              phx-click="toggle_sidebar"
+              class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-primary cursor-pointer"
+            >
+              <span class="flex items-center gap-2">
+                <.icon name="hero-list-bullet-micro" class="size-4" />
+                Contents
+              </span>
+              <.icon
+                name={if @sidebar_open, do: "hero-chevron-up-micro", else: "hero-chevron-down-micro"}
+                class="size-4 text-base-content/40"
+              />
+            </button>
 
-            <div class="max-h-[70vh] space-y-5 overflow-y-auto px-3 py-3">
+            <div
+              :if={@sidebar_open}
+              id="scroll-spy-nav"
+              phx-hook="ScrollSpy"
+              class="border-t border-base-300 max-h-[65vh] overflow-y-auto px-2 py-2 space-y-3"
+            >
               <section :if={@metadata_sections != []}>
-                <h3 class="px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-500">
+                <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
                   Metadata
                 </h3>
-                <nav id="metadata-sections-nav" class="mt-2 space-y-1">
+                <nav class="mt-1 space-y-px">
                   <a
                     :for={section <- @metadata_sections}
                     href={"##{section.id}"}
-                    class="block rounded-md px-2 py-1.5 text-sm text-gray-700 transition-colors hover:bg-[#5E2D66]/10 hover:text-[#5E2D66]"
+                    class="block rounded-md px-2 py-1 text-xs text-base-content/70 transition-colors hover:bg-primary/10 hover:text-primary active:bg-primary/20"
                   >
                     {section.label}
                   </a>
@@ -76,15 +98,15 @@ defmodule EmotheWeb.PlayShowLive do
               </section>
 
               <section :if={@play_sections != []}>
-                <h3 class="px-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-500">
-                  Play Sections
+                <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+                  Sections
                 </h3>
-                <nav id="play-sections-nav" class="mt-2 space-y-1">
+                <nav class="mt-1 space-y-px">
                   <a
                     :for={section <- @play_sections}
                     href={"##{section.id}"}
-                    class="block rounded-md py-1.5 text-sm text-gray-700 transition-colors hover:bg-[#5E2D66]/10 hover:text-[#5E2D66]"
-                    style={"padding-left: #{0.5 + section.depth * 0.75}rem"}
+                    class="block rounded-md py-1 text-xs text-base-content/70 transition-colors hover:bg-primary/10 hover:text-primary active:bg-primary/20"
+                    style={"padding-left: #{0.5 + section.depth * 0.625}rem"}
                   >
                     {section.label}
                   </a>
@@ -92,20 +114,29 @@ defmodule EmotheWeb.PlayShowLive do
               </section>
             </div>
           </div>
+
+          <%!-- Admin/researcher quick link --%>
+          <.link
+            :if={assigns[:current_user]}
+            navigate={~p"/admin/plays/#{@play.id}"}
+            class="mt-2 flex items-center gap-1.5 rounded-box border border-base-300 bg-base-100/90 px-3 py-2 text-xs text-base-content/60 hover:text-primary hover:border-primary/30 transition-colors"
+          >
+            <.icon name="hero-pencil-square-micro" class="size-3.5" /> Edit in Admin
+          </.link>
         </aside>
 
         <div>
           <%!-- Header --%>
           <header
             id="meta-overview"
-            class="play-header mb-8 border-b border-gray-300 pb-6 scroll-mt-20 text-center"
+            class="play-header mb-8 border-b border-base-300 pb-6 scroll-mt-20 text-center"
           >
             <h2 class="play-author">{@play.author_name}</h2>
             <h1 class="play-title font-bold">{@play.title}</h1>
 
             <%!-- Source info --%>
             <div :if={@play.sources != []} id="meta-sources" class="scroll-mt-20">
-              <div :for={source <- @play.sources} class="mt-4 text-xs text-gray-500">
+              <div :for={source <- @play.sources} class="mt-4 text-xs text-base-content/50">
                 <p :if={source.note} class="italic">{source.note}</p>
               </div>
             </div>
@@ -116,13 +147,13 @@ defmodule EmotheWeb.PlayShowLive do
               id="meta-editors"
               class="mt-3 flex flex-wrap justify-center gap-2 scroll-mt-20"
             >
-              <span :for={editor <- @play.editors} class="text-xs text-gray-500">
+              <span :for={editor <- @play.editors} class="text-xs text-base-content/50">
                 {editor.person_name}
-                <span class="text-gray-400">({editor.role})</span>
+                <span class="text-base-content/35">({editor.role})</span>
               </span>
             </div>
 
-            <p :if={@play.verse_count} class="mt-2 text-xs text-gray-500">
+            <p :if={@play.verse_count} class="mt-2 text-xs text-base-content/50">
               {if @play.is_verse, do: "#{@play.verse_count} verses", else: "Prose"}
             </p>
           </header>
@@ -138,7 +169,7 @@ defmodule EmotheWeb.PlayShowLive do
           </div>
 
           <%!-- Tab navigation --%>
-          <nav id="play-tab-nav" class="flex border-b border-gray-300 mb-6">
+          <nav id="play-tab-nav" class="flex border-b border-base-300 mb-6">
             <button
               :for={
                 tab <- [{:text, "Text"}, {:characters, "Characters"}, {:statistics, "Statistics"}]
@@ -146,10 +177,10 @@ defmodule EmotheWeb.PlayShowLive do
               phx-click="switch_tab"
               phx-value-tab={elem(tab, 0)}
               class={[
-                "px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
+                "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer",
                 if(@active_tab == elem(tab, 0),
-                  do: "border-[#5E2D66] text-[#5E2D66]",
-                  else: "border-transparent text-gray-500 hover:text-[#B93D83]"
+                  do: "border-primary text-primary",
+                  else: "border-transparent text-base-content/50 hover:text-primary/70"
                 )
               ]}
             >
@@ -160,21 +191,21 @@ defmodule EmotheWeb.PlayShowLive do
           <%!-- Text tab --%>
           <div :if={@active_tab == :text} id="play-tab-text">
             <%!-- Controls --%>
-            <div class="flex gap-4 mb-6 p-3 bg-white/60 rounded-lg border border-gray-200">
-              <label class="flex items-center gap-2 text-xs cursor-pointer">
+            <div class="flex gap-4 mb-6 p-2.5 bg-base-200/50 rounded-box border border-base-300">
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
                 <input
                   type="checkbox"
                   checked={@show_line_numbers}
                   phx-click="toggle_line_numbers"
-                  class="rounded text-[#5E2D66] focus:ring-[#5E2D66]"
+                  class="checkbox checkbox-xs checkbox-primary"
                 /> Line numbers
               </label>
-              <label class="flex items-center gap-2 text-xs cursor-pointer">
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
                 <input
                   type="checkbox"
                   checked={@show_stage_directions}
                   phx-click="toggle_stage_directions"
-                  class="rounded text-[#5E2D66] focus:ring-[#5E2D66]"
+                  class="checkbox checkbox-xs checkbox-primary"
                 /> Stage directions
               </label>
             </div>
@@ -188,21 +219,21 @@ defmodule EmotheWeb.PlayShowLive do
 
           <%!-- Characters tab --%>
           <div :if={@active_tab == :characters} id="play-tab-characters">
-            <h2 class="text-lg font-bold mb-4">Dramatis Personae</h2>
-            <div class="grid gap-3 max-w-2xl">
+            <h2 class="text-lg font-bold mb-4 text-base-content">Dramatis Personae</h2>
+            <div class="grid gap-2 max-w-2xl">
               <div
                 :for={char <- Enum.filter(@characters, &(!&1.is_hidden))}
-                class="flex items-center gap-3 p-3 bg-white/60 border border-gray-200 rounded"
+                class="flex items-center gap-3 p-3 bg-base-100/60 border border-base-300 rounded-box"
               >
-                <span class="font-semibold">{char.name}</span>
-                <span :if={char.description} class="text-sm text-gray-500">{char.description}</span>
+                <span class="font-semibold text-base-content">{char.name}</span>
+                <span :if={char.description} class="text-sm text-base-content/50">{char.description}</span>
               </div>
             </div>
           </div>
 
           <%!-- Statistics tab --%>
           <div :if={@active_tab == :statistics} id="play-tab-statistics">
-            <h2 class="text-lg font-bold mb-4">Play Statistics</h2>
+            <h2 class="text-lg font-bold mb-4 text-base-content">Play Statistics</h2>
             <.stats_panel statistic={@statistic} play={@play} />
           </div>
         </div>

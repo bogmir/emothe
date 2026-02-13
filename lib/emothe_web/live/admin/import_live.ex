@@ -12,6 +12,11 @@ defmodule EmotheWeb.Admin.ImportLive do
      |> assign(:page_title, "Import TEI-XML")
      |> assign(:successes, [])
      |> assign(:importing, false)
+     |> assign(:breadcrumbs, [
+       %{label: "Admin", to: ~p"/admin/plays"},
+       %{label: "Plays", to: ~p"/admin/plays"},
+       %{label: "Import TEI-XML"}
+     ])
      |> allow_upload(:tei_files,
        accept: ~w(.xml),
        max_entries: 20,
@@ -199,26 +204,7 @@ defmodule EmotheWeb.Admin.ImportLive do
         </div>
       </div>
 
-      <%!-- Import from server directory --%>
-      <div class="card mb-6 border border-base-300 bg-base-100 shadow-sm">
-        <div class="card-body">
-          <h2 class="card-title">Import from Server Directory</h2>
-          <p class="mb-3 text-sm text-base-content/70">
-            Import all .xml files from a directory on the server.
-          </p>
-          <form phx-submit="import_directory" class="flex gap-3">
-            <input
-              type="text"
-              name="directory"
-              value="/home/bogdan/Downloads/tei_files"
-              class="input input-bordered flex-1"
-            />
-            <button type="submit" class="btn btn-primary">
-              Import Directory
-            </button>
-          </form>
-        </div>
-      </div>
+
 
       <%!-- Success results --%>
       <div :if={@successes != []} class="card border border-base-300 bg-base-100 shadow-sm">

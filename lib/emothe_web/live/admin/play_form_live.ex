@@ -21,6 +21,12 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:page_title, "New Play")
     |> assign(:play, play)
     |> assign(:form, to_form(Catalogue.change_play_form(play)))
+    |> assign(:breadcrumbs, [
+      %{label: "Admin", to: ~p"/admin/plays"},
+      %{label: "Plays", to: ~p"/admin/plays"},
+      %{label: "New Play"}
+    ])
+    |> assign(:play_context, nil)
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
@@ -30,6 +36,13 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:page_title, "Edit: #{play.title}")
     |> assign(:play, play)
     |> assign(:form, to_form(Catalogue.change_play_form(play)))
+    |> assign(:breadcrumbs, [
+      %{label: "Admin", to: ~p"/admin/plays"},
+      %{label: "Plays", to: ~p"/admin/plays"},
+      %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
+      %{label: "Edit Metadata"}
+    ])
+    |> assign(:play_context, %{play: play, active_tab: :metadata})
   end
 
   @impl true

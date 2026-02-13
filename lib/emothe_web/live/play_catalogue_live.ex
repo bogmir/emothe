@@ -11,7 +11,8 @@ defmodule EmotheWeb.PlayCatalogueLive do
      socket
      |> assign(:page_title, "Play Catalogue")
      |> assign(:plays, plays)
-     |> assign(:search, "")}
+     |> assign(:search, "")
+     |> assign(:breadcrumbs, [%{label: "Catalogue"}])}
   end
 
   @impl true
@@ -24,8 +25,8 @@ defmodule EmotheWeb.PlayCatalogueLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-6xl mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">EMOTHE Digital Library</h1>
-      <p class="text-gray-600 mb-8">
+      <h1 class="text-3xl font-bold text-base-content mb-2">EMOTHE Digital Library</h1>
+      <p class="text-base-content/70 mb-8">
         European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions
       </p>
 
@@ -36,36 +37,33 @@ defmodule EmotheWeb.PlayCatalogueLive do
           value={@search}
           placeholder="Search by title, author, or code..."
           phx-debounce="300"
-          class="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+          class="input input-bordered w-full md:max-w-md"
         />
       </form>
 
-      <div class="grid gap-4">
-        <div
+      <div class="grid gap-3">
+        <.link
           :for={play <- @plays}
-          class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+          navigate={~p"/plays/#{play.code}"}
+          class="block rounded-box border border-base-300 bg-base-100 p-5 hover:shadow-md transition-shadow"
         >
-          <.link navigate={~p"/plays/#{play.code}"} class="block">
-            <div class="flex justify-between items-start">
-              <div>
-                <h2 class="text-xl font-semibold text-gray-900 hover:text-amber-700">
-                  {play.title}
-                </h2>
-                <p :if={play.author_name} class="text-gray-600 mt-1">{play.author_name}</p>
-              </div>
-              <div class="text-right">
-                <span class="inline-block bg-amber-100 text-amber-800 text-sm px-3 py-1 rounded-full">
-                  {play.code}
-                </span>
-                <p :if={play.verse_count} class="text-sm text-gray-500 mt-1">
-                  {play.verse_count} verses
-                </p>
-              </div>
+          <div class="flex justify-between items-start">
+            <div>
+              <h2 class="text-lg font-semibold text-base-content hover:text-primary">
+                {play.title}
+              </h2>
+              <p :if={play.author_name} class="text-sm text-base-content/70 mt-1">{play.author_name}</p>
             </div>
-          </.link>
-        </div>
+            <div class="text-right flex-shrink-0 ml-4">
+              <span class="badge badge-primary badge-outline">{play.code}</span>
+              <p :if={play.verse_count} class="text-xs text-base-content/50 mt-1">
+                {play.verse_count} verses
+              </p>
+            </div>
+          </div>
+        </.link>
 
-        <p :if={@plays == []} class="text-gray-500 text-center py-12">
+        <p :if={@plays == []} class="text-base-content/50 text-center py-12">
           No plays found. Try a different search term.
         </p>
       </div>

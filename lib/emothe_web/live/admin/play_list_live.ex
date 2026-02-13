@@ -11,7 +11,11 @@ defmodule EmotheWeb.Admin.PlayListLive do
      socket
      |> assign(:page_title, "Admin - Plays")
      |> assign(:plays, plays)
-     |> assign(:search, "")}
+     |> assign(:search, "")
+     |> assign(:breadcrumbs, [
+       %{label: "Admin", to: ~p"/admin/plays"},
+       %{label: "Plays"}
+     ])}
   end
 
   @impl true

@@ -153,3 +153,10 @@
 .play-text .verse-line .part-f {
   padding-left: 100px;
 }
+
+/* ScrollSpy active sidebar link */
+a.scroll-spy-active {
+  background-color: oklch(from var(--color-primary) l c h / 0.12);
+  color: var(--color-primary);
+  font-weight: 600;
+}

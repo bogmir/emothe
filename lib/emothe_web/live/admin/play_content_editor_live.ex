@@ -29,7 +29,14 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        modal_parent_id: nil,
        modal_element_type: nil,
        show_preview: false,
-       preview_divisions: []
+       preview_divisions: [],
+       breadcrumbs: [
+         %{label: "Admin", to: ~p"/admin/plays"},
+         %{label: "Plays", to: ~p"/admin/plays"},
+         %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
+         %{label: "Edit Content"}
+       ],
+       play_context: %{play: play, active_tab: :content}
      )}
   end
 
@@ -499,9 +506,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           >
             {if @show_preview, do: "Hide Preview", else: "Show Preview"}
           </button>
-          <.link navigate={~p"/admin/plays/#{@play.id}"} class="btn btn-sm btn-ghost">
-            Back to Detail
-          </.link>
         </div>
       </div>
 

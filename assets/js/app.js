@@ -25,11 +25,53 @@ import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/emothe"
 import topbar from "../vendor/topbar"
 
+// ScrollSpy hook: highlights the sidebar link matching the currently visible section
+const ScrollSpy = {
+  mounted() { this._setup() },
+  updated() { this._setup() },
+  destroyed() { if (this._obs) this._obs.disconnect() },
+  _setup() {
+    if (this._obs) this._obs.disconnect()
+
+    const links = this.el.querySelectorAll("a[href^='#']")
+    const ids = Array.from(links).map(a => a.getAttribute("href").slice(1))
+    const targets = ids.map(id => document.getElementById(id)).filter(Boolean)
+    if (!targets.length) return
+
+    // Track which sections are currently intersecting
+    const visible = new Map()
+
+    this._obs = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          visible.set(e.target.id, e.boundingClientRect.top)
+        } else {
+          visible.delete(e.target.id)
+        }
+      }
+
+      // Pick the topmost visible section
+      let activeId = null
+      let minTop = Infinity
+      for (const [id, top] of visible) {
+        if (top < minTop) { minTop = top; activeId = id }
+      }
+
+      links.forEach(link => {
+        const isActive = link.getAttribute("href").slice(1) === activeId
+        link.classList.toggle("scroll-spy-active", isActive)
+      })
+    }, { rootMargin: "-5% 0px -65% 0px", threshold: 0 })
+
+    targets.forEach(t => this._obs.observe(t))
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {...colocatedHooks, ScrollSpy},
 })
 
 // Show progress bar on live navigation and form submits

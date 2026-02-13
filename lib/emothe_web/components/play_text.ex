@@ -12,7 +12,7 @@ defmodule EmotheWeb.Components.PlayText do
   def play_body(assigns) do
     ~H"""
     <div class="play-text">
-      <div :for={division <- @divisions} class="mb-8" id={"div-#{division.id}"}>
+      <div :for={division <- @divisions} class="mb-8 scroll-mt-16" id={"div-#{division.id}"}>
         <.division_heading division={division} />
 
         <div :if={Map.has_key?(division, :loaded_elements)}>
@@ -23,7 +23,7 @@ defmodule EmotheWeb.Components.PlayText do
           />
         </div>
 
-        <div :for={child <- Map.get(division, :children, [])} class="mb-6" id={"div-#{child.id}"}>
+        <div :for={child <- Map.get(division, :children, [])} class="mb-6 scroll-mt-16" id={"div-#{child.id}"}>
           <.division_heading division={child} />
           <div :if={Map.has_key?(child, :loaded_elements)}>
             <.element_list

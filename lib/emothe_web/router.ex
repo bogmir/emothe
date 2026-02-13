@@ -24,8 +24,11 @@ defmodule EmotheWeb.Router do
     get "/", PageController, :home
 
     # Public play catalogue and presentation
-    live "/plays", PlayCatalogueLive, :index
-    live "/plays/:code", PlayShowLive, :show
+    live_session :public,
+      on_mount: [{EmotheWeb.UserAuth, :mount_current_user}] do
+      live "/plays", PlayCatalogueLive, :index
+      live "/plays/:code", PlayShowLive, :show
+    end
   end
 
   ## Authentication routes
@@ -71,6 +74,7 @@ defmodule EmotheWeb.Router do
     pipe_through [:browser, :require_authenticated_user, :require_admin_user]
 
     live_session :admin,
+      layout: {EmotheWeb.Layouts, :admin},
       on_mount: [{EmotheWeb.UserAuth, :ensure_admin}] do
       live "/plays", PlayListLive, :index
       live "/plays/new", PlayFormLive, :new

@@ -23,8 +23,8 @@ COPY priv priv
 COPY lib lib
 COPY assets assets
 
-RUN mix assets.deploy
 RUN mix compile
+RUN mix assets.deploy
 RUN mix release
 
 FROM debian:bookworm-slim AS app
@@ -32,7 +32,7 @@ FROM debian:bookworm-slim AS app
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
   libstdc++6 \
   openssl \
-  libncurses5 \
+  libncurses6 \
   locales \
   ca-certificates && \
   rm -rf /var/lib/apt/lists/*
@@ -53,4 +53,4 @@ ENV HOME=/app
 ENV PHX_SERVER=true
 EXPOSE 8080
 
-CMD ["/app/bin/server"]
+CMD ["/app/bin/emothe", "start"]

@@ -1,34 +1,40 @@
-app = "emothe"
-primary_region = "mad"
-kill_signal = "SIGTERM"
-kill_timeout = "30s"
+# fly.toml app configuration file generated for emothe on 2026-02-13T23:19:23+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'emothe'
+primary_region = 'cdg'
+kill_signal = 'SIGTERM'
+kill_timeout = '30s'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
+
+[deploy]
+  release_command = '/app/bin/emothe eval Emothe.Release.migrate'
 
 [env]
-  PHX_HOST = "emothe.fly.dev"
-  PHX_SERVER = "true"
-  PORT = "8080"
-  POOL_SIZE = "10"
+  PHX_HOST = 'emothe.fly.dev'
+  PHX_SERVER = 'true'
+  POOL_SIZE = '10'
+  PORT = '8080'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
   [http_service.concurrency]
-    type = "connections"
-    soft_limit = 200
+    type = 'connections'
     hard_limit = 250
+    soft_limit = 200
 
 [[vm]]
-  memory = "512mb"
-  cpu_kind = "shared"
+  memory = '512mb'
+  cpu_kind = 'shared'
   cpus = 1
-
-[deploy]
-  release_command = "/app/bin/emothe eval Emothe.Release.migrate"
+  memory_mb = 512

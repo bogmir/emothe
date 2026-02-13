@@ -11,9 +11,9 @@ defmodule EmotheWeb.PlayShowLiveTest do
     {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
     assert has_element?(view, "#play-sections-panel")
-    assert has_element?(view, "#metadata-sections-nav a[href='#meta-overview']")
-    assert has_element?(view, "#play-sections-nav a[href='#div-#{act.id}']")
-    assert has_element?(view, "#play-sections-nav a[href='#div-#{scene.id}']")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-overview']")
+    assert has_element?(view, "#scroll-spy-nav a[href='#div-#{act.id}']")
+    assert has_element?(view, "#scroll-spy-nav a[href='#div-#{scene.id}']")
   end
 
   test "tab navigation switches visible behavior", %{conn: conn} do
@@ -44,8 +44,8 @@ defmodule EmotheWeb.PlayShowLiveTest do
 
     {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
-    assert has_element?(view, "#metadata-sections-nav a[href='#meta-sources']")
-    assert has_element?(view, "#metadata-sections-nav a[href='#meta-editors']")
-    assert has_element?(view, "#metadata-sections-nav a[href='#meta-note-1']")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-sources']")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-editors']")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-note-1']")
   end
 end

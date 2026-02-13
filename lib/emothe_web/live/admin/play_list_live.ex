@@ -56,7 +56,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
         </div>
       </div>
 
-      <form phx-change="search" class="mb-5">
+      <form phx-change="search" phx-submit="search" class="mb-5">
         <input
           type="text"
           name="search"

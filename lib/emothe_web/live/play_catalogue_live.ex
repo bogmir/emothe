@@ -30,7 +30,7 @@ defmodule EmotheWeb.PlayCatalogueLive do
         European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions
       </p>
 
-      <form phx-change="search" class="mb-8">
+      <form phx-change="search" phx-submit="search" class="mb-8">
         <input
           type="text"
           name="search"

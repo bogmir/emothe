@@ -90,14 +90,20 @@ defmodule EmotheWeb.Router do
     get "/plays/:id/export/pdf", ExportController, :pdf
   end
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
-  if Application.compile_env(:emothe, :dev_routes) do
-    import Phoenix.LiveDashboard.Router
+  # LiveDashboard for admin users (all environments)
+  import Phoenix.LiveDashboard.Router
 
+  scope "/admin" do
+    pipe_through [:browser, :require_authenticated_user, :require_admin_user]
+
+    live_dashboard "/dashboard", metrics: EmotheWeb.Telemetry
+  end
+
+  # Swoosh mailbox preview in development only
+  if Application.compile_env(:emothe, :dev_routes) do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: EmotheWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end

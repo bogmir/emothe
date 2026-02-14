@@ -35,7 +35,7 @@ defmodule EmotheWeb.UserAuth do
     |> renew_session()
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect(to: user_return_to || signed_in_path(conn, user))
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -259,5 +259,17 @@ defmodule EmotheWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/"
+  defp signed_in_path(conn_or_socket, user \\ nil) do
+    current_user =
+      user ||
+        conn_or_socket
+        |> Map.get(:assigns, %{})
+        |> Map.get(:current_user)
+
+    if Accounts.admin?(current_user) do
+      ~p"/admin/plays"
+    else
+      ~p"/"
+    end
+  end
 end

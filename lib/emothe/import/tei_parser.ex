@@ -8,6 +8,7 @@ defmodule Emothe.Import.TeiParser do
 
   alias Emothe.Repo
   alias Emothe.Catalogue
+  alias Emothe.Catalogue.Play
   alias Emothe.PlayContent
 
   require Logger
@@ -133,7 +134,20 @@ defmodule Emothe.Import.TeiParser do
 
     play_attrs = extract_play_attrs(file_desc, encoding_desc)
 
-    {:ok, play} = Catalogue.create_play(play_attrs)
+    play =
+      case Repo.get_by(Play, code: play_attrs.code) do
+        %Play{} = existing_play ->
+          Repo.rollback({:play_already_exists, existing_play.code})
+
+        nil ->
+          case Catalogue.create_play(play_attrs) do
+            {:ok, play} ->
+              play
+
+            {:error, changeset} ->
+              Repo.rollback(changeset)
+          end
+      end
 
     if file_desc do
       import_editors(file_desc, play)

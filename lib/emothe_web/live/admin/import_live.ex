@@ -147,6 +147,7 @@ defmodule EmotheWeb.Admin.ImportLive do
 
   defp format_error(reason) when is_atom(reason), do: to_string(reason)
   defp format_error({:xml_parse_error, detail}), do: "XML parse error: #{inspect(detail)}"
+  defp format_error({:play_already_exists, code}), do: "Play with code #{code} already exists"
   defp format_error(reason), do: inspect(reason)
 
   @impl true

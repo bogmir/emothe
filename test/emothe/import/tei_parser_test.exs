@@ -77,6 +77,16 @@ defmodule Emothe.Import.TeiParserTest do
     assert {:error, {:xml_parse_error, _}} = TeiParser.import_file(path)
   end
 
+  test "import_file/1 returns error when play code already exists" do
+    code = "DUP01"
+    path = write_tei(minimal_tei(title: "Duplicate", code: code))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.code == code
+
+    assert {:error, {:play_already_exists, ^code}} = TeiParser.import_file(path)
+  end
+
   # --- Cast list ---
 
   test "import_file/1 imports characters from cast list" do

@@ -184,9 +184,10 @@ defmodule EmotheWeb.Admin.ImportLive do
                 type="button"
                 phx-click="cancel-upload"
                 phx-value-ref={entry.ref}
-                class="btn btn-xs btn-ghost text-error"
+                class="btn btn-ghost btn-xs text-error tooltip"
+                data-tip="Remove"
               >
-                Remove
+                <.icon name="hero-x-mark-mini" class="size-4" />
               </button>
             </div>
 
@@ -227,8 +228,13 @@ defmodule EmotheWeb.Admin.ImportLive do
                     <span class="badge badge-primary badge-sm">{code}</span>
                   </td>
                   <td>
-                    <.link navigate={~p"/plays/#{code}"} class="btn btn-xs btn-ghost">
-                      View
+                    <.link
+                      href={~p"/plays/#{code}"}
+                      target="_blank"
+                      class="btn btn-ghost btn-xs tooltip"
+                      data-tip="View public page"
+                    >
+                      <.icon name="hero-arrow-top-right-on-square-mini" class="size-4" />
                     </.link>
                   </td>
                 </tr>

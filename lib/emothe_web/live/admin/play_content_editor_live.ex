@@ -535,16 +535,22 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
               <span :if={char.is_hidden} class="badge badge-ghost badge-sm">hidden</span>
             </div>
             <div class="flex gap-1">
-              <button phx-click="edit_character" phx-value-id={char.id} class="btn btn-xs btn-ghost">
-                Edit
+              <button
+                phx-click="edit_character"
+                phx-value-id={char.id}
+                class="btn btn-ghost btn-xs tooltip"
+                data-tip="Edit"
+              >
+                <.icon name="hero-pencil-mini" class="size-4" />
               </button>
               <button
                 phx-click="delete_character"
                 phx-value-id={char.id}
                 data-confirm="Delete this character? Speeches referencing it will lose their speaker."
-                class="btn btn-xs btn-ghost text-error"
+                class="btn btn-ghost btn-xs text-error tooltip"
+                data-tip="Delete"
               >
-                Delete
+                <.icon name="hero-trash-mini" class="size-4" />
               </button>
             </div>
           </div>
@@ -574,16 +580,22 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                 <span class="ml-2 text-sm text-base-content/70">{div.type} {div.number}</span>
               </div>
               <div class="flex gap-1">
-                <button phx-click="edit_division" phx-value-id={div.id} class="btn btn-xs btn-ghost">
-                  Edit
+                <button
+                  phx-click="edit_division"
+                  phx-value-id={div.id}
+                  class="btn btn-ghost btn-xs tooltip"
+                  data-tip="Edit"
+                >
+                  <.icon name="hero-pencil-mini" class="size-4" />
                 </button>
                 <button
                   phx-click="delete_division"
                   phx-value-id={div.id}
                   data-confirm="Delete this division and all its content?"
-                  class="btn btn-xs btn-ghost text-error"
+                  class="btn btn-ghost btn-xs text-error tooltip"
+                  data-tip="Delete"
                 >
-                  Delete
+                  <.icon name="hero-trash-mini" class="size-4" />
                 </button>
               </div>
             </div>
@@ -601,17 +613,19 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   <button
                     phx-click="edit_division"
                     phx-value-id={child.id}
-                    class="btn btn-xs btn-ghost"
+                    class="btn btn-ghost btn-xs tooltip"
+                    data-tip="Edit"
                   >
-                    Edit
+                    <.icon name="hero-pencil-mini" class="size-4" />
                   </button>
                   <button
                     phx-click="delete_division"
                     phx-value-id={child.id}
                     data-confirm="Delete this scene and all its content?"
-                    class="btn btn-xs btn-ghost text-error"
+                    class="btn btn-ghost btn-xs text-error tooltip"
+                    data-tip="Delete"
                   >
-                    Delete
+                    <.icon name="hero-trash-mini" class="size-4" />
                   </button>
                 </div>
               </div>
@@ -798,16 +812,22 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           >
             Insert Above
           </button>
-          <button phx-click="edit_element" phx-value-id={@element.id} class="btn btn-xs btn-ghost">
-            Edit
+          <button
+            phx-click="edit_element"
+            phx-value-id={@element.id}
+            class="btn btn-ghost btn-xs tooltip"
+            data-tip="Edit"
+          >
+            <.icon name="hero-pencil-mini" class="size-4" />
           </button>
           <button
             phx-click="delete_element"
             phx-value-id={@element.id}
             data-confirm="Delete this element and its children?"
-            class="btn btn-xs btn-ghost text-error"
+            class="btn btn-ghost btn-xs text-error tooltip"
+            data-tip="Delete"
           >
-            Delete
+            <.icon name="hero-trash-mini" class="size-4" />
           </button>
         </div>
       </div>

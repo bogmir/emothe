@@ -184,7 +184,7 @@ Then visit:
 - [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs)
 
 ### Medium Priority
-- [ ] **Aside detection** in TEI importer (currently defaults to false)
+- [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
 - [ ] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.)
 - [ ] **Pagination** on catalogue pages for large collections
 - [ ] **Install Typst** for PDF export to work (`cargo install typst-cli` or download binary)

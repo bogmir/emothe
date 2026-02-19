@@ -71,39 +71,54 @@ defmodule EmotheWeb.Admin.PlayListLive do
         <table class="table table-zebra">
           <thead>
             <tr class="text-xs uppercase tracking-wide text-base-content/60">
-              <th>Code</th>
+              <th class="w-28">Code</th>
               <th>Title</th>
-              <th>Author</th>
-              <th>Verses</th>
-              <th>Actions</th>
+              <th class="w-20 text-right">Verses</th>
+              <th class="w-32 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr :for={play <- @plays} class="hover">
-              <td class="font-mono text-sm text-base-content/75">{play.code}</td>
+              <td class="font-mono text-xs text-base-content/60">{play.code}</td>
               <td>
                 <.link
-                  navigate={~p"/admin/plays/#{play.id}/content"}
-                  class="font-medium text-base-content hover:underline"
+                  navigate={~p"/admin/plays/#{play.id}"}
+                  class="font-medium text-base-content hover:text-primary"
                 >
                   {play.title}
                 </.link>
+                <p :if={play.author_name} class="text-xs text-base-content/60 mt-0.5">
+                  {play.author_name}
+                </p>
               </td>
-              <td class="text-sm text-base-content/75">{play.author_name}</td>
-              <td class="text-sm text-base-content/75">{play.verse_count || "-"}</td>
+              <td class="text-sm text-right tabular-nums text-base-content/70">
+                {play.verse_count || "—"}
+              </td>
               <td>
-                <div class="flex items-center gap-3 text-sm">
-                  <.link navigate={~p"/admin/plays/#{play.id}/edit"} class="link link-primary">
-                    Edit
+                <div class="flex items-center justify-end gap-1">
+                  <.link
+                    navigate={~p"/admin/plays/#{play.id}/edit"}
+                    class="btn btn-ghost btn-xs tooltip tooltip-left"
+                    data-tip="Edit metadata"
+                  >
+                    <.icon name="hero-pencil-mini" class="size-4" />
                   </.link>
-                  <.link navigate={~p"/plays/#{play.code}"} class="link link-hover">View</.link>
+                  <.link
+                    href={~p"/plays/#{play.code}"}
+                    target="_blank"
+                    class="btn btn-ghost btn-xs tooltip tooltip-left"
+                    data-tip="View public page"
+                  >
+                    <.icon name="hero-arrow-top-right-on-square-mini" class="size-4" />
+                  </.link>
                   <button
                     phx-click="delete"
                     phx-value-id={play.id}
-                    data-confirm="Are you sure you want to delete this play?"
-                    class="link link-error"
+                    data-confirm="Delete «#{play.title}» and all its content? This cannot be undone."
+                    class="btn btn-ghost btn-xs text-error tooltip tooltip-left"
+                    data-tip="Delete"
                   >
-                    Delete
+                    <.icon name="hero-trash-mini" class="size-4" />
                   </button>
                 </div>
               </td>

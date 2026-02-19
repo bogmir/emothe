@@ -168,7 +168,7 @@ defmodule EmotheWeb.PlayShowLive do
           </div>
 
           <%!-- Tab navigation --%>
-          <nav id="play-tab-nav" class="flex border-b border-base-300 mb-6">
+          <nav id="play-tab-nav" class="flex border-b border-stone-300 mb-6">
             <button
               :for={
                 tab <- [{:text, "Text"}, {:characters, "Characters"}, {:statistics, "Statistics"}]
@@ -178,8 +178,8 @@ defmodule EmotheWeb.PlayShowLive do
               class={[
                 "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer",
                 if(@active_tab == elem(tab, 0),
-                  do: "border-primary text-primary",
-                  else: "border-transparent text-base-content/50 hover:text-primary/70"
+                  do: "border-amber-700 text-amber-800",
+                  else: "border-transparent text-stone-500 hover:text-stone-700"
                 )
               ]}
             >
@@ -234,7 +234,6 @@ defmodule EmotheWeb.PlayShowLive do
 
           <%!-- Statistics tab --%>
           <div :if={@active_tab == :statistics} id="play-tab-statistics">
-            <h2 class="text-lg font-bold mb-4 text-base-content">Play Statistics</h2>
             <.stats_panel statistic={@statistic} play={@play} />
           </div>
         </div>

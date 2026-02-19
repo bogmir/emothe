@@ -53,6 +53,7 @@ defmodule Emothe.Statistics do
     division_to_act = build_division_to_act_map(play_id, acts)
 
     %{
+      "act_label" => act_label(acts),
       "num_acts" => length(acts),
       "scenes" => compute_scenes(play_id, acts),
       "total_verses" => count_by_type(all_elements, "verse_line"),
@@ -67,13 +68,19 @@ defmodule Emothe.Statistics do
     }
   end
 
+  @act_types ~w(acto jornada)
+
   defp list_acts(play_id) do
     Division
-    |> where(play_id: ^play_id, type: "acto")
+    |> where(play_id: ^play_id)
+    |> where([d], d.type in @act_types)
     |> where([d], is_nil(d.parent_id))
     |> order_by(:position)
     |> Repo.all()
   end
+
+  defp act_label([%{type: "jornada"} | _]), do: "Jornada"
+  defp act_label(_), do: "Act"
 
   defp list_all_elements(play_id) do
     Element

@@ -9,13 +9,14 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
   def stats_panel(assigns) do
     data = if assigns.statistic, do: assigns.statistic.data, else: %{}
-    assigns = assign(assigns, :data, data)
+    act_label = data["act_label"] || "Act"
+    assigns = assign(assigns, data: data, act_label: act_label)
 
     ~H"""
     <div :if={@data != %{}} class="space-y-6">
       <%!-- Summary cards --%>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <.stat_card label="Acts" value={@data["num_acts"]} icon="📜" />
+        <.stat_card label={"#{@act_label}s"} value={@data["num_acts"]} icon="📜" />
         <.stat_card label="Scenes" value={get_in(@data, ["scenes", "total"])} icon="🎭" />
         <.stat_card label="Verses" value={@data["total_verses"]} icon="✍️" />
         <.stat_card label="Stage Directions" value={@data["total_stage_directions"]} icon="🎬" />
@@ -23,11 +24,11 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
       <%!-- Scenes per act --%>
       <.bar_chart
-        title="Scenes per Act"
+        title={"Scenes per #{@act_label}"}
         items={get_in(@data, ["scenes", "per_act"]) || []}
         label_key="act"
         value_key="count"
-        label_prefix="Act "
+        label_prefix={"#{@act_label} "}
         color="bg-amber-500"
       />
 
@@ -37,7 +38,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
         items={@data["verse_distribution"] || []}
         label_key="act"
         value_key="count"
-        label_prefix="Act "
+        label_prefix={"#{@act_label} "}
         color="bg-indigo-500"
       />
 
@@ -48,7 +49,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
         items={@data["prose_fragments"] || []}
         label_key="act"
         value_key="count"
-        label_prefix="Act "
+        label_prefix={"#{@act_label} "}
         color="bg-emerald-500"
       />
 

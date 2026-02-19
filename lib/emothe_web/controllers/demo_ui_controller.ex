@@ -3,12 +3,19 @@ defmodule EmotheWeb.DemoUIController do
 
   alias EmotheWeb.Demo.UIDemoData
 
+  defp with_app_layout(conn), do: put_layout(conn, html: {EmotheWeb.Layouts, :app})
+  defp with_admin_layout(conn), do: put_layout(conn, html: {EmotheWeb.Layouts, :admin})
+
   def index(conn, _params) do
-    render(conn, :index, page_title: "UI Demos", breadcrumbs: [%{label: "UI Demos"}])
+    conn
+    |> with_app_layout()
+    |> render(:index, page_title: "UI Demos", breadcrumbs: [%{label: "UI Demos"}])
   end
 
   def public_catalogue(conn, _params) do
-    render(conn, :public_catalogue,
+    conn
+    |> with_app_layout()
+    |> render(:public_catalogue,
       page_title: "Play Catalogue (Demo)",
       breadcrumbs: [%{label: "Catalogue"}],
       plays: UIDemoData.plays_list(),
@@ -17,7 +24,9 @@ defmodule EmotheWeb.DemoUIController do
   end
 
   def public_play(conn, _params) do
-    render(conn, :public_play,
+    conn
+    |> with_app_layout()
+    |> render(:public_play,
       page_title: "Play Show (Demo)",
       breadcrumbs: [
         %{label: "Catalogue", to: "/demo/ui/public/catalogue"},
@@ -46,7 +55,9 @@ defmodule EmotheWeb.DemoUIController do
           conn
       end
 
-    render(conn, :admin_import,
+    conn
+    |> with_admin_layout()
+    |> render(:admin_import,
       page_title: "Import TEI-XML (Demo)",
       breadcrumbs: [
         %{label: "Admin", to: "/demo/ui/admin/plays"},
@@ -58,7 +69,9 @@ defmodule EmotheWeb.DemoUIController do
   end
 
   def admin_plays(conn, _params) do
-    render(conn, :admin_plays,
+    conn
+    |> with_admin_layout()
+    |> render(:admin_plays,
       page_title: "Admin - Plays (Demo)",
       breadcrumbs: [%{label: "Admin", to: "/demo/ui/admin/plays"}, %{label: "Plays"}],
       plays: UIDemoData.plays_list(),
@@ -69,7 +82,9 @@ defmodule EmotheWeb.DemoUIController do
   def admin_play(conn, _params) do
     play = UIDemoData.play()
 
-    render(conn, :admin_play,
+    conn
+    |> with_admin_layout()
+    |> render(:admin_play,
       page_title: "Admin: #{play.title} (Demo)",
       breadcrumbs: [
         %{label: "Admin", to: "/demo/ui/admin/plays"},

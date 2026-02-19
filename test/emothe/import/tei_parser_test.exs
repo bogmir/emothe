@@ -278,6 +278,111 @@ defmodule Emothe.Import.TeiParserTest do
     assert prose.content == "A prose paragraph in the play."
   end
 
+  # --- Asides ---
+
+  test "import_file/1 detects aside verse lines via stage type=delivery" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>ANA</speaker>
+          <lg type="redondilla">
+            <l n="1">Normal verse line</l>
+            <l n="2">
+              <stage type="delivery">[Aparte.]</stage>
+              <seg type="aside">An aside line</seg>
+            </l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+
+    [speech] = Enum.filter(elements, &(&1.type == "speech"))
+    [line_group] = speech.children
+    verse_lines = Enum.sort_by(line_group.children, & &1.line_number)
+
+    assert length(verse_lines) == 2
+    [normal_line, aside_line] = verse_lines
+
+    assert normal_line.is_aside == false
+    assert normal_line.content == "Normal verse line"
+
+    assert aside_line.is_aside == true
+    assert aside_line.content == "An aside line"
+  end
+
+  test "import_file/1 detects aside with variant Aparte notation" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>REY</speaker>
+          <lg type="decima">
+            <l n="1">
+              <stage type="delivery">(Aparte.)</stage>
+              <seg type="aside">Spoken aside</seg>
+            </l>
+            <l n="2">
+              <stage type="delivery">Aparte</stage>
+              <seg type="aside">Another aside</seg>
+            </l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = elements
+    [line_group] = speech.children
+    verse_lines = Enum.sort_by(line_group.children, & &1.line_number)
+
+    assert Enum.all?(verse_lines, & &1.is_aside)
+    assert Enum.map(verse_lines, & &1.content) == ["Spoken aside", "Another aside"]
+  end
+
+  test "import_file/1 does not mark stage-only aparte as verse aside" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <stage>Hablan los dos aparte.</stage>
+        <sp>
+          <speaker>REY</speaker>
+          <lg type="redondilla">
+            <l n="1">A normal line</l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = Enum.filter(elements, &(&1.type == "speech"))
+    [line_group] = speech.children
+    [verse_line] = line_group.children
+
+    assert verse_line.is_aside == false
+    assert verse_line.content == "A normal line"
+  end
+
   # --- Editorial notes ---
 
   test "import_file/1 imports front matter editorial notes" do

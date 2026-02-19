@@ -623,7 +623,7 @@ defmodule Emothe.Import.TeiParser do
   # --- Verse line ---
 
   defp import_verse_line(
-         {_name, attrs, _children} = line,
+         {name, attrs, children},
          play,
          division,
          parent,
@@ -634,7 +634,8 @@ defmodule Emothe.Import.TeiParser do
     line_number = parse_int(attr_value(attrs, "n"))
     part = attr_value(attrs, "part")
     rend = attr_value(attrs, "rend")
-    content = text_content(line)
+    is_aside = aside_delivery?(children)
+    content = verse_line_content({name, attrs, children}, is_aside)
 
     char_id = character_id || parent.character_id
 
@@ -649,9 +650,65 @@ defmodule Emothe.Import.TeiParser do
       line_id: line_id,
       part: part,
       rend: rend,
+      is_aside: is_aside,
       position: pos
     })
   end
+
+  # Returns true if the children of an <l> element contain a delivery stage
+  # direction with "aparte" in its text (e.g. <stage type="delivery">[Aparte.]</stage>).
+  defp aside_delivery?(children) when is_list(children) do
+    Enum.any?(children, fn
+      {"stage", attrs, stage_children} ->
+        attr_value(attrs, "type") == "delivery" and
+          String.match?(
+            text_content({"stage", attrs, stage_children}),
+            ~r/aparte/i
+          )
+
+      _ ->
+        false
+    end)
+  end
+
+  defp aside_delivery?(_), do: false
+
+  # Extracts the spoken content from a verse line element.
+  # For aside lines, prefers <seg type="aside"> children; falls back to
+  # stripping stage direction text if no <seg> is present.
+  defp verse_line_content({_name, _attrs, children}, true) do
+    aside_segs =
+      Enum.filter(children, fn
+        {"seg", attrs, _} -> attr_value(attrs, "type") == "aside"
+        _ -> false
+      end)
+
+    if aside_segs != [] do
+      aside_segs
+      |> Enum.map(&text_content/1)
+      |> Enum.join(" ")
+      |> String.trim()
+    else
+      # No <seg type="aside">: strip the stage direction and use remaining text
+      non_stage =
+        Enum.reject(children, fn
+          {"stage", _, _} -> true
+          _ -> false
+        end)
+
+      non_stage
+      |> Enum.map(fn
+        text when is_binary(text) -> String.trim(text)
+        child when is_tuple(child) -> text_content(child)
+        _ -> ""
+      end)
+      |> Enum.join(" ")
+      |> String.replace(~r/\s+/, " ")
+      |> String.trim()
+    end
+  end
+
+  defp verse_line_content(line, false), do: text_content(line)
 
   # --- Stage direction ---
 

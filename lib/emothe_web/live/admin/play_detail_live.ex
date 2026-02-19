@@ -46,27 +46,30 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
         </div>
         <div class="flex items-center gap-1">
           <span class="text-xs text-base-content/40 mr-1">Export</span>
-          <.link
+          <a
             href={~p"/admin/plays/#{@play.id}/export/tei"}
+            target="_blank"
             class="btn btn-ghost btn-xs tooltip"
             data-tip="Export TEI-XML"
           >
             <.icon name="hero-code-bracket-mini" class="size-4" />
-          </.link>
-          <.link
+          </a>
+          <a
             href={~p"/admin/plays/#{@play.id}/export/html"}
+            target="_blank"
             class="btn btn-ghost btn-xs tooltip"
             data-tip="Export HTML"
           >
             <.icon name="hero-globe-alt-mini" class="size-4" />
-          </.link>
-          <.link
+          </a>
+          <a
             href={~p"/admin/plays/#{@play.id}/export/pdf"}
+            target="_blank"
             class="btn btn-ghost btn-xs tooltip"
             data-tip="Export PDF"
           >
             <.icon name="hero-document-arrow-down-mini" class="size-4" />
-          </.link>
+          </a>
         </div>
       </div>
 

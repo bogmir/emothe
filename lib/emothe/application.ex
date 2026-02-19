@@ -19,6 +19,8 @@ defmodule Emothe.Application do
       {Phoenix.PubSub, name: Emothe.PubSub},
       # Start a worker by calling: Emothe.Worker.start_link(arg)
       # {Emothe.Worker, arg},
+      # PDF generation via headless Chrome
+      ChromicPDF,
       # Start to serve requests, typically the last entry
       EmotheWeb.Endpoint
     ]

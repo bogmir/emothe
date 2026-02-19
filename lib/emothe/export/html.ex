@@ -1,6 +1,7 @@
 defmodule Emothe.Export.Html do
   @moduledoc """
-  Generates a standalone HTML document for a play.
+  Generates a standalone HTML document for a play,
+  styled to match the public play presentation page.
   """
 
   alias Emothe.PlayContent
@@ -18,142 +19,348 @@ defmodule Emothe.Export.Html do
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>#{escape(play.title)} — #{escape(play.author_name || "")}</title>
       <style>
-        body { font-family: Georgia, 'Times New Roman', serif; max-width: 800px; margin: 0 auto; padding: 2rem; color: #333; line-height: 1.6; }
-        h1 { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; }
-        .author { text-align: center; font-size: 1.2rem; color: #666; margin-bottom: 2rem; }
-        .metadata { background: #f9f6f0; border: 1px solid #e5ddd0; padding: 1rem; border-radius: 4px; margin-bottom: 2rem; font-size: 0.9rem; }
-        .act-heading { text-align: center; font-size: 1.5rem; font-weight: bold; margin: 2rem 0 1rem; }
-        .scene-heading { text-align: center; font-size: 1.1rem; font-weight: bold; color: #555; margin: 1.5rem 0 1rem; }
-        .speech { margin-bottom: 1rem; }
-        .speaker { font-weight: bold; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; color: #555; }
-        .verse-line { display: flex; gap: 0.5rem; }
-        .line-number { color: #aaa; font-size: 0.8rem; width: 2.5rem; text-align: right; flex-shrink: 0; user-select: none; }
-        .stage-direction { text-align: center; font-style: italic; color: #777; margin: 0.75rem 2rem; }
-        .cast-list { columns: 2; margin-bottom: 2rem; }
-        .cast-item { break-inside: avoid; margin-bottom: 0.25rem; }
-        .cast-name { font-weight: bold; }
-        .cast-desc { color: #666; font-style: italic; }
-        .indent { padding-left: 3rem; }
-        .part-f { padding-left: 4rem; }
-        .part-m { padding-left: 2rem; }
-        .editorial-note { background: #fffbeb; border: 1px solid #fde68a; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; }
+    #{css()}
       </style>
     </head>
     <body>
-      <h1>#{escape(play.title)}</h1>
-      <p class="author">#{escape(play.author_name || "")}</p>
+      <div class="page">
+        <header class="header">
+          <p class="author">#{escape(play.author_name || "")}</p>
+          <h1 class="title">#{escape(play.title)}</h1>
+    #{render_sources(play.sources)}
+    #{render_editors(play.editors)}
+    #{render_verse_info(play)}
+        </header>
 
-      #{render_metadata(play)}
-      #{render_editorial_notes(play.editorial_notes)}
-      #{render_cast_list(characters)}
-      #{render_divisions(divisions)}
+    #{render_editorial_notes(play.editorial_notes)}
+    #{render_cast_list(characters)}
+
+        <div class="play-text">
+    #{render_divisions(divisions)}
+        </div>
+      </div>
     </body>
     </html>
     """
   end
 
-  defp render_metadata(play) do
-    parts = []
+  defp css do
+    ~s"""
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    parts =
-      if play.pub_place,
-        do: ["<strong>Place:</strong> #{escape(play.pub_place)}" | parts],
-        else: parts
+        body {
+          background-color: #faf5ee;
+          font-family: Verdana, Geneva, sans-serif;
+          line-height: 160%;
+          color: #333;
+        }
 
-    parts =
-      if play.publication_date,
-        do: ["<strong>Date:</strong> #{escape(play.publication_date)}" | parts],
-        else: parts
+        .page {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 2rem 1.5rem;
+        }
 
-    parts =
-      if play.verse_count,
-        do: ["<strong>Verses:</strong> #{play.verse_count}" | parts],
-        else: parts
+        /* Header — matches .play-header on the site */
+        .header {
+          text-align: center;
+          font-family: Georgia, "Times New Roman", Times, serif;
+          border-bottom: 1px solid #ddd;
+          padding-bottom: 1.5rem;
+          margin-bottom: 2rem;
+        }
 
-    sources =
-      play.sources
-      |> Enum.map(fn s -> if s.note, do: "<p><em>#{escape(s.note)}</em></p>", else: "" end)
-      |> Enum.join()
+        .header .author {
+          font-size: 17px;
+          color: #7E7B6A;
+        }
 
-    if parts != [] or sources != "" do
-      "<div class=\"metadata\">#{Enum.join(parts, " | ")}#{sources}</div>"
-    else
-      ""
+        .header .title {
+          font-size: 20px;
+          font-weight: bold;
+          text-transform: uppercase;
+        }
+
+        .header .source-note {
+          margin-top: 1rem;
+          font-size: 0.75rem;
+          color: rgba(51, 51, 51, 0.5);
+          font-style: italic;
+        }
+
+        .header .editors {
+          margin-top: 0.75rem;
+          font-size: 0.75rem;
+          color: rgba(51, 51, 51, 0.5);
+        }
+
+        .header .editors .role {
+          color: rgba(51, 51, 51, 0.35);
+        }
+
+        .header .verse-info {
+          margin-top: 0.5rem;
+          font-size: 0.75rem;
+          color: rgba(51, 51, 51, 0.5);
+        }
+
+        /* Editorial notes */
+        .editorial-note {
+          max-width: 640px;
+          margin: 0 auto 1.5rem;
+          text-align: justify;
+          font-size: 0.875rem;
+          white-space: pre-line;
+        }
+
+        .editorial-note h3 {
+          font-weight: bold;
+          text-align: center;
+          margin-bottom: 0.5rem;
+        }
+
+        /* Cast list */
+        .cast-section {
+          max-width: 640px;
+          margin: 0 auto 2rem;
+        }
+
+        .cast-section h2 {
+          font-weight: 600;
+          text-align: center;
+          margin-bottom: 1rem;
+        }
+
+        .cast-list {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.5rem;
+        }
+
+        .cast-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 0.75rem;
+          background: rgba(255, 255, 255, 0.4);
+          border: 1px solid #ddd;
+          border-radius: 0.5rem;
+        }
+
+        .cast-name { font-weight: 600; }
+        .cast-desc { font-size: 0.875rem; color: rgba(51, 51, 51, 0.5); }
+
+        /* Division headings */
+        .act-heading {
+          font-weight: bold;
+          text-align: center;
+          font-size: 1.125rem;
+          margin: 1.5rem 0;
+        }
+
+        .scene-heading {
+          font-weight: bold;
+          text-align: center;
+          font-size: 0.875rem;
+          margin: 1rem 0;
+        }
+
+        /* Speech blocks */
+        .speech {
+          margin-top: 0.5rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .speech.aside {
+          padding-left: 2rem;
+          border-left: 2px solid #ccc;
+        }
+
+        .speaker {
+          font-weight: bold;
+          font-size: x-small;
+          text-transform: uppercase;
+          color: #333;
+          margin-bottom: 0.125rem;
+        }
+
+        /* Verse lines — content left, line number right */
+        .verse-line {
+          display: flex;
+          align-items: baseline;
+          gap: 0.5rem;
+          margin-left: 1rem;
+        }
+
+        .verse-line .content { flex: 1; }
+        .verse-line .content.indent { padding-left: 2rem; }
+        .verse-line .content.part-m { padding-left: 50px; }
+        .verse-line .content.part-f { padding-left: 100px; }
+
+        .line-number {
+          width: 2rem;
+          text-align: left;
+          flex-shrink: 0;
+          font-size: x-small;
+          color: #999;
+          font-variant-numeric: tabular-nums;
+          user-select: none;
+        }
+
+        /* Stage directions */
+        .stage-direction {
+          text-align: center;
+          font-style: italic;
+          color: #555;
+          margin: 0.75rem 2rem;
+        }
+
+        /* Prose */
+        .prose-block {
+          margin-left: 1rem;
+          margin-bottom: 0.5rem;
+          text-align: justify;
+        }
+
+        .division { margin-bottom: 2rem; }
+        .child-division { margin-bottom: 1.5rem; }
+
+        @media print {
+          body { background: white; }
+          .page { max-width: 100%; padding: 0.5rem 0; }
+          .header { border-bottom-color: #ccc; }
+          .act-heading { page-break-before: always; }
+          .speech { break-inside: avoid; }
+          .verse-line { break-inside: avoid; }
+          .cast-item { break-inside: avoid; }
+        }
+    """
+  end
+
+  defp render_sources(sources) do
+    sources
+    |> Enum.map(fn s ->
+      if s.note,
+        do: "      <p class=\"source-note\">#{escape(s.note)}</p>",
+        else: ""
+    end)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.join("\n")
+  end
+
+  defp render_editors([]), do: ""
+
+  defp render_editors(editors) do
+    items =
+      Enum.map(editors, fn ed ->
+        "        <span>#{escape(ed.person_name)} <span class=\"role\">(#{escape(ed.role)})</span></span>"
+      end)
+      |> Enum.join("\n")
+
+    "      <div class=\"editors\">\n#{items}\n      </div>"
+  end
+
+  defp render_verse_info(play) do
+    cond do
+      play.verse_count && play.is_verse ->
+        "      <p class=\"verse-info\">#{play.verse_count} verses</p>"
+
+      play.verse_count ->
+        "      <p class=\"verse-info\">Prose</p>"
+
+      true ->
+        ""
     end
   end
 
   defp render_editorial_notes(notes) do
     notes
     |> Enum.map(fn note ->
-      heading = if note.heading, do: "<h3>#{escape(note.heading)}</h3>", else: ""
-
-      content =
-        note.content |> String.split("\n\n") |> Enum.map(&"<p>#{escape(&1)}</p>") |> Enum.join()
-
-      "<div class=\"editorial-note\">#{heading}#{content}</div>"
+      heading = if note.heading, do: "      <h3>#{escape(note.heading)}</h3>\n", else: ""
+      "    <div class=\"editorial-note\">\n#{heading}      <div>#{escape(note.content)}</div>\n    </div>"
     end)
-    |> Enum.join()
+    |> Enum.join("\n")
   end
 
   defp render_cast_list([]), do: ""
 
   defp render_cast_list(characters) do
+    visible = Enum.reject(characters, & &1.is_hidden)
+    if visible == [], do: "", else: do_render_cast_list(visible)
+  end
+
+  defp do_render_cast_list(characters) do
     items =
-      characters
-      |> Enum.reject(& &1.is_hidden)
-      |> Enum.map(fn char ->
+      Enum.map(characters, fn char ->
         desc =
           if char.description,
             do: " <span class=\"cast-desc\">#{escape(char.description)}</span>",
             else: ""
 
-        "<div class=\"cast-item\"><span class=\"cast-name\">#{escape(char.name)}</span>#{desc}</div>"
+        "          <div class=\"cast-item\"><span class=\"cast-name\">#{escape(char.name)}</span>#{desc}</div>"
       end)
-      |> Enum.join()
+      |> Enum.join("\n")
 
-    "<h2 style=\"text-align:center\">PERSONAJES</h2><div class=\"cast-list\">#{items}</div>"
+    """
+        <div class="cast-section">
+          <h2>Dramatis Personae</h2>
+          <div class="cast-list">
+    #{items}
+          </div>
+        </div>
+    """
   end
+
+  @act_types ~w(acto act acte jornada)
 
   defp render_divisions(divisions) do
     Enum.map(divisions, fn div ->
-      heading =
-        if div.title do
-          class = if div.type == "acto", do: "act-heading", else: "scene-heading"
-          "<div class=\"#{class}\">#{escape(div.title)}</div>"
-        else
-          ""
-        end
-
-      elements = Map.get(div, :loaded_elements, []) |> Enum.map(&render_element/1) |> Enum.join()
+      heading = division_heading(div)
+      elements = render_elements(Map.get(div, :loaded_elements, []))
 
       children =
         Map.get(div, :children, [])
         |> Enum.map(fn child ->
-          child_heading =
-            if child.title,
-              do: "<div class=\"scene-heading\">#{escape(child.title)}</div>",
-              else: ""
-
-          child_elements =
-            Map.get(child, :loaded_elements, []) |> Enum.map(&render_element/1) |> Enum.join()
-
-          child_heading <> child_elements
+          ch = child_heading(child)
+          ce = render_elements(Map.get(child, :loaded_elements, []))
+          "      <div class=\"child-division\">\n#{ch}#{ce}      </div>"
         end)
-        |> Enum.join()
+        |> Enum.join("\n")
 
-      heading <> elements <> children
+      "    <div class=\"division\">\n#{heading}#{elements}#{children}\n    </div>"
     end)
-    |> Enum.join()
+    |> Enum.join("\n")
+  end
+
+  defp division_heading(%{title: nil}), do: ""
+  defp division_heading(%{title: ""}), do: ""
+
+  defp division_heading(%{title: title, type: type}) when type in @act_types do
+    "      <h2 class=\"act-heading\">#{escape(title)}</h2>\n"
+  end
+
+  defp division_heading(%{title: title}) do
+    "      <h3 class=\"scene-heading\">#{escape(title)}</h3>\n"
+  end
+
+  defp child_heading(%{title: nil}), do: ""
+  defp child_heading(%{title: ""}), do: ""
+  defp child_heading(%{title: title}), do: "        <h3 class=\"scene-heading\">#{escape(title)}</h3>\n"
+
+  defp render_elements(elements) do
+    Enum.map(elements, &render_element/1) |> Enum.join()
   end
 
   defp render_element(%{type: "speech"} = el) do
+    aside_class = if el.is_aside, do: " aside", else: ""
+
     speaker =
       if el.speaker_label,
-        do: "<div class=\"speaker\">#{escape(el.speaker_label)}</div>",
+        do: "        <div class=\"speaker\">#{escape(el.speaker_label)}</div>\n",
         else: ""
 
     children = Map.get(el, :children, []) |> Enum.map(&render_element/1) |> Enum.join()
-    "<div class=\"speech\">#{speaker}#{children}</div>"
+    "      <div class=\"speech#{aside_class}\">\n#{speaker}#{children}      </div>\n"
   end
 
   defp render_element(%{type: "line_group"} = el) do
@@ -161,28 +368,28 @@ defmodule Emothe.Export.Html do
   end
 
   defp render_element(%{type: "verse_line"} = el) do
+    content_class =
+      cond do
+        el.rend == "indent" -> "content indent"
+        el.part == "F" -> "content part-f"
+        el.part == "M" -> "content part-m"
+        true -> "content"
+      end
+
     line_num =
-      if el.line_number && rem(el.line_number, 5) == 0,
+      if el.line_number,
         do: "<span class=\"line-number\">#{el.line_number}</span>",
         else: "<span class=\"line-number\"></span>"
 
-    css_class =
-      cond do
-        el.rend == "indent" -> " indent"
-        el.part == "F" -> " part-f"
-        el.part == "M" -> " part-m"
-        true -> ""
-      end
-
-    "<div class=\"verse-line\">#{line_num}<span class=\"#{css_class}\">#{escape(el.content || "")}</span></div>"
+    "        <div class=\"verse-line\"><span class=\"#{content_class}\">#{escape(el.content || "")}</span>#{line_num}</div>\n"
   end
 
   defp render_element(%{type: "stage_direction"} = el) do
-    "<div class=\"stage-direction\">(#{escape(el.content || "")})</div>"
+    "        <div class=\"stage-direction\">(#{escape(el.content || "")})</div>\n"
   end
 
   defp render_element(%{type: "prose"} = el) do
-    "<p>#{escape(el.content || "")}</p>"
+    "        <div class=\"prose-block\">#{escape(el.content || "")}</div>\n"
   end
 
   defp render_element(_), do: ""

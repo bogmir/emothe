@@ -9,7 +9,7 @@ Web application for managing, cataloguing, and presenting digitized early modern
 - PostgreSQL with UUID primary keys
 - OpenTelemetry (Phoenix, Ecto, Bandit auto-instrumented; stdout exporter in dev)
 - Saxy for TEI-XML parsing, xml_builder for TEI-XML generation
-- Typst CLI for PDF generation
+- ChromicPDF (headless Chrome) for PDF generation
 - Deployment target: Fly.io (later)
 
 ## Project Structure
@@ -41,7 +41,7 @@ lib/
 │   └── export/
 │       ├── tei_xml.ex                # Generate TEI-XML from DB
 │       ├── html.ex                   # Standalone HTML document export
-│       └── pdf.ex                    # PDF via Typst CLI
+│       └── pdf.ex                    # PDF via ChromicPDF (headless Chrome)
 └── emothe_web/
     ├── router.ex
     ├── user_auth.ex                  # Auth plugs & LiveView on_mount hooks
@@ -154,7 +154,7 @@ Then visit:
 - [x] `Emothe.Import.TeiParser` - parses UTF-16 TEI-XML files into DB (handles BOM, encoding detection, full TEI structure mapping)
 - [x] `Emothe.Export.TeiXml` - reconstructs TEI-XML from DB using xml_builder
 - [x] `Emothe.Export.Html` - standalone HTML document with CSS styling
-- [x] `Emothe.Export.Pdf` - PDF generation via Typst CLI
+- [x] `Emothe.Export.Pdf` - PDF generation via ChromicPDF (reuses HTML export)
 - [x] Public catalogue page (`/plays`) with search
 - [x] Public play presentation page (`/plays/:code`) with Text/Characters/Statistics tabs, line number and stage direction toggles
 - [x] Statistics panel with modern cards and CSS bar charts
@@ -187,7 +187,7 @@ Then visit:
 - [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
 - [ ] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.)
 - [ ] **Pagination** on catalogue pages for large collections
-- [ ] **Install Typst** for PDF export to work (`cargo install typst-cli` or download binary)
+- [x] ~~Install Typst~~ PDF export now uses ChromicPDF (requires Chrome/Chromium on the system)
 
 ### Low Priority / Future
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
@@ -203,7 +203,7 @@ Then visit:
 ## Key Decisions
 
 - **TEI Import first**: Primary data entry via XML import, not manual forms
-- **Typst for PDF**: Modern typesetting system, great for scholarly documents
+- **ChromicPDF for PDF**: Reuses the HTML export via headless Chrome, so PDF looks identical to the website
 - **Saxy for XML**: SAX-style streaming parser; uses `Saxy.SimpleForm` to parse into tree
 - **UUID primary keys**: All tables use `binary_id` for eventual distributed deployment
 - **JSONB statistics**: Cached stats stored as a JSON blob, recomputed on demand

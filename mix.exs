@@ -74,6 +74,9 @@ defmodule Emothe.MixProject do
       {:saxy, "~> 1.6"},
       {:xml_builder, "~> 2.3"},
 
+      # PDF generation via headless Chrome
+      {:chromic_pdf, "~> 1.17"},
+
       # OpenTelemetry
       {:opentelemetry, "~> 1.5"},
       {:opentelemetry_api, "~> 1.4"},

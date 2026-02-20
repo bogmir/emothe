@@ -103,10 +103,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   def handle_event("new_character", _, socket) do
     play = socket.assigns.play
-    pos = PlayContent.next_character_position(play.id)
+
+    # Shift all existing characters down to make room at position 0
+    PlayContent.shift_character_positions(play.id)
 
     changeset =
-      PlayContent.change_character(%Character{}, %{play_id: play.id, position: pos})
+      PlayContent.change_character(%Character{}, %{play_id: play.id, position: 0})
 
     {:noreply,
      assign(socket,
@@ -137,6 +139,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      socket
      |> put_flash(:info, gettext("Character deleted."))
      |> reload_characters()}
+  end
+
+  def handle_event("reorder_characters", %{"ids" => ids}, socket) do
+    PlayContent.reorder_characters(socket.assigns.play.id, ids)
+    {:noreply, reload_characters(socket)}
   end
 
   def handle_event("new_division", params, socket) do
@@ -599,33 +606,57 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         </div>
         <div
           :if={@characters != []}
-          class="divide-y rounded-box border border-base-300 bg-base-100 shadow-sm"
+          id="character-list"
+          phx-hook=".DragSortList"
+          class="rounded-box border border-base-300 bg-base-100 shadow-sm"
+          data-event="reorder_characters"
         >
           <div
-            :for={char <- @characters}
-            class="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-base-200/40"
+            :for={{char, idx} <- Enum.with_index(@characters)}
+            data-id={char.id}
+            class="drag-item group flex items-center gap-2 px-3 py-2.5 transition-all hover:bg-base-200/40 border-b border-base-300/60 last:border-b-0"
           >
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                {String.first(char.name)}
-              </div>
-              <div class="min-w-0">
-                <span class="font-medium">{char.name}</span>
-                <span class="ml-2 text-xs text-base-content/40 font-mono">{char.xml_id}</span>
-                <p :if={char.description} class="text-sm text-base-content/60 truncate">
-                  {char.description}
-                </p>
-              </div>
-              <span :if={char.is_hidden} class="badge badge-ghost badge-xs">{gettext("hidden")}</span>
+            <%!-- Drag handle --%>
+            <div class="drag-handle shrink-0 cursor-grab active:cursor-grabbing p-1 -ml-1 rounded text-base-content/25 hover:text-base-content/50 hover:bg-base-200/60 transition-colors">
+              <.icon name="hero-bars-3-mini" class="size-4" />
             </div>
-            <div class="flex gap-1 shrink-0">
+
+            <%!-- Position number --%>
+            <span class="drag-position flex size-6 shrink-0 items-center justify-center rounded-full bg-base-200 text-[10px] font-semibold text-base-content/50 tabular-nums">
+              {idx + 1}
+            </span>
+
+            <%!-- Avatar initial --%>
+            <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+              {String.first(char.name)}
+            </div>
+
+            <%!-- Character info --%>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-sm">{char.name}</span>
+                <span class="text-[10px] text-base-content/35 font-mono">{char.xml_id}</span>
+                <span
+                  :if={char.is_hidden}
+                  class="badge badge-ghost badge-xs text-[10px]"
+                >
+                  {gettext("hidden")}
+                </span>
+              </div>
+              <p :if={char.description} class="text-xs text-base-content/50 truncate">
+                {char.description}
+              </p>
+            </div>
+
+            <%!-- Actions --%>
+            <div class="flex gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 phx-click="edit_character"
                 phx-value-id={char.id}
                 class="btn btn-ghost btn-xs tooltip"
                 data-tip={gettext("Edit")}
               >
-                <.icon name="hero-pencil-mini" class="size-4" />
+                <.icon name="hero-pencil-mini" class="size-3.5" />
               </button>
               <button
                 phx-click="delete_character"
@@ -636,12 +667,154 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                 class="btn btn-ghost btn-xs text-error tooltip"
                 data-tip={gettext("Delete")}
               >
-                <.icon name="hero-trash-mini" class="size-4" />
+                <.icon name="hero-trash-mini" class="size-3.5" />
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".DragSortList">
+        export default {
+          mounted() {
+            this.dragEl = null
+            this.placeholder = null
+            this.eventName = this.el.dataset.event
+            this.bindItems()
+          },
+
+          updated() {
+            this.bindItems()
+          },
+
+          bindItems() {
+            this.el.querySelectorAll(".drag-item").forEach(item => {
+              if (!item._dragBound) {
+                this.setupItem(item)
+                item._dragBound = true
+              }
+            })
+          },
+
+          setupItem(item) {
+            const handle = item.querySelector(".drag-handle")
+            if (!handle) return
+
+            handle.addEventListener("mousedown", (e) => {
+              e.preventDefault()
+              this.startDrag(item, e.clientY)
+            })
+
+            handle.addEventListener("touchstart", (e) => {
+              e.preventDefault()
+              this.startDrag(item, e.touches[0].clientY)
+            }, { passive: false })
+          },
+
+          startDrag(item, startY) {
+            this.dragEl = item
+            const rect = item.getBoundingClientRect()
+            const containerRect = this.el.getBoundingClientRect()
+
+            // Create placeholder
+            this.placeholder = document.createElement("div")
+            this.placeholder.className = "border-2 border-dashed border-primary/30 rounded bg-primary/5 transition-all"
+            this.placeholder.style.height = rect.height + "px"
+            item.parentNode.insertBefore(this.placeholder, item)
+
+            // Style dragged element
+            item.style.position = "fixed"
+            item.style.zIndex = "50"
+            item.style.width = rect.width + "px"
+            item.style.left = rect.left + "px"
+            item.style.top = rect.top + "px"
+            item.style.boxShadow = "0 8px 25px -5px rgba(0,0,0,0.15), 0 4px 10px -6px rgba(0,0,0,0.1)"
+            item.style.opacity = "0.95"
+            item.style.borderRadius = "0.5rem"
+            item.style.background = "var(--color-base-100)"
+            item.style.transition = "box-shadow 0.2s, opacity 0.2s"
+            item.classList.add("ring-2", "ring-primary/30")
+
+            this.offsetY = startY - rect.top
+
+            this.moveHandler = (e) => {
+              const clientY = e.touches ? e.touches[0].clientY : e.clientY
+              this.onDragMove(clientY)
+            }
+            this.upHandler = () => this.endDrag()
+
+            document.addEventListener("mousemove", this.moveHandler)
+            document.addEventListener("mouseup", this.upHandler)
+            document.addEventListener("touchmove", this.moveHandler, { passive: false })
+            document.addEventListener("touchend", this.upHandler)
+          },
+
+          onDragMove(clientY) {
+            if (!this.dragEl) return
+            this.dragEl.style.top = (clientY - this.offsetY) + "px"
+
+            // find the item we're hovering over
+            const items = [...this.el.querySelectorAll(".drag-item")].filter(el => el !== this.dragEl)
+            let after = null
+            for (const item of items) {
+              const box = item.getBoundingClientRect()
+              const midY = box.top + box.height / 2
+              if (clientY < midY) { after = item; break }
+            }
+
+            if (after) {
+              this.el.insertBefore(this.placeholder, after)
+            } else {
+              this.el.appendChild(this.placeholder)
+            }
+          },
+
+          endDrag() {
+            if (!this.dragEl) return
+
+            document.removeEventListener("mousemove", this.moveHandler)
+            document.removeEventListener("mouseup", this.upHandler)
+            document.removeEventListener("touchmove", this.moveHandler)
+            document.removeEventListener("touchend", this.upHandler)
+
+            // Insert the real element where the placeholder is
+            this.el.insertBefore(this.dragEl, this.placeholder)
+            this.placeholder.remove()
+
+            // Reset styles
+            this.dragEl.style.position = ""
+            this.dragEl.style.zIndex = ""
+            this.dragEl.style.width = ""
+            this.dragEl.style.left = ""
+            this.dragEl.style.top = ""
+            this.dragEl.style.boxShadow = ""
+            this.dragEl.style.opacity = ""
+            this.dragEl.style.borderRadius = ""
+            this.dragEl.style.background = ""
+            this.dragEl.style.transition = ""
+            this.dragEl.classList.remove("ring-2", "ring-primary/30")
+
+            // Update position numbers
+            this.el.querySelectorAll(".drag-item").forEach((item, i) => {
+              const posEl = item.querySelector(".drag-position")
+              if (posEl) posEl.textContent = i + 1
+            })
+
+            // Collect new order and push to server
+            const ids = [...this.el.querySelectorAll(".drag-item")].map(el => el.dataset.id)
+            this.pushEvent(this.eventName, { ids })
+
+            // Brief highlight animation
+            this.dragEl.style.transition = "background-color 0.3s"
+            this.dragEl.style.backgroundColor = "oklch(from var(--color-primary) l c h / 0.08)"
+            setTimeout(() => {
+              if (this.dragEl) this.dragEl.style.backgroundColor = ""
+            }, 400)
+
+            this.dragEl = null
+          }
+        }
+      </script>
 
       <%!-- Tab: Structure --%>
       <div :if={@editor_tab == :structure} class="animate-in fade-in">

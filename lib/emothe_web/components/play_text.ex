@@ -42,7 +42,7 @@ defmodule EmotheWeb.Components.PlayText do
     """
   end
 
-  @act_types ~w(acto act acte jornada)
+  @act_types ~w(acto act acte jornada play)
 
   attr :division, :map, required: true
 
@@ -52,13 +52,13 @@ defmodule EmotheWeb.Components.PlayText do
     ~H"""
     <h2
       :if={@division.title && @is_act}
-      class="font-bold text-center my-6 text-lg tracking-wide text-base-content"
+      class="font-bold text-center my-6 text-lg uppercase tracking-wide text-base-content"
     >
       {@division.title}
     </h2>
     <h3
       :if={@division.title && !@is_act}
-      class="font-semibold text-center my-4 text-sm text-base-content/70"
+      class="font-semibold text-center my-4 text-xs uppercase tracking-widest text-base-content/60"
     >
       {@division.title}
     </h3>

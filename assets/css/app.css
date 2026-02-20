@@ -160,3 +160,19 @@ a.scroll-spy-active {
   color: var(--color-primary);
   font-weight: 600;
 }
+
+/* Tab panel animations */
+.animate-in {
+  animation: animate-in-keyframes 0.15s ease-out;
+}
+
+@keyframes animate-in-keyframes {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -50,6 +50,26 @@ defmodule Emothe.Catalogue do
     Repo.delete(play)
   end
 
+  @doc "Recomputes and updates play.verse_count from the actual verse_line elements."
+  def update_verse_count(play_id) do
+    alias Emothe.PlayContent.Element
+
+    # Count distinct line numbers rather than raw elements,
+    # because split verses (shared lines between characters) share the same number
+    count =
+      Element
+      |> where(play_id: ^play_id)
+      |> where(type: "verse_line")
+      |> where([e], not is_nil(e.line_number))
+      |> select([e], count(e.line_number, :distinct))
+      |> Repo.one()
+
+    Play
+    |> Repo.get!(play_id)
+    |> Ecto.Changeset.change(%{verse_count: count})
+    |> Repo.update()
+  end
+
   def change_play(%Play{} = play, attrs \\ %{}) do
     Play.changeset(play, attrs)
   end

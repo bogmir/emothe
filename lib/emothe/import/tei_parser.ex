@@ -123,6 +123,10 @@ defmodule Emothe.Import.TeiParser do
       import_text(text, play)
     end
 
+    # Recompute verse_count from actual verse_line elements (the TEI header
+    # <extent> value is often inaccurate or includes non-verse lines)
+    Emothe.Catalogue.update_verse_count(play.id)
+
     play
   end
 

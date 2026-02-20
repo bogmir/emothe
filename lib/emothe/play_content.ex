@@ -2,11 +2,31 @@ defmodule Emothe.PlayContent do
   @moduledoc """
   The PlayContent context manages the structured content of plays:
   characters, divisions (acts/scenes), and elements (speeches, verses, stage directions).
+
+  Broadcasts `{:play_content_changed, play_id}` via PubSub whenever
+  content is mutated, so all subscribed LiveViews can react.
   """
 
   import Ecto.Query
   alias Emothe.Repo
   alias Emothe.PlayContent.{Character, Division, Element}
+
+  @pubsub Emothe.PubSub
+
+  @doc "Subscribe the calling process to content-change events for this play."
+  def subscribe(play_id) do
+    Phoenix.PubSub.subscribe(@pubsub, topic(play_id))
+  end
+
+  @doc "Broadcast that a play's content has changed (stats, verse count, etc.)."
+  def broadcast_content_changed(play_id) do
+    # Recompute verse count in the DB before broadcasting
+    Emothe.Catalogue.update_verse_count(play_id)
+    Emothe.Statistics.delete_statistics(play_id)
+    Phoenix.PubSub.broadcast(@pubsub, topic(play_id), {:play_content_changed, play_id})
+  end
+
+  defp topic(play_id), do: "play_content:#{play_id}"
 
   # --- Characters ---
 

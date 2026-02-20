@@ -35,3 +35,4 @@ emothe-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/test/fixtures/tei_files/

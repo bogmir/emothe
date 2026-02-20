@@ -2,9 +2,18 @@ defmodule EmotheWeb.Admin.PlayListLive do
   use EmotheWeb, :live_view
 
   alias Emothe.Catalogue
+  alias Emothe.PlayContent
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      # Subscribe to all plays — we use a wildcard-like approach:
+      # subscribe once per play currently visible.
+      for play <- Catalogue.list_plays() do
+        PlayContent.subscribe(play.id)
+      end
+    end
+
     plays = Catalogue.list_plays()
 
     {:ok,
@@ -27,6 +36,13 @@ defmodule EmotheWeb.Admin.PlayListLive do
   def handle_event("delete", %{"id" => id}, socket) do
     play = Catalogue.get_play!(id)
     {:ok, _} = Catalogue.delete_play(play)
+    plays = Catalogue.list_plays(search: socket.assigns.search)
+    {:noreply, assign(socket, plays: plays)}
+  end
+
+  @impl true
+  def handle_info({:play_content_changed, _play_id}, socket) do
+    # Re-fetch plays to pick up updated verse_count
     plays = Catalogue.list_plays(search: socket.assigns.search)
     {:noreply, assign(socket, plays: plays)}
   end

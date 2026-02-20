@@ -6,11 +6,15 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   alias Emothe.Catalogue
   alias Emothe.PlayContent
   alias Emothe.PlayContent.{Character, Division, Element}
-  alias Emothe.Statistics
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     play = Catalogue.get_play!(id)
+
+    if connected?(socket) do
+      PlayContent.subscribe(play.id)
+    end
+
     characters = PlayContent.list_characters(play.id)
     divisions = PlayContent.list_top_divisions(play.id)
 
@@ -28,8 +32,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        editing: nil,
        modal_parent_id: nil,
        modal_element_type: nil,
-       show_preview: false,
        preview_divisions: [],
+       editor_tab: :characters,
        breadcrumbs: [
          %{label: "Admin", to: ~p"/admin/plays"},
          %{label: "Plays", to: ~p"/admin/plays"},
@@ -47,15 +51,25 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:noreply, assign(socket, modal: nil, form: nil, editing: nil)}
   end
 
-  def handle_event("toggle_preview", _, socket) do
-    show = !socket.assigns.show_preview
+  def handle_event("switch_tab", %{"tab" => tab}, socket) do
+    tab = String.to_existing_atom(tab)
 
     socket =
-      if show do
-        preview = PlayContent.load_play_content(socket.assigns.play.id)
-        assign(socket, show_preview: true, preview_divisions: preview)
-      else
-        assign(socket, show_preview: false, preview_divisions: [])
+      case tab do
+        :preview ->
+          preview = PlayContent.load_play_content(socket.assigns.play.id)
+          scroll_target = preview_scroll_target(socket.assigns)
+
+          socket
+          |> assign(editor_tab: :preview, preview_divisions: preview)
+          |> then(fn s ->
+            if scroll_target,
+              do: push_event(s, "scroll-to-preview", %{target: scroll_target}),
+              else: s
+          end)
+
+        _ ->
+          assign(socket, editor_tab: tab)
       end
 
     {:noreply, socket}
@@ -117,7 +131,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("delete_character", %{"id" => id}, socket) do
     character = PlayContent.get_character!(id)
     {:ok, _} = PlayContent.delete_character(character)
-    Statistics.delete_statistics(socket.assigns.play.id)
+    PlayContent.broadcast_content_changed(socket.assigns.play.id)
 
     {:noreply,
      socket
@@ -164,7 +178,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("delete_division", %{"id" => id}, socket) do
     division = PlayContent.get_division!(id)
     {:ok, _} = PlayContent.delete_division(division)
-    Statistics.delete_statistics(socket.assigns.play.id)
+    PlayContent.broadcast_content_changed(socket.assigns.play.id)
 
     selected =
       if socket.assigns.selected_division_id == id,
@@ -182,7 +196,21 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("select_division", %{"id" => id}, socket) do
     {:noreply,
      socket
-     |> assign(selected_division_id: id)
+     |> assign(selected_division_id: id, editor_tab: :content)
+     |> reload_elements()}
+  end
+
+  def handle_event("select_division_auto", %{"id" => id}, socket) do
+    # If the selected division is an act with children, auto-select its first scene
+    target_id =
+      case find_division(socket.assigns.divisions, id) do
+        %{children: [first_child | _]} -> first_child.id
+        _ -> id
+      end
+
+    {:noreply,
+     socket
+     |> assign(selected_division_id: target_id, editor_tab: :content)
      |> reload_elements()}
   end
 
@@ -280,7 +308,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       PlayContent.shift_line_numbers_down(play_id, element.line_number)
     end
 
-    Statistics.delete_statistics(play_id)
+    PlayContent.broadcast_content_changed(play_id)
 
     {:noreply,
      socket
@@ -306,7 +334,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     case result do
       {:ok, _} ->
-        Statistics.delete_statistics(play.id)
+        PlayContent.broadcast_content_changed(play.id)
 
         {:noreply,
          socket
@@ -339,7 +367,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     case result do
       {:ok, _} ->
-        Statistics.delete_statistics(play.id)
+        PlayContent.broadcast_content_changed(play.id)
 
         {:noreply,
          socket
@@ -387,7 +415,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     case result do
       {:ok, _} ->
-        Statistics.delete_statistics(play.id)
+        PlayContent.broadcast_content_changed(play.id)
 
         {:noreply,
          socket
@@ -398,6 +426,21 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       {:error, changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  # --- PubSub handler ---
+
+  @impl true
+  def handle_info({:play_content_changed, _play_id}, socket) do
+    # Refresh the play record (for updated verse_count) and reload visible data
+    play = Catalogue.get_play!(socket.assigns.play.id)
+
+    {:noreply,
+     socket
+     |> assign(:play, play)
+     |> reload_characters()
+     |> reload_divisions()
+     |> reload_elements()}
   end
 
   # --- Reload helpers ---
@@ -421,7 +464,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   end
 
   defp reload_preview(socket) do
-    if socket.assigns.show_preview do
+    if socket.assigns.editor_tab == :preview do
       assign(socket, preview_divisions: PlayContent.load_play_content(socket.assigns.play.id))
     else
       socket
@@ -435,6 +478,16 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   defp editing_label(nil), do: "Add"
   defp editing_label(_), do: "Edit"
+
+  defp find_division(divisions, id) do
+    Enum.find_value(divisions, fn div ->
+      if div.id == id do
+        div
+      else
+        Enum.find(div.children || [], &(&1.id == id))
+      end
+    end)
+  end
 
   defp maybe_add_line_number(attrs, "verse_line", play_id) do
     parent_id = attrs[:parent_id] || attrs["parent_id"]
@@ -492,49 +545,82 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-7xl px-4 py-8">
-      <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 class="text-3xl font-semibold tracking-tight text-base-content">
-            Edit Content: {@play.title}
-          </h1>
-          <p class="mt-1 text-sm text-base-content/70">{@play.author_name} — {@play.code}</p>
-        </div>
-        <div class="flex gap-2">
-          <button
-            phx-click="toggle_preview"
-            class={"btn btn-sm #{if @show_preview, do: "btn-secondary", else: "btn-ghost"}"}
-          >
-            {if @show_preview, do: "Hide Preview", else: "Show Preview"}
-          </button>
-        </div>
+      <%!-- Header --%>
+      <div class="mb-6">
+        <h1 class="text-3xl font-semibold tracking-tight text-base-content">
+          Edit Content: {@play.title}
+        </h1>
+        <p class="mt-1 text-sm text-base-content/70">{@play.author_name} — {@play.code}</p>
       </div>
 
-      <%!-- Characters Section --%>
-      <section class="mb-8">
-        <div class="mb-3 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-base-content">Characters ({length(@characters)})</h2>
-          <button phx-click="new_character" class="btn btn-xs btn-primary">Add Character</button>
+      <%!-- Tab Bar --%>
+      <div class="border-b border-base-300 mb-6">
+        <nav class="-mb-px flex gap-1" aria-label="Editor tabs">
+          <.tab_button
+            tab={:characters}
+            active={@editor_tab}
+            icon="hero-user-group-mini"
+            count={length(@characters)}
+          />
+          <.tab_button
+            tab={:structure}
+            active={@editor_tab}
+            icon="hero-bars-3-bottom-left-mini"
+            count={length(@divisions)}
+          />
+          <.tab_button
+            tab={:content}
+            active={@editor_tab}
+            icon="hero-document-text-mini"
+            badge={
+              if @selected_division_id,
+                do: selected_division_short_label(@divisions, @selected_division_id)
+            }
+          />
+          <.tab_button tab={:preview} active={@editor_tab} icon="hero-eye-mini" />
+        </nav>
+      </div>
+
+      <%!-- Tab: Characters --%>
+      <div :if={@editor_tab == :characters} class="animate-in fade-in">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-base-content">
+            Dramatis Personae
+            <span class="text-base-content/50 font-normal">({length(@characters)})</span>
+          </h2>
+          <button phx-click="new_character" class="btn btn-sm btn-primary gap-1">
+            <.icon name="hero-plus-mini" class="size-4" /> Add Character
+          </button>
         </div>
         <div
           :if={@characters == []}
-          class="rounded-box border border-base-300 bg-base-100 p-4 text-sm text-base-content/70"
+          class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
         >
-          No characters yet. Add one to get started.
+          <.icon name="hero-user-group" class="mx-auto mb-2 size-8 text-base-content/30" />
+          <p>No characters yet. Add one to get started.</p>
         </div>
         <div
           :if={@characters != []}
           class="divide-y rounded-box border border-base-300 bg-base-100 shadow-sm"
         >
-          <div :for={char <- @characters} class="flex items-center justify-between gap-3 p-3">
-            <div class="flex items-center gap-3">
-              <span class="font-medium">{char.name}</span>
-              <span class="text-xs text-base-content/50">{char.xml_id}</span>
-              <span :if={char.description} class="text-sm text-base-content/70">
-                {char.description}
-              </span>
-              <span :if={char.is_hidden} class="badge badge-ghost badge-sm">hidden</span>
+          <div
+            :for={char <- @characters}
+            class="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-base-200/40"
+          >
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                {String.first(char.name)}
+              </div>
+              <div class="min-w-0">
+                <span class="font-medium">{char.name}</span>
+                <span class="ml-2 text-xs text-base-content/40 font-mono">{char.xml_id}</span>
+                <p :if={char.description} class="text-sm text-base-content/60 truncate">
+                  {char.description}
+                </p>
+              </div>
+              <span :if={char.is_hidden} class="badge badge-ghost badge-xs">hidden</span>
             </div>
-            <div class="flex gap-1">
+            <div class="flex gap-1 shrink-0">
               <button
                 phx-click="edit_character"
                 phx-value-id={char.id}
@@ -555,38 +641,52 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <%!-- Divisions Section --%>
-      <section class="mb-8">
-        <div class="mb-3 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-base-content">Structure</h2>
-          <button phx-click="new_division" class="btn btn-xs btn-primary">Add Act</button>
+      <%!-- Tab: Structure --%>
+      <div :if={@editor_tab == :structure} class="animate-in fade-in">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-base-content">
+            Play Structure
+            <span class="text-base-content/50 font-normal">({length(@divisions)} acts)</span>
+          </h2>
+          <button phx-click="new_division" class="btn btn-sm btn-primary gap-1">
+            <.icon name="hero-plus-mini" class="size-4" /> Add Act
+          </button>
         </div>
         <div
           :if={@divisions == []}
-          class="rounded-box border border-base-300 bg-base-100 p-4 text-sm text-base-content/70"
+          class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
         >
-          No acts or scenes yet. Add an act to get started.
+          <.icon name="hero-bars-3-bottom-left" class="mx-auto mb-2 size-8 text-base-content/30" />
+          <p>No acts or scenes yet. Add an act to get started.</p>
         </div>
-        <div :if={@divisions != []} class="space-y-2">
+        <div :if={@divisions != []} class="space-y-3">
           <div
             :for={div <- @divisions}
-            class="rounded-box border border-base-300 bg-base-100 shadow-sm"
+            class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden"
           >
-            <div class="flex items-center justify-between p-3">
-              <div>
-                <span class="font-medium">{div.title || String.capitalize(div.type)}</span>
-                <span class="ml-2 text-sm text-base-content/70">{div.type} {div.number}</span>
+            <div class="flex items-center justify-between px-4 py-3 bg-base-200/30">
+              <div class="flex items-center gap-2">
+                <.icon name="hero-folder-mini" class="size-4 text-base-content/40" />
+                <span class="font-semibold">{div.title || String.capitalize(div.type)}</span>
+                <span class="text-sm text-base-content/50">{div.type} {div.number}</span>
               </div>
-              <div class="flex gap-1">
+              <div class="flex items-center gap-1">
+                <button
+                  phx-click="select_division_auto"
+                  phx-value-id={div.id}
+                  class="btn btn-xs btn-ghost btn-outline gap-1"
+                >
+                  <.icon name="hero-pencil-square-mini" class="size-3" /> Edit Content
+                </button>
                 <button
                   phx-click="edit_division"
                   phx-value-id={div.id}
                   class="btn btn-ghost btn-xs tooltip"
-                  data-tip="Edit"
+                  data-tip="Edit metadata"
                 >
-                  <.icon name="hero-pencil-mini" class="size-4" />
+                  <.icon name="hero-cog-6-tooth-mini" class="size-4" />
                 </button>
                 <button
                   phx-click="delete_division"
@@ -600,23 +700,39 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
               </div>
             </div>
             <%!-- Child divisions (scenes) --%>
-            <div :if={div.children != []} class="border-t border-base-300 bg-base-200/50 px-3 py-2">
-              <div :for={child <- div.children} class="flex items-center justify-between py-1 pl-4">
+            <div :if={div.children != []} class="divide-y divide-base-300/50">
+              <div
+                :for={child <- div.children}
+                class="flex items-center justify-between px-4 py-2 pl-8 transition-colors hover:bg-base-200/30"
+              >
                 <button
                   phx-click="select_division"
                   phx-value-id={child.id}
-                  class={"text-sm hover:underline #{if @selected_division_id == child.id, do: "font-bold text-primary", else: "text-base-content/80"}"}
+                  class={[
+                    "flex items-center gap-2 text-sm transition-colors",
+                    if(@selected_division_id == child.id,
+                      do: "font-bold text-primary",
+                      else: "text-base-content/70 hover:text-base-content"
+                    )
+                  ]}
                 >
+                  <.icon name="hero-document-mini" class="size-3.5" />
                   {child.title || String.capitalize(child.type)} {child.number}
+                  <span
+                    :if={@selected_division_id == child.id}
+                    class="badge badge-primary badge-xs ml-1"
+                  >
+                    editing
+                  </span>
                 </button>
                 <div class="flex gap-1">
                   <button
                     phx-click="edit_division"
                     phx-value-id={child.id}
                     class="btn btn-ghost btn-xs tooltip"
-                    data-tip="Edit"
+                    data-tip="Edit metadata"
                   >
-                    <.icon name="hero-pencil-mini" class="size-4" />
+                    <.icon name="hero-cog-6-tooth-mini" class="size-4" />
                   </button>
                   <button
                     phx-click="delete_division"
@@ -630,73 +746,152 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                 </div>
               </div>
             </div>
-            <div class="border-t border-base-300 px-3 py-2">
+            <div class="border-t border-base-300 px-4 py-2 bg-base-200/20">
               <button
                 phx-click="new_division"
                 phx-value-parent-id={div.id}
-                class="btn btn-xs btn-ghost btn-outline"
+                class="btn btn-xs btn-ghost gap-1"
               >
-                Add Scene
-              </button>
-              <%!-- Allow selecting the act itself for content --%>
-              <button
-                phx-click="select_division"
-                phx-value-id={div.id}
-                class={"btn btn-xs btn-ghost #{if @selected_division_id == div.id, do: "btn-active"}"}
-              >
-                Edit Act Content
+                <.icon name="hero-plus-mini" class="size-3" /> Add Scene
               </button>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <%!-- Elements Section (for selected division) --%>
-      <section :if={@selected_division_id} class="mb-8">
-        <div class="mb-3 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-base-content">
-            Content for: {selected_division_label(@divisions, @selected_division_id)}
-          </h2>
-          <div class="flex gap-1">
-            <button phx-click="new_element" phx-value-type="speech" class="btn btn-xs btn-primary">
-              Add Speech
-            </button>
-            <button
-              phx-click="new_element"
-              phx-value-type="stage_direction"
-              class="btn btn-xs btn-outline"
-            >
-              Add Stage Direction
-            </button>
-            <button phx-click="new_element" phx-value-type="prose" class="btn btn-xs btn-outline">
-              Add Prose
-            </button>
+      <%!-- Tab: Content --%>
+      <div :if={@editor_tab == :content} class="animate-in fade-in">
+        <%!-- No division selected --%>
+        <div
+          :if={!@selected_division_id}
+          class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-12 text-center"
+        >
+          <.icon name="hero-cursor-arrow-rays" class="mx-auto mb-3 size-10 text-base-content/30" />
+          <p class="text-base-content/60 mb-3">
+            Select a scene or act from the Structure tab to edit its content.
+          </p>
+          <button
+            phx-click="switch_tab"
+            phx-value-tab="structure"
+            class="btn btn-sm btn-outline gap-1"
+          >
+            <.icon name="hero-bars-3-bottom-left-mini" class="size-4" /> Go to Structure
+          </button>
+        </div>
+
+        <%!-- Division selected --%>
+        <div :if={@selected_division_id}>
+          <%!-- Content header with division selector --%>
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <div
+                :if={parent_division_label(@divisions, @selected_division_id)}
+                class="flex items-center gap-1.5 text-sm text-base-content/50"
+              >
+                <.icon name="hero-folder-mini" class="size-3.5" />
+                <span>{parent_division_label(@divisions, @selected_division_id)}</span>
+                <.icon name="hero-chevron-right-mini" class="size-3" />
+              </div>
+              <div class="flex items-center gap-3">
+                <h2 class="text-lg font-semibold text-base-content">
+                  {current_division_label(@divisions, @selected_division_id)}
+                </h2>
+                <%!-- Quick division navigation --%>
+                <div class="flex gap-1">
+                  <button
+                    :if={prev_division_id(@divisions, @selected_division_id)}
+                    phx-click="select_division"
+                    phx-value-id={prev_division_id(@divisions, @selected_division_id)}
+                    class="btn btn-ghost btn-xs tooltip"
+                    data-tip="Previous"
+                  >
+                    <.icon name="hero-chevron-left-mini" class="size-4" />
+                  </button>
+                  <button
+                    :if={next_division_id(@divisions, @selected_division_id)}
+                    phx-click="select_division"
+                    phx-value-id={next_division_id(@divisions, @selected_division_id)}
+                    class="btn btn-ghost btn-xs tooltip"
+                    data-tip="Next"
+                  >
+                    <.icon name="hero-chevron-right-mini" class="size-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-1">
+              <button
+                phx-click="new_element"
+                phx-value-type="speech"
+                class="btn btn-xs btn-primary gap-1"
+              >
+                <.icon name="hero-plus-mini" class="size-3" /> Speech
+              </button>
+              <button
+                phx-click="new_element"
+                phx-value-type="stage_direction"
+                class="btn btn-xs btn-outline gap-1"
+              >
+                <.icon name="hero-plus-mini" class="size-3" /> Stage Dir.
+              </button>
+              <button
+                phx-click="new_element"
+                phx-value-type="prose"
+                class="btn btn-xs btn-outline gap-1"
+              >
+                <.icon name="hero-plus-mini" class="size-3" /> Prose
+              </button>
+            </div>
+          </div>
+
+          <div
+            :if={@elements == []}
+            class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
+          >
+            <.icon name="hero-document-text" class="mx-auto mb-2 size-8 text-base-content/30" />
+            <p>No content yet. Add a speech, stage direction, or prose.</p>
+          </div>
+          <div :if={@elements != []} class="space-y-2">
+            <.element_card
+              :for={element <- @elements}
+              element={element}
+              characters={@characters}
+              depth={0}
+            />
           </div>
         </div>
-        <div
-          :if={@elements == []}
-          class="rounded-box border border-base-300 bg-base-100 p-4 text-sm text-base-content/70"
-        >
-          No content yet. Add a speech, stage direction, or prose to get started.
-        </div>
-        <div :if={@elements != []} class="space-y-2">
-          <.element_card
-            :for={element <- @elements}
-            element={element}
-            characters={@characters}
-            depth={0}
-          />
-        </div>
-      </section>
+      </div>
 
-      <%!-- Play Text Preview --%>
-      <section :if={@show_preview} class="mb-8">
-        <div class="mb-3">
+      <%!-- Tab: Preview --%>
+      <div :if={@editor_tab == :preview} class="animate-in fade-in">
+        <div class="mb-4">
           <h2 class="text-lg font-semibold text-base-content">Play Text Preview</h2>
         </div>
-        <div class="rounded-box border border-base-300 bg-base-100 p-6 shadow-sm max-h-[600px] overflow-y-auto">
-          <div :if={@preview_divisions == []} class="text-sm text-base-content/70">
-            No content to preview yet.
+        <div
+          id="preview-scroll-container"
+          phx-hook=".PreviewScroll"
+          class="rounded-box border border-base-300 bg-base-100 p-6 shadow-sm max-h-[70vh] overflow-y-auto"
+        >
+          <script :type={Phoenix.LiveView.ColocatedHook} name=".PreviewScroll">
+            export default {
+              mounted() {
+                this.handleEvent("scroll-to-preview", ({target}) => {
+                  // Wait for LiveView DOM patch to complete
+                  setTimeout(() => {
+                    const el = document.getElementById(target)
+                    if (el) {
+                      const container = this.el
+                      const elTop = el.offsetTop - container.offsetTop
+                      container.scrollTo({top: elTop, behavior: "smooth"})
+                    }
+                  }, 100)
+                })
+              }
+            }
+          </script>
+          <div :if={@preview_divisions == []} class="text-center py-8 text-base-content/60">
+            <.icon name="hero-document" class="mx-auto mb-2 size-8 text-base-content/30" />
+            <p>No content to preview yet.</p>
           </div>
           <.play_body
             :if={@preview_divisions != []}
@@ -705,7 +900,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             show_stage_directions={true}
           />
         </div>
-      </section>
+      </div>
 
       <%!-- Modal --%>
       <.modal :if={@modal} id="content-modal" on_cancel={JS.push("close_modal")}>
@@ -721,18 +916,103 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     """
   end
 
-  defp selected_division_label(divisions, id) do
+  defp parent_division_label(divisions, id) do
+    Enum.find_value(divisions, nil, fn div ->
+      Enum.find_value(div.children || [], nil, fn child ->
+        if child.id == id do
+          div.title || "#{String.capitalize(div.type)} #{div.number}"
+        end
+      end)
+    end)
+  end
+
+  defp current_division_label(divisions, id) do
     Enum.find_value(divisions, "Unknown", fn div ->
       if div.id == id do
         div.title || "#{String.capitalize(div.type)} #{div.number}"
       else
         Enum.find_value(div.children || [], nil, fn child ->
           if child.id == id do
-            "#{div.title || String.capitalize(div.type)} #{div.number} > #{child.title || String.capitalize(child.type)} #{child.number}"
+            child.title || "#{String.capitalize(child.type)} #{child.number}"
           end
         end)
       end
     end)
+  end
+
+  defp selected_division_short_label(divisions, id) do
+    # Show the parent act label when a scene is selected, otherwise the division itself
+    Enum.find_value(divisions, nil, fn div ->
+      if div.id == id do
+        String.slice(div.title || "#{String.capitalize(div.type)} #{div.number}", 0..15)
+      else
+        Enum.find_value(div.children || [], nil, fn child ->
+          if child.id == id do
+            String.slice(div.title || "#{String.capitalize(div.type)} #{div.number}", 0..15)
+          end
+        end)
+      end
+    end)
+  end
+
+  defp all_leaf_divisions(divisions) do
+    Enum.flat_map(divisions, fn div ->
+      case div.children do
+        [] -> [div.id]
+        children -> Enum.map(children, & &1.id)
+      end
+    end)
+  end
+
+  defp prev_division_id(divisions, current_id) do
+    leaves = all_leaf_divisions(divisions)
+    idx = Enum.find_index(leaves, &(&1 == current_id))
+
+    if idx && idx > 0, do: Enum.at(leaves, idx - 1)
+  end
+
+  defp next_division_id(divisions, current_id) do
+    leaves = all_leaf_divisions(divisions)
+    idx = Enum.find_index(leaves, &(&1 == current_id))
+
+    if idx && idx < length(leaves) - 1, do: Enum.at(leaves, idx + 1)
+  end
+
+  defp preview_scroll_target(assigns) do
+    case assigns.selected_division_id do
+      nil -> nil
+      id -> "div-#{id}"
+    end
+  end
+
+  # --- Tab button component ---
+
+  attr :tab, :atom, required: true
+  attr :active, :atom, required: true
+  attr :icon, :string, required: true
+  attr :count, :integer, default: nil
+  attr :badge, :string, default: nil
+
+  defp tab_button(assigns) do
+    ~H"""
+    <button
+      phx-click="switch_tab"
+      phx-value-tab={@tab}
+      class={[
+        "flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors",
+        if(@active == @tab,
+          do: "border-primary text-primary",
+          else:
+            "border-transparent text-base-content/60 hover:text-base-content hover:border-base-300"
+        )
+      ]}
+    >
+      <.icon name={@icon} class="size-4" />
+      <span class="capitalize">{@tab}</span>
+      <span :if={@count} class="badge badge-sm badge-ghost">{@count}</span>
+      <span :if={@badge} class="badge badge-sm badge-primary">{@badge}</span>
+    </button>
+    """
   end
 
   # --- Element card component (recursive) ---

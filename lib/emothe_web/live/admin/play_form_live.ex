@@ -131,14 +131,10 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label class="label"><span class="label-text font-medium">Language</span></label>
             <.input field={@form[:language]} type="select" options={language_options()} />
-          </div>
-          <div>
-            <label class="label"><span class="label-text font-medium">Verse Count</span></label>
-            <.input field={@form[:verse_count]} type="number" min="0" />
           </div>
           <div>
             <label class="label"><span class="label-text font-medium">Attribution</span></label>

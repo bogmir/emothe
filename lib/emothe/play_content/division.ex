@@ -29,6 +29,7 @@ defmodule Emothe.PlayContent.Division do
       acto escena prologo argumento dedicatoria elenco front jornada introduccion_editor
       act scene prologue epilogue
       acte scene prologue epilogue
+      play circunstancia_accion introduccion_editor_digital nota_edicion_digital head_title
     ))
   end
 end

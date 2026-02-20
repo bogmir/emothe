@@ -466,7 +466,7 @@ defmodule Emothe.Import.TeiParser do
     end)
     |> Enum.with_index(start_pos)
     |> Enum.each(fn {{_name, attrs, act_children}, pos} ->
-      type = attr_value(attrs, "type") || "acto"
+      type = (attr_value(attrs, "type") || "acto") |> String.downcase()
       number = parse_int(attr_value(attrs, "n"))
       heading = safe_text(find_child(act_children, "head"))
 
@@ -493,6 +493,7 @@ defmodule Emothe.Import.TeiParser do
 
         {"div2", attrs, scene_children}, {el_pos, scene_pos} ->
           # Scene subdivision
+          scene_type = (attr_value(attrs, "type") || "escena") |> String.downcase()
           number = parse_int(attr_value(attrs, "n"))
           heading = safe_text(find_child(scene_children, "head"))
 
@@ -500,7 +501,7 @@ defmodule Emothe.Import.TeiParser do
             PlayContent.create_division(%{
               play_id: play.id,
               parent_id: act_div.id,
-              type: "escena",
+              type: scene_type,
               number: number,
               title: heading,
               position: scene_pos
@@ -655,8 +656,9 @@ defmodule Emothe.Import.TeiParser do
     })
   end
 
-  # Returns true if the children of an <l> element contain a delivery stage
-  # direction with "aparte" in its text (e.g. <stage type="delivery">[Aparte.]</stage>).
+  # Returns true if the children of an <l> element indicate an aside, either via:
+  # - <stage type="delivery">[Aparte.]</stage>
+  # - <seg type="aside">...</seg>
   defp aside_delivery?(children) when is_list(children) do
     Enum.any?(children, fn
       {"stage", attrs, stage_children} ->
@@ -665,6 +667,9 @@ defmodule Emothe.Import.TeiParser do
             text_content({"stage", attrs, stage_children}),
             ~r/aparte/i
           )
+
+      {"seg", attrs, _} ->
+        attr_value(attrs, "type") == "aside"
 
       _ ->
         false
@@ -727,8 +732,9 @@ defmodule Emothe.Import.TeiParser do
 
   # --- Prose ---
 
-  defp import_prose({_name, _attrs, _children} = para, play, division, speech, pos) do
-    content = text_content(para)
+  defp import_prose({_name, _attrs, children} = para, play, division, speech, pos) do
+    is_aside = aside_in_children?(children)
+    content = if is_aside, do: prose_aside_content(children), else: text_content(para)
 
     PlayContent.create_element(%{
       play_id: play.id,
@@ -737,8 +743,31 @@ defmodule Emothe.Import.TeiParser do
       character_id: speech.character_id,
       type: "prose",
       content: content,
+      is_aside: is_aside,
       position: pos
     })
+  end
+
+  # Check if children contain a <seg type="aside"> element
+  defp aside_in_children?(children) when is_list(children) do
+    Enum.any?(children, fn
+      {"seg", attrs, _} -> attr_value(attrs, "type") == "aside"
+      _ -> false
+    end)
+  end
+
+  defp aside_in_children?(_), do: false
+
+  # Extract aside content from prose children, preferring <seg type="aside"> text
+  defp prose_aside_content(children) do
+    children
+    |> Enum.filter(fn
+      {"seg", attrs, _} -> attr_value(attrs, "type") == "aside"
+      _ -> false
+    end)
+    |> Enum.map(&text_content/1)
+    |> Enum.join(" ")
+    |> String.trim()
   end
 
   # --- Character resolution ---

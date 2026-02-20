@@ -33,10 +33,28 @@ defmodule Emothe.PlayContent do
   def create_character_unless_exists(attrs) do
     play_id = attrs[:play_id] || attrs["play_id"]
     xml_id = attrs[:xml_id] || attrs["xml_id"]
+    name = attrs[:name] || attrs["name"]
 
     case find_character_by_xml_id(play_id, xml_id) do
-      nil -> create_character(attrs)
-      existing -> {:ok, existing}
+      nil ->
+        create_character(attrs)
+
+      %Character{name: existing_name} = existing when existing_name == name ->
+        {:ok, existing}
+
+      _different_name ->
+        # Same xml_id but different name — generate a unique suffix
+        unique_id = generate_unique_xml_id(play_id, xml_id, 2)
+        create_character(Map.put(attrs, :xml_id, unique_id))
+    end
+  end
+
+  defp generate_unique_xml_id(play_id, base_id, n) do
+    candidate = "#{base_id}_#{n}"
+
+    case find_character_by_xml_id(play_id, candidate) do
+      nil -> candidate
+      _ -> generate_unique_xml_id(play_id, base_id, n + 1)
     end
   end
 

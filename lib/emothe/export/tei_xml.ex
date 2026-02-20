@@ -6,6 +6,8 @@ defmodule Emothe.Export.TeiXml do
   alias Emothe.PlayContent
   import XmlBuilder
 
+  @body_types ~w(acto jornada prologo argumento act acte play prologue epilogue)
+
   def generate(play) do
     play = Emothe.Repo.preload(play, [:editors, :sources, :editorial_notes])
     characters = PlayContent.list_characters(play.id)
@@ -21,7 +23,8 @@ defmodule Emothe.Export.TeiXml do
         ]
       )
 
-    XmlBuilder.generate(tei, format: :indent, encoding: nil)
+    "<?xml version=\"1.0\" ?>\n" <>
+      XmlBuilder.generate(tei, format: :indent, encoding: nil)
   end
 
   # --- Header ---
@@ -126,12 +129,12 @@ defmodule Emothe.Export.TeiXml do
 
     children =
       if play.publisher,
-        do: [element(:publisher, element(:orgName, play.publisher)) | children],
+        do: [element(:publisher, [element(:orgName, play.publisher)]) | children],
         else: children
 
     children =
       if play.availability_note,
-        do: children ++ [element(:availability, element(:p, play.availability_note))],
+        do: children ++ [element(:availability, [element(:p, play.availability_note)])],
         else: children
 
     element(:publicationStmt, children)
@@ -160,12 +163,12 @@ defmodule Emothe.Export.TeiXml do
 
     children =
       if play.project_description,
-        do: children ++ [element(:projectDesc, element(:p, play.project_description))],
+        do: children ++ [element(:projectDesc, [element(:p, play.project_description)])],
         else: children
 
     children =
       if play.editorial_declaration,
-        do: children ++ [element(:editorialDecl, element(:p, play.editorial_declaration))],
+        do: children ++ [element(:editorialDecl, [element(:p, play.editorial_declaration)])],
         else: children
 
     element(:encodingDesc, if(children == [], do: [element(:p, "")], else: children))
@@ -174,19 +177,16 @@ defmodule Emothe.Export.TeiXml do
   # --- Text ---
 
   defp build_text(play, characters, divisions) do
-    front_divisions =
-      Enum.filter(divisions, fn d -> d.type in ["elenco", "front", "dedicatoria"] end)
-
-    body_divisions = Enum.filter(divisions, fn d -> d.type == "acto" end)
+    body_divisions = Enum.filter(divisions, fn d -> d.type in @body_types end)
 
     element(:text, [
-      build_front(play, characters, front_divisions),
+      build_front(play, characters),
       build_body(body_divisions),
       element(:back)
     ])
   end
 
-  defp build_front(play, characters, _front_divisions) do
+  defp build_front(play, characters) do
     title_page =
       element(
         :titlePage,
@@ -197,19 +197,19 @@ defmodule Emothe.Export.TeiXml do
         |> Enum.reject(&is_nil/1)
       )
 
-    # Editorial notes as front divs
+    # Editorial notes as front divs with their stored section_type
     note_divs =
       play.editorial_notes
+      |> Enum.sort_by(& &1.position)
       |> Enum.map(fn note ->
-        children = []
-        children = if note.heading, do: [element(:head, note.heading) | children], else: children
+        head = if note.heading, do: [element(:head, note.heading)], else: []
 
         paragraphs =
           note.content
           |> String.split("\n\n")
           |> Enum.map(&element(:p, &1))
 
-        element(:div, %{type: note.section_type}, children ++ paragraphs)
+        element(:div, %{type: note.section_type}, head ++ paragraphs)
       end)
 
     # Cast list
@@ -238,39 +238,43 @@ defmodule Emothe.Export.TeiXml do
     element(:front, [title_page] ++ note_divs ++ cast_list)
   end
 
-  defp build_body(act_divisions) do
-    acts =
-      Enum.map(act_divisions, fn act ->
-        attrs = %{type: "acto"}
-        attrs = if act.number, do: Map.put(attrs, :n, to_string(act.number)), else: attrs
+  defp build_body(body_divisions) do
+    divs =
+      Enum.map(body_divisions, fn div ->
+        attrs = %{type: div.type}
+        attrs = if div.number, do: Map.put(attrs, :n, to_string(div.number)), else: attrs
 
-        children = if act.title, do: [element(:head, act.title)], else: []
+        children = if div.title, do: [element(:head, div.title)], else: []
 
-        # Add elements from the act
-        elements = Map.get(act, :loaded_elements, [])
-        element_xml = Enum.map(elements, &build_element/1)
+        # Add elements from the division
+        elements = Map.get(div, :loaded_elements, [])
+        element_xml = Enum.map(elements, &build_element/1) |> Enum.reject(&is_nil/1)
 
-        # Add scene sub-divisions
-        scene_children =
-          Map.get(act, :children, [])
-          |> Enum.flat_map(fn scene ->
-            scene_attrs = %{type: "escena"}
+        # Add sub-divisions (scenes, etc.)
+        sub_divs =
+          Map.get(div, :children, [])
+          |> Enum.map(fn child ->
+            child_attrs = %{type: child.type}
 
-            scene_attrs =
-              if scene.number,
-                do: Map.put(scene_attrs, :n, to_string(scene.number)),
-                else: scene_attrs
+            child_attrs =
+              if child.number,
+                do: Map.put(child_attrs, :n, to_string(child.number)),
+                else: child_attrs
 
-            scene_head = if scene.title, do: [element(:head, scene.title)], else: []
-            scene_elements = Map.get(scene, :loaded_elements, []) |> Enum.map(&build_element/1)
+            child_head = if child.title, do: [element(:head, child.title)], else: []
 
-            [element(:div2, scene_attrs, scene_head ++ scene_elements)]
+            child_elements =
+              Map.get(child, :loaded_elements, [])
+              |> Enum.map(&build_element/1)
+              |> Enum.reject(&is_nil/1)
+
+            element(:div2, child_attrs, child_head ++ child_elements)
           end)
 
-        element(:div1, attrs, children ++ element_xml ++ scene_children)
+        element(:div1, attrs, children ++ element_xml ++ sub_divs)
       end)
 
-    element(:body, acts)
+    element(:body, divs)
   end
 
   defp build_element(%{type: "speech"} = el) do
@@ -282,6 +286,7 @@ defmodule Emothe.Export.TeiXml do
     child_elements =
       Map.get(el, :children, [])
       |> Enum.map(&build_element/1)
+      |> Enum.reject(&is_nil/1)
 
     attrs = if el.character, do: %{who: "##{el.character.xml_id}"}, else: %{}
     element(:sp, attrs, children ++ child_elements)
@@ -292,7 +297,7 @@ defmodule Emothe.Export.TeiXml do
     attrs = if el.verse_type, do: Map.put(attrs, :type, el.verse_type), else: attrs
     attrs = if el.part, do: Map.put(attrs, :part, el.part), else: attrs
 
-    lines = Map.get(el, :children, []) |> Enum.map(&build_element/1)
+    lines = Map.get(el, :children, []) |> Enum.map(&build_element/1) |> Enum.reject(&is_nil/1)
     element(:lg, attrs, lines)
   end
 
@@ -308,7 +313,14 @@ defmodule Emothe.Export.TeiXml do
     attrs = if el.part, do: Map.put(attrs, :part, el.part), else: attrs
     attrs = if el.rend, do: Map.put(attrs, :rend, el.rend), else: attrs
 
-    element(:l, attrs, el.content || "")
+    content =
+      if el.is_aside do
+        [element(:seg, %{type: "aside"}, el.content || "")]
+      else
+        el.content || ""
+      end
+
+    element(:l, attrs, content)
   end
 
   defp build_element(%{type: "stage_direction"} = el) do
@@ -316,7 +328,14 @@ defmodule Emothe.Export.TeiXml do
   end
 
   defp build_element(%{type: "prose"} = el) do
-    element(:p, el.content || "")
+    content =
+      if el.is_aside do
+        [element(:seg, %{type: "aside"}, el.content || "")]
+      else
+        el.content || ""
+      end
+
+    element(:p, content)
   end
 
   defp build_element(_), do: nil

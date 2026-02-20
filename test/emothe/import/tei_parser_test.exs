@@ -145,10 +145,13 @@ defmodule Emothe.Import.TeiParserTest do
     assert {:ok, play} = TeiParser.import_file(path)
 
     characters = PlayContent.list_characters(play.id)
-    assert length(characters) == 2
+    assert length(characters) == 3
 
     hero = Enum.find(characters, &(&1.xml_id == "HERO"))
     assert hero.name == "Hero Original"
+
+    hero_dup = Enum.find(characters, &(&1.xml_id == "HERO_2"))
+    assert hero_dup.name == "Hero Duplicate"
   end
 
   # --- Body structure (acts, scenes, speeches, verses) ---

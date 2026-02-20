@@ -111,44 +111,83 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Title")} *</span></label>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Title")} *</span>
+            </label>
             <.input field={@form[:title]} type="text" required />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Code")} *</span></label>
-            <.input field={@form[:code]} type="text" required placeholder={gettext("e.g. AL0569")} />
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Original Title")}</span>
+            </label>
+            <.input
+              field={@form[:original_title]}
+              type="text"
+              placeholder={gettext("Title in original language")}
+            />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Author Name")}</span></label>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Code")} *</span>
+            </label>
+            <.input field={@form[:code]} type="text" required placeholder={gettext("e.g. AL0569")} />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("EMOTHE ID")}</span>
+            </label>
+            <.input field={@form[:emothe_id]} type="text" placeholder={gettext("e.g. 0703")} />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Author Name")}</span>
+            </label>
             <.input field={@form[:author_name]} type="text" />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Author (sort)")}</span></label>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Author (sort)")}</span>
+            </label>
             <.input field={@form[:author_sort]} type="text" placeholder={gettext("Surname, Name")} />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Language")}</span></label>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Language")}</span>
+            </label>
             <.input field={@form[:language]} type="select" options={language_options()} />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Attribution")}</span></label>
-            <.input field={@form[:author_attribution]} type="text" placeholder={gettext("fiable, dudosa...")} />
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Attribution")}</span>
+            </label>
+            <.input
+              field={@form[:author_attribution]}
+              type="text"
+              placeholder={gettext("fiable, dudosa...")}
+            />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Publication Place")}</span></label>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Publication Place")}</span>
+            </label>
             <.input field={@form[:pub_place]} type="text" />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">{gettext("Publication Date")}</span></label>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Publication Date")}</span>
+            </label>
             <.input
               field={@form[:publication_date]}
               type="text"
@@ -158,10 +197,86 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           </div>
         </div>
 
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Publisher")}</span>
+            </label>
+            <.input field={@form[:publisher]} type="text" />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Authority")}</span>
+            </label>
+            <.input
+              field={@form[:authority]}
+              type="text"
+              placeholder={gettext("Institutional authority")}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="label">
+            <span class="label-text font-medium">{gettext("Availability Note")}</span>
+          </label>
+          <.input
+            field={@form[:availability_note]}
+            type="textarea"
+            placeholder={gettext("Usage terms and citation info")}
+          />
+        </div>
+
         <div class="rounded-box bg-base-200 px-3 py-2">
           <label class="flex items-center gap-2 text-sm text-base-content/85">
             <.input field={@form[:is_verse]} type="checkbox" /> {gettext("Verse play")}
           </label>
+        </div>
+
+        <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-base-content/60">
+            {gettext("Funding & Licence")}
+          </h3>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Sponsor")}</span>
+            </label>
+            <.input
+              field={@form[:sponsor]}
+              type="text"
+              placeholder={gettext("Sponsoring organization")}
+            />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Funder")}</span>
+            </label>
+            <.input
+              field={@form[:funder]}
+              type="textarea"
+              placeholder={gettext("Funding organization(s) and grant references")}
+            />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Licence URL")}</span>
+            </label>
+            <.input
+              field={@form[:licence_url]}
+              type="text"
+              placeholder="https://creativecommons.org/licenses/..."
+            />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Licence Text")}</span>
+            </label>
+            <.input
+              field={@form[:licence_text]}
+              type="text"
+              placeholder={gettext("e.g. CC BY-NC-ND 4.0")}
+            />
+          </div>
         </div>
 
         <div class="flex flex-wrap gap-2 border-t border-base-300 pt-4">

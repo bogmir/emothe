@@ -277,6 +277,7 @@ defmodule Emothe.Export.Html do
     notes
     |> Enum.map(fn note ->
       heading = if note.heading, do: "      <h3>#{escape(note.heading)}</h3>\n", else: ""
+
       "    <div class=\"editorial-note\">\n#{heading}      <div>#{escape(note.content)}</div>\n    </div>"
     end)
     |> Enum.join("\n")
@@ -345,7 +346,9 @@ defmodule Emothe.Export.Html do
 
   defp child_heading(%{title: nil}), do: ""
   defp child_heading(%{title: ""}), do: ""
-  defp child_heading(%{title: title}), do: "        <h3 class=\"scene-heading\">#{escape(title)}</h3>\n"
+
+  defp child_heading(%{title: title}),
+    do: "        <h3 class=\"scene-heading\">#{escape(title)}</h3>\n"
 
   defp render_elements(elements) do
     Enum.map(elements, &render_element/1) |> Enum.join()

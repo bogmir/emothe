@@ -132,6 +132,9 @@ defmodule EmotheWeb.PlayShowLive do
           >
             <h2 class="play-author">{@play.author_name}</h2>
             <h1 class="play-title font-bold">{@play.title}</h1>
+            <p :if={@play.original_title} class="mt-1 text-sm italic text-base-content/50">
+              {@play.original_title}
+            </p>
 
             <%!-- Source info --%>
             <div :if={@play.sources != []} id="meta-sources" class="scroll-mt-20">
@@ -148,12 +151,27 @@ defmodule EmotheWeb.PlayShowLive do
             >
               <span :for={editor <- @play.editors} class="text-xs text-base-content/50">
                 {editor.person_name}
-                <span class="text-base-content/35">({editor.role})</span>
+                <span class="text-base-content/35">({role_label(editor.role)})</span>
               </span>
             </div>
 
             <p :if={@play.verse_count} class="mt-2 text-xs text-base-content/50">
-              {if @play.is_verse, do: "#{@play.verse_count} #{gettext("verses")}", else: gettext("Prose")}
+              {if @play.is_verse,
+                do: "#{@play.verse_count} #{gettext("verses")}",
+                else: gettext("Prose")}
+            </p>
+            <p :if={@play.licence_url || @play.licence_text} class="mt-1 text-xs text-base-content/40">
+              <%= if @play.licence_url do %>
+                <a
+                  href={@play.licence_url}
+                  target="_blank"
+                  class="hover:text-primary transition-colors"
+                >
+                  {@play.licence_text || @play.licence_url}
+                </a>
+              <% else %>
+                {@play.licence_text}
+              <% end %>
             </p>
           </header>
 
@@ -171,7 +189,11 @@ defmodule EmotheWeb.PlayShowLive do
           <nav id="play-tab-nav" class="flex border-b border-stone-300 mb-6">
             <button
               :for={
-                tab <- [{:text, gettext("Text")}, {:characters, gettext("Characters")}, {:statistics, gettext("Statistics")}]
+                tab <- [
+                  {:text, gettext("Text")},
+                  {:characters, gettext("Characters")},
+                  {:statistics, gettext("Statistics")}
+                ]
               }
               phx-click="switch_tab"
               phx-value-tab={elem(tab, 0)}
@@ -292,4 +314,12 @@ defmodule EmotheWeb.PlayShowLive do
 
     current ++ children
   end
+
+  defp role_label("principal"), do: gettext("Principal investigator")
+  defp role_label("translator"), do: gettext("Translator")
+  defp role_label("researcher"), do: gettext("Researcher")
+  defp role_label("editor"), do: gettext("Editor")
+  defp role_label("digital_editor"), do: gettext("Digital editor")
+  defp role_label("reviewer"), do: gettext("Reviewer")
+  defp role_label(role), do: role
 end

@@ -408,6 +408,129 @@ defmodule Emothe.Import.TeiParserTest do
     assert note.content =~ "Con todo respeto"
   end
 
+  # --- Extended metadata ---
+
+  defp rich_tei(opts) do
+    code = Keyword.get(opts, :code, "RICH#{System.unique_integer([:positive])}")
+    front = Keyword.get(opts, :front, "")
+    body = Keyword.get(opts, :body, "")
+
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title type="traduccion">Ricardo III</title>
+            <title type="original">The Tragedy of Richard III</title>
+            <editor role="translator"><persName>Sanderson, John D.</persName></editor>
+            <author ana="fiable">William Shakespeare</author>
+            <sponsor><orgName>Plan Nacional de I+D+i</orgName></sponsor>
+            <funder><orgName>Ministerio de Ciencia e Innovación</orgName></funder>
+            <respStmt>
+              <resp>Electronic edition</resp>
+              <persName>Amelang, David J.</persName>
+            </respStmt>
+            <principal>Joan Oleza Simó</principal>
+          </titleStmt>
+          <publicationStmt>
+            <publisher><orgName>ARTELOPE/EMOTHE, Universitat de València</orgName></publisher>
+            <authority><orgName>Universitat de València - Estudi General</orgName></authority>
+            <idno>#{code}</idno>
+            <idno type="EMOTHE">0703</idno>
+            <availability>
+              <p>Some general availability text.</p>
+              <licence target="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">CC BY-NC-ND 4.0</licence>
+            </availability>
+            <pubPlace>Valencia</pubPlace>
+            <date>2023</date>
+          </publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>La tragedia del rey Ricardo III</title>
+              <author>Shakespeare, William</author>
+              <editor role="traductor">Sanderson, John D.</editor>
+              <lang>Español</lang>
+              <note>Notas de la fuente.</note>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text>
+        <front>#{front}</front>
+        <body>#{body}</body>
+      </text>
+    </TEI>
+    """
+  end
+
+  test "import_file/1 extracts original_title from <title type=\"original\">" do
+    path = write_tei(rich_tei(code: "ORIG01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.original_title == "The Tragedy of Richard III"
+  end
+
+  test "import_file/1 imports translator role editor from titleStmt" do
+    path = write_tei(rich_tei(code: "TRANS01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    translator = Enum.find(play_full.editors, &(&1.role == "translator"))
+    assert translator != nil
+    assert translator.person_name =~ "Sanderson"
+  end
+
+  test "import_file/1 extracts emothe_id from <idno type=\"EMOTHE\">" do
+    path = write_tei(rich_tei(code: "IDNO01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.emothe_id == "0703"
+  end
+
+  test "import_file/1 extracts licence_url from <licence target>" do
+    path = write_tei(rich_tei(code: "LIC01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.licence_url == "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es"
+  end
+
+  test "import_file/1 extracts licence_text from <licence> text content" do
+    path = write_tei(rich_tei(code: "LIC02"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.licence_text == "CC BY-NC-ND 4.0"
+  end
+
+  test "import_file/1 extracts source language from <bibl><lang>" do
+    path = write_tei(rich_tei(code: "LANG01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.language == "Español"
+  end
+
+  test "import_file/1 extracts sponsor from <sponsor><orgName>" do
+    path = write_tei(rich_tei(code: "SPON01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.sponsor == "Plan Nacional de I+D+i"
+  end
+
+  test "import_file/1 extracts funder from <funder><orgName>" do
+    path = write_tei(rich_tei(code: "FUND01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.funder =~ "Ministerio de Ciencia"
+  end
+
+  test "import_file/1 extracts authority from <authority><orgName>" do
+    path = write_tei(rich_tei(code: "AUTH01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.authority == "Universitat de València - Estudi General"
+  end
+
+  test "import_file/1 extracts publisher from <publisher><orgName>" do
+    path = write_tei(rich_tei(code: "PUB01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.publisher =~ "ARTELOPE/EMOTHE"
+  end
+
   # --- Encoding ---
 
   test "import_file/1 handles UTF-16 LE encoded files" do

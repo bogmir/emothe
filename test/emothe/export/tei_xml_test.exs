@@ -311,4 +311,142 @@ defmodule Emothe.Export.TeiXmlTest do
     elems2 = PlayContent.list_elements_for_division(scene2.id)
     assert length(elems1) == length(elems2)
   end
+
+  # --- Extended metadata roundtrip ---
+
+  defp rich_tei(opts) do
+    code = Keyword.get(opts, :code, "RICH#{System.unique_integer([:positive])}")
+
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title type="traduccion">El gran teatro</title>
+            <title type="original">The Great Theatre</title>
+            <editor role="translator"><persName>Sanderson, John D.</persName></editor>
+            <author ana="fiable">William Shakespeare</author>
+            <sponsor><orgName>Plan Nacional de I+D+i</orgName></sponsor>
+            <funder><orgName>Ministerio de Ciencia</orgName></funder>
+            <respStmt>
+              <resp>Electronic edition</resp>
+              <persName>Amelang, David J.</persName>
+            </respStmt>
+            <principal>Joan Oleza Simó</principal>
+          </titleStmt>
+          <publicationStmt>
+            <publisher><orgName>ARTELOPE/EMOTHE</orgName></publisher>
+            <authority><orgName>Universitat de València</orgName></authority>
+            <idno>#{code}</idno>
+            <idno type="EMOTHE">0703</idno>
+            <availability>
+              <p>General availability text.</p>
+              <licence target="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">CC BY-NC-ND 4.0</licence>
+            </availability>
+            <pubPlace>Valencia</pubPlace>
+            <date>2023</date>
+          </publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>El gran teatro del mundo</title>
+              <author>Shakespeare, William</author>
+              <lang>Español</lang>
+              <note>Nota de fuente.</note>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text>
+        <front></front>
+        <body></body>
+      </text>
+    </TEI>
+    """
+  end
+
+  test "export includes original_title as <title type=\"original\">" do
+    path = write_tei(rich_tei(code: "EXORIG01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<title[^>]*type="original"[^>]*>\s*The Great Theatre\s*<\/title>/
+  end
+
+  test "export includes translator as <editor role=\"translator\">" do
+    path = write_tei(rich_tei(code: "EXTRANS01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<editor[^>]*role="translator"/
+    assert exported_xml =~ "Sanderson"
+  end
+
+  test "export includes EMOTHE idno in publicationStmt" do
+    path = write_tei(rich_tei(code: "EXIDNO01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<idno[^>]*type="EMOTHE"[^>]*>\s*0703\s*<\/idno>/
+  end
+
+  test "export includes licence with url and text" do
+    path = write_tei(rich_tei(code: "EXLIC01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~
+             ~r/<licence[^>]*target="https:\/\/creativecommons\.org\/licenses\/by-nc-nd\/4\.0\/deed\.es"/
+
+    assert exported_xml =~ "CC BY-NC-ND 4.0"
+  end
+
+  test "export includes source language in bibl" do
+    path = write_tei(rich_tei(code: "EXLANG01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<lang>\s*Español\s*<\/lang>/
+  end
+
+  test "export includes sponsor and funder in titleStmt" do
+    path = write_tei(rich_tei(code: "EXSF01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<sponsor>.*Plan Nacional.*<\/sponsor>/s
+    assert exported_xml =~ ~r/<funder>.*Ministerio de Ciencia.*<\/funder>/s
+  end
+
+  test "export includes authority in publicationStmt" do
+    path = write_tei(rich_tei(code: "EXAUTH01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<authority>.*Universitat de Val.*<\/authority>/s
+  end
+
+  test "export includes publisher in publicationStmt" do
+    path = write_tei(rich_tei(code: "EXPUB01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<publisher>.*ARTELOPE.*<\/publisher>/s
+  end
 end

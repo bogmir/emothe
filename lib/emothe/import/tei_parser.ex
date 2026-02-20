@@ -173,6 +173,13 @@ defmodule Emothe.Import.TeiParser do
     sort_title = Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "key") == "orden" end)
     code_title = Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "key") == "archivo" end)
 
+    original_title_el =
+      Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "type") == "original" end)
+
+    # Extract sponsor and funder from titleStmt
+    sponsor_el = if title_stmt, do: find_child(elem(title_stmt, 2), "sponsor"), else: nil
+    funder_el = if title_stmt, do: find_child(elem(title_stmt, 2), "funder"), else: nil
+
     main_author = Enum.find(authors, fn {_, attrs, _} -> !has_attr?(attrs, "key") end)
     sort_author = Enum.find(authors, fn {_, attrs, _} -> attr_value(attrs, "key") == "orden" end)
 
@@ -183,7 +190,11 @@ defmodule Emothe.Import.TeiParser do
     verse_count = if extent, do: extract_verse_count(extent), else: nil
 
     # Extract publication info
-    {pub_place, pub_date, publisher_text, availability} = extract_publication(publication_stmt)
+    {pub_place, pub_date, publisher_text, availability, licence_url, licence_text, authority_text} =
+      extract_publication(publication_stmt)
+
+    # Extract EMOTHE-specific idno
+    emothe_id = extract_emothe_idno(publication_stmt)
 
     # Extract project/editorial from encodingDesc
     {project_desc, editorial_decl} = extract_encoding(encoding_desc)
@@ -197,6 +208,7 @@ defmodule Emothe.Import.TeiParser do
       title: safe_text(main_title) |> normalize_imported_title(),
       title_sort: safe_text(sort_title),
       code: clean_code(code || "UNKNOWN"),
+      original_title: safe_text(original_title_el),
       author_name: safe_text(main_author),
       author_sort: safe_text(sort_author),
       author_attribution: attribution,
@@ -206,6 +218,12 @@ defmodule Emothe.Import.TeiParser do
       publication_date: pub_date,
       publisher: publisher_text,
       availability_note: availability,
+      licence_url: licence_url,
+      licence_text: licence_text,
+      emothe_id: emothe_id,
+      sponsor: safe_text(sponsor_el),
+      funder: safe_text(funder_el),
+      authority: authority_text,
       project_description: project_desc,
       editorial_declaration: editorial_decl
     }
@@ -218,6 +236,18 @@ defmodule Emothe.Import.TeiParser do
     if idno, do: text_content(idno), else: nil
   end
 
+  # Extract the EMOTHE-specific idno (type="EMOTHE")
+  defp extract_emothe_idno(nil), do: nil
+
+  defp extract_emothe_idno({_name, _attrs, children}) do
+    idnos = find_children(children, "idno")
+
+    emothe_idno =
+      Enum.find(idnos, fn {_, attrs, _} -> attr_value(attrs, "type") == "EMOTHE" end)
+
+    if emothe_idno, do: text_content(emothe_idno), else: nil
+  end
+
   defp extract_verse_count({_name, _attrs, _children} = extent) do
     text = text_content(extent)
 
@@ -227,19 +257,64 @@ defmodule Emothe.Import.TeiParser do
     end
   end
 
-  defp extract_publication(nil), do: {nil, nil, nil, nil}
+  defp extract_publication(nil), do: {nil, nil, nil, nil, nil, nil, nil}
 
   defp extract_publication({_name, _attrs, children}) do
     pub_place = find_child(children, "pubPlace")
     date = find_child(children, "date")
     publisher = find_child(children, "publisher")
     availability = find_child(children, "availability")
+    authority = find_child(children, "authority")
+
+    # Extract licence details from within availability
+    {licence_url, licence_text} =
+      case availability do
+        {_, _, avail_children} ->
+          licence_el = find_child(avail_children, "licence")
+
+          case licence_el do
+            {_, attrs, _} ->
+              url = attr_value(attrs, "target")
+              text = text_content(licence_el)
+              {url, text}
+
+            _ ->
+              {nil, nil}
+          end
+
+        _ ->
+          {nil, nil}
+      end
+
+    # availability_note: only the <p> text, not the licence text
+    availability_text =
+      case availability do
+        {_, _, avail_children} ->
+          avail_children
+          |> Enum.filter(fn
+            {"p", _, _} -> true
+            _ -> false
+          end)
+          |> Enum.map(&text_content/1)
+          |> Enum.join("\n\n")
+          |> String.trim()
+          |> case do
+            "" -> nil
+            t -> t
+          end
+
+        _ ->
+          safe_text(availability)
+      end
 
     {
       safe_text(pub_place),
       safe_text(date),
       safe_text(publisher),
-      safe_text(availability)
+      availability_text,
+      licence_url,
+      licence_text,
+      safe_text(authority)
     }
   end
 
@@ -261,9 +336,11 @@ defmodule Emothe.Import.TeiParser do
     title_stmt = find_child(elem(file_desc, 2), "titleStmt")
     edition_stmt = find_child(elem(file_desc, 2), "editionStmt")
 
-    # Principal investigator
+    # Principal investigator and titleStmt editors
     if title_stmt do
-      principal = find_child(elem(title_stmt, 2), "principal")
+      title_stmt_children = elem(title_stmt, 2)
+
+      principal = find_child(title_stmt_children, "principal")
 
       if principal do
         Catalogue.create_play_editor(%{
@@ -273,14 +350,80 @@ defmodule Emothe.Import.TeiParser do
           position: 0
         })
       end
+
+      # Translators specified directly in titleStmt as <editor role="translator">
+      title_editors = find_children(title_stmt_children, "editor")
+
+      title_editors
+      |> Enum.with_index(1)
+      |> Enum.each(fn {{_, attrs, ed_children}, idx} ->
+        role = attr_value(attrs, "role")
+
+        normalized_role =
+          case role do
+            "translator" -> "translator"
+            "researcher" -> "researcher"
+            _ -> nil
+          end
+
+        if normalized_role do
+          # Name may be in <persName> or direct text
+          person_name =
+            case find_child(ed_children, "persName") do
+              nil -> text_content({"editor", attrs, ed_children})
+              el -> text_content(el)
+            end
+
+          Catalogue.create_play_editor(%{
+            play_id: play.id,
+            person_name: person_name,
+            role: normalized_role,
+            position: idx
+          })
+        end
+      end)
+
+      # respStmt elements in titleStmt (common in EMOTHE files)
+      resp_stmts_in_title = find_children(title_stmt_children, "respStmt")
+
+      resp_stmts_in_title
+      |> Enum.with_index(100)
+      |> Enum.each(fn {{_name, _attrs, children}, idx} ->
+        person = find_child(children, "persName")
+        org = find_child(children, "orgName")
+        resp = find_child(children, "resp")
+
+        role =
+          case safe_text(resp) do
+            text when is_binary(text) ->
+              cond do
+                String.contains?(text, "Edición") -> "editor"
+                String.contains?(text, "Revisión") -> "reviewer"
+                true -> "digital_editor"
+              end
+
+            _ ->
+              "digital_editor"
+          end
+
+        if person do
+          Catalogue.create_play_editor(%{
+            play_id: play.id,
+            person_name: text_content(person),
+            role: role,
+            organization: safe_text(org),
+            position: idx
+          })
+        end
+      end)
     end
 
-    # Edition editors
+    # Edition editors (from editionStmt)
     if edition_stmt do
       resp_stmts = find_children(elem(edition_stmt, 2), "respStmt")
 
       resp_stmts
-      |> Enum.with_index(1)
+      |> Enum.with_index(200)
       |> Enum.each(fn {{_name, _attrs, children}, idx} ->
         person = find_child(children, "persName")
         org = find_child(children, "orgName")
@@ -329,6 +472,7 @@ defmodule Emothe.Import.TeiParser do
           author: safe_text(find_child(children, "author")),
           editor: safe_text(find_child(children, "editor")),
           note: safe_text(find_child(children, "note")),
+          language: safe_text(find_child(children, "lang")),
           position: idx
         })
       end)

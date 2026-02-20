@@ -47,17 +47,20 @@ defmodule Emothe.Export.TeiXml do
   end
 
   defp build_title_stmt(play) do
-    titles = [
-      element(:title, play.title)
-    ]
+    # Main title (translated/primary)
+    titles = [element(:title, play.title)]
+
+    titles =
+      if play.original_title,
+        do: [element(:title, %{type: "original"}, play.original_title) | titles],
+        else: titles
 
     titles =
       if play.title_sort,
         do: titles ++ [element(:title, %{key: "orden"}, play.title_sort)],
         else: titles
 
-    titles =
-      titles ++ [element(:title, %{key: "archivo"}, play.code)]
+    titles = titles ++ [element(:title, %{key: "archivo"}, play.code)]
 
     authors =
       if play.author_name do
@@ -73,12 +76,58 @@ defmodule Emothe.Export.TeiXml do
         []
       end
 
+    # Translators as <editor role="translator"><persName>...
+    translators =
+      play.editors
+      |> Enum.filter(&(&1.role == "translator"))
+      |> Enum.map(fn e ->
+        element(:editor, %{role: "translator"}, [element(:persName, e.person_name)])
+      end)
+
+    # respStmt for digital editors in titleStmt (from titleStmt import)
+    resp_stmts =
+      play.editors
+      |> Enum.filter(
+        &(&1.role in ["digital_editor", "editor", "reviewer"] and &1.position >= 100 and
+            &1.position < 200)
+      )
+      |> Enum.map(fn e ->
+        resp_label =
+          case e.role do
+            "editor" -> "Edición"
+            "reviewer" -> "Revisión"
+            _ -> "Electronic edition"
+          end
+
+        children = [element(:resp, resp_label), element(:persName, e.person_name)]
+
+        children =
+          if e.organization,
+            do: children ++ [element(:orgName, e.organization)],
+            else: children
+
+        element(:respStmt, children)
+      end)
+
     principal =
       play.editors
       |> Enum.filter(&(&1.role == "principal"))
       |> Enum.map(fn e -> element(:principal, e.person_name) end)
 
-    element(:titleStmt, titles ++ authors ++ principal)
+    sponsor =
+      if play.sponsor,
+        do: [element(:sponsor, [element(:orgName, play.sponsor)])],
+        else: []
+
+    funder =
+      if play.funder,
+        do: [element(:funder, [element(:orgName, play.funder)])],
+        else: []
+
+    element(
+      :titleStmt,
+      titles ++ authors ++ translators ++ sponsor ++ funder ++ resp_stmts ++ principal
+    )
   end
 
   defp build_edition_stmt(play) do
@@ -121,11 +170,19 @@ defmodule Emothe.Export.TeiXml do
   end
 
   defp build_publication_stmt(play) do
-    children = [
-      element(:idno, %{type: "code"}, play.code),
-      element(:pubPlace, play.pub_place || ""),
-      element(:date, play.publication_date || "")
-    ]
+    idno_children = [element(:idno, %{type: "code"}, play.code)]
+
+    idno_children =
+      if play.emothe_id,
+        do: idno_children ++ [element(:idno, %{type: "EMOTHE"}, play.emothe_id)],
+        else: idno_children
+
+    children =
+      idno_children ++
+        [
+          element(:pubPlace, play.pub_place || ""),
+          element(:date, play.publication_date || "")
+        ]
 
     children =
       if play.publisher,
@@ -133,8 +190,30 @@ defmodule Emothe.Export.TeiXml do
         else: children
 
     children =
-      if play.availability_note,
-        do: children ++ [element(:availability, [element(:p, play.availability_note)])],
+      if play.authority,
+        do: children ++ [element(:authority, [element(:orgName, play.authority)])],
+        else: children
+
+    # Build availability with optional <p> and <licence>
+    availability_children =
+      []
+      |> then(fn acc ->
+        if play.availability_note,
+          do: acc ++ [element(:p, play.availability_note)],
+          else: acc
+      end)
+      |> then(fn acc ->
+        if play.licence_url || play.licence_text do
+          licence_attrs = if play.licence_url, do: %{target: play.licence_url}, else: %{}
+          acc ++ [element(:licence, licence_attrs, play.licence_text || "")]
+        else
+          acc
+        end
+      end)
+
+    children =
+      if availability_children != [],
+        do: children ++ [element(:availability, availability_children)],
         else: children
 
     element(:publicationStmt, children)
@@ -148,6 +227,7 @@ defmodule Emothe.Export.TeiXml do
             if(source.title, do: element(:title, source.title)),
             if(source.author, do: element(:author, source.author)),
             if(source.editor, do: element(:editor, source.editor)),
+            if(source.language, do: element(:lang, source.language)),
             if(source.note, do: element(:note, source.note))
           ]
           |> Enum.reject(&is_nil/1)

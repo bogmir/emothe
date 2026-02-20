@@ -95,7 +95,8 @@ defmodule EmotheWeb.Admin.ImportLive do
           |> Enum.sort()
 
         if xml_files == [] do
-          {:noreply, put_flash(socket, :error, gettext("No .xml files found in %{dir}", dir: dir))}
+          {:noreply,
+           put_flash(socket, :error, gettext("No .xml files found in %{dir}", dir: dir))}
         else
           {successes, errors} =
             xml_files
@@ -160,7 +161,10 @@ defmodule EmotheWeb.Admin.ImportLive do
 
   defp format_error(reason) when is_atom(reason), do: to_string(reason)
   defp format_error({:xml_parse_error, detail}), do: "XML parse error: #{inspect(detail)}"
-  defp format_error({:play_already_exists, code}), do: gettext("Play with code %{code} already exists", code: code)
+
+  defp format_error({:play_already_exists, code}),
+    do: gettext("Play with code %{code} already exists", code: code)
+
   defp format_error(reason), do: inspect(reason)
 
   @impl true
@@ -168,7 +172,9 @@ defmodule EmotheWeb.Admin.ImportLive do
     ~H"""
     <div class="mx-auto max-w-5xl px-4 py-8">
       <div class="mb-6">
-        <h1 class="text-3xl font-semibold tracking-tight text-base-content">{gettext("Import TEI-XML Files")}</h1>
+        <h1 class="text-3xl font-semibold tracking-tight text-base-content">
+          {gettext("Import TEI-XML Files")}
+        </h1>
         <p class="mt-1 text-sm text-base-content/70">
           {gettext("Import one or many TEI files and review successful ingestions.")}
         </p>

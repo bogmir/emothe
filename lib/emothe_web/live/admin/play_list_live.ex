@@ -53,8 +53,12 @@ defmodule EmotheWeb.Admin.PlayListLive do
     <div class="mx-auto max-w-7xl px-4 py-8">
       <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-semibold tracking-tight text-base-content">{gettext("Play Management")}</h1>
-          <p class="mt-1 text-sm text-base-content/70">{gettext("Browse, edit, and curate imported plays.")}</p>
+          <h1 class="text-3xl font-semibold tracking-tight text-base-content">
+            {gettext("Play Management")}
+          </h1>
+          <p class="mt-1 text-sm text-base-content/70">
+            {gettext("Browse, edit, and curate imported plays.")}
+          </p>
         </div>
         <div class="flex gap-2">
           <.link
@@ -130,7 +134,11 @@ defmodule EmotheWeb.Admin.PlayListLive do
                   <button
                     phx-click="delete"
                     phx-value-id={play.id}
-                    data-confirm={gettext("Delete «%{title}» and all its content? This cannot be undone.", title: play.title)}
+                    data-confirm={
+                      gettext("Delete «%{title}» and all its content? This cannot be undone.",
+                        title: play.title
+                      )
+                    }
                     class="btn btn-ghost btn-xs text-error tooltip tooltip-left"
                     data-tip={gettext("Delete")}
                   >

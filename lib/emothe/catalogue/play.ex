@@ -22,6 +22,13 @@ defmodule Emothe.Catalogue.Play do
     field :availability_note, :string
     field :project_description, :string
     field :editorial_declaration, :string
+    field :original_title, :string
+    field :licence_url, :string
+    field :licence_text, :string
+    field :emothe_id, :string
+    field :sponsor, :string
+    field :funder, :string
+    field :authority, :string
 
     has_many :editors, Emothe.Catalogue.PlayEditor
     has_many :sources, Emothe.Catalogue.PlaySource
@@ -56,7 +63,14 @@ defmodule Emothe.Catalogue.Play do
       :pub_place,
       :availability_note,
       :project_description,
-      :editorial_declaration
+      :editorial_declaration,
+      :original_title,
+      :licence_url,
+      :licence_text,
+      :emothe_id,
+      :sponsor,
+      :funder,
+      :authority
     ])
     |> validate_required([:title, :code])
     |> validate_inclusion(:language, @valid_languages)

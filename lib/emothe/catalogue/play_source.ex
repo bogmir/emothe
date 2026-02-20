@@ -13,6 +13,7 @@ defmodule Emothe.Catalogue.PlaySource do
     field :publisher, :string
     field :pub_place, :string
     field :pub_date, :string
+    field :language, :string
     field :position, :integer, default: 0
 
     belongs_to :play, Emothe.Catalogue.Play
@@ -30,6 +31,7 @@ defmodule Emothe.Catalogue.PlaySource do
       :publisher,
       :pub_place,
       :pub_date,
+      :language,
       :position,
       :play_id
     ])

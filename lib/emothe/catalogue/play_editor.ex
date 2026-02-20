@@ -20,6 +20,9 @@ defmodule Emothe.Catalogue.PlayEditor do
     editor
     |> cast(attrs, [:person_name, :role, :organization, :position, :play_id])
     |> validate_required([:person_name, :role])
-    |> validate_inclusion(:role, ~w(editor digital_editor reviewer principal))
+    |> validate_inclusion(
+      :role,
+      ~w(editor digital_editor reviewer principal translator researcher)
+    )
   end
 end

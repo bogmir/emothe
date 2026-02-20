@@ -32,8 +32,18 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
   @impl true
   def handle_event("recompute_stats", _, socket) do
     statistic = Statistics.recompute(socket.assigns.play.id)
-    {:noreply, assign(socket, statistic: statistic) |> put_flash(:info, gettext("Statistics recomputed."))}
+
+    {:noreply,
+     assign(socket, statistic: statistic) |> put_flash(:info, gettext("Statistics recomputed."))}
   end
+
+  defp role_label("principal"), do: gettext("Principal investigator")
+  defp role_label("translator"), do: gettext("Translator")
+  defp role_label("researcher"), do: gettext("Researcher")
+  defp role_label("editor"), do: gettext("Editor")
+  defp role_label("digital_editor"), do: gettext("Digital editor")
+  defp role_label("reviewer"), do: gettext("Reviewer")
+  defp role_label(role), do: role
 
   @impl true
   def render(assigns) do
@@ -77,7 +87,18 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
       <section class="mb-8">
         <h2 class="mb-3 text-lg font-semibold text-base-content">{gettext("Metadata")}</h2>
         <div class="grid grid-cols-1 gap-4 rounded-box border border-base-300 bg-base-100 p-4 text-sm shadow-sm md:grid-cols-2">
-          <div><span class="font-medium">{gettext("Language:")}</span> <span class="text-base-content/70">{@play.language}</span></div>
+          <div :if={@play.original_title}>
+            <span class="font-medium">{gettext("Original title:")}</span>
+            <span class="text-base-content/70">{@play.original_title}</span>
+          </div>
+          <div :if={@play.emothe_id}>
+            <span class="font-medium">{gettext("EMOTHE ID:")}</span>
+            <span class="text-base-content/70">{@play.emothe_id}</span>
+          </div>
+          <div>
+            <span class="font-medium">{gettext("Language:")}</span>
+            <span class="text-base-content/70">{@play.language}</span>
+          </div>
           <div>
             <span class="font-medium">{gettext("Verse count:")}</span>
             <span class="text-base-content/70">{@play.verse_count || gettext("N/A")}</span>
@@ -90,6 +111,38 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
             <span class="font-medium">{gettext("Publication:")}</span>
             <span class="text-base-content/70">{@play.pub_place} ({@play.publication_date})</span>
           </div>
+          <div :if={@play.publisher}>
+            <span class="font-medium">{gettext("Publisher:")}</span>
+            <span class="text-base-content/70">{@play.publisher}</span>
+          </div>
+          <div :if={@play.authority}>
+            <span class="font-medium">{gettext("Authority:")}</span>
+            <span class="text-base-content/70">{@play.authority}</span>
+          </div>
+          <div :if={@play.availability_note} class="md:col-span-2">
+            <span class="font-medium">{gettext("Availability:")}</span>
+            <span class="text-base-content/70 text-xs">{@play.availability_note}</span>
+          </div>
+          <div :if={@play.sponsor} class="md:col-span-2">
+            <span class="font-medium">{gettext("Sponsor:")}</span>
+            <span class="text-base-content/70">{@play.sponsor}</span>
+          </div>
+          <div :if={@play.funder} class="md:col-span-2">
+            <span class="font-medium">{gettext("Funder:")}</span>
+            <span class="text-base-content/70">{@play.funder}</span>
+          </div>
+          <div :if={@play.licence_url || @play.licence_text} class="md:col-span-2">
+            <span class="font-medium">{gettext("Licence:")}</span>
+            <span class="text-base-content/70">
+              <%= if @play.licence_url do %>
+                <a href={@play.licence_url} target="_blank" class="link link-primary">
+                  {@play.licence_text || @play.licence_url}
+                </a>
+              <% else %>
+                {@play.licence_text}
+              <% end %>
+            </span>
+          </div>
         </div>
       </section>
 
@@ -100,7 +153,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
           <div :for={editor <- @play.editors} class="flex items-center justify-between p-3">
             <span class="font-medium">{editor.person_name}</span>
             <span class="text-sm text-base-content/60">
-              {editor.role} {if editor.organization, do: "— #{editor.organization}"}
+              {role_label(editor.role)} {if editor.organization, do: "— #{editor.organization}"}
             </span>
           </div>
         </div>

@@ -20,7 +20,11 @@ defmodule EmotheWeb.Components.StatisticsPanel do
         <.stat_card label={"#{@act_label}s"} value={@data["num_acts"]} icon="📜" />
         <.stat_card label={gettext("Scenes")} value={get_in(@data, ["scenes", "total"])} icon="🎭" />
         <.stat_card label={gettext("Verses")} value={@data["total_verses"]} icon="✍️" />
-        <.stat_card label={gettext("Stage Directions")} value={@data["total_stage_directions"]} icon="🎬" />
+        <.stat_card
+          label={gettext("Stage Directions")}
+          value={@data["total_stage_directions"]}
+          icon="🎬"
+        />
       </div>
 
       <%!-- Scenes per act --%>

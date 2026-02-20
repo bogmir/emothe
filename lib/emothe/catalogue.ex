@@ -100,10 +100,33 @@ defmodule Emothe.Catalogue do
 
   # --- Sources ---
 
+  def list_play_sources(play_id) do
+    PlaySource
+    |> where(play_id: ^play_id)
+    |> order_by(:position)
+    |> Repo.all()
+  end
+
+  def get_play_source!(id), do: Repo.get!(PlaySource, id)
+
   def create_play_source(attrs) do
     %PlaySource{}
     |> PlaySource.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update_play_source(%PlaySource{} = source, attrs) do
+    source
+    |> PlaySource.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_play_source(%PlaySource{} = source) do
+    Repo.delete(source)
+  end
+
+  def change_play_source(%PlaySource{} = source, attrs \\ %{}) do
+    PlaySource.changeset(source, attrs)
   end
 
   # --- Editorial Notes ---

@@ -351,6 +351,7 @@ defmodule Emothe.Export.TeiXmlTest do
             <bibl>
               <title>El gran teatro del mundo</title>
               <author>Shakespeare, William</author>
+              <editor role="traductor">Sanderson, John D.</editor>
               <lang>Español</lang>
               <note>Nota de fuente.</note>
             </bibl>
@@ -417,6 +418,17 @@ defmodule Emothe.Export.TeiXmlTest do
     exported_xml = TeiXml.generate(play_with_all)
 
     assert exported_xml =~ ~r/<lang>\s*Español\s*<\/lang>/
+  end
+
+  test "export preserves editor role in bibl" do
+    path = write_tei(rich_tei(code: "EXEDRL01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<editor role="traductor">/
+    assert exported_xml =~ "Sanderson, John D."
   end
 
   test "export includes sponsor and funder in titleStmt" do

@@ -466,11 +466,20 @@ defmodule Emothe.Import.TeiParser do
       bibls
       |> Enum.with_index()
       |> Enum.each(fn {{_name, _attrs, children}, idx} ->
+        editor_el = find_child(children, "editor")
+
+        editor_role =
+          case editor_el do
+            {_, attrs, _} -> attr_value(attrs, "role")
+            _ -> nil
+          end
+
         Catalogue.create_play_source(%{
           play_id: play.id,
           title: safe_text(find_child(children, "title")),
           author: safe_text(find_child(children, "author")),
-          editor: safe_text(find_child(children, "editor")),
+          editor: safe_text(editor_el),
+          editor_role: editor_role,
           note: safe_text(find_child(children, "note")),
           language: safe_text(find_child(children, "lang")),
           position: idx

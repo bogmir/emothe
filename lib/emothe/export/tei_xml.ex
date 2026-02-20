@@ -226,7 +226,10 @@ defmodule Emothe.Export.TeiXml do
           [
             if(source.title, do: element(:title, source.title)),
             if(source.author, do: element(:author, source.author)),
-            if(source.editor, do: element(:editor, source.editor)),
+            if source.editor do
+              attrs = if source.editor_role, do: %{role: source.editor_role}, else: %{}
+              element(:editor, attrs, source.editor)
+            end,
             if(source.language, do: element(:lang, source.language)),
             if(source.note, do: element(:note, source.note))
           ]

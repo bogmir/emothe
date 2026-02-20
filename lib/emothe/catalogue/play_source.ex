@@ -9,6 +9,7 @@ defmodule Emothe.Catalogue.PlaySource do
     field :title, :string
     field :author, :string
     field :editor, :string
+    field :editor_role, :string
     field :note, :string
     field :publisher, :string
     field :pub_place, :string
@@ -27,6 +28,7 @@ defmodule Emothe.Catalogue.PlaySource do
       :title,
       :author,
       :editor,
+      :editor_role,
       :note,
       :publisher,
       :pub_place,

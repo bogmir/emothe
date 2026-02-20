@@ -507,6 +507,16 @@ defmodule Emothe.Import.TeiParserTest do
     assert source.language == "Español"
   end
 
+  test "import_file/1 extracts editor role from <bibl><editor role=...>" do
+    path = write_tei(rich_tei(code: "EDRL01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.editor == "Sanderson, John D."
+    assert source.editor_role == "traductor"
+  end
+
   test "import_file/1 extracts sponsor from <sponsor><orgName>" do
     path = write_tei(rich_tei(code: "SPON01"))
     assert {:ok, play} = TeiParser.import_file(path)

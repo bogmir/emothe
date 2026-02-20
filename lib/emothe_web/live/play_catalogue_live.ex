@@ -42,28 +42,56 @@ defmodule EmotheWeb.PlayCatalogueLive do
       </form>
 
       <div class="grid gap-3">
-        <.link
+        <div
           :for={play <- @plays}
-          navigate={~p"/plays/#{play.code}"}
-          class="block rounded-box border border-base-300 bg-base-100 p-5 hover:shadow-md transition-shadow"
+          class="rounded-box border border-base-300 bg-base-100 px-5 py-3.5 hover:shadow-md transition-shadow"
         >
-          <div class="flex justify-between items-start">
-            <div>
-              <h2 class="text-lg font-semibold text-base-content hover:text-primary">
+          <div class="flex items-center gap-3">
+            <.link
+              navigate={~p"/plays/#{play.code}"}
+              class="flex-1 min-w-0"
+            >
+              <span class="font-semibold text-base-content hover:text-primary transition-colors">
                 {play.title}
-              </h2>
-              <p :if={play.author_name} class="text-sm text-base-content/70 mt-1">
+              </span>
+              <span :if={play.author_name} class="text-sm text-base-content/60 ml-2">
                 {play.author_name}
-              </p>
-            </div>
-            <div class="text-right flex-shrink-0 ml-4">
-              <span class="badge badge-primary badge-outline">{play.code}</span>
-              <p :if={play.verse_count} class="text-xs text-base-content/50 mt-1">
-                {play.verse_count} verses
-              </p>
+              </span>
+            </.link>
+            <span
+              :if={play.verse_count}
+              class="text-xs text-base-content/40 tabular-nums hidden sm:inline"
+            >
+              {play.verse_count}v
+            </span>
+            <span class="badge badge-primary badge-outline badge-sm hidden md:inline-flex">
+              {play.code}
+            </span>
+            <div class="flex items-center border-l border-base-200 pl-2 ml-1 gap-0.5">
+              <a
+                href={~p"/export/#{play.id}/tei"}
+                class="btn btn-xs btn-ghost btn-square text-base-content/50 hover:text-primary tooltip tooltip-bottom"
+                data-tip="TEI-XML"
+              >
+                <.icon name="hero-code-bracket-mini" class="size-3.5" />
+              </a>
+              <a
+                href={~p"/export/#{play.id}/html"}
+                class="btn btn-xs btn-ghost btn-square text-base-content/50 hover:text-primary tooltip tooltip-bottom"
+                data-tip="HTML"
+              >
+                <.icon name="hero-globe-alt-mini" class="size-3.5" />
+              </a>
+              <a
+                href={~p"/export/#{play.id}/pdf"}
+                class="btn btn-xs btn-ghost btn-square text-base-content/50 hover:text-primary tooltip tooltip-bottom"
+                data-tip="PDF"
+              >
+                <.icon name="hero-document-arrow-down-mini" class="size-3.5" />
+              </a>
             </div>
           </div>
-        </.link>
+        </div>
 
         <p :if={@plays == []} class="text-base-content/50 text-center py-12">
           No plays found. Try a different search term.

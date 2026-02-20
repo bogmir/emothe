@@ -33,6 +33,11 @@ defmodule EmotheWeb.Router do
 
     get "/", PageController, :home
 
+    # Public export endpoints
+    get "/export/:id/tei", ExportController, :tei
+    get "/export/:id/html", ExportController, :html
+    get "/export/:id/pdf", ExportController, :pdf
+
     # Public play catalogue and presentation
     live_session :public,
       on_mount: [{EmotheWeb.UserAuth, :mount_current_user}] do

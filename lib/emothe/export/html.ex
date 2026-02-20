@@ -33,10 +33,9 @@ defmodule Emothe.Export.Html do
         </header>
 
     #{render_editorial_notes(play.editorial_notes)}
-    #{render_cast_list(characters)}
 
         <div class="play-text">
-    #{render_divisions(divisions)}
+    #{render_divisions(divisions, characters)}
         </div>
       </div>
     </body>
@@ -119,36 +118,28 @@ defmodule Emothe.Export.Html do
           margin-bottom: 0.5rem;
         }
 
-        /* Cast list */
-        .cast-section {
-          max-width: 640px;
-          margin: 0 auto 2rem;
-        }
-
-        .cast-section h2 {
-          font-weight: 600;
-          text-align: center;
-          margin-bottom: 1rem;
-        }
-
+        /* Cast list (inline within elenco division) */
         .cast-list {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.5rem;
+          max-width: 560px;
+          margin: 0 auto 1.5rem;
         }
 
         .cast-item {
           display: flex;
-          align-items: center;
+          align-items: baseline;
           gap: 0.75rem;
-          padding: 0.5rem 0.75rem;
-          background: rgba(255, 255, 255, 0.4);
-          border: 1px solid #ddd;
-          border-radius: 0.5rem;
+          padding: 0.25rem 0;
+          margin-left: 1rem;
         }
 
-        .cast-name { font-weight: 600; }
-        .cast-desc { font-size: 0.875rem; color: rgba(51, 51, 51, 0.5); }
+        .cast-name {
+          font-weight: bold;
+          font-size: x-small;
+          text-transform: uppercase;
+          flex-shrink: 0;
+        }
+
+        .cast-desc { font-size: 0.875rem; color: rgba(51, 51, 51, 0.55); }
 
         /* Division headings */
         .act-heading {
@@ -283,14 +274,12 @@ defmodule Emothe.Export.Html do
     |> Enum.join("\n")
   end
 
-  defp render_cast_list([]), do: ""
-
-  defp render_cast_list(characters) do
+  defp render_inline_cast_list(characters) do
     visible = Enum.reject(characters, & &1.is_hidden)
-    if visible == [], do: "", else: do_render_cast_list(visible)
+    if visible == [], do: "", else: do_render_inline_cast_list(visible)
   end
 
-  defp do_render_cast_list(characters) do
+  defp do_render_inline_cast_list(characters) do
     items =
       Enum.map(characters, fn char ->
         desc =
@@ -303,20 +292,24 @@ defmodule Emothe.Export.Html do
       |> Enum.join("\n")
 
     """
-        <div class="cast-section">
-          <h2>Dramatis Personae</h2>
           <div class="cast-list">
     #{items}
           </div>
-        </div>
     """
   end
 
   @act_types ~w(acto act acte jornada)
 
-  defp render_divisions(divisions) do
+  defp render_divisions(divisions, characters) do
     Enum.map(divisions, fn div ->
       heading = division_heading(div)
+
+      # Render inline cast list for elenco divisions
+      cast =
+        if div.type == "elenco",
+          do: render_inline_cast_list(characters),
+          else: ""
+
       elements = render_elements(Map.get(div, :loaded_elements, []))
 
       children =
@@ -328,7 +321,7 @@ defmodule Emothe.Export.Html do
         end)
         |> Enum.join("\n")
 
-      "    <div class=\"division\">\n#{heading}#{elements}#{children}\n    </div>"
+      "    <div class=\"division\">\n#{heading}#{cast}#{elements}#{children}\n    </div>"
     end)
     |> Enum.join("\n")
   end

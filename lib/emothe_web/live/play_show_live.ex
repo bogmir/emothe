@@ -62,18 +62,21 @@ defmodule EmotheWeb.PlayShowLive do
         <%!-- Sidebar toggle (mobile + desktop) --%>
         <aside id="play-sections-panel" class="mb-4 lg:mb-0 lg:sticky lg:top-4 lg:self-start">
           <div class="rounded-box border border-base-300 bg-base-100/90 backdrop-blur-sm shadow-sm">
-            <button
-              phx-click="toggle_sidebar"
-              class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-primary cursor-pointer"
-            >
-              <span class="flex items-center gap-2">
+            <div class="flex items-center justify-between px-3 py-2.5">
+              <button
+                phx-click="toggle_sidebar"
+                class="flex items-center gap-2 text-sm font-semibold text-primary cursor-pointer"
+              >
                 <.icon name="hero-list-bullet-micro" class="size-4" /> {gettext("Contents")}
-              </span>
-              <.icon
-                name={if @sidebar_open, do: "hero-chevron-up-micro", else: "hero-chevron-down-micro"}
-                class="size-4 text-base-content/40"
-              />
-            </button>
+                <.icon
+                  name={
+                    if @sidebar_open, do: "hero-chevron-up-micro", else: "hero-chevron-down-micro"
+                  }
+                  class="size-4 text-base-content/40"
+                />
+              </button>
+              <Layouts.theme_toggle />
+            </div>
 
             <div
               :if={@sidebar_open}
@@ -128,7 +131,7 @@ defmodule EmotheWeb.PlayShowLive do
           <%!-- Header --%>
           <header
             id="meta-overview"
-            class="play-header mb-8 border-b border-base-300 pb-6 scroll-mt-20 text-center"
+            class="play-header mb-8 border-b border-base-300/40 pb-6 scroll-mt-20 text-center"
           >
             <h2 class="play-author">{@play.author_name}</h2>
             <h1 class="play-title font-bold">{@play.title}</h1>
@@ -186,12 +189,11 @@ defmodule EmotheWeb.PlayShowLive do
           </div>
 
           <%!-- Tab navigation --%>
-          <nav id="play-tab-nav" class="flex border-b border-stone-300 mb-6">
+          <nav id="play-tab-nav" class="flex border-b border-base-300 mb-6">
             <button
               :for={
                 tab <- [
                   {:text, gettext("Text")},
-                  {:characters, gettext("Characters")},
                   {:statistics, gettext("Statistics")}
                 ]
               }
@@ -200,8 +202,8 @@ defmodule EmotheWeb.PlayShowLive do
               class={[
                 "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer",
                 if(@active_tab == elem(tab, 0),
-                  do: "border-amber-700 text-amber-800",
-                  else: "border-transparent text-stone-500 hover:text-stone-700"
+                  do: "border-primary text-primary",
+                  else: "border-transparent text-base-content/50 hover:text-base-content/80"
                 )
               ]}
             >
@@ -233,25 +235,10 @@ defmodule EmotheWeb.PlayShowLive do
 
             <.play_body
               divisions={@divisions}
+              characters={@characters}
               show_line_numbers={@show_line_numbers}
               show_stage_directions={@show_stage_directions}
             />
-          </div>
-
-          <%!-- Characters tab --%>
-          <div :if={@active_tab == :characters} id="play-tab-characters">
-            <h2 class="text-lg font-bold mb-4 text-base-content">{gettext("Dramatis Personae")}</h2>
-            <div class="grid gap-2 max-w-2xl">
-              <div
-                :for={char <- Enum.filter(@characters, &(!&1.is_hidden))}
-                class="flex items-center gap-3 p-3 bg-base-100/60 border border-base-300 rounded-box"
-              >
-                <span class="font-semibold text-base-content">{char.name}</span>
-                <span :if={char.description} class="text-sm text-base-content/50">
-                  {char.description}
-                </span>
-              </div>
-            </div>
           </div>
 
           <%!-- Statistics tab --%>

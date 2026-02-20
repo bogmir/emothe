@@ -16,27 +16,27 @@ defmodule EmotheWeb.PlayShowLiveTest do
     assert has_element?(view, "#scroll-spy-nav a[href='#div-#{scene.id}']")
   end
 
-  test "tab navigation switches visible behavior", %{conn: conn} do
+  test "tab navigation switches between text and statistics", %{conn: conn} do
     %{play: play} = TestFixtures.play_with_structure_fixture()
 
     {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
     assert has_element?(view, "#play-tab-text")
-    refute has_element?(view, "#play-tab-characters")
-
-    view
-    |> element("#play-tab-nav button[phx-value-tab='characters']")
-    |> render_click()
-
-    assert has_element?(view, "#play-tab-characters")
-    refute has_element?(view, "#play-tab-text")
+    refute has_element?(view, "#play-tab-statistics")
 
     view
     |> element("#play-tab-nav button[phx-value-tab='statistics']")
     |> render_click()
 
     assert has_element?(view, "#play-tab-statistics")
-    refute has_element?(view, "#play-tab-characters")
+    refute has_element?(view, "#play-tab-text")
+
+    view
+    |> element("#play-tab-nav button[phx-value-tab='text']")
+    |> render_click()
+
+    assert has_element?(view, "#play-tab-text")
+    refute has_element?(view, "#play-tab-statistics")
   end
 
   test "metadata links appear when metadata exists", %{conn: conn} do

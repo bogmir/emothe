@@ -6,6 +6,7 @@ defmodule EmotheWeb.Components.PlayText do
   use Phoenix.Component
 
   attr :divisions, :list, required: true
+  attr :characters, :list, default: []
   attr :show_line_numbers, :boolean, default: true
   attr :show_stage_directions, :boolean, default: true
 
@@ -14,6 +15,9 @@ defmodule EmotheWeb.Components.PlayText do
     <div class="play-text">
       <div :for={division <- @divisions} class="mb-8 scroll-mt-16" id={"div-#{division.id}"}>
         <.division_heading division={division} />
+
+        <%!-- Render inline cast list for elenco divisions --%>
+        <.cast_list :if={division.type == "elenco"} characters={@characters} />
 
         <div :if={Map.has_key?(division, :loaded_elements)}>
           <.element_list
@@ -52,16 +56,38 @@ defmodule EmotheWeb.Components.PlayText do
     ~H"""
     <h2
       :if={@division.title && @is_act}
-      class="font-bold text-center my-6 text-lg uppercase tracking-wide text-base-content"
+      class="font-bold text-center my-6 text-lg uppercase tracking-wide play-act-title"
     >
       {@division.title}
     </h2>
     <h3
       :if={@division.title && !@is_act}
-      class="font-semibold text-center my-4 text-xs uppercase tracking-widest text-base-content/60"
+      class="font-semibold text-center my-4 text-xs uppercase tracking-widest play-scene-title"
     >
       {@division.title}
     </h3>
+    """
+  end
+
+  attr :characters, :list, required: true
+
+  defp cast_list(assigns) do
+    visible = Enum.filter(assigns.characters, &(!&1.is_hidden))
+    assigns = assign(assigns, :visible_characters, visible)
+
+    ~H"""
+    <div :if={@visible_characters != []} class="cast-list mb-8 max-w-xl mx-auto">
+      <div :for={char <- @visible_characters} class="cast-item flex items-baseline gap-3 py-1 ml-4">
+        <span class="speaker shrink-0">{char.name}</span>
+        <span
+          :if={char.description}
+          class="text-sm"
+          style="color: oklch(from var(--color-base-content) l c h / 0.55)"
+        >
+          {char.description}
+        </span>
+      </div>
+    </div>
     """
   end
 

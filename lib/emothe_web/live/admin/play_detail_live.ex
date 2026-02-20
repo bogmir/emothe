@@ -22,8 +22,8 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
      |> assign(:divisions, divisions)
      |> assign(:statistic, statistic)
      |> assign(:breadcrumbs, [
-       %{label: "Admin", to: ~p"/admin/plays"},
-       %{label: "Plays", to: ~p"/admin/plays"},
+       %{label: gettext("Admin"), to: ~p"/admin/plays"},
+       %{label: gettext("Plays"), to: ~p"/admin/plays"},
        %{label: play.title}
      ])
      |> assign(:play_context, %{play: play, active_tab: :overview})}
@@ -32,7 +32,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
   @impl true
   def handle_event("recompute_stats", _, socket) do
     statistic = Statistics.recompute(socket.assigns.play.id)
-    {:noreply, assign(socket, statistic: statistic) |> put_flash(:info, "Statistics recomputed.")}
+    {:noreply, assign(socket, statistic: statistic) |> put_flash(:info, gettext("Statistics recomputed."))}
   end
 
   @impl true
@@ -45,12 +45,12 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
           <p class="mt-1 text-sm text-base-content/60">{@play.author_name} — {@play.code}</p>
         </div>
         <div class="flex items-center gap-1">
-          <span class="text-xs text-base-content/40 mr-1">Export</span>
+          <span class="text-xs text-base-content/40 mr-1">{gettext("Export")}</span>
           <a
             href={~p"/admin/plays/#{@play.id}/export/tei"}
             target="_blank"
             class="btn btn-ghost btn-xs tooltip"
-            data-tip="Export TEI-XML"
+            data-tip={gettext("Export TEI-XML")}
           >
             <.icon name="hero-code-bracket-mini" class="size-4" />
           </a>
@@ -58,7 +58,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
             href={~p"/admin/plays/#{@play.id}/export/html"}
             target="_blank"
             class="btn btn-ghost btn-xs tooltip"
-            data-tip="Export HTML"
+            data-tip={gettext("Export HTML")}
           >
             <.icon name="hero-globe-alt-mini" class="size-4" />
           </a>
@@ -66,7 +66,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
             href={~p"/admin/plays/#{@play.id}/export/pdf"}
             target="_blank"
             class="btn btn-ghost btn-xs tooltip"
-            data-tip="Export PDF"
+            data-tip={gettext("Export PDF")}
           >
             <.icon name="hero-document-arrow-down-mini" class="size-4" />
           </a>
@@ -75,19 +75,19 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
 
       <%!-- Metadata --%>
       <section class="mb-8">
-        <h2 class="mb-3 text-lg font-semibold text-base-content">Metadata</h2>
+        <h2 class="mb-3 text-lg font-semibold text-base-content">{gettext("Metadata")}</h2>
         <div class="grid grid-cols-1 gap-4 rounded-box border border-base-300 bg-base-100 p-4 text-sm shadow-sm md:grid-cols-2">
-          <div><span class="font-medium">Language:</span> <span class="text-base-content/70">{@play.language}</span></div>
+          <div><span class="font-medium">{gettext("Language:")}</span> <span class="text-base-content/70">{@play.language}</span></div>
           <div>
-            <span class="font-medium">Verse count:</span>
-            <span class="text-base-content/70">{@play.verse_count || "N/A"}</span>
+            <span class="font-medium">{gettext("Verse count:")}</span>
+            <span class="text-base-content/70">{@play.verse_count || gettext("N/A")}</span>
           </div>
           <div>
-            <span class="font-medium">Attribution:</span>
-            <span class="text-base-content/70">{@play.author_attribution || "N/A"}</span>
+            <span class="font-medium">{gettext("Attribution:")}</span>
+            <span class="text-base-content/70">{@play.author_attribution || gettext("N/A")}</span>
           </div>
           <div>
-            <span class="font-medium">Publication:</span>
+            <span class="font-medium">{gettext("Publication:")}</span>
             <span class="text-base-content/70">{@play.pub_place} ({@play.publication_date})</span>
           </div>
         </div>
@@ -95,7 +95,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
 
       <%!-- Editors --%>
       <section :if={@play.editors != []} class="mb-8">
-        <h2 class="mb-3 text-lg font-semibold text-base-content">Editors</h2>
+        <h2 class="mb-3 text-lg font-semibold text-base-content">{gettext("Editors")}</h2>
         <div class="divide-y rounded-box border border-base-300 bg-base-100 shadow-sm">
           <div :for={editor <- @play.editors} class="flex items-center justify-between p-3">
             <span class="font-medium">{editor.person_name}</span>
@@ -109,7 +109,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
       <%!-- Characters --%>
       <section :if={@characters != []} class="mb-8">
         <h2 class="mb-3 text-lg font-semibold text-base-content">
-          Characters ({length(@characters)})
+          {gettext("Characters")} ({length(@characters)})
         </h2>
         <div class="divide-y rounded-box border border-base-300 bg-base-100 shadow-sm">
           <div :for={char <- @characters} class="flex items-center gap-3 p-3">
@@ -118,7 +118,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
               {char.description}
             </span>
             <span :if={char.is_hidden} class="badge badge-ghost badge-sm">
-              hidden
+              {gettext("hidden")}
             </span>
           </div>
         </div>
@@ -126,7 +126,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
 
       <%!-- Structure --%>
       <section :if={@divisions != []} class="mb-8">
-        <h2 class="mb-3 text-lg font-semibold text-base-content">Structure</h2>
+        <h2 class="mb-3 text-lg font-semibold text-base-content">{gettext("Structure")}</h2>
         <div class="divide-y rounded-box border border-base-300 bg-base-100 shadow-sm">
           <div :for={div <- @divisions} class="p-3">
             <span class="font-medium">{div.title || div.type}</span>
@@ -143,13 +143,13 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
       <%!-- Statistics --%>
       <section class="mb-8">
         <div class="mb-3 flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-base-content">Statistics</h2>
+          <h2 class="text-lg font-semibold text-base-content">{gettext("Statistics")}</h2>
           <button phx-click="recompute_stats" class="btn btn-xs btn-ghost">
-            <.icon name="hero-arrow-path-mini" class="size-4" /> Recompute
+            <.icon name="hero-arrow-path-mini" class="size-4" /> {gettext("Recompute")}
           </button>
         </div>
         <div :if={@statistic} class="mb-4 text-xs text-base-content/60">
-          Last computed: {Calendar.strftime(@statistic.computed_at, "%Y-%m-%d %H:%M")}
+          {gettext("Last computed:")} {Calendar.strftime(@statistic.computed_at, "%Y-%m-%d %H:%M")}
         </div>
         <.stats_panel :if={@statistic} statistic={@statistic} play={@play} />
       </section>

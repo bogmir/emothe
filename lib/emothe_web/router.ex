@@ -11,6 +11,7 @@ defmodule EmotheWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug EmotheWeb.Plugs.SetLocale
   end
 
   pipeline :demo_browser do
@@ -32,6 +33,7 @@ defmodule EmotheWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    post "/locale", LocaleController, :update
 
     # Public export endpoints
     get "/export/:id/tei", ExportController, :tei
@@ -40,7 +42,7 @@ defmodule EmotheWeb.Router do
 
     # Public play catalogue and presentation
     live_session :public,
-      on_mount: [{EmotheWeb.UserAuth, :mount_current_user}] do
+      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :mount_current_user}] do
       live "/plays", PlayCatalogueLive, :index
       live "/plays/:code", PlayShowLive, :show
     end
@@ -52,7 +54,7 @@ defmodule EmotheWeb.Router do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
-      on_mount: [{EmotheWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/register", UserRegistrationLive, :new
       live "/users/log-in", UserLoginLive, :new
       live "/users/reset-password", UserForgotPasswordLive, :new
@@ -66,7 +68,7 @@ defmodule EmotheWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{EmotheWeb.UserAuth, :ensure_authenticated}] do
+      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm-email/:token", UserSettingsLive, :confirm_email
     end
@@ -78,7 +80,7 @@ defmodule EmotheWeb.Router do
     delete "/users/log-out", UserSessionController, :delete
 
     live_session :current_user,
-      on_mount: [{EmotheWeb.UserAuth, :mount_current_user}] do
+      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
@@ -90,7 +92,7 @@ defmodule EmotheWeb.Router do
 
     live_session :admin,
       layout: {EmotheWeb.Layouts, :admin},
-      on_mount: [{EmotheWeb.UserAuth, :ensure_admin}] do
+      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :ensure_admin}] do
       live "/plays", PlayListLive, :index
       live "/plays/new", PlayFormLive, :new
       live "/plays/:id/edit", PlayFormLive, :edit

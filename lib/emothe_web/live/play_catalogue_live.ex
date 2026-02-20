@@ -9,10 +9,10 @@ defmodule EmotheWeb.PlayCatalogueLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "Play Catalogue")
+     |> assign(:page_title, gettext("Play Catalogue"))
      |> assign(:plays, plays)
      |> assign(:search, "")
-     |> assign(:breadcrumbs, [%{label: "Catalogue"}])}
+     |> assign(:breadcrumbs, [%{label: gettext("Catalogue")}])}
   end
 
   @impl true
@@ -25,9 +25,9 @@ defmodule EmotheWeb.PlayCatalogueLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-6xl mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-base-content mb-2">EMOTHE Digital Library</h1>
+      <h1 class="text-3xl font-bold text-base-content mb-2">{gettext("EMOTHE Digital Library")}</h1>
       <p class="text-base-content/70 mb-8">
-        European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions
+        {gettext("European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions")}
       </p>
 
       <form phx-change="search" phx-submit="search" class="mb-8">
@@ -35,7 +35,7 @@ defmodule EmotheWeb.PlayCatalogueLive do
           type="text"
           name="search"
           value={@search}
-          placeholder="Search by title, author, or code..."
+          placeholder={gettext("Search by title, author, or code...")}
           phx-debounce="300"
           class="input input-bordered w-full md:max-w-md"
         />
@@ -94,7 +94,7 @@ defmodule EmotheWeb.PlayCatalogueLive do
         </div>
 
         <p :if={@plays == []} class="text-base-content/50 text-center py-12">
-          No plays found. Try a different search term.
+          {gettext("No plays found. Try a different search term.")}
         </p>
       </div>
     </div>

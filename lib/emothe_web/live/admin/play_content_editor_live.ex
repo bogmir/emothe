@@ -21,7 +21,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:ok,
      socket
      |> assign(
-       page_title: "Edit Content: #{play.title}",
+       page_title: "#{gettext("Edit Content")}: #{play.title}",
        play: play,
        characters: characters,
        divisions: divisions,
@@ -35,10 +35,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        preview_divisions: [],
        editor_tab: :characters,
        breadcrumbs: [
-         %{label: "Admin", to: ~p"/admin/plays"},
-         %{label: "Plays", to: ~p"/admin/plays"},
+         %{label: gettext("Admin"), to: ~p"/admin/plays"},
+         %{label: gettext("Plays"), to: ~p"/admin/plays"},
          %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
-         %{label: "Edit Content"}
+         %{label: gettext("Edit Content")}
        ],
        play_context: %{play: play, active_tab: :content}
      )}
@@ -135,7 +135,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Character deleted.")
+     |> put_flash(:info, gettext("Character deleted."))
      |> reload_characters()}
   end
 
@@ -187,7 +187,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Division deleted.")
+     |> put_flash(:info, gettext("Division deleted."))
      |> assign(selected_division_id: selected)
      |> reload_divisions()
      |> reload_elements()}
@@ -201,7 +201,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   end
 
   def handle_event("select_division_auto", %{"id" => id}, socket) do
-    # If the selected division is an act with children, auto-select its first scene
     target_id =
       case find_division(socket.assigns.divisions, id) do
         %{children: [first_child | _]} -> first_child.id
@@ -254,7 +253,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     element_type = params["type"]
     before_pos = String.to_integer(params["position"])
 
-    # Shift existing elements to make room
     PlayContent.shift_element_positions(div_id, parent_id, before_pos)
 
     attrs = %{
@@ -296,7 +294,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     element = PlayContent.get_element!(id)
     play_id = socket.assigns.play.id
 
-    # Check if we need to shift line numbers down after deletion
     should_shift_down =
       element.type == "verse_line" &&
         element.line_number != nil &&
@@ -312,7 +309,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Element deleted.")
+     |> put_flash(:info, gettext("Element deleted."))
      |> reload_elements()}
   end
 
@@ -338,7 +335,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Character saved.")
+         |> put_flash(:info, gettext("Character saved."))
          |> assign(modal: nil, form: nil, editing: nil)
          |> reload_characters()}
 
@@ -371,7 +368,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Division saved.")
+         |> put_flash(:info, gettext("Division saved."))
          |> assign(modal: nil, form: nil, editing: nil, modal_parent_id: nil)
          |> reload_divisions()}
 
@@ -392,7 +389,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             |> Map.put("play_id", play.id)
             |> Map.put("division_id", socket.assigns.selected_division_id)
 
-          # Shift line numbers before creating a new verse_line
           if el_params["type"] == "verse_line" do
             case el_params["line_number"] do
               nil ->
@@ -419,7 +415,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Element saved.")
+         |> put_flash(:info, gettext("Element saved."))
          |> assign(modal: nil, form: nil, editing: nil, modal_element_type: nil)
          |> reload_elements()}
 
@@ -432,7 +428,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   @impl true
   def handle_info({:play_content_changed, _play_id}, socket) do
-    # Refresh the play record (for updated verse_count) and reload visible data
     play = Catalogue.get_play!(socket.assigns.play.id)
 
     {:noreply,
@@ -476,8 +471,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   defp extract_form_params(params, :element), do: params["element"] || %{}
   defp extract_form_params(_params, _), do: %{}
 
-  defp editing_label(nil), do: "Add"
-  defp editing_label(_), do: "Edit"
+  defp editing_label(nil), do: gettext("Add")
+  defp editing_label(_), do: gettext("Edit")
 
   defp find_division(divisions, id) do
     Enum.find_value(divisions, fn div ->
@@ -548,7 +543,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <%!-- Header --%>
       <div class="mb-6">
         <h1 class="text-3xl font-semibold tracking-tight text-base-content">
-          Edit Content: {@play.title}
+          {gettext("Edit Content")}: {@play.title}
         </h1>
         <p class="mt-1 text-sm text-base-content/70">{@play.author_name} — {@play.code}</p>
       </div>
@@ -585,11 +580,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <div :if={@editor_tab == :characters} class="animate-in fade-in">
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-lg font-semibold text-base-content">
-            Dramatis Personae
+            {gettext("Dramatis Personae")}
             <span class="text-base-content/50 font-normal">({length(@characters)})</span>
           </h2>
           <button phx-click="new_character" class="btn btn-sm btn-primary gap-1">
-            <.icon name="hero-plus-mini" class="size-4" /> Add Character
+            <.icon name="hero-plus-mini" class="size-4" /> {gettext("Add Character")}
           </button>
         </div>
         <div
@@ -597,7 +592,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
         >
           <.icon name="hero-user-group" class="mx-auto mb-2 size-8 text-base-content/30" />
-          <p>No characters yet. Add one to get started.</p>
+          <p>{gettext("No characters yet. Add one to get started.")}</p>
         </div>
         <div
           :if={@characters != []}
@@ -618,23 +613,23 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   {char.description}
                 </p>
               </div>
-              <span :if={char.is_hidden} class="badge badge-ghost badge-xs">hidden</span>
+              <span :if={char.is_hidden} class="badge badge-ghost badge-xs">{gettext("hidden")}</span>
             </div>
             <div class="flex gap-1 shrink-0">
               <button
                 phx-click="edit_character"
                 phx-value-id={char.id}
                 class="btn btn-ghost btn-xs tooltip"
-                data-tip="Edit"
+                data-tip={gettext("Edit")}
               >
                 <.icon name="hero-pencil-mini" class="size-4" />
               </button>
               <button
                 phx-click="delete_character"
                 phx-value-id={char.id}
-                data-confirm="Delete this character? Speeches referencing it will lose their speaker."
+                data-confirm={gettext("Delete this character? Speeches referencing it will lose their speaker.")}
                 class="btn btn-ghost btn-xs text-error tooltip"
-                data-tip="Delete"
+                data-tip={gettext("Delete")}
               >
                 <.icon name="hero-trash-mini" class="size-4" />
               </button>
@@ -647,11 +642,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <div :if={@editor_tab == :structure} class="animate-in fade-in">
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-lg font-semibold text-base-content">
-            Play Structure
-            <span class="text-base-content/50 font-normal">({length(@divisions)} acts)</span>
+            {gettext("Play Structure")}
+            <span class="text-base-content/50 font-normal">({length(@divisions)} {gettext("acts")})</span>
           </h2>
           <button phx-click="new_division" class="btn btn-sm btn-primary gap-1">
-            <.icon name="hero-plus-mini" class="size-4" /> Add Act
+            <.icon name="hero-plus-mini" class="size-4" /> {gettext("Add Act")}
           </button>
         </div>
         <div
@@ -659,7 +654,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
         >
           <.icon name="hero-bars-3-bottom-left" class="mx-auto mb-2 size-8 text-base-content/30" />
-          <p>No acts or scenes yet. Add an act to get started.</p>
+          <p>{gettext("No acts or scenes yet. Add an act to get started.")}</p>
         </div>
         <div :if={@divisions != []} class="space-y-3">
           <div
@@ -678,22 +673,22 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   phx-value-id={div.id}
                   class="btn btn-xs btn-ghost btn-outline gap-1"
                 >
-                  <.icon name="hero-pencil-square-mini" class="size-3" /> Edit Content
+                  <.icon name="hero-pencil-square-mini" class="size-3" /> {gettext("Edit Content")}
                 </button>
                 <button
                   phx-click="edit_division"
                   phx-value-id={div.id}
                   class="btn btn-ghost btn-xs tooltip"
-                  data-tip="Edit metadata"
+                  data-tip={gettext("Edit metadata")}
                 >
                   <.icon name="hero-cog-6-tooth-mini" class="size-4" />
                 </button>
                 <button
                   phx-click="delete_division"
                   phx-value-id={div.id}
-                  data-confirm="Delete this division and all its content?"
+                  data-confirm={gettext("Delete this division and all its content?")}
                   class="btn btn-ghost btn-xs text-error tooltip"
-                  data-tip="Delete"
+                  data-tip={gettext("Delete")}
                 >
                   <.icon name="hero-trash-mini" class="size-4" />
                 </button>
@@ -722,7 +717,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                     :if={@selected_division_id == child.id}
                     class="badge badge-primary badge-xs ml-1"
                   >
-                    editing
+                    {gettext("editing")}
                   </span>
                 </button>
                 <div class="flex gap-1">
@@ -730,16 +725,16 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                     phx-click="edit_division"
                     phx-value-id={child.id}
                     class="btn btn-ghost btn-xs tooltip"
-                    data-tip="Edit metadata"
+                    data-tip={gettext("Edit metadata")}
                   >
                     <.icon name="hero-cog-6-tooth-mini" class="size-4" />
                   </button>
                   <button
                     phx-click="delete_division"
                     phx-value-id={child.id}
-                    data-confirm="Delete this scene and all its content?"
+                    data-confirm={gettext("Delete this scene and all its content?")}
                     class="btn btn-ghost btn-xs text-error tooltip"
-                    data-tip="Delete"
+                    data-tip={gettext("Delete")}
                   >
                     <.icon name="hero-trash-mini" class="size-4" />
                   </button>
@@ -752,7 +747,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                 phx-value-parent-id={div.id}
                 class="btn btn-xs btn-ghost gap-1"
               >
-                <.icon name="hero-plus-mini" class="size-3" /> Add Scene
+                <.icon name="hero-plus-mini" class="size-3" /> {gettext("Add Scene")}
               </button>
             </div>
           </div>
@@ -768,14 +763,14 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         >
           <.icon name="hero-cursor-arrow-rays" class="mx-auto mb-3 size-10 text-base-content/30" />
           <p class="text-base-content/60 mb-3">
-            Select a scene or act from the Structure tab to edit its content.
+            {gettext("Select a scene or act from the Structure tab to edit its content.")}
           </p>
           <button
             phx-click="switch_tab"
             phx-value-tab="structure"
             class="btn btn-sm btn-outline gap-1"
           >
-            <.icon name="hero-bars-3-bottom-left-mini" class="size-4" /> Go to Structure
+            <.icon name="hero-bars-3-bottom-left-mini" class="size-4" /> {gettext("Go to Structure")}
           </button>
         </div>
 
@@ -803,7 +798,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                     phx-click="select_division"
                     phx-value-id={prev_division_id(@divisions, @selected_division_id)}
                     class="btn btn-ghost btn-xs tooltip"
-                    data-tip="Previous"
+                    data-tip={gettext("Previous")}
                   >
                     <.icon name="hero-chevron-left-mini" class="size-4" />
                   </button>
@@ -812,7 +807,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                     phx-click="select_division"
                     phx-value-id={next_division_id(@divisions, @selected_division_id)}
                     class="btn btn-ghost btn-xs tooltip"
-                    data-tip="Next"
+                    data-tip={gettext("Next")}
                   >
                     <.icon name="hero-chevron-right-mini" class="size-4" />
                   </button>
@@ -825,21 +820,21 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                 phx-value-type="speech"
                 class="btn btn-xs btn-primary gap-1"
               >
-                <.icon name="hero-plus-mini" class="size-3" /> Speech
+                <.icon name="hero-plus-mini" class="size-3" /> {gettext("Speech")}
               </button>
               <button
                 phx-click="new_element"
                 phx-value-type="stage_direction"
                 class="btn btn-xs btn-outline gap-1"
               >
-                <.icon name="hero-plus-mini" class="size-3" /> Stage Dir.
+                <.icon name="hero-plus-mini" class="size-3" /> {gettext("Stage Dir.")}
               </button>
               <button
                 phx-click="new_element"
                 phx-value-type="prose"
                 class="btn btn-xs btn-outline gap-1"
               >
-                <.icon name="hero-plus-mini" class="size-3" /> Prose
+                <.icon name="hero-plus-mini" class="size-3" /> {gettext("Prose")}
               </button>
             </div>
           </div>
@@ -849,7 +844,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
           >
             <.icon name="hero-document-text" class="mx-auto mb-2 size-8 text-base-content/30" />
-            <p>No content yet. Add a speech, stage direction, or prose.</p>
+            <p>{gettext("No content yet. Add a speech, stage direction, or prose.")}</p>
           </div>
           <div :if={@elements != []} class="space-y-2">
             <.element_card
@@ -865,7 +860,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <%!-- Tab: Preview --%>
       <div :if={@editor_tab == :preview} class="animate-in fade-in">
         <div class="mb-4">
-          <h2 class="text-lg font-semibold text-base-content">Play Text Preview</h2>
+          <h2 class="text-lg font-semibold text-base-content">{gettext("Play Text Preview")}</h2>
         </div>
         <div
           id="preview-scroll-container"
@@ -891,7 +886,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           </script>
           <div :if={@preview_divisions == []} class="text-center py-8 text-base-content/60">
             <.icon name="hero-document" class="mx-auto mb-2 size-8 text-base-content/30" />
-            <p>No content to preview yet.</p>
+            <p>{gettext("No content to preview yet.")}</p>
           </div>
           <.play_body
             :if={@preview_divisions != []}
@@ -941,7 +936,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   end
 
   defp selected_division_short_label(divisions, id) do
-    # Show the parent act label when a scene is selected, otherwise the division itself
     Enum.find_value(divisions, nil, fn div ->
       if div.id == id do
         String.slice(div.title || "#{String.capitalize(div.type)} #{div.number}", 0..15)
@@ -1039,12 +1033,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           <span :if={@element.line_number} class="text-xs text-base-content/50 ml-1">
             L{@element.line_number}
           </span>
-          <span :if={@element.is_aside} class="badge badge-ghost badge-xs ml-1">aside</span>
+          <span :if={@element.is_aside} class="badge badge-ghost badge-xs ml-1">{gettext("aside")}</span>
         </div>
         <div class="flex gap-1">
           <%!-- Insert Above for top-level elements (speeches, stage dirs, prose) --%>
           <div :if={@depth == 0} class="dropdown dropdown-end">
-            <label tabindex="0" class="btn btn-xs btn-ghost btn-outline">Insert Above</label>
+            <label tabindex="0" class="btn btn-xs btn-ghost btn-outline">{gettext("Insert Above")}</label>
             <ul
               tabindex="0"
               class="dropdown-content z-[1] menu p-1 shadow bg-base-100 rounded-box w-40"
@@ -1056,7 +1050,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   phx-value-position={@element.position}
                   phx-value-parent-id=""
                 >
-                  Speech
+                  {gettext("Speech")}
                 </button>
               </li>
               <li>
@@ -1066,7 +1060,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   phx-value-position={@element.position}
                   phx-value-parent-id=""
                 >
-                  Stage Direction
+                  {gettext("Stage Direction")}
                 </button>
               </li>
               <li>
@@ -1076,7 +1070,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   phx-value-position={@element.position}
                   phx-value-parent-id=""
                 >
-                  Prose
+                  {gettext("Prose")}
                 </button>
               </li>
             </ul>
@@ -1090,22 +1084,22 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             phx-value-parent-id={@element.parent_id}
             class="btn btn-xs btn-ghost btn-outline"
           >
-            Insert Above
+            {gettext("Insert Above")}
           </button>
           <button
             phx-click="edit_element"
             phx-value-id={@element.id}
             class="btn btn-ghost btn-xs tooltip"
-            data-tip="Edit"
+            data-tip={gettext("Edit")}
           >
             <.icon name="hero-pencil-mini" class="size-4" />
           </button>
           <button
             phx-click="delete_element"
             phx-value-id={@element.id}
-            data-confirm="Delete this element and its children?"
+            data-confirm={gettext("Delete this element and its children?")}
             class="btn btn-ghost btn-xs text-error tooltip"
-            data-tip="Delete"
+            data-tip={gettext("Delete")}
           >
             <.icon name="hero-trash-mini" class="size-4" />
           </button>
@@ -1131,7 +1125,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           phx-value-parent-id={@element.id}
           class="btn btn-xs btn-ghost btn-outline"
         >
-          Add Line Group
+          {gettext("Add Line Group")}
         </button>
         <button
           phx-click="new_element"
@@ -1139,7 +1133,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           phx-value-parent-id={@element.id}
           class="btn btn-xs btn-ghost btn-outline"
         >
-          Add Stage Direction
+          {gettext("Add Stage Direction")}
         </button>
         <button
           phx-click="new_element"
@@ -1147,7 +1141,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           phx-value-parent-id={@element.id}
           class="btn btn-xs btn-ghost btn-outline"
         >
-          Add Prose
+          {gettext("Add Prose")}
         </button>
       </div>
       <div :if={@element.type == "line_group"} class="border-t border-base-300 px-3 py-2">
@@ -1157,18 +1151,18 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           phx-value-parent-id={@element.id}
           class="btn btn-xs btn-ghost btn-outline"
         >
-          Add Verse Line
+          {gettext("Add Verse Line")}
         </button>
       </div>
     </div>
     """
   end
 
-  defp element_type_label("speech"), do: "Speech"
-  defp element_type_label("stage_direction"), do: "Stage Dir."
-  defp element_type_label("verse_line"), do: "Verse"
-  defp element_type_label("prose"), do: "Prose"
-  defp element_type_label("line_group"), do: "Line Group"
+  defp element_type_label("speech"), do: gettext("Speech")
+  defp element_type_label("stage_direction"), do: gettext("Stage Dir.")
+  defp element_type_label("verse_line"), do: gettext("Verse")
+  defp element_type_label("prose"), do: gettext("Prose")
+  defp element_type_label("line_group"), do: gettext("Line Group")
   defp element_type_label(type), do: type
 
   # --- Modal content ---
@@ -1181,7 +1175,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   defp modal_content(%{modal: :character} = assigns) do
     ~H"""
-    <h3 class="text-lg font-bold mb-4">{editing_label(@editing)} Character</h3>
+    <h3 class="text-lg font-bold mb-4">{editing_label(@editing)} {gettext("Character")}</h3>
     <.form
       for={@form}
       as={:character}
@@ -1191,26 +1185,26 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     >
       <div>
         <label class="label"><span class="label-text font-medium">XML ID *</span></label>
-        <.input field={@form[:xml_id]} type="text" required placeholder="e.g. DONA_ANA" />
+        <.input field={@form[:xml_id]} type="text" required placeholder={gettext("e.g. DONA_ANA")} />
       </div>
       <div>
-        <label class="label"><span class="label-text font-medium">Name *</span></label>
-        <.input field={@form[:name]} type="text" required placeholder="e.g. Dona Ana" />
+        <label class="label"><span class="label-text font-medium">{gettext("Name")} *</span></label>
+        <.input field={@form[:name]} type="text" required placeholder={gettext("e.g. Dona Ana")} />
       </div>
       <div>
-        <label class="label"><span class="label-text font-medium">Description</span></label>
-        <.input field={@form[:description]} type="text" placeholder="e.g. una dama" />
+        <label class="label"><span class="label-text font-medium">{gettext("Description")}</span></label>
+        <.input field={@form[:description]} type="text" placeholder={gettext("e.g. una dama")} />
       </div>
       <div>
         <label class="flex items-center gap-2">
           <.input field={@form[:is_hidden]} type="checkbox" />
-          <span class="label-text">Hidden character</span>
+          <span class="label-text">{gettext("Hidden character")}</span>
         </label>
       </div>
       <.input field={@form[:position]} type="hidden" />
       <div class="flex gap-2 pt-2">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" phx-click="close_modal" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-primary">{gettext("Save")}</button>
+        <button type="button" phx-click="close_modal" class="btn btn-ghost">{gettext("Cancel")}</button>
       </div>
     </.form>
     """
@@ -1218,7 +1212,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   defp modal_content(%{modal: :division} = assigns) do
     ~H"""
-    <h3 class="text-lg font-bold mb-4">{editing_label(@editing)} Division</h3>
+    <h3 class="text-lg font-bold mb-4">{editing_label(@editing)} {gettext("Division")}</h3>
     <.form
       for={@form}
       as={:division}
@@ -1227,21 +1221,21 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       class="space-y-4"
     >
       <div>
-        <label class="label"><span class="label-text font-medium">Type *</span></label>
+        <label class="label"><span class="label-text font-medium">{gettext("Type")} *</span></label>
         <.input field={@form[:type]} type="select" options={division_types()} />
       </div>
       <div>
-        <label class="label"><span class="label-text font-medium">Number</span></label>
+        <label class="label"><span class="label-text font-medium">{gettext("Number")}</span></label>
         <.input field={@form[:number]} type="number" />
       </div>
       <div>
-        <label class="label"><span class="label-text font-medium">Title</span></label>
-        <.input field={@form[:title]} type="text" placeholder="e.g. ACTO PRIMERO" />
+        <label class="label"><span class="label-text font-medium">{gettext("Title")}</span></label>
+        <.input field={@form[:title]} type="text" placeholder={gettext("e.g. ACTO PRIMERO")} />
       </div>
       <.input field={@form[:position]} type="hidden" />
       <div class="flex gap-2 pt-2">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" phx-click="close_modal" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-primary">{gettext("Save")}</button>
+        <button type="button" phx-click="close_modal" class="btn btn-ghost">{gettext("Cancel")}</button>
       </div>
     </.form>
     """
@@ -1266,21 +1260,21 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <%!-- Speech fields --%>
       <div :if={@modal_element_type == "speech"}>
         <div class="mb-4">
-          <label class="label"><span class="label-text font-medium">Speaker Label</span></label>
-          <.input field={@form[:speaker_label]} type="text" placeholder="e.g. ANA" />
+          <label class="label"><span class="label-text font-medium">{gettext("Speaker Label")}</span></label>
+          <.input field={@form[:speaker_label]} type="text" placeholder={gettext("e.g. ANA")} />
         </div>
         <div class="mb-4">
-          <label class="label"><span class="label-text font-medium">Character</span></label>
+          <label class="label"><span class="label-text font-medium">{gettext("Character")}</span></label>
           <.input
             field={@form[:character_id]}
             type="select"
-            options={[{"(none)", ""} | Enum.map(@characters, &{&1.name, &1.id})]}
+            options={[{gettext("(none)"), ""} | Enum.map(@characters, &{&1.name, &1.id})]}
           />
         </div>
         <div>
           <label class="flex items-center gap-2">
             <.input field={@form[:is_aside]} type="checkbox" />
-            <span class="label-text">Aside</span>
+            <span class="label-text">{gettext("Aside")}</span>
           </label>
         </div>
       </div>
@@ -1288,53 +1282,53 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <%!-- Stage direction fields --%>
       <div :if={@modal_element_type == "stage_direction"}>
         <div class="mb-4">
-          <label class="label"><span class="label-text font-medium">Content</span></label>
+          <label class="label"><span class="label-text font-medium">{gettext("Content")}</span></label>
           <.input
             field={@form[:content]}
             type="textarea"
             rows="3"
-            placeholder="Stage direction text..."
+            placeholder={gettext("Stage direction text...")}
           />
         </div>
         <div>
           <label class="label"><span class="label-text font-medium">Rend</span></label>
-          <.input field={@form[:rend]} type="text" placeholder="e.g. italics" />
+          <.input field={@form[:rend]} type="text" placeholder={gettext("e.g. italics")} />
         </div>
       </div>
 
       <%!-- Prose fields --%>
       <div :if={@modal_element_type == "prose"}>
-        <label class="label"><span class="label-text font-medium">Content</span></label>
-        <.input field={@form[:content]} type="textarea" rows="4" placeholder="Prose text..." />
+        <label class="label"><span class="label-text font-medium">{gettext("Content")}</span></label>
+        <.input field={@form[:content]} type="textarea" rows="4" placeholder={gettext("Prose text...")} />
       </div>
 
       <%!-- Line group fields --%>
       <div :if={@modal_element_type == "line_group"}>
-        <label class="label"><span class="label-text font-medium">Verse Type</span></label>
+        <label class="label"><span class="label-text font-medium">{gettext("Verse Type")}</span></label>
         <.input field={@form[:verse_type]} type="select" options={verse_types()} />
       </div>
 
       <%!-- Verse line fields --%>
       <div :if={@modal_element_type == "verse_line"}>
         <div class="mb-4">
-          <label class="label"><span class="label-text font-medium">Content *</span></label>
-          <.input field={@form[:content]} type="text" required placeholder="Verse line text..." />
+          <label class="label"><span class="label-text font-medium">{gettext("Content")} *</span></label>
+          <.input field={@form[:content]} type="text" required placeholder={gettext("Verse line text...")} />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="label"><span class="label-text font-medium">Line Number</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Line Number")}</span></label>
             <.input field={@form[:line_number]} type="number" />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">Part (split line)</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Part (split line)")}</span></label>
             <.input field={@form[:part]} type="select" options={part_options()} />
           </div>
         </div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" phx-click="close_modal" class="btn btn-ghost">Cancel</button>
+        <button type="submit" class="btn btn-primary">{gettext("Save")}</button>
+        <button type="button" phx-click="close_modal" class="btn btn-ghost">{gettext("Cancel")}</button>
       </div>
     </.form>
     """

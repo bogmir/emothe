@@ -118,25 +118,25 @@ defmodule EmotheWeb.Layouts do
             navigate={~p"/admin/plays/#{@play.id}"}
             class={ctx_tab_class(@active_tab == :overview)}
           >
-            Overview
+            {gettext("Overview")}
           </.link>
           <.link
             navigate={~p"/admin/plays/#{@play.id}/edit"}
             class={ctx_tab_class(@active_tab == :metadata)}
           >
-            Metadata
+            {gettext("Metadata")}
           </.link>
           <.link
             navigate={~p"/admin/plays/#{@play.id}/content"}
             class={ctx_tab_class(@active_tab == :content)}
           >
-            Content
+            {gettext("Content")}
           </.link>
           <.link
             navigate={~p"/plays/#{@play.code}"}
             class={ctx_tab_class(@active_tab == :public)}
           >
-            <.icon name="hero-eye-micro" class="size-3.5" /> Public
+            <.icon name="hero-eye-micro" class="size-3.5" /> {gettext("Public")}
           </.link>
         </nav>
       </div>
@@ -167,6 +167,31 @@ defmodule EmotheWeb.Layouts do
       <.icon name="hero-sun-micro" class="size-5 [[data-theme=dark]_&]:hidden" />
       <.icon name="hero-moon-micro" class="size-5 hidden [[data-theme=dark]_&]:block" />
     </button>
+    """
+  end
+
+  @doc """
+  Language toggle component (ES/EN).
+  """
+  attr :locale, :string, default: "es"
+
+  def locale_toggle(assigns) do
+    ~H"""
+    <div class="flex items-center gap-0.5">
+      <form :if={@locale != "es"} action="/locale" method="post" class="inline">
+        <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
+        <input type="hidden" name="locale" value="es" />
+        <button type="submit" class="btn btn-ghost btn-xs font-bold">ES</button>
+      </form>
+      <span :if={@locale == "es"} class="btn btn-ghost btn-xs font-bold btn-active">ES</span>
+
+      <form :if={@locale != "en"} action="/locale" method="post" class="inline">
+        <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
+        <input type="hidden" name="locale" value="en" />
+        <button type="submit" class="btn btn-ghost btn-xs font-bold">EN</button>
+      </form>
+      <span :if={@locale == "en"} class="btn btn-ghost btn-xs font-bold btn-active">EN</span>
+    </div>
     """
   end
 end

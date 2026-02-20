@@ -32,7 +32,7 @@ defmodule EmotheWeb.PlayShowLive do
      |> assign(:active_tab, :text)
      |> assign(:sidebar_open, true)
      |> assign(:breadcrumbs, [
-       %{label: "Catalogue", to: ~p"/plays"},
+       %{label: gettext("Catalogue"), to: ~p"/plays"},
        %{label: play.title}
      ])}
   end
@@ -67,7 +67,7 @@ defmodule EmotheWeb.PlayShowLive do
               class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold text-primary cursor-pointer"
             >
               <span class="flex items-center gap-2">
-                <.icon name="hero-list-bullet-micro" class="size-4" /> Contents
+                <.icon name="hero-list-bullet-micro" class="size-4" /> {gettext("Contents")}
               </span>
               <.icon
                 name={if @sidebar_open, do: "hero-chevron-up-micro", else: "hero-chevron-down-micro"}
@@ -83,7 +83,7 @@ defmodule EmotheWeb.PlayShowLive do
             >
               <section :if={@metadata_sections != []}>
                 <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
-                  Metadata
+                  {gettext("Metadata")}
                 </h3>
                 <nav class="mt-1 space-y-px">
                   <a
@@ -98,7 +98,7 @@ defmodule EmotheWeb.PlayShowLive do
 
               <section :if={@play_sections != []}>
                 <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
-                  Sections
+                  {gettext("Sections")}
                 </h3>
                 <nav class="mt-1 space-y-px">
                   <a
@@ -120,7 +120,7 @@ defmodule EmotheWeb.PlayShowLive do
             navigate={~p"/admin/plays/#{@play.id}"}
             class="mt-2 flex items-center gap-1.5 rounded-box border border-base-300 bg-base-100/90 px-3 py-2 text-xs text-base-content/60 hover:text-primary hover:border-primary/30 transition-colors"
           >
-            <.icon name="hero-pencil-square-micro" class="size-3.5" /> Edit in Admin
+            <.icon name="hero-pencil-square-micro" class="size-3.5" /> {gettext("Edit in Admin")}
           </.link>
         </aside>
 
@@ -153,7 +153,7 @@ defmodule EmotheWeb.PlayShowLive do
             </div>
 
             <p :if={@play.verse_count} class="mt-2 text-xs text-base-content/50">
-              {if @play.is_verse, do: "#{@play.verse_count} verses", else: "Prose"}
+              {if @play.is_verse, do: "#{@play.verse_count} #{gettext("verses")}", else: gettext("Prose")}
             </p>
           </header>
 
@@ -171,7 +171,7 @@ defmodule EmotheWeb.PlayShowLive do
           <nav id="play-tab-nav" class="flex border-b border-stone-300 mb-6">
             <button
               :for={
-                tab <- [{:text, "Text"}, {:characters, "Characters"}, {:statistics, "Statistics"}]
+                tab <- [{:text, gettext("Text")}, {:characters, gettext("Characters")}, {:statistics, gettext("Statistics")}]
               }
               phx-click="switch_tab"
               phx-value-tab={elem(tab, 0)}
@@ -197,7 +197,7 @@ defmodule EmotheWeb.PlayShowLive do
                   checked={@show_line_numbers}
                   phx-click="toggle_line_numbers"
                   class="checkbox checkbox-xs checkbox-primary"
-                /> Line numbers
+                /> {gettext("Line numbers")}
               </label>
               <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
                 <input
@@ -205,7 +205,7 @@ defmodule EmotheWeb.PlayShowLive do
                   checked={@show_stage_directions}
                   phx-click="toggle_stage_directions"
                   class="checkbox checkbox-xs checkbox-primary"
-                /> Stage directions
+                /> {gettext("Stage directions")}
               </label>
             </div>
 
@@ -218,7 +218,7 @@ defmodule EmotheWeb.PlayShowLive do
 
           <%!-- Characters tab --%>
           <div :if={@active_tab == :characters} id="play-tab-characters">
-            <h2 class="text-lg font-bold mb-4 text-base-content">Dramatis Personae</h2>
+            <h2 class="text-lg font-bold mb-4 text-base-content">{gettext("Dramatis Personae")}</h2>
             <div class="grid gap-2 max-w-2xl">
               <div
                 :for={char <- Enum.filter(@characters, &(!&1.is_hidden))}
@@ -250,11 +250,11 @@ defmodule EmotheWeb.PlayShowLive do
   end
 
   defp build_metadata_sections(play) do
-    base = [%{id: "meta-overview", label: "Overview"}]
+    base = [%{id: "meta-overview", label: gettext("Overview")}]
 
     base
-    |> maybe_add_section(play.sources != [], "meta-sources", "Source")
-    |> maybe_add_section(play.editors != [], "meta-editors", "Editors")
+    |> maybe_add_section(play.sources != [], "meta-sources", gettext("Source"))
+    |> maybe_add_section(play.editors != [], "meta-editors", gettext("Editors"))
     |> Kernel.++(build_editorial_note_sections(play.editorial_notes))
   end
 
@@ -268,7 +268,7 @@ defmodule EmotheWeb.PlayShowLive do
       label =
         case note.heading do
           heading when is_binary(heading) and heading != "" -> heading
-          _ -> "Editorial Note #{index}"
+          _ -> "#{gettext("Editorial Note")} #{index}"
         end
 
       %{id: "meta-note-#{index}", label: label}

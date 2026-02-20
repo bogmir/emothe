@@ -3,6 +3,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
   Modern visualization components for play statistics.
   """
   use Phoenix.Component
+  use Gettext, backend: EmotheWeb.Gettext
 
   attr :statistic, :map, required: true
   attr :play, :map, required: true
@@ -17,14 +18,14 @@ defmodule EmotheWeb.Components.StatisticsPanel do
       <%!-- Summary cards --%>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <.stat_card label={"#{@act_label}s"} value={@data["num_acts"]} icon="📜" />
-        <.stat_card label="Scenes" value={get_in(@data, ["scenes", "total"])} icon="🎭" />
-        <.stat_card label="Verses" value={@data["total_verses"]} icon="✍️" />
-        <.stat_card label="Stage Directions" value={@data["total_stage_directions"]} icon="🎬" />
+        <.stat_card label={gettext("Scenes")} value={get_in(@data, ["scenes", "total"])} icon="🎭" />
+        <.stat_card label={gettext("Verses")} value={@data["total_verses"]} icon="✍️" />
+        <.stat_card label={gettext("Stage Directions")} value={@data["total_stage_directions"]} icon="🎬" />
       </div>
 
       <%!-- Scenes per act --%>
       <.bar_chart
-        title={"Scenes per #{@act_label}"}
+        title={"#{gettext("Scenes per")} #{@act_label}"}
         items={get_in(@data, ["scenes", "per_act"]) || []}
         label_key="act"
         value_key="count"
@@ -34,7 +35,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
       <%!-- Verse distribution --%>
       <.bar_chart
-        title="Verse Distribution"
+        title={gettext("Verse Distribution")}
         items={@data["verse_distribution"] || []}
         label_key="act"
         value_key="count"
@@ -45,7 +46,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
       <%!-- Prose fragments --%>
       <.bar_chart
         :if={(@data["total_prose_fragments"] || 0) > 0}
-        title="Prose Fragments"
+        title={gettext("Prose Fragments")}
         items={@data["prose_fragments"] || []}
         label_key="act"
         value_key="count"
@@ -55,14 +56,14 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
       <%!-- Additional stats --%>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <.stat_card label="Split Verses" value={@data["split_verses"]} icon="↔️" />
-        <.stat_card label="Asides" value={@data["total_asides"]} icon="🤫" />
-        <.stat_card label="Aside Verses" value={@data["aside_verses"]} icon="💬" />
+        <.stat_card label={gettext("Split Verses")} value={@data["split_verses"]} icon="↔️" />
+        <.stat_card label={gettext("Asides")} value={@data["total_asides"]} icon="🤫" />
+        <.stat_card label={gettext("Aside Verses")} value={@data["aside_verses"]} icon="💬" />
       </div>
 
       <%!-- Character appearances --%>
       <div :if={@data["character_appearances"] && @data["character_appearances"] != []}>
-        <h3 class="text-lg font-semibold text-gray-900 mb-3">Character Speeches</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">{gettext("Character Speeches")}</h3>
         <div class="space-y-2">
           <div :for={char <- @data["character_appearances"]} class="flex items-center gap-3">
             <span class="w-28 text-sm font-medium text-gray-700 truncate" title={char["name"]}>

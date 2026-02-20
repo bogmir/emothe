@@ -44,7 +44,7 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
       }
 
       view
-      |> element("form")
+      |> element("form[phx-submit]")
       |> render_submit(params)
 
       created = Catalogue.get_play_by_code!(code)
@@ -58,12 +58,12 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/plays/new")
 
       view
-      |> element("form")
+      |> element("form[phx-submit]")
       |> render_submit(%{"play" => %{"title" => "", "code" => ""}})
 
       html = render(view)
-      assert html =~ "can&#39;t be blank"
-      assert html =~ "New Play"
+      assert html =~ "no puede estar en blanco"
+      assert html =~ "Nueva obra"
     end
 
     test "given existing play when editing then updated data is persisted", %{conn: conn} do
@@ -73,7 +73,7 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
 
       view
-      |> element("form")
+      |> element("form[phx-submit]")
       |> render_submit(%{"play" => %{"title" => "Updated Title", "code" => play.code}})
 
       assert_redirect(view, ~p"/admin/plays/#{play.id}")

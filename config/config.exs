@@ -11,6 +11,10 @@ config :emothe,
   ecto_repos: [Emothe.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :emothe, EmotheWeb.Gettext,
+  default_locale: "es",
+  locales: ~w(es en)
+
 # Configure the endpoint
 config :emothe, EmotheWeb.Endpoint,
   url: [host: "localhost"],

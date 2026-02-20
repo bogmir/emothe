@@ -40,7 +40,7 @@ defmodule EmotheWeb.Admin.PlayListLiveTest do
       assert render(view) =~ beta.title
 
       view
-      |> element("form")
+      |> element("form[phx-change=search]")
       |> render_change(%{"search" => "Alpha"})
 
       html = render(view)

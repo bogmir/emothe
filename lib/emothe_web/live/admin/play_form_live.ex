@@ -18,13 +18,13 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     play = %Play{}
 
     socket
-    |> assign(:page_title, "New Play")
+    |> assign(:page_title, gettext("New Play"))
     |> assign(:play, play)
     |> assign(:form, to_form(Catalogue.change_play_form(play)))
     |> assign(:breadcrumbs, [
-      %{label: "Admin", to: ~p"/admin/plays"},
-      %{label: "Plays", to: ~p"/admin/plays"},
-      %{label: "New Play"}
+      %{label: gettext("Admin"), to: ~p"/admin/plays"},
+      %{label: gettext("Plays"), to: ~p"/admin/plays"},
+      %{label: gettext("New Play")}
     ])
     |> assign(:play_context, nil)
   end
@@ -33,14 +33,14 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     play = Catalogue.get_play!(id)
 
     socket
-    |> assign(:page_title, "Edit: #{play.title}")
+    |> assign(:page_title, "#{gettext("Edit")}: #{play.title}")
     |> assign(:play, play)
     |> assign(:form, to_form(Catalogue.change_play_form(play)))
     |> assign(:breadcrumbs, [
-      %{label: "Admin", to: ~p"/admin/plays"},
-      %{label: "Plays", to: ~p"/admin/plays"},
+      %{label: gettext("Admin"), to: ~p"/admin/plays"},
+      %{label: gettext("Plays"), to: ~p"/admin/plays"},
       %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
-      %{label: "Edit Metadata"}
+      %{label: gettext("Edit Metadata")}
     ])
     |> assign(:play_context, %{play: play, active_tab: :metadata})
   end
@@ -60,7 +60,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       {:ok, play} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Play created successfully.")
+         |> put_flash(:info, gettext("Play created successfully."))
          |> push_navigate(to: ~p"/admin/plays/#{play.id}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -73,7 +73,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       {:ok, play} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Play updated successfully.")
+         |> put_flash(:info, gettext("Play updated successfully."))
          |> push_navigate(to: ~p"/admin/plays/#{play.id}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -83,12 +83,12 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   defp language_options do
     [
-      {"Spanish", "es"},
-      {"English", "en"},
-      {"Italian", "it"},
-      {"Catalan", "ca"},
-      {"French", "fr"},
-      {"Portuguese", "pt"}
+      {gettext("Spanish"), "es"},
+      {gettext("English"), "en"},
+      {gettext("Italian"), "it"},
+      {gettext("Catalan"), "ca"},
+      {gettext("French"), "fr"},
+      {gettext("Portuguese"), "pt"}
     ]
   end
 
@@ -99,7 +99,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       <div class="mb-6">
         <h1 class="text-3xl font-semibold tracking-tight text-base-content">{@page_title}</h1>
         <p class="mt-1 text-sm text-base-content/70">
-          Update bibliographic and editorial metadata for this play.
+          {gettext("Update bibliographic and editorial metadata for this play.")}
         </p>
       </div>
 
@@ -111,44 +111,44 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">Title *</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Title")} *</span></label>
             <.input field={@form[:title]} type="text" required />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">Code *</span></label>
-            <.input field={@form[:code]} type="text" required placeholder="e.g. AL0569" />
+            <label class="label"><span class="label-text font-medium">{gettext("Code")} *</span></label>
+            <.input field={@form[:code]} type="text" required placeholder={gettext("e.g. AL0569")} />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">Author Name</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Author Name")}</span></label>
             <.input field={@form[:author_name]} type="text" />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">Author (sort)</span></label>
-            <.input field={@form[:author_sort]} type="text" placeholder="Surname, Name" />
+            <label class="label"><span class="label-text font-medium">{gettext("Author (sort)")}</span></label>
+            <.input field={@form[:author_sort]} type="text" placeholder={gettext("Surname, Name")} />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">Language</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Language")}</span></label>
             <.input field={@form[:language]} type="select" options={language_options()} />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">Attribution</span></label>
-            <.input field={@form[:author_attribution]} type="text" placeholder="fiable, dudosa..." />
+            <label class="label"><span class="label-text font-medium">{gettext("Attribution")}</span></label>
+            <.input field={@form[:author_attribution]} type="text" placeholder={gettext("fiable, dudosa...")} />
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label class="label"><span class="label-text font-medium">Publication Place</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Publication Place")}</span></label>
             <.input field={@form[:pub_place]} type="text" />
           </div>
           <div>
-            <label class="label"><span class="label-text font-medium">Publication Date</span></label>
+            <label class="label"><span class="label-text font-medium">{gettext("Publication Date")}</span></label>
             <.input
               field={@form[:publication_date]}
               type="text"
@@ -160,16 +160,16 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
         <div class="rounded-box bg-base-200 px-3 py-2">
           <label class="flex items-center gap-2 text-sm text-base-content/85">
-            <.input field={@form[:is_verse]} type="checkbox" /> Verse play
+            <.input field={@form[:is_verse]} type="checkbox" /> {gettext("Verse play")}
           </label>
         </div>
 
         <div class="flex flex-wrap gap-2 border-t border-base-300 pt-4">
           <button type="submit" class="btn btn-primary">
-            Save Play
+            {gettext("Save Play")}
           </button>
           <.link navigate={~p"/admin/plays"} class="btn btn-ghost">
-            Cancel
+            {gettext("Cancel")}
           </.link>
         </div>
       </.form>

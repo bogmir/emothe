@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang={assigns[:locale] || "es"}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="Emothe" suffix=" · Phoenix Framework">
+    <.live_title default="EMOTHE" suffix=" · EMOTHE">
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />

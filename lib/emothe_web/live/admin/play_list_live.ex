@@ -18,12 +18,12 @@ defmodule EmotheWeb.Admin.PlayListLive do
 
     {:ok,
      socket
-     |> assign(:page_title, "Admin - Plays")
+     |> assign(:page_title, gettext("Admin - Plays"))
      |> assign(:plays, plays)
      |> assign(:search, "")
      |> assign(:breadcrumbs, [
-       %{label: "Admin", to: ~p"/admin/plays"},
-       %{label: "Plays"}
+       %{label: gettext("Admin"), to: ~p"/admin/plays"},
+       %{label: gettext("Plays")}
      ])}
   end
 
@@ -53,21 +53,21 @@ defmodule EmotheWeb.Admin.PlayListLive do
     <div class="mx-auto max-w-7xl px-4 py-8">
       <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 class="text-3xl font-semibold tracking-tight text-base-content">Play Management</h1>
-          <p class="mt-1 text-sm text-base-content/70">Browse, edit, and curate imported plays.</p>
+          <h1 class="text-3xl font-semibold tracking-tight text-base-content">{gettext("Play Management")}</h1>
+          <p class="mt-1 text-sm text-base-content/70">{gettext("Browse, edit, and curate imported plays.")}</p>
         </div>
         <div class="flex gap-2">
           <.link
             navigate={~p"/admin/plays/import"}
             class="btn btn-sm btn-success"
           >
-            Import TEI-XML
+            {gettext("Import TEI-XML")}
           </.link>
           <.link
             navigate={~p"/admin/plays/new"}
             class="btn btn-sm btn-primary"
           >
-            New Play
+            {gettext("New Play")}
           </.link>
         </div>
       </div>
@@ -77,7 +77,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
           type="text"
           name="search"
           value={@search}
-          placeholder="Search plays..."
+          placeholder={gettext("Search plays...")}
           phx-debounce="300"
           class="input input-bordered w-full md:max-w-md"
         />
@@ -87,10 +87,10 @@ defmodule EmotheWeb.Admin.PlayListLive do
         <table class="table table-zebra">
           <thead>
             <tr class="text-xs uppercase tracking-wide text-base-content/60">
-              <th class="w-28">Code</th>
-              <th>Title</th>
-              <th class="w-20 text-right">Verses</th>
-              <th class="w-32 text-right">Actions</th>
+              <th class="w-28">{gettext("Code")}</th>
+              <th>{gettext("Title")}</th>
+              <th class="w-20 text-right">{gettext("Verses")}</th>
+              <th class="w-32 text-right">{gettext("Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -115,7 +115,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
                   <.link
                     navigate={~p"/admin/plays/#{play.id}/edit"}
                     class="btn btn-ghost btn-xs tooltip tooltip-left"
-                    data-tip="Edit metadata"
+                    data-tip={gettext("Edit metadata")}
                   >
                     <.icon name="hero-pencil-mini" class="size-4" />
                   </.link>
@@ -123,16 +123,16 @@ defmodule EmotheWeb.Admin.PlayListLive do
                     href={~p"/plays/#{play.code}"}
                     target="_blank"
                     class="btn btn-ghost btn-xs tooltip tooltip-left"
-                    data-tip="View public page"
+                    data-tip={gettext("View public page")}
                   >
                     <.icon name="hero-arrow-top-right-on-square-mini" class="size-4" />
                   </.link>
                   <button
                     phx-click="delete"
                     phx-value-id={play.id}
-                    data-confirm="Delete «#{play.title}» and all its content? This cannot be undone."
+                    data-confirm={gettext("Delete «%{title}» and all its content? This cannot be undone.", title: play.title)}
                     class="btn btn-ghost btn-xs text-error tooltip tooltip-left"
-                    data-tip="Delete"
+                    data-tip={gettext("Delete")}
                   >
                     <.icon name="hero-trash-mini" class="size-4" />
                   </button>
@@ -147,7 +147,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
         :if={@plays == []}
         class="mt-8 rounded-box border border-dashed border-base-300 py-10 text-center text-base-content/60"
       >
-        No plays yet. Import a TEI-XML file or create a new play.
+        {gettext("No plays yet. Import a TEI-XML file or create a new play.")}
       </p>
     </div>
     """

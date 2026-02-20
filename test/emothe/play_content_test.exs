@@ -36,7 +36,7 @@ defmodule Emothe.PlayContentTest do
     assert nested_verse.id == verse_line.id
   end
 
-  test "create_character_unless_exists/1 skips duplicate xml_id keeping the first" do
+  test "create_character_unless_exists/1 returns existing character when xml_id and name match" do
     play = TestFixtures.play_fixture()
 
     {:ok, char1} =
@@ -51,12 +51,35 @@ defmodule Emothe.PlayContentTest do
       PlayContent.create_character_unless_exists(%{
         play_id: play.id,
         xml_id: "DUP",
-        name: "Should Be Ignored",
+        name: "First Name",
         position: 1
       })
 
     assert char1.id == char2.id
-    assert char2.name == "First Name"
+  end
+
+  test "create_character_unless_exists/1 creates new character with unique xml_id when name differs" do
+    play = TestFixtures.play_fixture()
+
+    {:ok, char1} =
+      PlayContent.create_character_unless_exists(%{
+        play_id: play.id,
+        xml_id: "DUP",
+        name: "First Name",
+        position: 0
+      })
+
+    {:ok, char2} =
+      PlayContent.create_character_unless_exists(%{
+        play_id: play.id,
+        xml_id: "DUP",
+        name: "Different Name",
+        position: 1
+      })
+
+    assert char1.id != char2.id
+    assert char2.xml_id != "DUP"
+    assert String.starts_with?(char2.xml_id, "DUP")
   end
 
   describe "shift_element_positions/3" do

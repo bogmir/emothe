@@ -9,13 +9,13 @@ defmodule EmotheWeb.Admin.ImportLive do
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:page_title, "Import TEI-XML")
+     |> assign(:page_title, gettext("Import TEI-XML"))
      |> assign(:successes, [])
      |> assign(:importing, false)
      |> assign(:breadcrumbs, [
-       %{label: "Admin", to: ~p"/admin/plays"},
-       %{label: "Plays", to: ~p"/admin/plays"},
-       %{label: "Import TEI-XML"}
+       %{label: gettext("Admin"), to: ~p"/admin/plays"},
+       %{label: gettext("Plays"), to: ~p"/admin/plays"},
+       %{label: gettext("Import TEI-XML")}
      ])
      |> allow_upload(:tei_files,
        accept: ~w(.xml),
@@ -65,7 +65,7 @@ defmodule EmotheWeb.Admin.ImportLive do
               "#{file}: #{format_error(reason)}"
             end)
 
-          put_flash(socket, :error, "Import errors:\n#{error_msg}")
+          put_flash(socket, :error, "#{gettext("Import errors")}:\n#{error_msg}")
       end
 
     socket =
@@ -74,7 +74,11 @@ defmodule EmotheWeb.Admin.ImportLive do
           socket
 
         _ ->
-          put_flash(socket, :info, "Successfully imported #{length(successes)} play(s).")
+          put_flash(
+            socket,
+            :info,
+            gettext("Successfully imported %{count} play(s).", count: length(successes))
+          )
       end
 
     {:noreply, socket}
@@ -91,7 +95,7 @@ defmodule EmotheWeb.Admin.ImportLive do
           |> Enum.sort()
 
         if xml_files == [] do
-          {:noreply, put_flash(socket, :error, "No .xml files found in #{dir}")}
+          {:noreply, put_flash(socket, :error, gettext("No .xml files found in %{dir}", dir: dir))}
         else
           {successes, errors} =
             xml_files
@@ -118,7 +122,7 @@ defmodule EmotheWeb.Admin.ImportLive do
                     "#{file}: #{format_error(reason)}"
                   end)
 
-                put_flash(socket, :error, "Import errors:\n#{error_msg}")
+                put_flash(socket, :error, "#{gettext("Import errors")}:\n#{error_msg}")
             end
 
           socket =
@@ -127,14 +131,23 @@ defmodule EmotheWeb.Admin.ImportLive do
                 socket
 
               _ ->
-                put_flash(socket, :info, "Successfully imported #{length(successes)} play(s).")
+                put_flash(
+                  socket,
+                  :info,
+                  gettext("Successfully imported %{count} play(s).", count: length(successes))
+                )
             end
 
           {:noreply, socket}
         end
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Cannot read directory: #{format_error(reason)}")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "#{gettext("Cannot read directory")}: #{format_error(reason)}"
+         )}
     end
   end
 
@@ -147,7 +160,7 @@ defmodule EmotheWeb.Admin.ImportLive do
 
   defp format_error(reason) when is_atom(reason), do: to_string(reason)
   defp format_error({:xml_parse_error, detail}), do: "XML parse error: #{inspect(detail)}"
-  defp format_error({:play_already_exists, code}), do: "Play with code #{code} already exists"
+  defp format_error({:play_already_exists, code}), do: gettext("Play with code %{code} already exists", code: code)
   defp format_error(reason), do: inspect(reason)
 
   @impl true
@@ -155,18 +168,18 @@ defmodule EmotheWeb.Admin.ImportLive do
     ~H"""
     <div class="mx-auto max-w-5xl px-4 py-8">
       <div class="mb-6">
-        <h1 class="text-3xl font-semibold tracking-tight text-base-content">Import TEI-XML Files</h1>
+        <h1 class="text-3xl font-semibold tracking-tight text-base-content">{gettext("Import TEI-XML Files")}</h1>
         <p class="mt-1 text-sm text-base-content/70">
-          Import one or many TEI files and review successful ingestions.
+          {gettext("Import one or many TEI files and review successful ingestions.")}
         </p>
       </div>
 
       <%!-- Upload files from browser --%>
       <div class="card mb-6 border border-base-300 bg-base-100 shadow-sm">
         <div class="card-body">
-          <h2 class="card-title">Select Files</h2>
+          <h2 class="card-title">{gettext("Select Files")}</h2>
           <p class="mb-3 text-sm text-base-content/70">
-            Choose one or more TEI-XML files from your computer.
+            {gettext("Choose one or more TEI-XML files from your computer.")}
           </p>
           <form id="upload-form" phx-submit="import" phx-change="validate">
             <.live_file_input
@@ -185,7 +198,7 @@ defmodule EmotheWeb.Admin.ImportLive do
                 phx-click="cancel-upload"
                 phx-value-ref={entry.ref}
                 class="btn btn-ghost btn-xs text-error tooltip"
-                data-tip="Remove"
+                data-tip={gettext("Remove")}
               >
                 <.icon name="hero-x-mark-mini" class="size-4" />
               </button>
@@ -200,7 +213,7 @@ defmodule EmotheWeb.Admin.ImportLive do
               class="btn btn-primary mt-2"
               disabled={@uploads.tei_files.entries == []}
             >
-              Import {length(@uploads.tei_files.entries)} file(s)
+              {gettext("Import %{count} file(s)", count: length(@uploads.tei_files.entries))}
             </button>
           </form>
         </div>
@@ -209,14 +222,14 @@ defmodule EmotheWeb.Admin.ImportLive do
       <%!-- Success results --%>
       <div :if={@successes != []} class="card border border-base-300 bg-base-100 shadow-sm">
         <div class="card-body">
-          <h2 class="card-title">Imported Plays</h2>
+          <h2 class="card-title">{gettext("Imported Plays")}</h2>
           <div class="overflow-x-auto">
             <table class="table table-sm">
               <thead>
                 <tr>
-                  <th>File</th>
-                  <th>Title</th>
-                  <th>Code</th>
+                  <th>{gettext("File")}</th>
+                  <th>{gettext("Title")}</th>
+                  <th>{gettext("Code")}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -232,7 +245,7 @@ defmodule EmotheWeb.Admin.ImportLive do
                       href={~p"/plays/#{code}"}
                       target="_blank"
                       class="btn btn-ghost btn-xs tooltip"
-                      data-tip="View public page"
+                      data-tip={gettext("View public page")}
                     >
                       <.icon name="hero-arrow-top-right-on-square-mini" class="size-4" />
                     </.link>
@@ -243,7 +256,7 @@ defmodule EmotheWeb.Admin.ImportLive do
           </div>
           <div class="card-actions mt-4">
             <.link navigate={~p"/admin/plays"} class="btn btn-sm btn-outline">
-              View all plays
+              {gettext("View all plays")}
             </.link>
           </div>
         </div>
@@ -252,8 +265,8 @@ defmodule EmotheWeb.Admin.ImportLive do
     """
   end
 
-  defp upload_error_to_string(:too_large), do: "File is too large (max 20MB)"
-  defp upload_error_to_string(:not_accepted), do: "Only .xml files are accepted"
-  defp upload_error_to_string(:too_many_files), do: "Too many files (max 20)"
-  defp upload_error_to_string(err), do: "Error: #{inspect(err)}"
+  defp upload_error_to_string(:too_large), do: gettext("File is too large (max 20MB)")
+  defp upload_error_to_string(:not_accepted), do: gettext("Only .xml files are accepted")
+  defp upload_error_to_string(:too_many_files), do: gettext("Too many files (max 20)")
+  defp upload_error_to_string(err), do: "#{gettext("Error")}: #{inspect(err)}"
 end

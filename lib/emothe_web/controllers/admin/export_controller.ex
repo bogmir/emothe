@@ -36,7 +36,7 @@ defmodule EmotheWeb.Admin.ExportController do
 
       {:error, reason} ->
         conn
-        |> put_flash(:error, "PDF generation failed: #{inspect(reason)}")
+        |> put_flash(:error, gettext("PDF generation failed: %{reason}", reason: inspect(reason)))
         |> redirect(to: ~p"/admin/plays/#{id}")
     end
   end

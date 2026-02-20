@@ -29,6 +29,9 @@ defmodule EmotheWeb.PlayShowLive do
      |> assign(:play_sections, play_sections)
      |> assign(:show_line_numbers, true)
      |> assign(:show_stage_directions, true)
+     |> assign(:show_asides, true)
+     |> assign(:show_split_verses, true)
+     |> assign(:show_verse_type, false)
      |> assign(:active_tab, :text)
      |> assign(:sidebar_open, true)
      |> assign(:breadcrumbs, [
@@ -44,6 +47,18 @@ defmodule EmotheWeb.PlayShowLive do
 
   def handle_event("toggle_stage_directions", _, socket) do
     {:noreply, assign(socket, :show_stage_directions, !socket.assigns.show_stage_directions)}
+  end
+
+  def handle_event("toggle_asides", _, socket) do
+    {:noreply, assign(socket, :show_asides, !socket.assigns.show_asides)}
+  end
+
+  def handle_event("toggle_split_verses", _, socket) do
+    {:noreply, assign(socket, :show_split_verses, !socket.assigns.show_split_verses)}
+  end
+
+  def handle_event("toggle_verse_type", _, socket) do
+    {:noreply, assign(socket, :show_verse_type, !socket.assigns.show_verse_type)}
   end
 
   def handle_event("switch_tab", %{"tab" => tab}, socket) do
@@ -114,6 +129,53 @@ defmodule EmotheWeb.PlayShowLive do
                   </a>
                 </nav>
               </section>
+            </div>
+
+            <%!-- Visual markers --%>
+            <div :if={@sidebar_open} class="border-t border-base-300 px-3 py-2.5 space-y-2">
+              <h3 class="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+                {gettext("Visual markers")}
+              </h3>
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
+                <input
+                  type="checkbox"
+                  checked={@show_line_numbers}
+                  phx-click="toggle_line_numbers"
+                  class="checkbox checkbox-xs checkbox-primary"
+                /> {gettext("Line numbers")}
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
+                <input
+                  type="checkbox"
+                  checked={@show_stage_directions}
+                  phx-click="toggle_stage_directions"
+                  class="checkbox checkbox-xs checkbox-primary"
+                /> {gettext("Stage directions")}
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
+                <input
+                  type="checkbox"
+                  checked={@show_asides}
+                  phx-click="toggle_asides"
+                  class="checkbox checkbox-xs checkbox-primary"
+                /> {gettext("Asides")}
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
+                <input
+                  type="checkbox"
+                  checked={@show_split_verses}
+                  phx-click="toggle_split_verses"
+                  class="checkbox checkbox-xs checkbox-primary"
+                /> {gettext("Split verses")}
+              </label>
+              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
+                <input
+                  type="checkbox"
+                  checked={@show_verse_type}
+                  phx-click="toggle_verse_type"
+                  class="checkbox checkbox-xs checkbox-primary"
+                /> {gettext("Verse type")}
+              </label>
             </div>
           </div>
 
@@ -213,31 +275,14 @@ defmodule EmotheWeb.PlayShowLive do
 
           <%!-- Text tab --%>
           <div :if={@active_tab == :text} id="play-tab-text">
-            <%!-- Controls --%>
-            <div class="flex gap-4 mb-6 p-2.5 bg-base-200/50 rounded-box border border-base-300">
-              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
-                <input
-                  type="checkbox"
-                  checked={@show_line_numbers}
-                  phx-click="toggle_line_numbers"
-                  class="checkbox checkbox-xs checkbox-primary"
-                /> {gettext("Line numbers")}
-              </label>
-              <label class="flex items-center gap-2 text-xs cursor-pointer text-base-content/70">
-                <input
-                  type="checkbox"
-                  checked={@show_stage_directions}
-                  phx-click="toggle_stage_directions"
-                  class="checkbox checkbox-xs checkbox-primary"
-                /> {gettext("Stage directions")}
-              </label>
-            </div>
-
             <.play_body
               divisions={@divisions}
               characters={@characters}
               show_line_numbers={@show_line_numbers}
               show_stage_directions={@show_stage_directions}
+              show_asides={@show_asides}
+              show_split_verses={@show_split_verses}
+              show_verse_type={@show_verse_type}
             />
           </div>
 

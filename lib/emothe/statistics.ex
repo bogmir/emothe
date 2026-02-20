@@ -79,8 +79,8 @@ defmodule Emothe.Statistics do
     |> Repo.all()
   end
 
-  defp act_label([%{type: "jornada"} | _]), do: "Jornada"
-  defp act_label(_), do: "Act"
+  defp act_label([%{type: type} | _]), do: type
+  defp act_label([]), do: "act"
 
   defp list_all_elements(play_id) do
     Element

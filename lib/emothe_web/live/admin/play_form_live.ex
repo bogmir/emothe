@@ -191,8 +191,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
             <.input
               field={@form[:publication_date]}
               type="text"
-              placeholder="dd-mm-yyyy"
-              pattern="[0-9]{2}-[0-9]{2}-[0-9]{4}"
+              placeholder="e.g. 2023 or 01-01-2023"
             />
           </div>
         </div>

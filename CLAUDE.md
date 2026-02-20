@@ -176,6 +176,10 @@ Then visit:
 - [x] EMOTHE home page with catalogue CTA
 - [x] "Edit in Admin" link on public play page for logged-in users
 - [x] DaisyUI component migration (catalogue, play show, admin pages)
+- [x] Bibliographic sources admin page (`/admin/plays/:id/sources`) - add/edit/delete sources with modal forms
+- [x] Play text visual markers in sidebar: line numbers, stage directions, asides, split verses, verse type toggles
+- [x] i18n: full Spanish translations for all UI strings (public + admin); `mix gettext.extract/merge` workflow established
+- [x] Statistics panel act label i18n fix - stores raw division type (`"acto"`, `"jornada"`) and translates at display time
 
 ## What Still Needs To Be Done
 
@@ -185,9 +189,11 @@ Then visit:
 
 ### Medium Priority
 - [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
-- [ ] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.)
+- [ ] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.) in statistics panel
 - [ ] **Pagination** on catalogue pages for large collections
 - [x] ~~Install Typst~~ PDF export now uses ChromicPDF (requires Chrome/Chromium on the system)
+- [ ] **Stage direction navigator** (`« N / M »`) - client-side JS hook to scroll between stage directions in play text
+- [ ] **Recompute statistics** for existing plays after `act_label` fix (raw type is now stored; old cached values handled gracefully but ideally refreshed)
 
 ### Low Priority / Future
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
@@ -199,6 +205,7 @@ Then visit:
 - [ ] **API endpoints** for programmatic access
 - [ ] **Batch export** - export multiple plays at once
 - [ ] **Custom OTel spans** for TEI import, export, statistics computation
+- [ ] **Line number frequency control** - "show every N lines" option (original Artelope had "Mostrar cada 5")
 
 ## Key Decisions
 

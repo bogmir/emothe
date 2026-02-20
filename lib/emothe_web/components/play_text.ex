@@ -9,6 +9,9 @@ defmodule EmotheWeb.Components.PlayText do
   attr :characters, :list, default: []
   attr :show_line_numbers, :boolean, default: true
   attr :show_stage_directions, :boolean, default: true
+  attr :show_asides, :boolean, default: true
+  attr :show_split_verses, :boolean, default: true
+  attr :show_verse_type, :boolean, default: false
 
   def play_body(assigns) do
     ~H"""
@@ -24,6 +27,9 @@ defmodule EmotheWeb.Components.PlayText do
             elements={Map.get(division, :loaded_elements, [])}
             show_line_numbers={@show_line_numbers}
             show_stage_directions={@show_stage_directions}
+            show_asides={@show_asides}
+            show_split_verses={@show_split_verses}
+            show_verse_type={@show_verse_type}
           />
         </div>
 
@@ -38,6 +44,9 @@ defmodule EmotheWeb.Components.PlayText do
               elements={Map.get(child, :loaded_elements, [])}
               show_line_numbers={@show_line_numbers}
               show_stage_directions={@show_stage_directions}
+              show_asides={@show_asides}
+              show_split_verses={@show_split_verses}
+              show_verse_type={@show_verse_type}
             />
           </div>
         </div>
@@ -94,6 +103,9 @@ defmodule EmotheWeb.Components.PlayText do
   attr :elements, :list, required: true
   attr :show_line_numbers, :boolean, default: true
   attr :show_stage_directions, :boolean, default: true
+  attr :show_asides, :boolean, default: true
+  attr :show_split_verses, :boolean, default: true
+  attr :show_verse_type, :boolean, default: false
 
   defp element_list(assigns) do
     ~H"""
@@ -103,6 +115,9 @@ defmodule EmotheWeb.Components.PlayText do
           element={element}
           show_line_numbers={@show_line_numbers}
           show_stage_directions={@show_stage_directions}
+          show_asides={@show_asides}
+          show_split_verses={@show_split_verses}
+          show_verse_type={@show_verse_type}
         />
       </div>
     </div>
@@ -112,10 +127,16 @@ defmodule EmotheWeb.Components.PlayText do
   attr :element, :map, required: true
   attr :show_line_numbers, :boolean, default: true
   attr :show_stage_directions, :boolean, default: true
+  attr :show_asides, :boolean, default: true
+  attr :show_split_verses, :boolean, default: true
+  attr :show_verse_type, :boolean, default: false
 
   defp render_element(%{element: %{type: "speech"}} = assigns) do
     ~H"""
-    <div class={["speech mt-3 mb-5", @element.is_aside && "pl-6 aside-border"]}>
+    <div
+      :if={!@element.is_aside || @show_asides}
+      class={["speech mt-3 mb-5", @element.is_aside && "pl-6 aside-border"]}
+    >
       <div :if={@element.speaker_label} class="speaker mb-1">
         {@element.speaker_label}
       </div>
@@ -124,6 +145,9 @@ defmodule EmotheWeb.Components.PlayText do
           element={child}
           show_line_numbers={@show_line_numbers}
           show_stage_directions={@show_stage_directions}
+          show_asides={@show_asides}
+          show_split_verses={@show_split_verses}
+          show_verse_type={@show_verse_type}
         />
       </div>
     </div>
@@ -133,11 +157,23 @@ defmodule EmotheWeb.Components.PlayText do
   defp render_element(%{element: %{type: "line_group"}} = assigns) do
     ~H"""
     <div class="line-group">
+      <div
+        :if={@show_verse_type && @element.verse_type}
+        class="flex items-baseline gap-2 ml-4 -mb-0.5"
+      >
+        <span class="flex-1" />
+        <span class="w-16 text-left text-[9px] italic text-base-content/35 shrink-0 leading-tight">
+          {@element.verse_type}
+        </span>
+      </div>
       <div :for={child <- Map.get(@element, :children, [])}>
         <.render_element
           element={child}
           show_line_numbers={@show_line_numbers}
           show_stage_directions={@show_stage_directions}
+          show_asides={@show_asides}
+          show_split_verses={@show_split_verses}
+          show_verse_type={@show_verse_type}
         />
       </div>
     </div>
@@ -150,20 +186,20 @@ defmodule EmotheWeb.Components.PlayText do
       <span class={[
         "flex-1",
         @element.rend == "indent" && "pl-8",
-        @element.part == "F" && "part-f",
-        @element.part == "M" && "part-m"
+        @show_split_verses && @element.part == "F" && "part-f",
+        @show_split_verses && @element.part == "M" && "part-m"
       ]}>
         {@element.content}
       </span>
       <span
         :if={@element.line_number}
-        class={["line-number w-8 text-left shrink-0 select-none", !@show_line_numbers && "invisible"]}
+        class={["line-number w-16 text-left shrink-0 select-none", !@show_line_numbers && "invisible"]}
       >
         {@element.line_number}
       </span>
       <span
         :if={!@element.line_number}
-        class="w-8 shrink-0"
+        class="w-16 shrink-0"
       />
     </div>
     """
@@ -179,7 +215,7 @@ defmodule EmotheWeb.Components.PlayText do
 
   defp render_element(%{element: %{type: "prose"}} = assigns) do
     ~H"""
-    <div class="ml-4 mb-2 text-justify">
+    <div :if={!@element.is_aside || @show_asides} class="ml-4 mb-2 text-justify">
       {@element.content}
     </div>
     """

@@ -461,7 +461,12 @@ defmodule Emothe.Import.TeiParser do
     source_desc = find_child(elem(file_desc, 2), "sourceDesc")
 
     if source_desc do
-      bibls = find_children(elem(source_desc, 2), "bibl")
+      # Look for <bibl> directly under <sourceDesc>, or inside <listBibl>
+      bibls =
+        case find_child(elem(source_desc, 2), "listBibl") do
+          nil -> find_children(elem(source_desc, 2), "bibl")
+          list_bibl -> find_children(elem(list_bibl, 2), "bibl")
+        end
 
       bibls
       |> Enum.with_index()

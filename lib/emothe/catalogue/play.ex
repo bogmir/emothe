@@ -79,14 +79,9 @@ defmodule Emothe.Catalogue.Play do
   end
 
   @doc """
-  Changeset with stricter validations for manual form entry.
-  Enforces dd-mm-yyyy format for publication_date.
+  Changeset for manual form entry.
   """
   def form_changeset(play, attrs) do
-    play
-    |> changeset(attrs)
-    |> validate_format(:publication_date, ~r/^\d{2}-\d{2}-\d{4}$/,
-      message: "must be in dd-mm-yyyy format"
-    )
+    changeset(play, attrs)
   end
 end

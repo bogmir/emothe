@@ -10,14 +10,14 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
   def stats_panel(assigns) do
     data = if assigns.statistic, do: assigns.statistic.data, else: %{}
-    act_label = data["act_label"] || "Act"
-    assigns = assign(assigns, data: data, act_label: act_label)
+    raw_label = data["act_label"] || "act"
+    assigns = assign(assigns, data: data, raw_label: raw_label)
 
     ~H"""
     <div :if={@data != %{}} class="space-y-6">
       <%!-- Summary cards --%>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <.stat_card label={"#{@act_label}s"} value={@data["num_acts"]} icon="📜" />
+        <.stat_card label={act_label_plural(@raw_label)} value={@data["num_acts"]} icon="📜" />
         <.stat_card label={gettext("Scenes")} value={get_in(@data, ["scenes", "total"])} icon="🎭" />
         <.stat_card label={gettext("Verses")} value={@data["total_verses"]} icon="✍️" />
         <.stat_card
@@ -29,11 +29,11 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
       <%!-- Scenes per act --%>
       <.bar_chart
-        title={"#{gettext("Scenes per")} #{@act_label}"}
+        title={"#{gettext("Scenes per")} #{act_label_singular(@raw_label)}"}
         items={get_in(@data, ["scenes", "per_act"]) || []}
         label_key="act"
         value_key="count"
-        label_prefix={"#{@act_label} "}
+        label_prefix={"#{act_label_singular(@raw_label)} "}
         color="bg-amber-500"
       />
 
@@ -43,7 +43,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
         items={@data["verse_distribution"] || []}
         label_key="act"
         value_key="count"
-        label_prefix={"#{@act_label} "}
+        label_prefix={"#{act_label_singular(@raw_label)} "}
         color="bg-indigo-500"
       />
 
@@ -54,7 +54,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
         items={@data["prose_fragments"] || []}
         label_key="act"
         value_key="count"
-        label_prefix={"#{@act_label} "}
+        label_prefix={"#{act_label_singular(@raw_label)} "}
         color="bg-emerald-500"
       />
 
@@ -136,6 +136,25 @@ defmodule EmotheWeb.Components.StatisticsPanel do
     </div>
     """
   end
+
+  # Handles both new raw types ("acto", "jornada") and legacy cached values ("Act", "Jornada")
+  defp act_label_singular("acto"), do: gettext("Acto")
+  defp act_label_singular("jornada"), do: gettext("Jornada")
+  defp act_label_singular("act"), do: gettext("Act")
+  defp act_label_singular("acte"), do: gettext("Acte")
+  defp act_label_singular("play"), do: gettext("Play")
+  defp act_label_singular("Jornada"), do: gettext("Jornada")
+  defp act_label_singular("Act"), do: gettext("Act")
+  defp act_label_singular(other), do: other
+
+  defp act_label_plural("acto"), do: gettext("Actos")
+  defp act_label_plural("jornada"), do: gettext("Jornadas")
+  defp act_label_plural("act"), do: gettext("Acts")
+  defp act_label_plural("acte"), do: gettext("Actes")
+  defp act_label_plural("play"), do: gettext("Plays")
+  defp act_label_plural("Jornada"), do: gettext("Jornadas")
+  defp act_label_plural("Act"), do: gettext("Acts")
+  defp act_label_plural(other), do: other <> "s"
 
   defp bar_percent(nil, _max), do: 0
   defp bar_percent(_value, 0), do: 0

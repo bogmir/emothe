@@ -52,13 +52,13 @@ defmodule EmotheWeb.Components.PlayText do
     ~H"""
     <h2
       :if={@division.title && @is_act}
-      class="font-bold text-center my-6 text-lg"
+      class="font-bold text-center my-6 text-lg tracking-wide text-base-content"
     >
       {@division.title}
     </h2>
     <h3
       :if={@division.title && !@is_act}
-      class="font-bold text-center my-4 text-sm"
+      class="font-semibold text-center my-4 text-sm text-base-content/70"
     >
       {@division.title}
     </h3>
@@ -89,8 +89,8 @@ defmodule EmotheWeb.Components.PlayText do
 
   defp render_element(%{element: %{type: "speech"}} = assigns) do
     ~H"""
-    <div class={["speech mt-2 mb-5", if(@element.is_aside, do: "pl-8 border-l-2 border-gray-300")]}>
-      <div :if={@element.speaker_label} class="speaker mb-0.5">
+    <div class={["speech mt-3 mb-5", @element.is_aside && "pl-6 aside-border"]}>
+      <div :if={@element.speaker_label} class="speaker mb-1">
         {@element.speaker_label}
       </div>
       <div :for={child <- Map.get(@element, :children, [])}>
@@ -145,7 +145,7 @@ defmodule EmotheWeb.Components.PlayText do
 
   defp render_element(%{element: %{type: "stage_direction"}} = assigns) do
     ~H"""
-    <div :if={@show_stage_directions} class="stage-direction text-center my-3 px-8">
+    <div :if={@show_stage_directions} class="stage-direction text-center my-4 px-8">
       ({@element.content})
     </div>
     """

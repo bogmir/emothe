@@ -127,23 +127,29 @@
   color: #7E7B6A;
 }
 
-/* Play text body */
+/* Play text body — uses theme-aware colors for dark mode support */
+.play-text {
+  font-family: Verdana, Geneva, sans-serif;
+  line-height: 170%;
+}
+
 .play-text .speaker {
-  font-weight: bold;
-  font-size: x-small;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #333;
+  color: oklch(from var(--color-primary) l c h);
 }
 
 .play-text .line-number {
-  font-size: x-small;
-  color: #999;
+  font-size: 0.65rem;
   font-variant-numeric: tabular-nums;
+  color: oklch(from var(--color-base-content) l c h / 0.35);
 }
 
 .play-text .stage-direction {
   font-style: italic;
-  color: #555;
+  color: oklch(from var(--color-base-content) l c h / 0.55);
 }
 
 .play-text .verse-line .part-m {
@@ -152,6 +158,10 @@
 
 .play-text .verse-line .part-f {
   padding-left: 100px;
+}
+
+.play-text .aside-border {
+  border-left: 2px solid oklch(from var(--color-warning) l c h / 0.4);
 }
 
 /* ScrollSpy active sidebar link */

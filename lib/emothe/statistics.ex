@@ -69,7 +69,8 @@ defmodule Emothe.Statistics do
     }
   end
 
-  @act_types ~w(acto jornada)
+  @act_types ~w(acto act acte jornada)
+  @scene_types ~w(escena scene scène)
 
   defp list_acts(play_id) do
     Division
@@ -109,7 +110,8 @@ defmodule Emothe.Statistics do
   defp compute_scenes(play_id, acts) do
     scenes =
       Division
-      |> where(play_id: ^play_id, type: "escena")
+      |> where(play_id: ^play_id)
+      |> where([d], d.type in @scene_types)
       |> Repo.all()
 
     scenes_by_parent = Enum.group_by(scenes, & &1.parent_id)

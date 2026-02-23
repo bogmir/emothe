@@ -865,6 +865,11 @@ msgstr "Público"
 msgid "Publication Date"
 msgstr "Fecha de publicación"
 
+#: lib/emothe_web/live/admin/play_form_live.ex:189
+#, elixir-autogen, elixir-format
+msgid "Digital Publication Date"
+msgstr "Fecha de publicación digital"
+
 #: lib/emothe_web/live/admin/play_form_live.ex:183
 #, elixir-autogen, elixir-format
 msgid "Publication Place"
@@ -874,6 +879,11 @@ msgstr "Lugar de publicación"
 #, elixir-autogen, elixir-format
 msgid "Publication:"
 msgstr "Publicación:"
+
+#: lib/emothe_web/live/admin/play_detail_live.ex:117
+#, elixir-autogen, elixir-format
+msgid "Digital publication date:"
+msgstr "Fecha de publicación digital:"
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:201
 #, elixir-autogen, elixir-format

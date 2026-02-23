@@ -701,6 +701,29 @@ defmodule Emothe.Import.TeiParserTest do
     assert play.publication_date == "2023"
   end
 
+  test "import_file/1 extracts digital_publication_date from <date type=digital>" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Digital Date Test</title></titleStmt>
+          <publicationStmt>
+            <idno>DIGDATE01</idno>
+            <date>2023</date>
+            <date type="digital">2024-01-31</date>
+          </publicationStmt>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.digital_publication_date == ~D[2024-01-31]
+  end
+
   test "import_file/1 extracts availability_note from <availability><p>" do
     path = write_tei(rich_tei(code: "AVAIL01"))
     assert {:ok, play} = TeiParser.import_file(path)

@@ -208,7 +208,8 @@ defmodule Emothe.Import.TeiParser do
     verse_count = if extent, do: extract_verse_count(extent), else: nil
 
     # Extract publication info
-    {pub_place, pub_date, publisher_text, availability, licence_url, licence_text, authority_text} =
+    {pub_place, pub_date, digital_pub_date, publisher_text, availability, licence_url,
+     licence_text, authority_text} =
       extract_publication(publication_stmt)
 
     # Extract EMOTHE-specific idno
@@ -234,6 +235,7 @@ defmodule Emothe.Import.TeiParser do
       is_verse: verse_count != nil && verse_count > 0,
       pub_place: pub_place,
       publication_date: pub_date,
+      digital_publication_date: digital_pub_date,
       publisher: publisher_text,
       availability_note: availability,
       licence_url: licence_url,
@@ -277,14 +279,29 @@ defmodule Emothe.Import.TeiParser do
     end
   end
 
-  defp extract_publication(nil), do: {nil, nil, nil, nil, nil, nil, nil}
+  defp extract_publication(nil), do: {nil, nil, nil, nil, nil, nil, nil, nil}
 
   defp extract_publication({_name, _attrs, children}) do
     pub_place = find_child(children, "pubPlace")
-    date = find_child(children, "date")
+    dates = find_children(children, "date")
+
+    digital_date_el =
+      Enum.find(dates, fn {_, attrs, _} ->
+        attr_value(attrs, "type") == "digital" or attr_value(attrs, "ana") == "digital"
+      end)
+
+    pub_date_el =
+      Enum.find(dates, fn
+        {_, attrs, _} ->
+          !(attr_value(attrs, "type") == "digital" or attr_value(attrs, "ana") == "digital")
+      end)
+
+    date = pub_date_el || find_child(children, "date")
     publisher = find_child(children, "publisher")
     availability = find_child(children, "availability")
     authority = find_child(children, "authority")
+
+    digital_pub_date = parse_iso_date(digital_date_el)
 
     # Extract licence details from within availability
     {licence_url, licence_text} =
@@ -330,12 +347,31 @@ defmodule Emothe.Import.TeiParser do
     {
       safe_text(pub_place),
       safe_text(date),
+      digital_pub_date,
       safe_text(publisher),
       availability_text,
       licence_url,
       licence_text,
       safe_text(authority)
     }
+  end
+
+  defp parse_iso_date(nil), do: nil
+
+  defp parse_iso_date({_name, attrs, _children} = date_el) do
+    raw = attr_value(attrs, "when") || text_content(date_el)
+    raw = if is_binary(raw), do: String.trim(raw), else: nil
+
+    case raw do
+      <<_::binary>> ->
+        case Date.from_iso8601(raw) do
+          {:ok, date} -> date
+          _ -> nil
+        end
+
+      _ ->
+        nil
+    end
   end
 
   defp extract_encoding(nil), do: {nil, nil}

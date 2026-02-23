@@ -48,12 +48,12 @@ defmodule Emothe.Catalogue do
     Play
     |> Repo.get!(id)
     |> Repo.preload([
-      :editors,
-      :sources,
-      :editorial_notes,
       :statistic,
       :parent_play,
-      :derived_plays
+      :derived_plays,
+      editors: from(e in PlayEditor, order_by: e.position),
+      sources: from(s in PlaySource, order_by: s.position),
+      editorial_notes: from(n in PlayEditorialNote, order_by: n.inserted_at)
     ])
   end
 
@@ -61,12 +61,12 @@ defmodule Emothe.Catalogue do
     Play
     |> Repo.get_by!(code: code)
     |> Repo.preload([
-      :editors,
-      :sources,
-      :editorial_notes,
       :statistic,
       :parent_play,
-      :derived_plays
+      :derived_plays,
+      editors: from(e in PlayEditor, order_by: e.position),
+      sources: from(s in PlaySource, order_by: s.position),
+      editorial_notes: from(n in PlayEditorialNote, order_by: n.inserted_at)
     ])
   end
 
@@ -102,7 +102,7 @@ defmodule Emothe.Catalogue do
 
     Play
     |> Repo.get!(play_id)
-    |> Ecto.Changeset.change(%{verse_count: count})
+    |> Ecto.Changeset.change(%{verse_count: count, is_verse: count > 0})
     |> Repo.update()
   end
 

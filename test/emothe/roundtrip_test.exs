@@ -210,6 +210,112 @@ defmodule Emothe.RoundtripTest do
     end
   end
 
+  defp normalize_ws(text) when is_binary(text) do
+    text
+    |> String.replace(~r/\s+/u, " ")
+    |> String.trim()
+  end
+
+  defp strip_tags(text) when is_binary(text) do
+    text
+    |> then(fn t -> Regex.replace(~r/<[^>]+>/u, t, "") end)
+    |> normalize_ws()
+  end
+
+  defp extract_between(xml, open_tag, close_tag) do
+    case Regex.run(~r/#{open_tag}(.*)#{close_tag}/s, xml) do
+      [_, inner] -> inner
+      _ -> ""
+    end
+  end
+
+  defp character_roles_in_order(xml) do
+    cast_list = extract_between(xml, "<castList>", "<\\/castList>")
+
+    Regex.scan(~r/<role\b[^>]*>(.*?)<\/role>/su, cast_list, capture: :all_but_first)
+    |> Enum.map(fn
+      [role_inner] -> strip_tags(role_inner)
+      _ -> ""
+    end)
+    |> Enum.reject(&(&1 == ""))
+  end
+
+  defp source_titles_in_order(xml) do
+    source_desc = extract_between(xml, "<sourceDesc>", "<\\/sourceDesc>")
+
+    Regex.scan(~r/<bibl>(.*?)<\/bibl>/su, source_desc, capture: :all_but_first)
+    |> Enum.map(fn
+      [bibl_inner] ->
+        case Regex.run(~r/<title>(.*?)<\/title>/su, bibl_inner, capture: :all_but_first) do
+          [title] -> strip_tags(title)
+          _ -> ""
+        end
+
+      _ ->
+        ""
+    end)
+    |> Enum.reject(&(&1 == ""))
+  end
+
+  defp verse_line_tokens_in_order(xml) do
+    body = extract_body(xml)
+
+    Regex.scan(~r/<l\b([^>]*)>/u, body, capture: :all_but_first)
+    |> Enum.map(fn
+      [attrs] ->
+        n =
+          case Regex.run(~r/\bn="(\d+)"/u, attrs, capture: :all_but_first) do
+            [num] -> String.to_integer(num)
+            _ -> nil
+          end
+
+        part =
+          case Regex.run(~r/\bpart="([IMF])"/u, attrs, capture: :all_but_first) do
+            [p] -> p
+            _ -> nil
+          end
+
+        line_id =
+          case Regex.run(~r/\bxml:id="([^"]+)"/u, attrs, capture: :all_but_first) do
+            [id] -> id
+            _ -> nil
+          end
+
+        {line_id, n, part}
+    end)
+  end
+
+  defp distinct_verse_numbers(xml) do
+    xml
+    |> verse_line_tokens_in_order()
+    |> Enum.map(fn {_id, n, _part} -> n end)
+    |> Enum.reject(&is_nil/1)
+    |> MapSet.new()
+    |> MapSet.size()
+  end
+
+  defp assert_order_preserved(code, label, original_list, exported_list) do
+    if original_list != [] do
+      assert original_list == exported_list,
+             "#{code} ordering mismatch for #{label}: original=#{inspect(original_list)} exported=#{inspect(exported_list)}"
+    end
+  end
+
+  defp assert_derived_verse_fields(code, play, original_xml, exported_xml) do
+    expected = distinct_verse_numbers(original_xml)
+
+    assert play.verse_count == expected,
+           "#{code} derived verse_count mismatch: expected=#{expected} got=#{inspect(play.verse_count)}"
+
+    expected_is_verse = expected > 0
+
+    assert play.is_verse == expected_is_verse,
+           "#{code} derived is_verse mismatch: expected=#{expected_is_verse} got=#{inspect(play.is_verse)}"
+
+    assert exported_xml =~ ~r/<extent[^>]*>\s*#{expected}\s+versos\s*<\/extent>/u,
+           "#{code} export missing computed <extent> for verse_count=#{expected}"
+  end
+
   # Verify that key metadata fields from the DB appear in the exported XML
   defp assert_metadata_roundtrip(code, play, exported_xml) do
     # Play title must appear in export
@@ -376,6 +482,30 @@ defmodule Emothe.RoundtripTest do
 
           # Metadata fidelity: verify key play fields survive the roundtrip
           assert_metadata_roundtrip(@code, play_full, exported_xml)
+
+          # Low priority: ordering + derived values
+          assert_order_preserved(
+            @code,
+            "characters (castList role text)",
+            character_roles_in_order(original_xml),
+            character_roles_in_order(exported_xml)
+          )
+
+          assert_order_preserved(
+            @code,
+            "sources (sourceDesc/bibl/title)",
+            source_titles_in_order(original_xml),
+            source_titles_in_order(exported_xml)
+          )
+
+          assert_order_preserved(
+            @code,
+            "verse lines (<l> attrs)",
+            verse_line_tokens_in_order(original_xml),
+            verse_line_tokens_in_order(exported_xml)
+          )
+
+          assert_derived_verse_fields(@code, play_full, original_xml, exported_xml)
 
           roundtrip_log(@code, "OK")
         rescue

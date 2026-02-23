@@ -163,61 +163,68 @@ defmodule Emothe.RoundtripTest do
     EMOTHE0254_JulesCesar.xml
   )
 
-  for file <-
-        Path.expand("../fixtures/tei_files", __DIR__)
-        |> File.ls!()
-        |> Enum.filter(&String.ends_with?(&1, ".xml"))
-        |> Enum.reject(&(&1 in @passing_files))
-        |> Enum.sort() do
-    @file_name file
-    @code String.replace_suffix(file, ".xml", "")
+  if File.dir?(@fixtures_dir) do
+    for file <-
+          @fixtures_dir
+          |> File.ls!()
+          |> Enum.filter(&String.ends_with?(&1, ".xml"))
+          |> Enum.reject(&(&1 in @passing_files))
+          |> Enum.sort() do
+      @file_name file
+      @code String.replace_suffix(file, ".xml", "")
 
-    @tag capture_log: false
-    @tag timeout: 120_000
-    test "roundtrip: #{@code}" do
-      path = Path.join(@fixtures_dir, @file_name)
-      original_xml = read_original(path)
-      orig_counts = structural_counts(original_xml)
+      @tag capture_log: false
+      @tag timeout: 120_000
+      test "roundtrip: #{@code}" do
+        path = Path.join(@fixtures_dir, @file_name)
+        original_xml = read_original(path)
+        orig_counts = structural_counts(original_xml)
 
-      Logger.metadata(roundtrip_code: @code, tei_file: @file_name)
-      roundtrip_log(@code, "START file=#{@file_name}")
+        Logger.metadata(roundtrip_code: @code, tei_file: @file_name)
+        roundtrip_log(@code, "START file=#{@file_name}")
 
-      import_t0 = System.monotonic_time()
-      roundtrip_log(@code, "IMPORT start")
+        import_t0 = System.monotonic_time()
+        roundtrip_log(@code, "IMPORT start")
 
-      assert {:ok, play} = TeiParser.import_file(path), "Failed to import #{@file_name}"
+        assert {:ok, play} = TeiParser.import_file(path), "Failed to import #{@file_name}"
 
-      roundtrip_log(@code, "IMPORT ok play_id=#{play.id} (#{ms_since(import_t0)}ms)")
+        roundtrip_log(@code, "IMPORT ok play_id=#{play.id} (#{ms_since(import_t0)}ms)")
 
-      export_t0 = System.monotonic_time()
-      roundtrip_log(@code, "EXPORT start")
+        export_t0 = System.monotonic_time()
+        roundtrip_log(@code, "EXPORT start")
 
-      play_full = Catalogue.get_play_with_all!(play.id)
-      exported_xml = TeiXml.generate(play_full)
-      export_counts = structural_counts(exported_xml)
+        play_full = Catalogue.get_play_with_all!(play.id)
+        exported_xml = TeiXml.generate(play_full)
+        export_counts = structural_counts(exported_xml)
 
-      roundtrip_log(@code, "EXPORT ok (#{ms_since(export_t0)}ms)")
+        roundtrip_log(@code, "EXPORT ok (#{ms_since(export_t0)}ms)")
 
-      try do
-        for field <- @fields do
-          orig_val = Map.fetch!(orig_counts, field)
-          export_val = Map.fetch!(export_counts, field)
+        try do
+          for field <- @fields do
+            orig_val = Map.fetch!(orig_counts, field)
+            export_val = Map.fetch!(export_counts, field)
 
-          assert orig_val == export_val,
-                 "#{@code} #{field}: original=#{orig_val} exported=#{export_val}"
+            assert orig_val == export_val,
+                   "#{@code} #{field}: original=#{orig_val} exported=#{export_val}"
+          end
+
+          roundtrip_log(@code, "OK")
+        rescue
+          e in ExUnit.AssertionError ->
+            roundtrip_log(@code, "FAILED (see assertion). Logging count summaries...")
+
+            Logger.error(
+              "ROUNDTRIP failed original_counts=#{inspect(orig_counts)} exported_counts=#{inspect(export_counts)}"
+            )
+
+            reraise e, __STACKTRACE__
         end
-
-        roundtrip_log(@code, "OK")
-      rescue
-        e in ExUnit.AssertionError ->
-          roundtrip_log(@code, "FAILED (see assertion). Logging count summaries...")
-
-          Logger.error(
-            "ROUNDTRIP failed original_counts=#{inspect(orig_counts)} exported_counts=#{inspect(export_counts)}"
-          )
-
-          reraise e, __STACKTRACE__
       end
+    end
+  else
+    @tag skip: "Roundtrip TEI fixtures not available (expected at test/fixtures/tei_files)."
+    test "roundtrip fixtures missing" do
+      :ok
     end
   end
 end

@@ -16,7 +16,13 @@ defmodule Emothe.RoundtripTest do
   """
 
   @fixtures_dir Path.expand("../fixtures/tei_files", __DIR__)
-  @fields ~w(acts scenes characters speeches verses line_groups stage_dirs asides)a
+  @fields ~w(acts scenes characters speeches verses line_groups stage_dirs asides
+             split_parts verse_type_attrs hidden_chars heads)a
+
+  # speaker_refs may lose a few who= attrs when a speech references multiple
+  # characters (e.g. who="#ALB #COR") which the parser can't resolve to one ID.
+  # We warn instead of failing so the delta is visible without blocking CI.
+  @warn_fields ~w(speaker_refs)a
 
   defp ms_since(t0_native) do
     System.convert_time_unit(System.monotonic_time() - t0_native, :native, :millisecond)
@@ -92,6 +98,46 @@ defmodule Emothe.RoundtripTest do
 
   defp attr_val(attrs, key), do: Enum.find_value(attrs, fn {k, v} -> if k == key, do: v end)
 
+  # Count <l> elements with a part attribute (split verses)
+  defp count_part_attrs(body) do
+    Regex.scan(~r/<l\s[^>]*part="[IMF]"/, body) |> length()
+  end
+
+  # Count <sp> elements with a who attribute (speaker references)
+  defp count_who_attrs(body) do
+    Regex.scan(~r/<sp\s[^>]*who="/, body) |> length()
+  end
+
+  # Count <lg> elements with a type attribute (verse type annotations)
+  defp count_verse_type_attrs(body) do
+    Regex.scan(~r/<lg\s[^>]*type="/, body) |> length()
+  end
+
+  # Count <castItem> elements with ana="oculto" (hidden characters)
+  defp count_hidden_chars(front) do
+    Regex.scan(~r/<castItem\s[^>]*ana="oculto"/, front) |> length()
+  end
+
+  # Count <head> elements inside div1/div2 (division titles in body)
+  defp count_heads_in_body(body) do
+    clean = Regex.replace(~r/<\?xml[^?]*\?>/, body, "")
+    {:ok, tree} = Saxy.SimpleForm.parse_string("<root>#{clean}</root>")
+    count_head_children(tree)
+  end
+
+  defp count_head_children({_name, _attrs, children}) do
+    Enum.reduce(children, 0, fn
+      {"head", _, _}, acc ->
+        acc + 1
+
+      {tag, _, _} = el, acc when tag in ~w(root div1 div2) ->
+        acc + count_head_children(el)
+
+      _, acc ->
+        acc
+    end)
+  end
+
   defp structural_counts(xml) do
     body = extract_body(xml)
     front = extract_front(xml)
@@ -104,7 +150,12 @@ defmodule Emothe.RoundtripTest do
       acts: count_tag(xml, "div1"),
       scenes: count_tag(xml, "div2"),
       characters: count_tag(front, "castItem"),
-      asides: count_aside_elements(body)
+      asides: count_aside_elements(body),
+      split_parts: count_part_attrs(body),
+      speaker_refs: count_who_attrs(body),
+      verse_type_attrs: count_verse_type_attrs(body),
+      hidden_chars: count_hidden_chars(front),
+      heads: count_heads_in_body(body)
     }
   end
 
@@ -133,6 +184,108 @@ defmodule Emothe.RoundtripTest do
       _, acc ->
         acc
     end)
+  end
+
+  defp xml_escape(text) when is_binary(text) do
+    text
+    |> String.replace("&", "&amp;")
+    |> String.replace("<", "&lt;")
+    |> String.replace(">", "&gt;")
+    |> String.replace("\"", "&quot;")
+    |> String.replace("'", "&apos;")
+  end
+
+  defp assert_export_includes_text(code, exported_xml, label, text)
+
+  defp assert_export_includes_text(_code, _exported_xml, _label, text)
+       when is_nil(text) or text == "" do
+    :ok
+  end
+
+  defp assert_export_includes_text(code, exported_xml, label, text) when is_binary(text) do
+    if String.contains?(exported_xml, text) or String.contains?(exported_xml, xml_escape(text)) do
+      :ok
+    else
+      flunk("#{code} #{label}: '#{text}' not found in export")
+    end
+  end
+
+  # Verify that key metadata fields from the DB appear in the exported XML
+  defp assert_metadata_roundtrip(code, play, exported_xml) do
+    # Play title must appear in export
+    assert_export_includes_text(code, exported_xml, "metadata: title", play.title)
+
+    # Author name must appear in export
+    assert_export_includes_text(code, exported_xml, "metadata: author", play.author_name)
+
+    # Play code must appear in export
+    assert_export_includes_text(code, exported_xml, "metadata: code", play.code)
+
+    # Original title if present
+    assert_export_includes_text(
+      code,
+      exported_xml,
+      "metadata: original_title",
+      play.original_title
+    )
+
+    # Publication place if present
+    assert_export_includes_text(code, exported_xml, "metadata: pub_place", play.pub_place)
+
+    # Publication date if present
+    assert_export_includes_text(
+      code,
+      exported_xml,
+      "metadata: publication_date",
+      play.publication_date
+    )
+
+    # Licence URL if present
+    assert_export_includes_text(code, exported_xml, "metadata: licence_url", play.licence_url)
+
+    # Source fields: each source's title and author should appear
+    for source <- play.sources || [] do
+      assert_export_includes_text(code, exported_xml, "source: title", source.title)
+      assert_export_includes_text(code, exported_xml, "source: author", source.author)
+    end
+
+    # Edition title if present
+    assert_export_includes_text(code, exported_xml, "metadata: edition_title", play.edition_title)
+
+    # Author attribution if present (appears as ana= attribute)
+    assert_export_includes_text(
+      code,
+      exported_xml,
+      "metadata: author_attribution",
+      play.author_attribution
+    )
+
+    # Editor names should appear
+    for editor <- play.editors || [] do
+      assert_export_includes_text(code, exported_xml, "editor", editor.person_name)
+    end
+
+    # Principal editor should appear in <principal> tag
+    principals = Enum.filter(play.editors || [], &(&1.role == "principal"))
+
+    for p <- principals do
+      if p.person_name && p.person_name != "" do
+        name_re = Regex.escape(p.person_name)
+        escaped_name_re = Regex.escape(xml_escape(p.person_name))
+
+        assert Regex.match?(
+                 ~r/<principal>\s*(#{name_re}|#{escaped_name_re})\s*<\/principal>/s,
+                 exported_xml
+               ),
+               "#{code} principal: '#{p.person_name}' not found as <principal> in export"
+      end
+    end
+
+    # Sponsor should appear if present
+    assert_export_includes_text(code, exported_xml, "metadata: sponsor", play.sponsor)
+
+    # Funder should appear if present
+    assert_export_includes_text(code, exported_xml, "metadata: funder", play.funder)
   end
 
   # Files that already pass roundtrip — skip them to speed up iteration.
@@ -207,6 +360,22 @@ defmodule Emothe.RoundtripTest do
             assert orig_val == export_val,
                    "#{@code} #{field}: original=#{orig_val} exported=#{export_val}"
           end
+
+          # Warn-only fields: log mismatches without failing
+          for field <- @warn_fields do
+            orig_val = Map.fetch!(orig_counts, field)
+            export_val = Map.fetch!(export_counts, field)
+
+            if orig_val != export_val do
+              roundtrip_log(
+                @code,
+                "WARN #{field}: original=#{orig_val} exported=#{export_val} (delta=#{orig_val - export_val})"
+              )
+            end
+          end
+
+          # Metadata fidelity: verify key play fields survive the roundtrip
+          assert_metadata_roundtrip(@code, play_full, exported_xml)
 
           roundtrip_log(@code, "OK")
         rescue

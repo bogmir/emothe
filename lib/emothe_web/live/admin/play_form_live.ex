@@ -83,8 +83,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
         |> Enum.take(8)
       end
 
-    {:noreply,
-     assign(socket, parent_play_search: search, parent_play_suggestions: suggestions)}
+    {:noreply, assign(socket, parent_play_search: search, parent_play_suggestions: suggestions)}
   end
 
   def handle_event("pick_parent", %{"id" => id, "label" => label}, socket) do

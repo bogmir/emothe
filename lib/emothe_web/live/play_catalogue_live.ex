@@ -3,23 +3,56 @@ defmodule EmotheWeb.PlayCatalogueLive do
 
   alias Emothe.Catalogue
 
+  @per_page 25
+
   @impl true
   def mount(_params, _session, socket) do
-    plays = Catalogue.list_plays()
-
     {:ok,
      socket
      |> assign(:page_title, gettext("Play Catalogue"))
-     |> assign(:plays, plays)
+     |> assign(:breadcrumbs, [%{label: gettext("Catalogue")}])
+     |> assign(:plays, [])
      |> assign(:search, "")
-     |> assign(:breadcrumbs, [%{label: gettext("Catalogue")}])}
+     |> assign(:page, 1)
+     |> assign(:total_pages, 1)}
+  end
+
+  @impl true
+  def handle_params(params, _url, socket) do
+    search = params["search"] || ""
+    page = parse_page(params["page"])
+
+    total = Catalogue.count_plays(search: search)
+    total_pages = max(1, ceil(total / @per_page))
+    page = min(page, total_pages)
+
+    plays = Catalogue.list_plays(search: search, page: page, per_page: @per_page)
+
+    {:noreply,
+     socket
+     |> assign(:plays, plays)
+     |> assign(:search, search)
+     |> assign(:page, page)
+     |> assign(:total_pages, total_pages)}
   end
 
   @impl true
   def handle_event("search", %{"search" => search}, socket) do
-    plays = Catalogue.list_plays(search: search)
-    {:noreply, assign(socket, plays: plays, search: search)}
+    params = if search == "", do: [], else: [search: search]
+    {:noreply, push_patch(socket, to: ~p"/plays?#{params}")}
   end
+
+  defp parse_page(nil), do: 1
+
+  defp parse_page(s) do
+    case Integer.parse(s) do
+      {n, ""} -> max(1, n)
+      _ -> 1
+    end
+  end
+
+  defp page_params("", page), do: [page: page]
+  defp page_params(search, page), do: [search: search, page: page]
 
   @impl true
   def render(assigns) do
@@ -96,6 +129,27 @@ defmodule EmotheWeb.PlayCatalogueLive do
         <p :if={@plays == []} class="text-base-content/50 text-center py-12">
           {gettext("No plays found. Try a different search term.")}
         </p>
+      </div>
+
+      <%!-- Pagination --%>
+      <div :if={@total_pages > 1} class="mt-6 flex items-center justify-center gap-4">
+        <.link
+          :if={@page > 1}
+          patch={~p"/plays?#{page_params(@search, @page - 1)}"}
+          class="btn btn-sm btn-ghost"
+        >
+          <.icon name="hero-chevron-left-mini" class="size-4" />{gettext("Previous")}
+        </.link>
+        <span class="text-sm text-base-content/60">
+          {gettext("Page %{page} of %{total}", page: @page, total: @total_pages)}
+        </span>
+        <.link
+          :if={@page < @total_pages}
+          patch={~p"/plays?#{page_params(@search, @page + 1)}"}
+          class="btn btn-sm btn-ghost"
+        >
+          {gettext("Next")}<.icon name="hero-chevron-right-mini" class="size-4" />
+        </.link>
       </div>
     </div>
     """

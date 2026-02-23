@@ -9,11 +9,33 @@ defmodule Emothe.Catalogue do
 
   # --- Plays ---
 
+  @per_page 25
+
   def list_plays(opts \\ []) do
+    query =
+      Play
+      |> apply_search(opts[:search])
+      |> apply_sort(opts[:sort] || :title_sort)
+
+    case opts[:page] do
+      nil ->
+        Repo.all(query)
+
+      page ->
+        per_page = opts[:per_page] || @per_page
+        offset = (page - 1) * per_page
+
+        query
+        |> limit(^per_page)
+        |> offset(^offset)
+        |> Repo.all()
+    end
+  end
+
+  def count_plays(opts \\ []) do
     Play
     |> apply_search(opts[:search])
-    |> apply_sort(opts[:sort] || :title_sort)
-    |> Repo.all()
+    |> Repo.aggregate(:count, :id)
   end
 
   def get_play!(id), do: Repo.get!(Play, id)

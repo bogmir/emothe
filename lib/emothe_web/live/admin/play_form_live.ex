@@ -6,7 +6,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :plays_for_select, Catalogue.list_plays_for_select())}
+    {:ok, socket}
   end
 
   @impl true
@@ -21,6 +21,10 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:page_title, gettext("New Play"))
     |> assign(:play, play)
     |> assign(:form, to_form(Catalogue.change_play_form(play)))
+    |> assign(:parent_play_id, nil)
+    |> assign(:parent_play_label, "")
+    |> assign(:parent_play_search, "")
+    |> assign(:parent_play_suggestions, [])
     |> assign(:breadcrumbs, [
       %{label: gettext("Admin"), to: ~p"/admin/plays"},
       %{label: gettext("Plays"), to: ~p"/admin/plays"},
@@ -32,10 +36,22 @@ defmodule EmotheWeb.Admin.PlayFormLive do
   defp apply_action(socket, :edit, %{"id" => id}) do
     play = Catalogue.get_play!(id)
 
+    parent_label =
+      if play.parent_play_id do
+        parent = Catalogue.get_play!(play.parent_play_id)
+        "#{parent.title} (#{parent.code})"
+      else
+        ""
+      end
+
     socket
     |> assign(:page_title, "#{gettext("Edit")}: #{play.title}")
     |> assign(:play, play)
     |> assign(:form, to_form(Catalogue.change_play_form(play)))
+    |> assign(:parent_play_id, play.parent_play_id)
+    |> assign(:parent_play_label, parent_label)
+    |> assign(:parent_play_search, "")
+    |> assign(:parent_play_suggestions, [])
     |> assign(:breadcrumbs, [
       %{label: gettext("Admin"), to: ~p"/admin/plays"},
       %{label: gettext("Plays"), to: ~p"/admin/plays"},
@@ -53,6 +69,40 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   def handle_event("save", %{"play" => play_params}, socket) do
     save_play(socket, socket.assigns.live_action, play_params)
+  end
+
+  def handle_event("suggest_parent", params, socket) do
+    search = params["parent_play_search"] || ""
+
+    suggestions =
+      if String.trim(search) == "" do
+        []
+      else
+        Catalogue.list_plays(search: search)
+        |> Enum.reject(&(&1.id == socket.assigns.play.id))
+        |> Enum.take(8)
+      end
+
+    {:noreply,
+     assign(socket, parent_play_search: search, parent_play_suggestions: suggestions)}
+  end
+
+  def handle_event("pick_parent", %{"id" => id, "label" => label}, socket) do
+    {:noreply,
+     socket
+     |> assign(:parent_play_id, id)
+     |> assign(:parent_play_label, label)
+     |> assign(:parent_play_search, "")
+     |> assign(:parent_play_suggestions, [])}
+  end
+
+  def handle_event("clear_parent", _, socket) do
+    {:noreply,
+     socket
+     |> assign(:parent_play_id, nil)
+     |> assign(:parent_play_label, "")
+     |> assign(:parent_play_search, "")
+     |> assign(:parent_play_suggestions, [])}
   end
 
   defp save_play(socket, :new, play_params) do
@@ -88,17 +138,6 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       {gettext("Adaptation"), "adaptacion"},
       {gettext("Reworking"), "refundicion"}
     ]
-  end
-
-  defp parent_play_options(plays_for_select, current_play) do
-    plays =
-      if current_play && current_play.id do
-        Enum.reject(plays_for_select, fn {_label, id} -> id == current_play.id end)
-      else
-        plays_for_select
-      end
-
-    [{"— #{gettext("None")}", ""} | plays]
   end
 
   defp language_options do
@@ -205,11 +244,77 @@ defmodule EmotheWeb.Admin.PlayFormLive do
               <label class="label">
                 <span class="label-text font-medium">{gettext("Original Work")}</span>
               </label>
-              <.input
-                field={@form[:parent_play_id]}
-                type="select"
-                options={parent_play_options(@plays_for_select, @play)}
-              />
+              <%!-- Autocomplete combobox for parent play --%>
+              <div class="relative">
+                <%!-- Selected state --%>
+                <div
+                  :if={@parent_play_id}
+                  class="input input-bordered flex items-center justify-between gap-2 h-auto min-h-[2.5rem] py-1.5"
+                >
+                  <span class="text-sm truncate">{@parent_play_label}</span>
+                  <button
+                    type="button"
+                    phx-click="clear_parent"
+                    class="btn btn-ghost btn-xs btn-circle shrink-0"
+                    title={gettext("Clear")}
+                  >
+                    <.icon name="hero-x-mark-mini" class="size-3.5" />
+                  </button>
+                </div>
+                <%!-- Search state --%>
+                <div :if={!@parent_play_id}>
+                  <input
+                    type="text"
+                    name="parent_play_search"
+                    value={@parent_play_search}
+                    phx-change="suggest_parent"
+                    phx-debounce="200"
+                    placeholder={gettext("Search by title or code...")}
+                    class="input input-bordered w-full"
+                    autocomplete="off"
+                  />
+                  <%!-- Suggestions dropdown --%>
+                  <ul
+                    :if={@parent_play_suggestions != []}
+                    class="absolute z-20 mt-1 w-full bg-base-100 border border-base-300 rounded-box shadow-lg max-h-64 overflow-y-auto"
+                  >
+                    <li :for={sugg <- @parent_play_suggestions}>
+                      <button
+                        type="button"
+                        phx-click="pick_parent"
+                        phx-value-id={sugg.id}
+                        phx-value-label={sugg.title}
+                        class="w-full text-left px-3 py-2 hover:bg-base-200 transition-colors"
+                      >
+                        <div class="text-sm font-medium text-base-content truncate">
+                          {sugg.title}
+                        </div>
+                        <div class="text-xs text-base-content/50 truncate mt-0.5">
+                          {sugg.code}
+                        </div>
+                      </button>
+                    </li>
+                  </ul>
+                  <p
+                    :if={@parent_play_search == ""}
+                    class="mt-1 text-xs text-base-content/50"
+                  >
+                    {gettext("Type to search for a play")}
+                  </p>
+                  <p
+                    :if={@parent_play_search != "" && @parent_play_suggestions == []}
+                    class="mt-1 text-xs text-base-content/50"
+                  >
+                    {gettext("No plays found")}
+                  </p>
+                </div>
+                <%!-- Hidden input carries the value through form submit / validate --%>
+                <input
+                  type="hidden"
+                  name={@form[:parent_play_id].name}
+                  value={@parent_play_id || ""}
+                />
+              </div>
             </div>
           </div>
         </div>

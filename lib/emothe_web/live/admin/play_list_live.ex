@@ -4,23 +4,17 @@ defmodule EmotheWeb.Admin.PlayListLive do
   alias Emothe.Catalogue
   alias Emothe.PlayContent
 
+  @per_page 50
+
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      # Subscribe to all plays — we use a wildcard-like approach:
-      # subscribe once per play currently visible.
-      for play <- Catalogue.list_plays() do
-        PlayContent.subscribe(play.id)
-      end
-    end
-
-    plays = Catalogue.list_plays()
-
     {:ok,
      socket
      |> assign(:page_title, gettext("Admin - Plays"))
-     |> assign(:plays, plays)
+     |> assign(:plays, [])
      |> assign(:search, "")
+     |> assign(:page, 1)
+     |> assign(:total_pages, 1)
      |> assign(:breadcrumbs, [
        %{label: gettext("Admin"), to: ~p"/admin/plays"},
        %{label: gettext("Plays")}
@@ -28,24 +22,69 @@ defmodule EmotheWeb.Admin.PlayListLive do
   end
 
   @impl true
+  def handle_params(params, _url, socket) do
+    search = params["search"] || ""
+    page = parse_page(params["page"])
+
+    total = Catalogue.count_plays(search: search)
+    total_pages = max(1, ceil(total / @per_page))
+    page = min(page, total_pages)
+
+    plays = Catalogue.list_plays(search: search, page: page, per_page: @per_page)
+
+    if connected?(socket) do
+      for play <- plays, do: PlayContent.subscribe(play.id)
+    end
+
+    {:noreply,
+     socket
+     |> assign(:plays, plays)
+     |> assign(:search, search)
+     |> assign(:page, page)
+     |> assign(:total_pages, total_pages)}
+  end
+
+  @impl true
   def handle_event("search", %{"search" => search}, socket) do
-    plays = Catalogue.list_plays(search: search)
-    {:noreply, assign(socket, plays: plays, search: search)}
+    params = if search == "", do: [], else: [search: search]
+    {:noreply, push_patch(socket, to: ~p"/admin/plays?#{params}")}
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
     play = Catalogue.get_play!(id)
     {:ok, _} = Catalogue.delete_play(play)
-    plays = Catalogue.list_plays(search: socket.assigns.search)
-    {:noreply, assign(socket, plays: plays)}
+
+    total = Catalogue.count_plays(search: socket.assigns.search)
+    total_pages = max(1, ceil(total / @per_page))
+    page = min(socket.assigns.page, total_pages)
+    plays = Catalogue.list_plays(search: socket.assigns.search, page: page, per_page: @per_page)
+
+    {:noreply, assign(socket, plays: plays, page: page, total_pages: total_pages)}
   end
 
   @impl true
   def handle_info({:play_content_changed, _play_id}, socket) do
-    # Re-fetch plays to pick up updated verse_count
-    plays = Catalogue.list_plays(search: socket.assigns.search)
+    plays =
+      Catalogue.list_plays(
+        search: socket.assigns.search,
+        page: socket.assigns.page,
+        per_page: @per_page
+      )
+
     {:noreply, assign(socket, plays: plays)}
   end
+
+  defp parse_page(nil), do: 1
+
+  defp parse_page(s) do
+    case Integer.parse(s) do
+      {n, ""} -> max(1, n)
+      _ -> 1
+    end
+  end
+
+  defp page_params("", page), do: [page: page]
+  defp page_params(search, page), do: [search: search, page: page]
 
   @impl true
   def render(assigns) do
@@ -157,6 +196,27 @@ defmodule EmotheWeb.Admin.PlayListLive do
       >
         {gettext("No plays yet. Import a TEI-XML file or create a new play.")}
       </p>
+
+      <%!-- Pagination --%>
+      <div :if={@total_pages > 1} class="mt-6 flex items-center justify-center gap-4">
+        <.link
+          :if={@page > 1}
+          patch={~p"/admin/plays?#{page_params(@search, @page - 1)}"}
+          class="btn btn-sm btn-ghost"
+        >
+          <.icon name="hero-chevron-left-mini" class="size-4" />{gettext("Previous")}
+        </.link>
+        <span class="text-sm text-base-content/60">
+          {gettext("Page %{page} of %{total}", page: @page, total: @total_pages)}
+        </span>
+        <.link
+          :if={@page < @total_pages}
+          patch={~p"/admin/plays?#{page_params(@search, @page + 1)}"}
+          class="btn btn-sm btn-ghost"
+        >
+          {gettext("Next")}<.icon name="hero-chevron-right-mini" class="size-4" />
+        </.link>
+      </div>
     </div>
     """
   end

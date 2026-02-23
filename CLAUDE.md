@@ -190,10 +190,10 @@ Then visit:
 ### Medium Priority
 - [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
 - [x] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.) in statistics panel
-- [ ] **Pagination** on catalogue pages for large collections
+- [x] **Pagination** on catalogue pages (25/page public, 50/page admin) with URL-based navigation (`?page=N&search=query`); parent play field is now an autocomplete combobox
 - [x] ~~Install Typst~~ PDF export now uses ChromicPDF (requires Chrome/Chromium on the system)
 - [ ] **Stage direction navigator** (`« N / M »`) - client-side JS hook to scroll between stage directions in play text
-- [ ] **Recompute statistics** for existing plays after `act_label` fix (raw type is now stored; old cached values handled gracefully but ideally refreshed)
+- [x] **Recompute statistics** - stats cache is invalidated automatically on every content change via `broadcast_content_changed/1` (lazy recompute on next access); one-time refresh: `Emothe.Repo.all(Emothe.Catalogue.Play) |> Enum.each(&Emothe.Statistics.recompute(&1.id))`
 
 ### Low Priority / Future
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting

@@ -25,13 +25,27 @@ defmodule Emothe.Catalogue do
   def get_play_with_all!(id) do
     Play
     |> Repo.get!(id)
-    |> Repo.preload([:editors, :sources, :editorial_notes, :statistic, :parent_play, :derived_plays])
+    |> Repo.preload([
+      :editors,
+      :sources,
+      :editorial_notes,
+      :statistic,
+      :parent_play,
+      :derived_plays
+    ])
   end
 
   def get_play_by_code_with_all!(code) do
     Play
     |> Repo.get_by!(code: code)
-    |> Repo.preload([:editors, :sources, :editorial_notes, :statistic, :parent_play, :derived_plays])
+    |> Repo.preload([
+      :editors,
+      :sources,
+      :editorial_notes,
+      :statistic,
+      :parent_play,
+      :derived_plays
+    ])
   end
 
   def create_play(attrs \\ %{}) do

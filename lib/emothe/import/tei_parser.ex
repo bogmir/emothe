@@ -178,8 +178,9 @@ defmodule Emothe.Import.TeiParser do
         !has_attr?(attrs, "key") and !has_attr?(attrs, "type")
       end)
 
-    main_title = traduccion_title || plain_title ||
-      Enum.find(titles, fn {_, attrs, _} -> !has_attr?(attrs, "key") end)
+    main_title =
+      traduccion_title || plain_title ||
+        Enum.find(titles, fn {_, attrs, _} -> !has_attr?(attrs, "key") end)
 
     sort_title = Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "key") == "orden" end)
     code_title = Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "key") == "archivo" end)

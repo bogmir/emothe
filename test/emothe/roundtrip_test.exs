@@ -1,6 +1,8 @@
 defmodule Emothe.RoundtripTest do
   use Emothe.DataCase, async: false
 
+  require Logger
+
   alias Emothe.Import.TeiParser
   alias Emothe.Export.TeiXml
   alias Emothe.Catalogue
@@ -15,6 +17,14 @@ defmodule Emothe.RoundtripTest do
 
   @fixtures_dir Path.expand("../fixtures/tei_files", __DIR__)
   @fields ~w(acts scenes characters speeches verses line_groups stage_dirs asides)a
+
+  defp ms_since(t0_native) do
+    System.convert_time_unit(System.monotonic_time() - t0_native, :native, :millisecond)
+  end
+
+  defp roundtrip_log(code, msg) do
+    IO.puts("[roundtrip #{code}] #{msg}")
+  end
 
   # Read a possibly UTF-16 file and return UTF-8 string
   defp read_original(path) do
@@ -162,25 +172,51 @@ defmodule Emothe.RoundtripTest do
     @file_name file
     @code String.replace_suffix(file, ".xml", "")
 
+    @tag capture_log: false
     @tag timeout: 120_000
     test "roundtrip: #{@code}" do
       path = Path.join(@fixtures_dir, @file_name)
       original_xml = read_original(path)
       orig_counts = structural_counts(original_xml)
 
-      assert {:ok, play} = TeiParser.import_file(path),
-             "Failed to import #{@file_name}"
+      Logger.metadata(roundtrip_code: @code, tei_file: @file_name)
+      roundtrip_log(@code, "START file=#{@file_name}")
+
+      import_t0 = System.monotonic_time()
+      roundtrip_log(@code, "IMPORT start")
+
+      assert {:ok, play} = TeiParser.import_file(path), "Failed to import #{@file_name}"
+
+      roundtrip_log(@code, "IMPORT ok play_id=#{play.id} (#{ms_since(import_t0)}ms)")
+
+      export_t0 = System.monotonic_time()
+      roundtrip_log(@code, "EXPORT start")
 
       play_full = Catalogue.get_play_with_all!(play.id)
       exported_xml = TeiXml.generate(play_full)
       export_counts = structural_counts(exported_xml)
 
-      for field <- @fields do
-        orig_val = Map.fetch!(orig_counts, field)
-        export_val = Map.fetch!(export_counts, field)
+      roundtrip_log(@code, "EXPORT ok (#{ms_since(export_t0)}ms)")
 
-        assert orig_val == export_val,
-               "#{@code} #{field}: original=#{orig_val} exported=#{export_val}"
+      try do
+        for field <- @fields do
+          orig_val = Map.fetch!(orig_counts, field)
+          export_val = Map.fetch!(export_counts, field)
+
+          assert orig_val == export_val,
+                 "#{@code} #{field}: original=#{orig_val} exported=#{export_val}"
+        end
+
+        roundtrip_log(@code, "OK")
+      rescue
+        e in ExUnit.AssertionError ->
+          roundtrip_log(@code, "FAILED (see assertion). Logging count summaries...")
+
+          Logger.error(
+            "ROUNDTRIP failed original_counts=#{inspect(orig_counts)} exported_counts=#{inspect(export_counts)}"
+          )
+
+          reraise e, __STACKTRACE__
       end
     end
   end

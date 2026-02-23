@@ -6,7 +6,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, assign(socket, :plays_for_select, Catalogue.list_plays_for_select())}
   end
 
   @impl true
@@ -81,6 +81,26 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     end
   end
 
+  defp relationship_type_options do
+    [
+      {gettext("— (Original / standalone)"), ""},
+      {gettext("Translation"), "traduccion"},
+      {gettext("Adaptation"), "adaptacion"},
+      {gettext("Reworking"), "refundicion"}
+    ]
+  end
+
+  defp parent_play_options(plays_for_select, current_play) do
+    plays =
+      if current_play && current_play.id do
+        Enum.reject(plays_for_select, fn {_label, id} -> id == current_play.id end)
+      else
+        plays_for_select
+      end
+
+    [{"— #{gettext("None")}", ""} | plays]
+  end
+
   defp language_options do
     [
       {gettext("Spanish"), "es"},
@@ -131,6 +151,29 @@ defmodule EmotheWeb.Admin.PlayFormLive do
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label class="label">
+              <span class="label-text font-medium">{gettext("Title (sort)")}</span>
+            </label>
+            <.input
+              field={@form[:title_sort]}
+              type="text"
+              placeholder={gettext("Alphabetical sorting form")}
+            />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Edition Title")}</span>
+            </label>
+            <.input
+              field={@form[:edition_title]}
+              type="text"
+              placeholder={gettext("Full editorial citation")}
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label class="label">
               <span class="label-text font-medium">{gettext("Code")} *</span>
             </label>
             <.input field={@form[:code]} type="text" required placeholder={gettext("e.g. AL0569")} />
@@ -140,6 +183,34 @@ defmodule EmotheWeb.Admin.PlayFormLive do
               <span class="label-text font-medium">{gettext("EMOTHE ID")}</span>
             </label>
             <.input field={@form[:emothe_id]} type="text" placeholder={gettext("e.g. 0703")} />
+          </div>
+        </div>
+
+        <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-base-content/60">
+            {gettext("Work Relationship")}
+          </h3>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label class="label">
+                <span class="label-text font-medium">{gettext("Relationship Type")}</span>
+              </label>
+              <.input
+                field={@form[:relationship_type]}
+                type="select"
+                options={relationship_type_options()}
+              />
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-medium">{gettext("Original Work")}</span>
+              </label>
+              <.input
+                field={@form[:parent_play_id]}
+                type="select"
+                options={parent_play_options(@plays_for_select, @play)}
+              />
+            </div>
           </div>
         </div>
 

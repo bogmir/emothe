@@ -29,6 +29,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
       <%!-- Scenes per act --%>
       <.bar_chart
+        :if={(get_in(@data, ["scenes", "total"]) || 0) > 0}
         title={"#{gettext("Scenes per")} #{act_label_singular(@raw_label)}"}
         items={get_in(@data, ["scenes", "per_act"]) || []}
         label_key="act"
@@ -66,26 +67,27 @@ defmodule EmotheWeb.Components.StatisticsPanel do
       </div>
 
       <%!-- Verse type distribution --%>
-      <div :if={@data["verse_type_distribution"] && @data["verse_type_distribution"] != []}>
-        <h3 class="text-lg font-semibold text-gray-900 mb-3">
+      <div
+        :if={@data["verse_type_distribution"] && @data["verse_type_distribution"] != []}
+        class="bg-base-100 border border-base-300 rounded-xl p-5"
+      >
+        <h3 class="text-lg font-semibold text-base-content mb-4">
           {gettext("Verse Type Distribution")}
         </h3>
-        <div class="bg-white border border-gray-200 rounded-xl p-5">
-          <div class="space-y-3">
-            <div :for={vt <- @data["verse_type_distribution"]} class="flex items-center gap-3">
-              <span
-                class="w-36 text-sm text-gray-600 truncate shrink-0"
-                title={verse_type_label(vt["verse_type"])}
+        <div class="space-y-3">
+          <div :for={vt <- @data["verse_type_distribution"]} class="flex items-center gap-3">
+            <span
+              class="w-36 text-sm text-base-content/70 truncate shrink-0"
+              title={verse_type_label(vt["verse_type"])}
+            >
+              {verse_type_label(vt["verse_type"])}
+            </span>
+            <div class="flex-1 bg-base-200 rounded-full h-6 overflow-hidden">
+              <div
+                class="bg-violet-500 h-full rounded-full transition-all flex items-center justify-end pr-2"
+                style={"width: #{bar_percent(vt["count"], max_verse_type(@data["verse_type_distribution"]))}%"}
               >
-                {verse_type_label(vt["verse_type"])}
-              </span>
-              <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
-                <div
-                  class="bg-violet-500 h-full rounded-full transition-all flex items-center justify-end pr-2"
-                  style={"width: #{bar_percent(vt["count"], max_verse_type(@data["verse_type_distribution"]))}%"}
-                >
-                  <span class="text-xs text-white font-medium">{vt["count"]}</span>
-                </div>
+                <span class="text-xs text-white font-medium">{vt["count"]}</span>
               </div>
             </div>
           </div>
@@ -93,21 +95,27 @@ defmodule EmotheWeb.Components.StatisticsPanel do
       </div>
 
       <%!-- Character appearances --%>
-      <div :if={@data["character_appearances"] && @data["character_appearances"] != []}>
-        <h3 class="text-lg font-semibold text-gray-900 mb-3">{gettext("Character Speeches")}</h3>
+      <div
+        :if={@data["character_appearances"] && @data["character_appearances"] != []}
+        class="bg-base-100 border border-base-300 rounded-xl p-5"
+      >
+        <h3 class="text-lg font-semibold text-base-content mb-4">{gettext("Character Speeches")}</h3>
         <div class="space-y-2">
           <div :for={char <- @data["character_appearances"]} class="flex items-center gap-3">
-            <span class="w-28 text-sm font-medium text-gray-700 truncate" title={char["name"]}>
+            <span
+              class="w-28 text-sm font-medium text-base-content/80 truncate shrink-0"
+              title={char["name"]}
+            >
               {char["name"]}
             </span>
-            <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+            <div class="flex-1 bg-base-200 rounded-full h-6 overflow-hidden">
               <div
-                class="bg-amber-500 h-full rounded-full transition-all"
+                class="bg-amber-500 h-full rounded-full transition-all flex items-center justify-end pr-2"
                 style={"width: #{bar_percent(char["speeches"], max_speeches(@data["character_appearances"]))}%"}
               >
+                <span class="text-xs text-white font-medium">{char["speeches"]}</span>
               </div>
             </div>
-            <span class="text-sm text-gray-500 w-10 text-right">{char["speeches"]}</span>
           </div>
         </div>
       </div>
@@ -121,10 +129,10 @@ defmodule EmotheWeb.Components.StatisticsPanel do
 
   defp stat_card(assigns) do
     ~H"""
-    <div class="bg-white border border-gray-200 rounded-xl p-4 text-center">
+    <div class="bg-base-100 border border-base-300 rounded-xl p-4 text-center">
       <div class="text-2xl mb-1">{@icon}</div>
-      <div class="text-2xl font-bold text-gray-900">{@value || 0}</div>
-      <div class="text-sm text-gray-500">{@label}</div>
+      <div class="text-2xl font-bold text-base-content">{@value || 0}</div>
+      <div class="text-sm text-base-content/60">{@label}</div>
     </div>
     """
   end
@@ -141,14 +149,14 @@ defmodule EmotheWeb.Components.StatisticsPanel do
     assigns = assign(assigns, :max, max)
 
     ~H"""
-    <div class="bg-white border border-gray-200 rounded-xl p-5">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">{@title}</h3>
+    <div class="bg-base-100 border border-base-300 rounded-xl p-5">
+      <h3 class="text-lg font-semibold text-base-content mb-4">{@title}</h3>
       <div class="space-y-3">
         <div :for={item <- @items} class="flex items-center gap-3">
-          <span class="w-16 text-sm text-gray-600 text-right">
+          <span class="text-sm text-base-content/70 text-right shrink-0 whitespace-nowrap">
             {@label_prefix}{item[@label_key]}
           </span>
-          <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+          <div class="flex-1 bg-base-200 rounded-full h-6 overflow-hidden">
             <div
               class={"#{@color} h-full rounded-full transition-all flex items-center justify-end pr-2"}
               style={"width: #{bar_percent(item[@value_key], @max)}%"}
@@ -201,6 +209,7 @@ defmodule EmotheWeb.Components.StatisticsPanel do
   defp max_verse_type(items), do: items |> Enum.map(&(&1["count"] || 0)) |> Enum.max(fn -> 1 end)
 
   defp bar_percent(nil, _max), do: 0
+  defp bar_percent(0, _max), do: 0
   defp bar_percent(_value, 0), do: 0
 
   defp bar_percent(value, max) do

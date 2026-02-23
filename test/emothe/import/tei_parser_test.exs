@@ -87,6 +87,51 @@ defmodule Emothe.Import.TeiParserTest do
     assert {:error, {:play_already_exists, ^code}} = TeiParser.import_file(path)
   end
 
+  test "import_file/1 returns error for valid XML without teiHeader" do
+    path = write_tei("<TEI><text><body></body></text></TEI>")
+
+    assert {:error, :missing_tei_header} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 returns error for non-TEI XML" do
+    path = write_tei("<html><body><p>Hello</p></body></html>")
+
+    assert {:error, :missing_tei_header} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 returns error for empty teiHeader (no fileDesc)" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader></teiHeader>
+      <text><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    # No fileDesc means no title → changeset validation fails
+    assert {:error, %Ecto.Changeset{}} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 succeeds with teiHeader-only TEI (no <text>)" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Header Only</title></titleStmt>
+          <publicationStmt><idno>HEADERONLY01</idno></publicationStmt>
+        </fileDesc>
+      </teiHeader>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.title == "Header Only"
+    assert play.code == "HEADERONLY01"
+  end
+
   # --- Cast list ---
 
   test "import_file/1 imports characters from cast list" do

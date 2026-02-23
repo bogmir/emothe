@@ -117,6 +117,10 @@ defmodule Emothe.Import.TeiParser do
     header = find_child(children, "teiHeader")
     text = find_child(children, "text")
 
+    if is_nil(header) do
+      Repo.rollback(:missing_tei_header)
+    end
+
     play = import_header(header)
 
     if text do
@@ -562,13 +566,15 @@ defmodule Emothe.Import.TeiParser do
     end
 
     # Create a division for the elenco
-    {:ok, _div} =
-      PlayContent.create_division(%{
-        play_id: play.id,
-        type: "elenco",
-        title: safe_text(find_child(children, "head")),
-        position: pos
-      })
+    case PlayContent.create_division(%{
+           play_id: play.id,
+           type: "elenco",
+           title: safe_text(find_child(children, "head")),
+           position: pos
+         }) do
+      {:ok, _div} -> :ok
+      {:error, cs} -> Repo.rollback({:division_create_failed, cs})
+    end
 
     pos + 1
   end
@@ -652,14 +658,17 @@ defmodule Emothe.Import.TeiParser do
       number = parse_int(attr_value(attrs, "n"))
       heading = safe_text(find_child(act_children, "head"))
 
-      {:ok, act_div} =
-        PlayContent.create_division(%{
-          play_id: play.id,
-          type: type,
-          number: number,
-          title: heading,
-          position: pos
-        })
+      act_div =
+        case PlayContent.create_division(%{
+               play_id: play.id,
+               type: type,
+               number: number,
+               title: heading,
+               position: pos
+             }) do
+          {:ok, div} -> div
+          {:error, cs} -> Repo.rollback({:division_create_failed, cs})
+        end
 
       import_act_content(act_children, play, act_div)
     end)
@@ -679,15 +688,18 @@ defmodule Emothe.Import.TeiParser do
           number = parse_int(attr_value(attrs, "n"))
           heading = safe_text(find_child(scene_children, "head"))
 
-          {:ok, scene_div} =
-            PlayContent.create_division(%{
-              play_id: play.id,
-              parent_id: act_div.id,
-              type: scene_type,
-              number: number,
-              title: heading,
-              position: scene_pos
-            })
+          scene_div =
+            case PlayContent.create_division(%{
+                   play_id: play.id,
+                   parent_id: act_div.id,
+                   type: scene_type,
+                   number: number,
+                   title: heading,
+                   position: scene_pos
+                 }) do
+              {:ok, div} -> div
+              {:error, cs} -> Repo.rollback({:division_create_failed, cs})
+            end
 
           new_el_pos = import_scene_content(scene_children, play, scene_div, el_pos)
           {new_el_pos, scene_pos + 1}
@@ -732,15 +744,18 @@ defmodule Emothe.Import.TeiParser do
     # Resolve character from who attribute
     character_id = resolve_character(play.id, who)
 
-    {:ok, speech} =
-      PlayContent.create_element(%{
-        play_id: play.id,
-        division_id: division.id,
-        type: "speech",
-        speaker_label: speaker_label,
-        character_id: character_id,
-        position: start_pos
-      })
+    speech =
+      case PlayContent.create_element(%{
+             play_id: play.id,
+             division_id: division.id,
+             type: "speech",
+             speaker_label: speaker_label,
+             character_id: character_id,
+             position: start_pos
+           }) do
+        {:ok, el} -> el
+        {:error, cs} -> Repo.rollback({:element_create_failed, :speech, cs})
+      end
 
     # Import child elements (lg groups, individual l elements, stage directions, p elements)
     _child_pos =
@@ -776,16 +791,19 @@ defmodule Emothe.Import.TeiParser do
     verse_type = attr_value(attrs, "type")
     part = attr_value(attrs, "part")
 
-    {:ok, lg} =
-      PlayContent.create_element(%{
-        play_id: play.id,
-        division_id: division.id,
-        parent_id: speech.id,
-        type: "line_group",
-        verse_type: verse_type,
-        part: part,
-        position: start_pos
-      })
+    lg =
+      case PlayContent.create_element(%{
+             play_id: play.id,
+             division_id: division.id,
+             parent_id: speech.id,
+             type: "line_group",
+             verse_type: verse_type,
+             part: part,
+             position: start_pos
+           }) do
+        {:ok, el} -> el
+        {:error, cs} -> Repo.rollback({:element_create_failed, :line_group, cs})
+      end
 
     Enum.reduce(children, 0, fn
       {"l", _, _} = line, pos ->
@@ -822,20 +840,23 @@ defmodule Emothe.Import.TeiParser do
 
     char_id = character_id || parent.character_id
 
-    PlayContent.create_element(%{
-      play_id: play.id,
-      division_id: division.id,
-      parent_id: parent.id,
-      character_id: char_id,
-      type: "verse_line",
-      content: content,
-      line_number: line_number,
-      line_id: line_id,
-      part: part,
-      rend: rend,
-      is_aside: is_aside,
-      position: pos
-    })
+    case PlayContent.create_element(%{
+           play_id: play.id,
+           division_id: division.id,
+           parent_id: parent.id,
+           character_id: char_id,
+           type: "verse_line",
+           content: content,
+           line_number: line_number,
+           line_id: line_id,
+           part: part,
+           rend: rend,
+           is_aside: is_aside,
+           position: pos
+         }) do
+      {:ok, _el} -> :ok
+      {:error, cs} -> Logger.warning("Failed to create verse_line: #{inspect(cs)}")
+    end
   end
 
   # Returns true if the children of an <l> element indicate an aside, either via:
@@ -902,14 +923,17 @@ defmodule Emothe.Import.TeiParser do
   defp import_stage_direction({_name, _attrs, _children} = stage, play, division, parent_id, pos) do
     content = text_content(stage)
 
-    PlayContent.create_element(%{
-      play_id: play.id,
-      division_id: division.id,
-      parent_id: parent_id,
-      type: "stage_direction",
-      content: content,
-      position: pos
-    })
+    case PlayContent.create_element(%{
+           play_id: play.id,
+           division_id: division.id,
+           parent_id: parent_id,
+           type: "stage_direction",
+           content: content,
+           position: pos
+         }) do
+      {:ok, _el} -> :ok
+      {:error, cs} -> Logger.warning("Failed to create stage_direction: #{inspect(cs)}")
+    end
   end
 
   # --- Prose ---
@@ -918,16 +942,19 @@ defmodule Emothe.Import.TeiParser do
     is_aside = aside_in_children?(children)
     content = if is_aside, do: prose_aside_content(children), else: text_content(para)
 
-    PlayContent.create_element(%{
-      play_id: play.id,
-      division_id: division.id,
-      parent_id: speech.id,
-      character_id: speech.character_id,
-      type: "prose",
-      content: content,
-      is_aside: is_aside,
-      position: pos
-    })
+    case PlayContent.create_element(%{
+           play_id: play.id,
+           division_id: division.id,
+           parent_id: speech.id,
+           character_id: speech.character_id,
+           type: "prose",
+           content: content,
+           is_aside: is_aside,
+           position: pos
+         }) do
+      {:ok, _el} -> :ok
+      {:error, cs} -> Logger.warning("Failed to create prose element: #{inspect(cs)}")
+    end
   end
 
   # Check if children contain a <seg type="aside"> element

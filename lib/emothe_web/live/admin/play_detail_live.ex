@@ -116,10 +116,6 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
             <span class="font-medium">{gettext("Publication:")}</span>
             <span class="text-base-content/70">{@play.pub_place} ({@play.publication_date})</span>
           </div>
-          <div :if={@play.digital_publication_date}>
-            <span class="font-medium">{gettext("Digital publication date:")}</span>
-            <span class="text-base-content/70">{@play.digital_publication_date}</span>
-          </div>
           <div :if={@play.publisher}>
             <span class="font-medium">{gettext("Publisher:")}</span>
             <span class="text-base-content/70">{@play.publisher}</span>

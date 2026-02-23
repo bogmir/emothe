@@ -565,33 +565,6 @@ defmodule Emothe.Export.TeiXmlTest do
     assert exported_xml =~ ~r/<date>\s*2023\s*<\/date>/
   end
 
-  test "export preserves digital_publication_date as <date type=digital>" do
-    xml = """
-    <?xml version="1.0" encoding="UTF-8"?>
-    <TEI xmlns="http://www.tei-c.org/ns/1.0">
-      <teiHeader>
-        <fileDesc>
-          <titleStmt><title>Digital Date Test</title></titleStmt>
-          <publicationStmt>
-            <idno>EXDIGDT01</idno>
-            <date>2023</date>
-            <date type="digital">2024-01-31</date>
-          </publicationStmt>
-        </fileDesc>
-      </teiHeader>
-      <text><front></front><body></body></text>
-    </TEI>
-    """
-
-    path = write_tei(xml)
-    assert {:ok, play} = TeiParser.import_file(path)
-
-    play_with_all = Catalogue.get_play_with_all!(play.id)
-    exported_xml = TeiXml.generate(play_with_all)
-
-    assert exported_xml =~ ~r/<date\s+type="digital">\s*2024-01-31\s*<\/date>/u
-  end
-
   test "export preserves availability_note" do
     path = write_tei(rich_tei(code: "EXAVAIL01"))
     assert {:ok, play} = TeiParser.import_file(path)

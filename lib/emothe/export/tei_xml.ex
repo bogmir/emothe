@@ -193,16 +193,6 @@ defmodule Emothe.Export.TeiXml do
         ]
 
     children =
-      if play.digital_publication_date do
-        children ++
-          [
-            element(:date, %{type: "digital"}, Date.to_iso8601(play.digital_publication_date))
-          ]
-      else
-        children
-      end
-
-    children =
       if play.publisher,
         do: [element(:publisher, [element(:orgName, play.publisher)]) | children],
         else: children

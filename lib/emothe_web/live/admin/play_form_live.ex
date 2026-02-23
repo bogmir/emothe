@@ -369,12 +369,6 @@ defmodule EmotheWeb.Admin.PlayFormLive do
               placeholder="e.g. 2023 or 01-01-2023"
             />
           </div>
-          <div>
-            <label class="label">
-              <span class="label-text font-medium">{gettext("Digital Publication Date")}</span>
-            </label>
-            <.input field={@form[:digital_publication_date]} type="date" />
-          </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">

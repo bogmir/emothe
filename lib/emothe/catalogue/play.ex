@@ -14,7 +14,6 @@ defmodule Emothe.Catalogue.Play do
     field :author_sort, :string
     field :author_attribution, :string
     field :publication_date, :string
-    field :digital_publication_date, :date
     field :verse_count, :integer
     field :is_verse, :boolean, default: true
     field :publisher, :string
@@ -62,7 +61,6 @@ defmodule Emothe.Catalogue.Play do
       :author_sort,
       :author_attribution,
       :publication_date,
-      :digital_publication_date,
       :verse_count,
       :is_verse,
       :publisher,

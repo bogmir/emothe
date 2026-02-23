@@ -28,6 +28,17 @@ defmodule EmotheWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # Public API
+  scope "/api/v1", EmotheWeb.API do
+    pipe_through :api
+
+    get "/plays", PlayController, :index
+    get "/plays/:code", PlayController, :show
+    get "/plays/:code/characters", PlayController, :characters
+    get "/plays/:code/text", PlayController, :text
+    get "/plays/:code/statistics", PlayController, :statistics
+  end
+
   # Public routes
   scope "/", EmotheWeb do
     pipe_through :browser

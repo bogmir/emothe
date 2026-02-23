@@ -458,66 +458,60 @@ defmodule Emothe.RoundtripTest do
 
         roundtrip_log(@code, "EXPORT ok (#{ms_since(export_t0)}ms)")
 
-        try do
-          for field <- @fields do
-            orig_val = Map.fetch!(orig_counts, field)
-            export_val = Map.fetch!(export_counts, field)
-
-            assert orig_val == export_val,
-                   "#{@code} #{field}: original=#{orig_val} exported=#{export_val}"
+        # Structural counts: collect all mismatches and assert once
+        mismatches =
+          for field <- @fields,
+              orig_val = Map.fetch!(orig_counts, field),
+              export_val = Map.fetch!(export_counts, field),
+              orig_val != export_val do
+            "  #{field}: original=#{orig_val} exported=#{export_val}"
           end
 
-          # Warn-only fields: log mismatches without failing
-          for field <- @warn_fields do
-            orig_val = Map.fetch!(orig_counts, field)
-            export_val = Map.fetch!(export_counts, field)
+        assert mismatches == [],
+               "#{@code} structural mismatches:\n#{Enum.join(mismatches, "\n")}" <>
+                 "\n\noriginal=#{inspect(orig_counts)}\nexported=#{inspect(export_counts)}"
 
-            if orig_val != export_val do
-              roundtrip_log(
-                @code,
-                "WARN #{field}: original=#{orig_val} exported=#{export_val} (delta=#{orig_val - export_val})"
-              )
-            end
-          end
+        # Warn-only fields: log mismatches without failing
+        for field <- @warn_fields do
+          orig_val = Map.fetch!(orig_counts, field)
+          export_val = Map.fetch!(export_counts, field)
 
-          # Metadata fidelity: verify key play fields survive the roundtrip
-          assert_metadata_roundtrip(@code, play_full, exported_xml)
-
-          # Low priority: ordering + derived values
-          assert_order_preserved(
-            @code,
-            "characters (castList role text)",
-            character_roles_in_order(original_xml),
-            character_roles_in_order(exported_xml)
-          )
-
-          assert_order_preserved(
-            @code,
-            "sources (sourceDesc/bibl/title)",
-            source_titles_in_order(original_xml),
-            source_titles_in_order(exported_xml)
-          )
-
-          assert_order_preserved(
-            @code,
-            "verse lines (<l> attrs)",
-            verse_line_tokens_in_order(original_xml),
-            verse_line_tokens_in_order(exported_xml)
-          )
-
-          assert_derived_verse_fields(@code, play_full, original_xml, exported_xml)
-
-          roundtrip_log(@code, "OK")
-        rescue
-          e in ExUnit.AssertionError ->
-            roundtrip_log(@code, "FAILED (see assertion). Logging count summaries...")
-
-            Logger.error(
-              "ROUNDTRIP failed original_counts=#{inspect(orig_counts)} exported_counts=#{inspect(export_counts)}"
+          if orig_val != export_val do
+            roundtrip_log(
+              @code,
+              "WARN #{field}: original=#{orig_val} exported=#{export_val} (delta=#{orig_val - export_val})"
             )
-
-            reraise e, __STACKTRACE__
+          end
         end
+
+        # Metadata fidelity: verify key play fields survive the roundtrip
+        assert_metadata_roundtrip(@code, play_full, exported_xml)
+
+        # Ordering + derived values
+        assert_order_preserved(
+          @code,
+          "characters (castList role text)",
+          character_roles_in_order(original_xml),
+          character_roles_in_order(exported_xml)
+        )
+
+        assert_order_preserved(
+          @code,
+          "sources (sourceDesc/bibl/title)",
+          source_titles_in_order(original_xml),
+          source_titles_in_order(exported_xml)
+        )
+
+        assert_order_preserved(
+          @code,
+          "verse lines (<l> attrs)",
+          verse_line_tokens_in_order(original_xml),
+          verse_line_tokens_in_order(exported_xml)
+        )
+
+        assert_derived_verse_fields(@code, play_full, original_xml, exported_xml)
+
+        roundtrip_log(@code, "OK")
       end
     end
   else

@@ -25,13 +25,13 @@ defmodule Emothe.Catalogue do
   def get_play_with_all!(id) do
     Play
     |> Repo.get!(id)
-    |> Repo.preload([:editors, :sources, :editorial_notes, :statistic])
+    |> Repo.preload([:editors, :sources, :editorial_notes, :statistic, :parent_play, :derived_plays])
   end
 
   def get_play_by_code_with_all!(code) do
     Play
     |> Repo.get_by!(code: code)
-    |> Repo.preload([:editors, :sources, :editorial_notes, :statistic])
+    |> Repo.preload([:editors, :sources, :editorial_notes, :statistic, :parent_play, :derived_plays])
   end
 
   def create_play(attrs \\ %{}) do
@@ -135,6 +135,14 @@ defmodule Emothe.Catalogue do
     %PlayEditorialNote{}
     |> PlayEditorialNote.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def list_plays_for_select do
+    Play
+    |> order_by([p], asc: p.title_sort, asc: p.title)
+    |> select([p], {p.title, p.code, p.id})
+    |> Repo.all()
+    |> Enum.map(fn {title, code, id} -> {"#{title} (#{code})", id} end)
   end
 
   # --- Private ---

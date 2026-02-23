@@ -37,6 +37,11 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
      assign(socket, statistic: statistic) |> put_flash(:info, gettext("Statistics recomputed."))}
   end
 
+  defp relationship_type_label("traduccion"), do: gettext("Translation")
+  defp relationship_type_label("adaptacion"), do: gettext("Adaptation")
+  defp relationship_type_label("refundicion"), do: gettext("Reworking")
+  defp relationship_type_label(_), do: ""
+
   defp role_label("principal"), do: gettext("Principal investigator")
   defp role_label("translator"), do: gettext("Translator")
   defp role_label("researcher"), do: gettext("Researcher")
@@ -131,6 +136,10 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
             <span class="font-medium">{gettext("Funder:")}</span>
             <span class="text-base-content/70">{@play.funder}</span>
           </div>
+          <div :if={@play.edition_title} class="md:col-span-2">
+            <span class="font-medium">{gettext("Edition title:")}</span>
+            <span class="text-base-content/70">{@play.edition_title}</span>
+          </div>
           <div :if={@play.licence_url || @play.licence_text} class="md:col-span-2">
             <span class="font-medium">{gettext("Licence:")}</span>
             <span class="text-base-content/70">
@@ -142,6 +151,57 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
                 {@play.licence_text}
               <% end %>
             </span>
+          </div>
+        </div>
+      </section>
+
+      <%!-- Work Relationship --%>
+      <section
+        :if={@play.relationship_type || @play.derived_plays != []}
+        class="mb-8"
+      >
+        <h2 class="mb-3 text-lg font-semibold text-base-content">
+          {gettext("Work Relationship")}
+        </h2>
+        <div class="rounded-box border border-base-300 bg-base-100 p-4 text-sm shadow-sm space-y-3">
+          <div :if={@play.relationship_type}>
+            <span class="badge badge-outline badge-sm mr-2">
+              {relationship_type_label(@play.relationship_type)}
+            </span>
+            <%= if @play.parent_play do %>
+              <span>
+                {gettext("of")}
+                <.link
+                  navigate={~p"/admin/plays/#{@play.parent_play.id}"}
+                  class="link link-primary"
+                >
+                  {@play.parent_play.title}
+                </.link>
+                <span class="text-base-content/50">({@play.parent_play.code})</span>
+              </span>
+            <% else %>
+              <span :if={@play.original_title} class="text-base-content/70">
+                {gettext("of")} {@play.original_title}
+                <span class="text-base-content/40">({gettext("not linked")})</span>
+              </span>
+            <% end %>
+          </div>
+          <div :if={@play.derived_plays != []}>
+            <span class="font-medium">{gettext("Derived works:")}</span>
+            <ul class="mt-1 ml-4 list-disc">
+              <li :for={derived <- @play.derived_plays}>
+                <.link
+                  navigate={~p"/admin/plays/#{derived.id}"}
+                  class="link link-primary"
+                >
+                  {derived.title}
+                </.link>
+                <span class="text-base-content/50">({derived.code})</span>
+                <span :if={derived.relationship_type} class="badge badge-ghost badge-xs ml-1">
+                  {relationship_type_label(derived.relationship_type)}
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
       </section>

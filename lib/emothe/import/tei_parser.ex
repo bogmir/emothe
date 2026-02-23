@@ -169,12 +169,29 @@ defmodule Emothe.Import.TeiParser do
     titles = if title_stmt, do: find_children(elem(title_stmt, 2), "title"), else: []
     authors = if title_stmt, do: find_children(elem(title_stmt, 2), "author"), else: []
 
-    main_title = Enum.find(titles, fn {_, attrs, _} -> !has_attr?(attrs, "key") end)
+    # Title selection: prefer <title type="traduccion">, then first <title> without key/type, then fallback
+    traduccion_title =
+      Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "type") == "traduccion" end)
+
+    plain_title =
+      Enum.find(titles, fn {_, attrs, _} ->
+        !has_attr?(attrs, "key") and !has_attr?(attrs, "type")
+      end)
+
+    main_title = traduccion_title || plain_title ||
+      Enum.find(titles, fn {_, attrs, _} -> !has_attr?(attrs, "key") end)
+
     sort_title = Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "key") == "orden" end)
     code_title = Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "key") == "archivo" end)
 
     original_title_el =
       Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "type") == "original" end)
+
+    edition_title_el =
+      Enum.find(titles, fn {_, attrs, _} -> attr_value(attrs, "type") == "edicion" end)
+
+    # Determine relationship type from title types
+    relationship_type = if traduccion_title, do: "traduccion", else: nil
 
     # Extract sponsor and funder from titleStmt
     sponsor_el = if title_stmt, do: find_child(elem(title_stmt, 2), "sponsor"), else: nil
@@ -225,7 +242,9 @@ defmodule Emothe.Import.TeiParser do
       funder: safe_text(funder_el),
       authority: authority_text,
       project_description: project_desc,
-      editorial_declaration: editorial_decl
+      editorial_declaration: editorial_decl,
+      edition_title: safe_text(edition_title_el),
+      relationship_type: relationship_type
     }
   end
 

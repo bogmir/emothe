@@ -29,6 +29,12 @@ defmodule Emothe.Catalogue.Play do
     field :sponsor, :string
     field :funder, :string
     field :authority, :string
+    field :parent_play_id, :binary_id
+    field :relationship_type, :string
+    field :edition_title, :string
+
+    belongs_to :parent_play, Emothe.Catalogue.Play, define_field: false
+    has_many :derived_plays, Emothe.Catalogue.Play, foreign_key: :parent_play_id
 
     has_many :editors, Emothe.Catalogue.PlayEditor
     has_many :sources, Emothe.Catalogue.PlaySource
@@ -70,11 +76,15 @@ defmodule Emothe.Catalogue.Play do
       :emothe_id,
       :sponsor,
       :funder,
-      :authority
+      :authority,
+      :parent_play_id,
+      :relationship_type,
+      :edition_title
     ])
     |> validate_required([:title, :code])
     |> validate_inclusion(:language, @valid_languages)
     |> validate_number(:verse_count, greater_than_or_equal_to: 0)
+    |> validate_inclusion(:relationship_type, ~w(traduccion adaptacion refundicion))
     |> unique_constraint(:code)
   end
 

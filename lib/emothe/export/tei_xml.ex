@@ -47,12 +47,20 @@ defmodule Emothe.Export.TeiXml do
   end
 
   defp build_title_stmt(play) do
-    # Main title (translated/primary)
-    titles = [element(:title, play.title)]
+    # Main title — use type="traduccion" if this is a translation
+    main_title_attrs =
+      if play.relationship_type == "traduccion", do: %{type: "traduccion"}, else: %{}
+
+    titles = [element(:title, main_title_attrs, play.title)]
 
     titles =
       if play.original_title,
         do: [element(:title, %{type: "original"}, play.original_title) | titles],
+        else: titles
+
+    titles =
+      if play.edition_title,
+        do: titles ++ [element(:title, %{type: "edicion"}, play.edition_title)],
         else: titles
 
     titles =

@@ -201,6 +201,37 @@ defmodule EmotheWeb.PlayShowLive do
               {@play.original_title}
             </p>
 
+            <%!-- Relationship badge --%>
+            <div :if={@play.relationship_type} class="mt-2 text-xs text-base-content/60">
+              <span class="badge badge-outline badge-xs">
+                {relationship_type_label(@play.relationship_type)}
+              </span>
+              <%= if @play.parent_play do %>
+                <span>
+                  {gettext("of")}
+                  <.link
+                    navigate={~p"/plays/#{@play.parent_play.code}"}
+                    class="link link-primary"
+                  >
+                    {@play.parent_play.title}
+                  </.link>
+                </span>
+              <% end %>
+            </div>
+            <div
+              :if={@play.derived_plays != []}
+              class="mt-2 flex flex-wrap justify-center gap-2 text-xs text-base-content/50"
+            >
+              <span :for={derived <- @play.derived_plays}>
+                <.link navigate={~p"/plays/#{derived.code}"} class="link link-primary">
+                  {derived.title}
+                </.link>
+                <span :if={derived.relationship_type} class="text-base-content/35">
+                  ({relationship_type_label(derived.relationship_type)})
+                </span>
+              </span>
+            </div>
+
             <%!-- Source info --%>
             <div :if={@play.sources != []} id="meta-sources" class="scroll-mt-20">
               <div :for={source <- @play.sources} class="mt-4 text-xs text-base-content/50">
@@ -346,6 +377,11 @@ defmodule EmotheWeb.PlayShowLive do
 
     current ++ children
   end
+
+  defp relationship_type_label("traduccion"), do: gettext("Translation")
+  defp relationship_type_label("adaptacion"), do: gettext("Adaptation")
+  defp relationship_type_label("refundicion"), do: gettext("Reworking")
+  defp relationship_type_label(_), do: ""
 
   defp role_label("principal"), do: gettext("Principal investigator")
   defp role_label("translator"), do: gettext("Translator")

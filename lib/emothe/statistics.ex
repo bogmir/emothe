@@ -64,7 +64,8 @@ defmodule Emothe.Statistics do
       "total_stage_directions" => count_by_type(all_elements, "stage_direction"),
       "total_asides" => count_asides(all_elements),
       "aside_verses" => count_aside_verses(all_elements),
-      "character_appearances" => character_appearances(all_elements)
+      "character_appearances" => character_appearances(all_elements),
+      "verse_type_distribution" => verse_type_distribution(all_elements)
     }
   end
 
@@ -172,6 +173,14 @@ defmodule Emothe.Statistics do
     elements
     |> Enum.filter(&(&1.type == "verse_line" && &1.is_aside))
     |> Enum.count()
+  end
+
+  defp verse_type_distribution(elements) do
+    elements
+    |> Enum.filter(&(&1.type == "line_group" && &1.verse_type not in [nil, ""]))
+    |> Enum.frequencies_by(& &1.verse_type)
+    |> Enum.sort_by(fn {_type, count} -> -count end)
+    |> Enum.map(fn {type, count} -> %{"verse_type" => type, "count" => count} end)
   end
 
   defp character_appearances(elements) do

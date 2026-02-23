@@ -1131,6 +1131,71 @@ msgstr "Verso"
 msgid "Verse Distribution"
 msgstr "Distribución de versos"
 
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Verse Type Distribution"
+msgstr "Distribución de tipos de verso"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Redondilla"
+msgstr "Redondilla"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Romance"
+msgstr "Romance"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Romance (tirada)"
+msgstr "Romance (tirada)"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Octava real"
+msgstr "Octava real"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Soneto"
+msgstr "Soneto"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Décima"
+msgstr "Décima"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Terceto"
+msgstr "Terceto"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Silva"
+msgstr "Silva"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Quintilla"
+msgstr "Quintilla"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Lira"
+msgstr "Lira"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Canción"
+msgstr "Canción"
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Otro"
+msgstr "Otro"
+
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1509
 #, elixir-autogen, elixir-format
 msgid "Verse Type"

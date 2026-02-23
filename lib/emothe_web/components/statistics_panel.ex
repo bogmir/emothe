@@ -65,6 +65,33 @@ defmodule EmotheWeb.Components.StatisticsPanel do
         <.stat_card label={gettext("Aside Verses")} value={@data["aside_verses"]} icon="💬" />
       </div>
 
+      <%!-- Verse type distribution --%>
+      <div :if={@data["verse_type_distribution"] && @data["verse_type_distribution"] != []}>
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">
+          {gettext("Verse Type Distribution")}
+        </h3>
+        <div class="bg-white border border-gray-200 rounded-xl p-5">
+          <div class="space-y-3">
+            <div :for={vt <- @data["verse_type_distribution"]} class="flex items-center gap-3">
+              <span
+                class="w-36 text-sm text-gray-600 truncate shrink-0"
+                title={verse_type_label(vt["verse_type"])}
+              >
+                {verse_type_label(vt["verse_type"])}
+              </span>
+              <div class="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                <div
+                  class="bg-violet-500 h-full rounded-full transition-all flex items-center justify-end pr-2"
+                  style={"width: #{bar_percent(vt["count"], max_verse_type(@data["verse_type_distribution"]))}%"}
+                >
+                  <span class="text-xs text-white font-medium">{vt["count"]}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <%!-- Character appearances --%>
       <div :if={@data["character_appearances"] && @data["character_appearances"] != []}>
         <h3 class="text-lg font-semibold text-gray-900 mb-3">{gettext("Character Speeches")}</h3>
@@ -155,6 +182,23 @@ defmodule EmotheWeb.Components.StatisticsPanel do
   defp act_label_plural("Jornada"), do: gettext("Jornadas")
   defp act_label_plural("Act"), do: gettext("Acts")
   defp act_label_plural(other), do: other <> "s"
+
+  defp verse_type_label("redondilla"), do: gettext("Redondilla")
+  defp verse_type_label("romance"), do: gettext("Romance")
+  defp verse_type_label("romance_tirada"), do: gettext("Romance (tirada)")
+  defp verse_type_label("octava_real"), do: gettext("Octava real")
+  defp verse_type_label("soneto"), do: gettext("Soneto")
+  defp verse_type_label("decima"), do: gettext("Décima")
+  defp verse_type_label("terceto"), do: gettext("Terceto")
+  defp verse_type_label("silva"), do: gettext("Silva")
+  defp verse_type_label("quintilla"), do: gettext("Quintilla")
+  defp verse_type_label("lira"), do: gettext("Lira")
+  defp verse_type_label("cancion"), do: gettext("Canción")
+  defp verse_type_label("otro"), do: gettext("Otro")
+  defp verse_type_label(other), do: other
+
+  defp max_verse_type([]), do: 1
+  defp max_verse_type(items), do: items |> Enum.map(&(&1["count"] || 0)) |> Enum.max(fn -> 1 end)
 
   defp bar_percent(nil, _max), do: 0
   defp bar_percent(_value, 0), do: 0

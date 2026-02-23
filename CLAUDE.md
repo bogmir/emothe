@@ -189,7 +189,7 @@ Then visit:
 
 ### Medium Priority
 - [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
-- [ ] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.) in statistics panel
+- [x] **Verse type statistics** - distribution of verse types (redondilla, romance, etc.) in statistics panel
 - [ ] **Pagination** on catalogue pages for large collections
 - [x] ~~Install Typst~~ PDF export now uses ChromicPDF (requires Chrome/Chromium on the system)
 - [ ] **Stage direction navigator** (`« N / M »`) - client-side JS hook to scroll between stage directions in play text

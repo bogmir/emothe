@@ -1131,6 +1131,71 @@ msgstr ""
 msgid "Verse Distribution"
 msgstr ""
 
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Verse Type Distribution"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Redondilla"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Romance"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Romance (tirada)"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Octava real"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Soneto"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Décima"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Terceto"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Silva"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Quintilla"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Lira"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Canción"
+msgstr ""
+
+#: lib/emothe_web/components/statistics_panel.ex
+#, elixir-autogen, elixir-format
+msgid "Otro"
+msgstr ""
+
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1509
 #, elixir-autogen, elixir-format
 msgid "Verse Type"

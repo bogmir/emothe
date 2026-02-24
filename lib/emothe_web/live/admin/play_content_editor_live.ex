@@ -99,7 +99,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           PlayContent.change_element(socket.assigns.editing || %Element{}, form_params)
       end
 
-    {:noreply, assign(socket, form: to_form(Map.put(changeset, :action, :validate)))}
+    {:noreply,
+     assign(socket,
+       form: to_form(Map.put(changeset, :action, :validate), as: socket.assigns.modal)
+     )}
   end
 
   def handle_event("save_form", params, socket) do
@@ -125,7 +128,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      assign(socket,
        modal: :editorial_note,
        editing: nil,
-       form: to_form(changeset)
+       form: to_form(changeset, as: :editorial_note)
      )}
   end
 
@@ -137,7 +140,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      assign(socket,
        modal: :editorial_note,
        editing: note,
-       form: to_form(changeset)
+       form: to_form(changeset, as: :editorial_note)
      )}
   end
 
@@ -395,7 +398,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
          |> reload_editorial_notes()}
 
       {:error, changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
+        {:noreply, assign(socket, form: to_form(changeset, as: :editorial_note))}
     end
   end
 

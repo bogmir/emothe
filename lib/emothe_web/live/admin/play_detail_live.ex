@@ -102,7 +102,9 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
           </div>
           <div>
             <span class="font-medium">{gettext("Language:")}</span>
-            <span class="text-base-content/70">{Emothe.Catalogue.Play.language_name(@play.language)}</span>
+            <span class="text-base-content/70">
+              {Emothe.Catalogue.Play.language_name(@play.language)}
+            </span>
           </div>
           <div>
             <span class="font-medium">{gettext("Verse count:")}</span>

@@ -106,7 +106,12 @@ defmodule EmotheWeb.PlayShowLive do
                 </h3>
                 <nav class="mt-1 space-y-px">
                   <button
-                    :for={{tab_key, tab_label} <- [{:text, gettext("Text")}, {:statistics, gettext("Statistics")}]}
+                    :for={
+                      {tab_key, tab_label} <- [
+                        {:text, gettext("Text")},
+                        {:statistics, gettext("Statistics")}
+                      ]
+                    }
                     phx-click="switch_tab"
                     phx-value-tab={tab_key}
                     class={[
@@ -155,7 +160,10 @@ defmodule EmotheWeb.PlayShowLive do
             </div>
 
             <%!-- Visual markers (text view only) --%>
-            <div :if={@sidebar_open && @active_tab == :text} class="border-t border-base-300 px-3 py-2.5 space-y-2">
+            <div
+              :if={@sidebar_open && @active_tab == :text}
+              class="border-t border-base-300 px-3 py-2.5 space-y-2"
+            >
               <h3 class="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
                 {gettext("Visual markers")}
               </h3>
@@ -299,7 +307,10 @@ defmodule EmotheWeb.PlayShowLive do
           </header>
 
           <%!-- Editorial notes (text view only) --%>
-          <div :if={@active_tab == :text} :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}>
+          <div
+            :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}
+            :if={@active_tab == :text}
+          >
             <hr :if={index > 1} class="max-w-2xl mx-auto border-base-300 mb-6" />
             <div
               id={"meta-note-#{index}"}

@@ -18,6 +18,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     editorial_notes = Catalogue.list_play_editorial_notes(play.id)
     characters = PlayContent.list_characters(play.id)
+
     divisions = PlayContent.list_top_divisions(play.id)
 
     {:ok,
@@ -46,6 +47,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        play_context: %{play: play, active_tab: :content}
      )}
   end
+
+  defp cast_list_division(divisions) when is_list(divisions) do
+    Enum.find(divisions, &(&1.type == "elenco"))
+  end
+
+  defp cast_list_division(_), do: nil
 
   # --- All handle_event/3 clauses grouped together ---
 
@@ -261,16 +268,22 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   end
 
   def handle_event("select_division_auto", %{"id" => id}, socket) do
-    target_id =
-      case find_division(socket.assigns.divisions, id) do
-        %{children: [first_child | _]} -> first_child.id
-        _ -> id
-      end
+    case find_division(socket.assigns.divisions, id) do
+      %{type: "elenco"} ->
+        {:noreply, assign(socket, editor_tab: :characters, selected_division_id: nil)}
 
-    {:noreply,
-     socket
-     |> assign(selected_division_id: target_id, editor_tab: :content)
-     |> reload_elements()}
+      %{children: [first_child | _]} ->
+        {:noreply,
+         socket
+         |> assign(selected_division_id: first_child.id, editor_tab: :content)
+         |> reload_elements()}
+
+      _ ->
+        {:noreply,
+         socket
+         |> assign(selected_division_id: id, editor_tab: :content)
+         |> reload_elements()}
+    end
   end
 
   def handle_event("new_element", params, socket) do
@@ -672,16 +685,17 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             count={length(@editorial_notes)}
           />
           <.tab_button
-            tab={:characters}
-            active={@editor_tab}
-            icon="hero-user-group-mini"
-            count={length(@characters)}
-          />
-          <.tab_button
             tab={:structure}
             active={@editor_tab}
             icon="hero-bars-3-bottom-left-mini"
-            count={length(@divisions)}
+            count={Enum.count(@divisions, &(&1.type != "elenco"))}
+          />
+          <.tab_button
+            tab={:characters}
+            label={gettext("Cast list")}
+            active={@editor_tab}
+            icon="hero-user-group-mini"
+            count={length(@characters)}
           />
           <.tab_button
             tab={:content}
@@ -762,9 +776,32 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
       <%!-- Tab: Characters --%>
       <div :if={@editor_tab == :characters} class="animate-in fade-in">
+        <div :if={cast_list_division(@divisions)} class="mb-4">
+          <div class="rounded-box border border-base-300 bg-base-100 px-4 py-3 shadow-sm">
+            <div class="flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-xs font-medium text-base-content/50">
+                  {gettext("Header")}
+                </div>
+                <div class="truncate text-sm font-semibold text-base-content">
+                  {cast_list_division(@divisions).title ||
+                    String.capitalize(cast_list_division(@divisions).type)}
+                </div>
+              </div>
+              <button
+                phx-click="edit_division"
+                phx-value-id={cast_list_division(@divisions).id}
+                class="btn btn-ghost btn-xs tooltip"
+                data-tip={gettext("Edit header")}
+              >
+                <.icon name="hero-pencil-square-mini" class="size-4" />
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="mb-4 flex items-center justify-between">
           <h2 class="text-lg font-semibold text-base-content">
-            {gettext("Dramatis Personae")}
+            {gettext("Cast list")}
             <span class="text-base-content/50 font-normal">({length(@characters)})</span>
           </h2>
           <button phx-click="new_character" class="btn btn-sm btn-primary gap-1">
@@ -996,7 +1033,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           <h2 class="text-lg font-semibold text-base-content">
             {gettext("Play Structure")}
             <span class="text-base-content/50 font-normal">
-              ({length(@divisions)} {gettext("acts")})
+              ({Enum.count(@divisions, &(&1.type != "elenco"))} {gettext("acts")})
             </span>
           </h2>
           <button phx-click="new_division" class="btn btn-sm btn-primary gap-1">

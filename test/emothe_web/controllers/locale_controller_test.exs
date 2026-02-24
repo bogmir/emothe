@@ -1,26 +1,26 @@
 defmodule EmotheWeb.LocaleControllerTest do
   use EmotheWeb.ConnCase, async: true
 
-  test "POST /locale redirects back preserving query and fragment", %{conn: conn} do
-    conn =
-      conn
-      |> put_req_header("referer", "http://example.com/plays?search=hamlet#meta-overview")
-      |> post(~p"/locale", %{locale: "en"})
+  test "POST /locale redirects to return_to path", %{conn: conn} do
+    conn = post(conn, ~p"/locale", %{locale: "en", return_to: "/plays?search=hamlet"})
 
-    assert redirected_to(conn) == "/plays?search=hamlet#meta-overview"
+    assert redirected_to(conn) == "/plays?search=hamlet"
+    assert get_session(conn, :locale) == "en"
   end
 
-  test "POST /locale falls back to / when referer missing", %{conn: conn} do
+  test "POST /locale falls back to / when return_to missing", %{conn: conn} do
     conn = post(conn, ~p"/locale", %{locale: "en"})
     assert redirected_to(conn) == "/"
   end
 
-  test "POST /locale falls back to session last_path when referer missing", %{conn: conn} do
-    conn =
-      conn
-      |> init_test_session(%{last_path: "/plays?search=hamlet"})
-      |> post(~p"/locale", %{locale: "en"})
+  test "POST /locale rejects non-local return_to paths", %{conn: conn} do
+    conn = post(conn, ~p"/locale", %{locale: "en", return_to: "https://evil.com"})
+    assert redirected_to(conn) == "/"
+  end
 
-    assert redirected_to(conn) == "/plays?search=hamlet"
+  test "POST /locale ignores invalid locale", %{conn: conn} do
+    conn = post(conn, ~p"/locale", %{locale: "xx", return_to: "/plays"})
+    assert redirected_to(conn) == "/plays"
+    refute get_session(conn, :locale) == "xx"
   end
 end

@@ -118,6 +118,13 @@ defmodule Emothe.Export.Html do
           margin-bottom: 0.5rem;
         }
 
+        .editorial-note-sep {
+          max-width: 640px;
+          margin: 0 auto 1.5rem;
+          border: none;
+          border-top: 1px solid #e5e7eb;
+        }
+
         /* Cast list (inline within elenco division) */
         .cast-list {
           max-width: 560px;
@@ -271,7 +278,7 @@ defmodule Emothe.Export.Html do
 
       "    <div class=\"editorial-note\">\n#{heading}      <div>#{escape(note.content)}</div>\n    </div>"
     end)
-    |> Enum.join("\n")
+    |> Enum.join("\n    <hr class=\"editorial-note-sep\">\n")
   end
 
   defp render_inline_cast_list(characters) do

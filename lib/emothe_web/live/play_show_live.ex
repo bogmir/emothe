@@ -276,13 +276,15 @@ defmodule EmotheWeb.PlayShowLive do
           </header>
 
           <%!-- Editorial notes --%>
-          <div
-            :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}
-            id={"meta-note-#{index}"}
-            class="mb-6 max-w-2xl mx-auto scroll-mt-20 text-justify text-sm"
-          >
-            <h3 :if={note.heading} class="font-bold text-center mb-2">{note.heading}</h3>
-            <div class="whitespace-pre-line">{note.content}</div>
+          <div :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}>
+            <hr :if={index > 1} class="max-w-2xl mx-auto border-base-300 mb-6" />
+            <div
+              id={"meta-note-#{index}"}
+              class="mb-6 max-w-2xl mx-auto scroll-mt-20 text-justify text-sm"
+            >
+              <h3 :if={note.heading} class="font-bold text-center mb-2">{note.heading}</h3>
+              <div class="whitespace-pre-line">{note.content}</div>
+            </div>
           </div>
 
           <%!-- Tab navigation --%>

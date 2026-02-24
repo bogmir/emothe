@@ -17,7 +17,7 @@ defmodule Emothe.RoundtripTest do
 
   @fixtures_dir Path.expand("../fixtures/tei_files", __DIR__)
   @fields ~w(acts scenes characters speeches verses line_groups stage_dirs asides
-             split_parts verse_type_attrs hidden_chars heads)a
+             split_parts verse_type_attrs hidden_chars heads front_notes)a
 
   # speaker_refs may lose a few who= attrs when a speech references multiple
   # characters (e.g. who="#ALB #COR") which the parser can't resolve to one ID.
@@ -118,6 +118,54 @@ defmodule Emothe.RoundtripTest do
     Regex.scan(~r/<castItem\s[^>]*ana="oculto"/, front) |> length()
   end
 
+  # Count front-matter <div> elements that the parser imports as editorial notes:
+  # any div that is NOT "elenco" and has at least one direct <p> child with non-empty text.
+  # Mirrors import_front_div/4: "elenco" has its own handler, everything else becomes a note
+  # if paragraphs (direct <p> children) are non-empty.
+  defp count_front_note_divs(front) do
+    clean = Regex.replace(~r/<\?xml[^?]*\?>/, front, "")
+
+    case Saxy.SimpleForm.parse_string("<root>#{clean}</root>") do
+      {:ok, tree} -> count_note_divs_in_front(tree)
+      _ -> 0
+    end
+  end
+
+  defp count_note_divs_in_front({_name, _attrs, children}) do
+    Enum.reduce(children, 0, fn
+      {"div", attrs, div_children}, acc ->
+        type = attr_val(attrs, "type") || ""
+
+        # Skip cast list — it has its own import handler
+        if type != "elenco" do
+          has_content =
+            Enum.any?(div_children, fn
+              {"p", _, p_children} ->
+                text =
+                  Enum.map_join(p_children, fn
+                    t when is_binary(t) -> String.trim(t)
+                    _ -> ""
+                  end)
+
+                text != ""
+
+              _ ->
+                false
+            end)
+
+          if has_content, do: acc + 1, else: acc
+        else
+          acc
+        end
+
+      {"root", _, _} = root, acc ->
+        acc + count_note_divs_in_front(root)
+
+      _, acc ->
+        acc
+    end)
+  end
+
   # Count <head> elements inside div1/div2 (division titles in body)
   defp count_heads_in_body(body) do
     clean = Regex.replace(~r/<\?xml[^?]*\?>/, body, "")
@@ -155,7 +203,8 @@ defmodule Emothe.RoundtripTest do
       speaker_refs: count_who_attrs(body),
       verse_type_attrs: count_verse_type_attrs(body),
       hidden_chars: count_hidden_chars(front),
-      heads: count_heads_in_body(body)
+      heads: count_heads_in_body(body),
+      front_notes: count_front_note_divs(front)
     }
   end
 

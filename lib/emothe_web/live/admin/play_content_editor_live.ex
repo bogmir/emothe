@@ -4,6 +4,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   import EmotheWeb.Components.PlayText
 
   alias Emothe.Catalogue
+  alias Emothe.Catalogue.PlayEditorialNote
   alias Emothe.PlayContent
   alias Emothe.PlayContent.{Character, Division, Element}
 
@@ -15,6 +16,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       PlayContent.subscribe(play.id)
     end
 
+    editorial_notes = Catalogue.list_play_editorial_notes(play.id)
     characters = PlayContent.list_characters(play.id)
     divisions = PlayContent.list_top_divisions(play.id)
 
@@ -23,6 +25,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      |> assign(
        page_title: "#{gettext("Edit Content")}: #{play.title}",
        play: play,
+       editorial_notes: editorial_notes,
        characters: characters,
        divisions: divisions,
        selected_division_id: nil,
@@ -80,6 +83,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     changeset =
       case socket.assigns.modal do
+        :editorial_note ->
+          Catalogue.change_play_editorial_note(
+            socket.assigns.editing || %PlayEditorialNote{},
+            form_params
+          )
+
         :character ->
           PlayContent.change_character(socket.assigns.editing || %Character{}, form_params)
 
@@ -95,10 +104,51 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   def handle_event("save_form", params, socket) do
     case socket.assigns.modal do
+      :editorial_note -> save_editorial_note(socket, params)
       :character -> save_character(socket, params)
       :division -> save_division(socket, params)
       :element -> save_element(socket, params)
     end
+  end
+
+  def handle_event("new_editorial_note", _, socket) do
+    play = socket.assigns.play
+    next_pos = length(socket.assigns.editorial_notes)
+
+    changeset =
+      Catalogue.change_play_editorial_note(%PlayEditorialNote{
+        play_id: play.id,
+        position: next_pos
+      })
+
+    {:noreply,
+     assign(socket,
+       modal: :editorial_note,
+       editing: nil,
+       form: to_form(changeset)
+     )}
+  end
+
+  def handle_event("edit_editorial_note", %{"id" => id}, socket) do
+    note = Catalogue.get_play_editorial_note!(id)
+    changeset = Catalogue.change_play_editorial_note(note)
+
+    {:noreply,
+     assign(socket,
+       modal: :editorial_note,
+       editing: note,
+       form: to_form(changeset)
+     )}
+  end
+
+  def handle_event("delete_editorial_note", %{"id" => id}, socket) do
+    note = Catalogue.get_play_editorial_note!(id)
+    {:ok, _} = Catalogue.delete_play_editorial_note(note)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, gettext("Editorial note deleted."))
+     |> reload_editorial_notes()}
   end
 
   def handle_event("new_character", _, socket) do
@@ -322,6 +372,33 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   # --- Save helpers ---
 
+  defp save_editorial_note(socket, params) do
+    note_params = params["editorial_note"] || %{}
+    play = socket.assigns.play
+
+    result =
+      case socket.assigns.editing do
+        nil ->
+          note_params = Map.put(note_params, "play_id", play.id)
+          Catalogue.create_play_editorial_note(note_params)
+
+        note ->
+          Catalogue.update_play_editorial_note(note, note_params)
+      end
+
+    case result do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, gettext("Editorial note saved."))
+         |> assign(modal: nil, form: nil, editing: nil)
+         |> reload_editorial_notes()}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
   defp save_character(socket, params) do
     char_params = params["character"] || %{}
     play = socket.assigns.play
@@ -440,12 +517,17 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:noreply,
      socket
      |> assign(:play, play)
+     |> reload_editorial_notes()
      |> reload_characters()
      |> reload_divisions()
      |> reload_elements()}
   end
 
   # --- Reload helpers ---
+
+  defp reload_editorial_notes(socket) do
+    assign(socket, editorial_notes: Catalogue.list_play_editorial_notes(socket.assigns.play.id))
+  end
 
   defp reload_characters(socket) do
     assign(socket, characters: PlayContent.list_characters(socket.assigns.play.id))
@@ -473,6 +555,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     end
   end
 
+  defp extract_form_params(params, :editorial_note), do: params["editorial_note"] || %{}
   defp extract_form_params(params, :character), do: params["character"] || %{}
   defp extract_form_params(params, :division), do: params["division"] || %{}
   defp extract_form_params(params, :element), do: params["element"] || %{}
@@ -500,6 +583,23 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   end
 
   defp maybe_add_line_number(attrs, _type, _play_id), do: attrs
+
+  defp section_type_options do
+    [
+      {gettext("Editor's Introduction"), "introduccion_editor"},
+      {gettext("Dedication"), "dedicatoria"},
+      {gettext("Argument"), "argumento"},
+      {gettext("Prologue"), "prologo"},
+      {gettext("Note"), "nota"}
+    ]
+  end
+
+  defp section_type_label("introduccion_editor"), do: gettext("Editor's Introduction")
+  defp section_type_label("dedicatoria"), do: gettext("Dedication")
+  defp section_type_label("argumento"), do: gettext("Argument")
+  defp section_type_label("prologo"), do: gettext("Prologue")
+  defp section_type_label("nota"), do: gettext("Note")
+  defp section_type_label(t), do: t
 
   defp division_types do
     [
@@ -562,6 +662,13 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       <div class="border-b border-base-300 mb-6">
         <nav class="-mb-px flex gap-1" aria-label="Editor tabs">
           <.tab_button
+            tab={:editorial_notes}
+            label={gettext("Editorial Notes")}
+            active={@editor_tab}
+            icon="hero-document-text-mini"
+            count={length(@editorial_notes)}
+          />
+          <.tab_button
             tab={:characters}
             active={@editor_tab}
             icon="hero-user-group-mini"
@@ -584,6 +691,70 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           />
           <.tab_button tab={:preview} active={@editor_tab} icon="hero-eye-mini" />
         </nav>
+      </div>
+
+      <%!-- Tab: Editorial Notes --%>
+      <div :if={@editor_tab == :editorial_notes} class="animate-in fade-in">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-base-content">
+            {gettext("Editorial Notes")}
+            <span class="text-base-content/50 font-normal">({length(@editorial_notes)})</span>
+          </h2>
+          <button phx-click="new_editorial_note" class="btn btn-sm btn-primary gap-1">
+            <.icon name="hero-plus-mini" class="size-4" /> {gettext("Add Note")}
+          </button>
+        </div>
+        <p class="mb-4 text-sm text-base-content/60">
+          {gettext(
+            "Front-matter sections: dedications, editor's introductions, prologues, arguments."
+          )}
+        </p>
+        <div
+          :if={@editorial_notes == []}
+          class="rounded-box border border-dashed border-base-300 bg-base-200/30 p-8 text-center text-sm text-base-content/60"
+        >
+          <.icon name="hero-document-text" class="mx-auto mb-2 size-8 text-base-content/30" />
+          <p>{gettext("No editorial notes yet.")}</p>
+        </div>
+        <div class="space-y-3">
+          <div
+            :for={note <- @editorial_notes}
+            id={"note-#{note.id}"}
+            class="rounded-box border border-base-300 bg-base-100 shadow-sm"
+          >
+            <div class="flex items-start justify-between gap-4 p-4">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="badge badge-outline badge-sm">
+                    {section_type_label(note.section_type)}
+                  </span>
+                  <span :if={note.heading} class="font-medium text-sm">{note.heading}</span>
+                </div>
+                <p class="text-sm text-base-content/70 line-clamp-3 whitespace-pre-line">
+                  {note.content}
+                </p>
+              </div>
+              <span class="text-xs text-base-content/30 shrink-0">#{note.position}</span>
+            </div>
+            <div class="flex justify-end gap-1 border-t border-base-300 px-3 py-2">
+              <button
+                phx-click="edit_editorial_note"
+                phx-value-id={note.id}
+                class="btn btn-ghost btn-xs gap-1"
+              >
+                <.icon name="hero-pencil-square-micro" class="size-3.5" /> {gettext("Edit")}
+              </button>
+              <button
+                phx-click="delete_editorial_note"
+                phx-value-id={note.id}
+                data-confirm={gettext("Delete this editorial note?")}
+                class="btn btn-ghost btn-xs text-error gap-1"
+              >
+                <.icon name="hero-trash-micro" class="size-3.5" /> {gettext("Delete")}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <%!-- Tab: Characters --%>
@@ -1164,6 +1335,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :tab, :atom, required: true
   attr :active, :atom, required: true
   attr :icon, :string, required: true
+  attr :label, :string, default: nil
   attr :count, :integer, default: nil
   attr :badge, :string, default: nil
 
@@ -1182,7 +1354,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       ]}
     >
       <.icon name={@icon} class="size-4" />
-      <span class="capitalize">{@tab}</span>
+      <span class={unless @label, do: "capitalize"}>{@label || @tab}</span>
       <span :if={@count} class="badge badge-sm badge-ghost">{@count}</span>
       <span :if={@badge} class="badge badge-sm badge-primary">{@badge}</span>
     </button>
@@ -1356,6 +1528,56 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :editing, :any, default: nil
   attr :characters, :list, default: []
   attr :modal_element_type, :string, default: nil
+
+  defp modal_content(%{modal: :editorial_note} = assigns) do
+    ~H"""
+    <h3 class="text-lg font-bold mb-4">
+      {editing_label(@editing)} {gettext("Editorial Note")}
+    </h3>
+    <.form
+      for={@form}
+      as={:editorial_note}
+      phx-change="validate_form"
+      phx-submit="save_form"
+      class="space-y-4"
+    >
+      <div>
+        <label class="label">
+          <span class="label-text font-medium">{gettext("Section Type")} *</span>
+        </label>
+        <.input field={@form[:section_type]} type="select" options={section_type_options()} />
+      </div>
+      <div>
+        <label class="label">
+          <span class="label-text font-medium">{gettext("Heading")}</span>
+        </label>
+        <.input
+          field={@form[:heading]}
+          type="text"
+          placeholder={gettext("Optional section heading")}
+        />
+      </div>
+      <div>
+        <label class="label">
+          <span class="label-text font-medium">{gettext("Content")} *</span>
+        </label>
+        <.input
+          field={@form[:content]}
+          type="textarea"
+          rows="8"
+          placeholder={gettext("Note text...")}
+        />
+      </div>
+      <.input field={@form[:position]} type="hidden" />
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="btn btn-primary">{gettext("Save")}</button>
+        <button type="button" phx-click="close_modal" class="btn btn-ghost">
+          {gettext("Cancel")}
+        </button>
+      </div>
+    </.form>
+    """
+  end
 
   defp modal_content(%{modal: :character} = assigns) do
     ~H"""

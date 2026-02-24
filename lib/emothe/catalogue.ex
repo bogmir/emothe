@@ -190,10 +190,33 @@ defmodule Emothe.Catalogue do
 
   # --- Editorial Notes ---
 
+  def list_play_editorial_notes(play_id) do
+    PlayEditorialNote
+    |> where(play_id: ^play_id)
+    |> order_by(:position)
+    |> Repo.all()
+  end
+
+  def get_play_editorial_note!(id), do: Repo.get!(PlayEditorialNote, id)
+
   def create_play_editorial_note(attrs) do
     %PlayEditorialNote{}
     |> PlayEditorialNote.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update_play_editorial_note(%PlayEditorialNote{} = note, attrs) do
+    note
+    |> PlayEditorialNote.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_play_editorial_note(%PlayEditorialNote{} = note) do
+    Repo.delete(note)
+  end
+
+  def change_play_editorial_note(%PlayEditorialNote{} = note, attrs \\ %{}) do
+    PlayEditorialNote.changeset(note, attrs)
   end
 
   def list_plays_for_select do

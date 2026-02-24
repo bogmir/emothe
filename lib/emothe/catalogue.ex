@@ -128,10 +128,33 @@ defmodule Emothe.Catalogue do
 
   # --- Editors ---
 
+  def list_play_editors(play_id) do
+    PlayEditor
+    |> where(play_id: ^play_id)
+    |> order_by(:position)
+    |> Repo.all()
+  end
+
+  def get_play_editor!(id), do: Repo.get!(PlayEditor, id)
+
   def create_play_editor(attrs) do
     %PlayEditor{}
     |> PlayEditor.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update_play_editor(%PlayEditor{} = editor, attrs) do
+    editor
+    |> PlayEditor.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_play_editor(%PlayEditor{} = editor) do
+    Repo.delete(editor)
+  end
+
+  def change_play_editor(%PlayEditor{} = editor, attrs \\ %{}) do
+    PlayEditor.changeset(editor, attrs)
   end
 
   # --- Sources ---

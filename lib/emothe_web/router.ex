@@ -112,6 +112,7 @@ defmodule EmotheWeb.Router do
       live "/plays/:id/edit", PlayFormLive, :edit
       live "/plays/import", ImportLive, :index
       live "/plays/:id", PlayDetailLive, :show
+      live "/plays/:id/editors", PlayEditorsLive, :index
       live "/plays/:id/sources", PlaySourcesLive, :index
       live "/plays/:id/content", PlayContentEditorLive, :index
     end

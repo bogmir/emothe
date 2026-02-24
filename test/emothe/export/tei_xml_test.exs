@@ -906,6 +906,39 @@ defmodule Emothe.Export.TeiXmlTest do
     assert length(Regex.scan(~r/<bibl>/, exported_xml)) == 2
   end
 
+  test "export includes publisher, pubPlace, date in bibl when set" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>El Rey Lear</title></titleStmt>
+          <publicationStmt><idno>EXBIBPUB01</idno></publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>El Rey Lear</title>
+              <publisher>Miguel Seguí</publisher>
+              <pubPlace>Barcelona</pubPlace>
+              <date>1908</date>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ "<publisher>Miguel Seguí</publisher>"
+    assert exported_xml =~ "<pubPlace>Barcelona</pubPlace>"
+    assert exported_xml =~ "<date>1908</date>"
+  end
+
   test "export includes extent element when verse_count is set" do
     front = """
     <div type="elenco">

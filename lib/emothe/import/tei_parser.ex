@@ -530,6 +530,9 @@ defmodule Emothe.Import.TeiParser do
           author: safe_text(find_child(children, "author")),
           editor: safe_text(editor_el),
           editor_role: editor_role,
+          publisher: safe_text(find_child(children, "publisher")),
+          pub_place: safe_text(find_child(children, "pubPlace")),
+          pub_date: safe_text(find_child(children, "date")),
           note: safe_text(find_child(children, "note")),
           language: safe_text(find_child(children, "lang")),
           position: idx

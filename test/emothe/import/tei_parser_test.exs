@@ -1111,6 +1111,39 @@ defmodule Emothe.Import.TeiParserTest do
     assert Enum.map(sources, & &1.title) == ["Source A", "Source B"]
   end
 
+  test "import_file/1 extracts publisher, pub_place, pub_date from <bibl>" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>El Rey Lear</title></titleStmt>
+          <publicationStmt><idno>BIBPUB01</idno></publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>El Rey Lear</title>
+              <author>Shakespeare, William</author>
+              <publisher>Miguel Seguí</publisher>
+              <pubPlace>Barcelona</pubPlace>
+              <date>1908</date>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.publisher == "Miguel Seguí"
+    assert source.pub_place == "Barcelona"
+    assert source.pub_date == "1908"
+  end
+
   # --- Encoding ---
 
   test "import_file/1 handles UTF-16 LE encoded files" do

@@ -199,7 +199,7 @@ Then visit:
 
 ### Known Roundtrip Gaps
 - [x] **`Play.language` imported** from `<profileDesc><langUsage><language ident="xx-XX">` (e.g. "it-IT" → "it"); exported back as `<profileDesc><langUsage><language ident="...">` with label. Note: `xml:lang` on the root `<TEI>` element is always "es" in EMOTHE files (editorial platform language), NOT the play language — the play language lives in `profileDesc/langUsage`.
-- [ ] **`PlaySource.publisher/pub_place/pub_date`** — imported to DB but NOT exported to TEI XML and NOT editable in admin UI (dead fields)
+- [x] **`PlaySource.publisher/pub_place/pub_date`** — now imported from `<publisher>`, `<pubPlace>`, `<date>` inside `<bibl>`; exported back to same elements; editable in admin UI. Fields are optional — most EMOTHE corpus `<bibl>` elements use a freeform `<note>` citation instead.
 - [ ] **No admin UI for PlayEditors** — editors are read-only in admin; can only be set via TEI import
 - [ ] **No admin UI for PlayEditorialNotes** — editorial notes are read-only; can only be set via TEI import
 - [ ] **`project_description`/`editorial_declaration`** — imported and exported but no admin UI to edit

@@ -1,25 +1,17 @@
 defmodule EmotheWeb.LocaleController do
   use EmotheWeb, :controller
 
-  def update(conn, %{"locale" => locale}) when locale in ~w(es en) do
+  def update(conn, %{"locale" => locale} = params) when locale in ~w(es en) do
     conn
     |> put_session(:locale, locale)
-    |> redirect(to: redirect_back(conn))
+    |> redirect(to: safe_return_to(params))
   end
 
-  def update(conn, _params) do
+  def update(conn, params) do
     conn
-    |> redirect(to: redirect_back(conn))
+    |> redirect(to: safe_return_to(params))
   end
 
-  defp redirect_back(conn) do
-    case get_req_header(conn, "referer") do
-      [referer | _] ->
-        uri = URI.parse(referer)
-        uri.path || "/"
-
-      _ ->
-        "/"
-    end
-  end
+  defp safe_return_to(%{"return_to" => "/" <> _ = path}), do: path
+  defp safe_return_to(_), do: "/"
 end

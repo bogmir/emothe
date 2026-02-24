@@ -190,16 +190,30 @@ defmodule EmotheWeb.Layouts do
   def locale_toggle(assigns) do
     ~H"""
     <div class="flex items-center gap-0.5">
-      <form :if={@locale != "es"} action="/locale" method="post" class="inline">
+      <form
+        :if={@locale != "es"}
+        action="/locale"
+        method="post"
+        class="inline"
+        onsubmit="this.querySelector('[name=return_to]').value=window.location.pathname+window.location.search"
+      >
         <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
         <input type="hidden" name="locale" value="es" />
+        <input type="hidden" name="return_to" value="" />
         <button type="submit" class="btn btn-ghost btn-xs font-bold">ES</button>
       </form>
       <span :if={@locale == "es"} class="btn btn-ghost btn-xs font-bold btn-active">ES</span>
 
-      <form :if={@locale != "en"} action="/locale" method="post" class="inline">
+      <form
+        :if={@locale != "en"}
+        action="/locale"
+        method="post"
+        class="inline"
+        onsubmit="this.querySelector('[name=return_to]').value=window.location.pathname+window.location.search"
+      >
         <input type="hidden" name="_csrf_token" value={Phoenix.Controller.get_csrf_token()} />
         <input type="hidden" name="locale" value="en" />
+        <input type="hidden" name="return_to" value="" />
         <button type="submit" class="btn btn-ghost btn-xs font-bold">EN</button>
       </form>
       <span :if={@locale == "en"} class="btn btn-ghost btn-xs font-bold btn-active">EN</span>

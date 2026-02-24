@@ -12,6 +12,7 @@ defmodule EmotheWeb.Router do
     plug :put_secure_browser_headers
     plug :fetch_current_user
     plug EmotheWeb.Plugs.SetLocale
+    plug EmotheWeb.Plugs.StoreLastPath
   end
 
   pipeline :demo_browser do

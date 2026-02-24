@@ -4,6 +4,8 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
   import EmotheWeb.Components.StatisticsPanel
 
   alias Emothe.Catalogue
+  alias Emothe.Export.TeiValidator
+  alias Emothe.Export.TeiXml
   alias Emothe.PlayContent
   alias Emothe.Statistics
 
@@ -26,10 +28,20 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
        %{label: gettext("Plays"), to: ~p"/admin/plays"},
        %{label: play.title}
      ])
-     |> assign(:play_context, %{play: play, active_tab: :overview})}
+     |> assign(:play_context, %{play: play, active_tab: :overview})
+     |> assign(:validation_result, nil)
+     |> assign(:validating, false)}
   end
 
   @impl true
+  def handle_event("validate_tei", _, socket) do
+    play = socket.assigns.play
+    xml = TeiXml.generate(play)
+    result = TeiValidator.validate(xml)
+
+    {:noreply, assign(socket, validation_result: result, validating: false)}
+  end
+
   def handle_event("recompute_stats", _, socket) do
     statistic = Statistics.recompute(socket.assigns.play.id)
 
@@ -85,7 +97,57 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
           >
             <.icon name="hero-document-arrow-down-mini" class="size-4" />
           </a>
+          <span class="border-l border-base-300 h-4 mx-1"></span>
+          <button
+            phx-click="validate_tei"
+            class="btn btn-ghost btn-xs tooltip"
+            data-tip={gettext("Validate TEI-XML")}
+            disabled={@validating}
+          >
+            <.icon name="hero-check-badge-mini" class="size-4" />
+          </button>
         </div>
+      </div>
+
+      <%!-- Validation Result --%>
+      <div :if={@validation_result} class="mb-6">
+        <div :if={@validation_result == {:ok, :valid}} role="alert" class="alert alert-success">
+          <.icon name="hero-check-circle-mini" class="size-5" />
+          <span>{gettext("TEI-XML is valid against TEI P5 schema.")}</span>
+        </div>
+        <div
+          :if={@validation_result == {:error, :xmllint_not_found}}
+          role="alert"
+          class="alert alert-warning"
+        >
+          <.icon name="hero-exclamation-triangle-mini" class="size-5" />
+          <span>{gettext("xmllint is not installed. Cannot validate.")}</span>
+        </div>
+        <div
+          :if={@validation_result == {:error, :schema_not_found}}
+          role="alert"
+          class="alert alert-warning"
+        >
+          <.icon name="hero-exclamation-triangle-mini" class="size-5" />
+          <span>{gettext("TEI schema file not found.")}</span>
+        </div>
+        <%= if match?({:error, errors} when is_list(errors), @validation_result) do %>
+          <% {:error, errors} = @validation_result %>
+          <div role="alert" class="alert alert-error">
+            <.icon name="hero-x-circle-mini" class="size-5" />
+            <div>
+              <span class="font-medium">{gettext("TEI-XML validation failed:")}</span>
+              <details class="mt-2">
+                <summary class="cursor-pointer text-sm underline">
+                  {gettext("Show %{count} error(s)", count: length(errors))}
+                </summary>
+                <ul class="mt-2 ml-4 list-disc text-xs font-mono space-y-1">
+                  <li :for={error <- errors}>{error}</li>
+                </ul>
+              </details>
+            </div>
+          </div>
+        <% end %>
       </div>
 
       <%!-- Metadata --%>

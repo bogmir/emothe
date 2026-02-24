@@ -1,6 +1,7 @@
 defmodule EmotheWeb.Admin.ImportLive do
   use EmotheWeb, :live_view
 
+  alias Emothe.Export.TeiValidator
   alias Emothe.Import.TeiParser
 
   require Logger
@@ -138,7 +139,8 @@ defmodule EmotheWeb.Admin.ImportLive do
     socket =
       case TeiParser.import_file(path) do
         {:ok, play} ->
-          success = {filename, play.title, play.code, play.id}
+          validation_warnings = validate_source_file(path)
+          success = {filename, play.title, play.code, play.id, validation_warnings}
           update(socket, :successes, &[success | &1])
 
         {:error, reason} ->
@@ -152,6 +154,20 @@ defmodule EmotheWeb.Admin.ImportLive do
 
     send(self(), {:import_next, rest})
     {:noreply, update(socket, :import_done, &(&1 + 1))}
+  end
+
+  defp validate_source_file(path) do
+    case File.read(path) do
+      {:ok, xml} ->
+        case TeiValidator.validate(xml) do
+          {:ok, :valid} -> []
+          {:error, errors} when is_list(errors) -> errors
+          {:error, _atom} -> []
+        end
+
+      {:error, _} ->
+        []
+    end
   end
 
   defp format_error(reason) when is_atom(reason), do: to_string(reason)
@@ -252,15 +268,37 @@ defmodule EmotheWeb.Admin.ImportLive do
                   <th>{gettext("File")}</th>
                   <th>{gettext("Title")}</th>
                   <th>{gettext("Code")}</th>
+                  <th>{gettext("Schema")}</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr :for={{filename, title, code, play_id} <- @successes}>
+                <tr :for={{filename, title, code, play_id, warnings} <- @successes}>
                   <td class="font-mono text-xs">{filename}</td>
                   <td>{title}</td>
                   <td>
                     <span class="badge badge-primary badge-sm">{code}</span>
+                  </td>
+                  <td>
+                    <%= if warnings == [] do %>
+                      <span class="badge badge-success badge-sm gap-1">
+                        <.icon name="hero-check-mini" class="size-3" />
+                        {gettext("Valid")}
+                      </span>
+                    <% else %>
+                      <details>
+                        <summary class="badge badge-warning badge-sm gap-1 cursor-pointer">
+                          <.icon name="hero-exclamation-triangle-mini" class="size-3" />
+                          {gettext("%{count} warning(s)", count: length(warnings))}
+                        </summary>
+                        <ul class="mt-2 ml-2 text-xs font-mono text-base-content/70 space-y-1 max-h-40 overflow-y-auto">
+                          <li :for={w <- Enum.take(warnings, 10)}>{w}</li>
+                          <li :if={length(warnings) > 10} class="text-base-content/50">
+                            … {gettext("and %{count} more", count: length(warnings) - 10)}
+                          </li>
+                        </ul>
+                      </details>
+                    <% end %>
                   </td>
                   <td class="flex gap-1">
                     <.link

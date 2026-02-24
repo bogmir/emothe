@@ -39,7 +39,7 @@ defmodule EmotheWeb.Admin.ImportLive do
         result =
           case TeiParser.import_file(path) do
             {:ok, play} ->
-              {:ok, {entry.client_name, play.title, play.code}}
+              {:ok, {entry.client_name, play.title, play.code, play.id}}
 
             {:error, reason} ->
               {:error, {entry.client_name, reason}}
@@ -104,7 +104,7 @@ defmodule EmotheWeb.Admin.ImportLive do
               path = Path.join(dir, file)
 
               case TeiParser.import_file(path) do
-                {:ok, play} -> {:ok, {file, play.title, play.code}}
+                {:ok, play} -> {:ok, {file, play.title, play.code, play.id}}
                 {:error, reason} -> {:error, {file, reason}}
               end
             end)
@@ -240,13 +240,20 @@ defmodule EmotheWeb.Admin.ImportLive do
                 </tr>
               </thead>
               <tbody>
-                <tr :for={{filename, title, code} <- @successes}>
+                <tr :for={{filename, title, code, play_id} <- @successes}>
                   <td class="font-mono text-xs">{filename}</td>
                   <td>{title}</td>
                   <td>
                     <span class="badge badge-primary badge-sm">{code}</span>
                   </td>
-                  <td>
+                  <td class="flex gap-1">
+                    <.link
+                      navigate={~p"/admin/plays/#{play_id}"}
+                      class="btn btn-ghost btn-xs tooltip"
+                      data-tip={gettext("Edit in Admin")}
+                    >
+                      <.icon name="hero-pencil-square-mini" class="size-4" />
+                    </.link>
                     <.link
                       href={~p"/plays/#{code}"}
                       target="_blank"

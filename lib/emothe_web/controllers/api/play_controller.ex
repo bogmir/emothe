@@ -67,6 +67,7 @@ defmodule EmotheWeb.API.PlayController do
   defp play_summary(play) do
     %{
       code: play.code,
+      url: play_url(play.code),
       title: play.title,
       author: play.author_name,
       verse_count: play.verse_count,
@@ -77,6 +78,7 @@ defmodule EmotheWeb.API.PlayController do
   defp play_detail(play) do
     %{
       code: play.code,
+      url: play_url(play.code),
       title: play.title,
       original_title: play.original_title,
       author: play.author_name,
@@ -174,6 +176,8 @@ defmodule EmotheWeb.API.PlayController do
   defp serialize_element(element) do
     %{type: element.type, content: element.content}
   end
+
+  defp play_url(code), do: EmotheWeb.Endpoint.url() <> "/plays/#{code}"
 
   # --- Helpers ---
 

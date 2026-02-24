@@ -100,6 +100,16 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
             <span class="font-medium">{gettext("EMOTHE ID:")}</span>
             <span class="text-base-content/70">{@play.emothe_id}</span>
           </div>
+          <div class="md:col-span-2">
+            <span class="font-medium">{gettext("Play URL:")}</span>
+            <a
+              href={~p"/plays/#{@play.code}"}
+              target="_blank"
+              class="link link-primary text-xs break-all"
+            >
+              {EmotheWeb.Endpoint.url() <> ~p"/plays/#{@play.code}"}
+            </a>
+          </div>
           <div>
             <span class="font-medium">{gettext("Language:")}</span>
             <span class="text-base-content/70">

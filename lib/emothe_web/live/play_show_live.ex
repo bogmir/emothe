@@ -304,6 +304,9 @@ defmodule EmotheWeb.PlayShowLive do
                 {@play.licence_text}
               <% end %>
             </p>
+            <p class="mt-1 text-xs text-base-content/30">
+              {EmotheWeb.Endpoint.url() <> ~p"/plays/#{@play.code}"}
+            </p>
           </header>
 
           <%!-- Editorial notes (text view only) --%>

@@ -1395,8 +1395,13 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         <div class="flex gap-1">
           <%!-- Insert Above for top-level elements (speeches, stage dirs, prose) --%>
           <div :if={@depth == 0} class="dropdown dropdown-end">
-            <label tabindex="0" class="btn btn-xs btn-ghost btn-outline">
-              {gettext("Insert Above")}
+            <label
+              tabindex="0"
+              class="btn btn-xs btn-ghost btn-outline tooltip"
+              aria-label={gettext("Insert Above")}
+              data-tip={gettext("Insert Above")}
+            >
+              <.icon name="hero-arrow-up-mini" class="size-4" />
             </label>
             <ul
               tabindex="0"
@@ -1441,9 +1446,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             phx-value-type="verse_line"
             phx-value-position={@element.position}
             phx-value-parent-id={@element.parent_id}
-            class="btn btn-xs btn-ghost btn-outline"
+            class="btn btn-xs btn-ghost btn-outline tooltip"
+            aria-label={gettext("Insert Above")}
+            data-tip={gettext("Insert Above")}
           >
-            {gettext("Insert Above")}
+            <.icon name="hero-arrow-up-mini" class="size-4" />
           </button>
           <button
             phx-click="edit_element"

@@ -99,7 +99,30 @@ defmodule EmotheWeb.PlayShowLive do
               phx-hook="ScrollSpy"
               class="border-t border-base-300 max-h-[65vh] overflow-y-auto px-2 py-2 space-y-3"
             >
-              <section :if={@metadata_sections != []}>
+              <%!-- View switcher --%>
+              <section>
+                <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
+                  {gettext("View")}
+                </h3>
+                <nav class="mt-1 space-y-px">
+                  <button
+                    :for={{tab_key, tab_label} <- [{:text, gettext("Text")}, {:statistics, gettext("Statistics")}]}
+                    phx-click="switch_tab"
+                    phx-value-tab={tab_key}
+                    class={[
+                      "w-full text-left block rounded-md px-2 py-1 text-xs transition-colors",
+                      if(@active_tab == tab_key,
+                        do: "bg-primary/10 text-primary font-medium",
+                        else: "text-base-content/70 hover:bg-primary/10 hover:text-primary"
+                      )
+                    ]}
+                  >
+                    {tab_label}
+                  </button>
+                </nav>
+              </section>
+
+              <section :if={@active_tab == :text && @metadata_sections != []}>
                 <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
                   {gettext("Metadata")}
                 </h3>
@@ -114,7 +137,7 @@ defmodule EmotheWeb.PlayShowLive do
                 </nav>
               </section>
 
-              <section :if={@play_sections != []}>
+              <section :if={@active_tab == :text && @play_sections != []}>
                 <h3 class="px-2 pt-1 text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
                   {gettext("Sections")}
                 </h3>
@@ -131,8 +154,8 @@ defmodule EmotheWeb.PlayShowLive do
               </section>
             </div>
 
-            <%!-- Visual markers --%>
-            <div :if={@sidebar_open} class="border-t border-base-300 px-3 py-2.5 space-y-2">
+            <%!-- Visual markers (text view only) --%>
+            <div :if={@sidebar_open && @active_tab == :text} class="border-t border-base-300 px-3 py-2.5 space-y-2">
               <h3 class="text-[10px] font-semibold uppercase tracking-widest text-base-content/40">
                 {gettext("Visual markers")}
               </h3>
@@ -275,8 +298,8 @@ defmodule EmotheWeb.PlayShowLive do
             </p>
           </header>
 
-          <%!-- Editorial notes --%>
-          <div :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}>
+          <%!-- Editorial notes (text view only) --%>
+          <div :if={@active_tab == :text} :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}>
             <hr :if={index > 1} class="max-w-2xl mx-auto border-base-300 mb-6" />
             <div
               id={"meta-note-#{index}"}
@@ -286,29 +309,6 @@ defmodule EmotheWeb.PlayShowLive do
               <div class="whitespace-pre-line">{note.content}</div>
             </div>
           </div>
-
-          <%!-- Tab navigation --%>
-          <nav id="play-tab-nav" class="flex border-b border-base-300 mb-6">
-            <button
-              :for={
-                tab <- [
-                  {:text, gettext("Text")},
-                  {:statistics, gettext("Statistics")}
-                ]
-              }
-              phx-click="switch_tab"
-              phx-value-tab={elem(tab, 0)}
-              class={[
-                "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer",
-                if(@active_tab == elem(tab, 0),
-                  do: "border-primary text-primary",
-                  else: "border-transparent text-base-content/50 hover:text-base-content/80"
-                )
-              ]}
-            >
-              {elem(tab, 1)}
-            </button>
-          </nav>
 
           <%!-- Text tab --%>
           <div :if={@active_tab == :text} id="play-tab-text">

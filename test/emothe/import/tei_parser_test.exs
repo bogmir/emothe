@@ -752,6 +752,87 @@ defmodule Emothe.Import.TeiParserTest do
     assert play.availability_note == "Some general availability text."
   end
 
+  # --- Language: profileDesc/langUsage/language[@ident] ---
+
+  test "import_file/1 extracts language code from <profileDesc><langUsage>" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Amleto</title></titleStmt>
+          <publicationStmt><idno>LANG01</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="it-IT">Italiano</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "it"
+  end
+
+  test "import_file/1 extracts French language from <language ident=\"fr-FR\">" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Le Cid</title></titleStmt>
+          <publicationStmt><idno>LANG02</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="fr-FR">Français</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "fr"
+  end
+
+  test "import_file/1 defaults to nil language when profileDesc is absent" do
+    path = write_tei(minimal_tei(code: "LANG03"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    # language defaults to "es" from schema when nil is given
+    assert play.language == "es"
+  end
+
+  test "import_file/1 extracts English from <language ident=\"en-EN\">" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>The Coffer</title></titleStmt>
+          <publicationStmt><idno>LANG04</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="en-EN">English</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "en"
+  end
+
   # --- Medium priority: respStmt, principal, edition_title, author_attribution ---
 
   test "import_file/1 creates principal editor from <principal>" do

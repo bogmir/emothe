@@ -575,6 +575,81 @@ defmodule Emothe.Export.TeiXmlTest do
     assert exported_xml =~ "General availability text."
   end
 
+  # --- Language: profileDesc/langUsage/language[@ident] ---
+
+  test "export emits <profileDesc><langUsage><language> for Italian play" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Amleto</title></titleStmt>
+          <publicationStmt><idno>EXPLANG01</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="it-IT">Italiano</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "it"
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<language\s+ident="it-IT"/
+    assert exported_xml =~ "Italiano"
+    assert exported_xml =~ "<profileDesc>"
+    assert exported_xml =~ "<langUsage>"
+  end
+
+  test "export emits <language ident=\"fr-FR\"> for French play" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Le Cid</title></titleStmt>
+          <publicationStmt><idno>EXPLANG02</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="fr-FR">Français</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<language\s+ident="fr-FR"/
+    assert exported_xml =~ "Français"
+  end
+
+  test "export defaults to <language ident=\"es-ES\"> when language is nil" do
+    path = write_tei(minimal_tei(code: "EXPLANG03"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    # no profileDesc in TEI => language stays "es" (schema default)
+
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ ~r/<language\s+ident="es-ES"/
+    assert exported_xml =~ "Español"
+  end
+
   test "export roundtrip preserves split verse content fidelity" do
     front = """
     <div type="elenco">

@@ -167,7 +167,9 @@ Then visit:
 - [x] Role-based access control (`:admin`, `:researcher` roles)
 - [x] Admin route protection (requires admin role via plug + LiveView on_mount)
 - [x] Compile & fix errors (all modules compile cleanly)
-- [x] TEI parser test suite - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding
+- [x] TEI parser test suite - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding, split verse parts, line_id, rend, source fields, principal/respStmt editors, author_attribution, edition_title, is_verse, lg part, prose asides, multiple bibl sources, listBibl wrapper
+- [x] TEI XML export test suite - full roundtrip coverage: split verses, xml:id, rend, source bibl fields, pub_place/publication_date, availability_note, principal, respStmt roles, author_attribution, edition_title, hidden characters, division heads, lg part, prose asides, multiple sources, extent
+- [x] Real-fixture roundtrip test (`RoundtripTest`) - imports 22+ real TEI files, exports, and verifies: 12 structural count fields (acts, scenes, characters, speeches, verses, line_groups, stage_dirs, asides, split_parts, verse_type_attrs, hidden_chars, heads), ordering preservation (characters, sources, verse line attrs), metadata fidelity (title, author, code, original_title, pub_place, publication_date, licence_url, edition_title, author_attribution, editors, principals, sponsor, funder, sources), derived fields (verse_count, is_verse, extent), and warn-only speaker_refs (multi-character `who` limitation)
 - [x] Duplicate character xml_id handling in TEI importer (`create_character_unless_exists`)
 - [x] Manual play content editor at `/admin/plays/:id/content` - characters, divisions, elements with modal forms
 - [x] Navigation overhaul: two layouts (public app + admin), breadcrumbs, play context bar for admin play pages
@@ -194,6 +196,14 @@ Then visit:
 - [x] ~~Install Typst~~ PDF export now uses ChromicPDF (requires Chrome/Chromium on the system)
 - [ ] **Stage direction navigator** (`« N / M »`) - client-side JS hook to scroll between stage directions in play text
 - [x] **Recompute statistics** - stats cache is invalidated automatically on every content change via `broadcast_content_changed/1` (lazy recompute on next access); one-time refresh: `Emothe.Repo.all(Emothe.Catalogue.Play) |> Enum.each(&Emothe.Statistics.recompute(&1.id))`
+
+### Known Roundtrip Gaps
+- [x] **`Play.language` imported** from `<profileDesc><langUsage><language ident="xx-XX">` (e.g. "it-IT" → "it"); exported back as `<profileDesc><langUsage><language ident="...">` with label. Note: `xml:lang` on the root `<TEI>` element is always "es" in EMOTHE files (editorial platform language), NOT the play language — the play language lives in `profileDesc/langUsage`.
+- [ ] **`PlaySource.publisher/pub_place/pub_date`** — imported to DB but NOT exported to TEI XML and NOT editable in admin UI (dead fields)
+- [ ] **No admin UI for PlayEditors** — editors are read-only in admin; can only be set via TEI import
+- [ ] **No admin UI for PlayEditorialNotes** — editorial notes are read-only; can only be set via TEI import
+- [ ] **`project_description`/`editorial_declaration`** — imported and exported but no admin UI to edit
+- [ ] **Multi-character `who` attrs** (`who="#ALB #COR"`) — parser can't resolve to single character_id; speeches get `character_id=nil`, losing `who` on export (warn-only in roundtrip test)
 
 ### Low Priority / Future
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting

@@ -139,8 +139,9 @@ defmodule Emothe.Import.TeiParser do
   defp import_header({_name, _attrs, children}) do
     file_desc = find_child(children, "fileDesc")
     encoding_desc = find_child(children, "encodingDesc")
+    profile_desc = find_child(children, "profileDesc")
 
-    play_attrs = extract_play_attrs(file_desc, encoding_desc)
+    play_attrs = extract_play_attrs(file_desc, encoding_desc, profile_desc)
 
     play =
       case Repo.get_by(Play, code: play_attrs.code) do
@@ -165,7 +166,7 @@ defmodule Emothe.Import.TeiParser do
     play
   end
 
-  defp extract_play_attrs(file_desc, encoding_desc) do
+  defp extract_play_attrs(file_desc, encoding_desc, profile_desc) do
     title_stmt = file_desc && find_child(elem(file_desc, 2), "titleStmt")
     publication_stmt = file_desc && find_child(elem(file_desc, 2), "publicationStmt")
     extent = file_desc && find_child(elem(file_desc, 2), "extent")
@@ -221,6 +222,9 @@ defmodule Emothe.Import.TeiParser do
     # Extract project/editorial from encodingDesc
     {project_desc, editorial_decl} = extract_encoding(encoding_desc)
 
+    # Extract play language from profileDesc/langUsage/language[@ident]
+    language = extract_language_code(profile_desc)
+
     attribution =
       if main_author do
         attr_value(elem(main_author, 1), "ana")
@@ -249,8 +253,25 @@ defmodule Emothe.Import.TeiParser do
       project_description: project_desc,
       editorial_declaration: editorial_decl,
       edition_title: safe_text(edition_title_el),
-      relationship_type: relationship_type
+      relationship_type: relationship_type,
+      language: language || "es"
     }
+  end
+
+  # Extract the 2-letter language code from profileDesc/langUsage/language[@ident]
+  # e.g. ident="it-IT" -> "it", ident="fr-FR" -> "fr"
+  defp extract_language_code(nil), do: nil
+
+  defp extract_language_code({_name, _attrs, children}) do
+    with lang_usage when not is_nil(lang_usage) <- find_child(children, "langUsage"),
+         lang_el when not is_nil(lang_el) <- find_child(elem(lang_usage, 2), "language"),
+         ident when not is_nil(ident) <- attr_value(elem(lang_el, 1), "ident"),
+         code <- ident |> String.split("-") |> List.first() |> String.downcase(),
+         true <- code in Play.valid_languages() do
+      code
+    else
+      _ -> nil
+    end
   end
 
   defp extract_idno(nil), do: nil

@@ -50,6 +50,17 @@ defmodule Emothe.Catalogue.Play do
 
   def valid_languages, do: @valid_languages
 
+  @language_names %{
+    "es" => "Español",
+    "en" => "English",
+    "it" => "Italiano",
+    "ca" => "Català",
+    "fr" => "Français",
+    "pt" => "Português"
+  }
+
+  def language_name(code), do: Map.get(@language_names, code, code)
+
   def changeset(play, attrs) do
     play
     |> cast(attrs, [

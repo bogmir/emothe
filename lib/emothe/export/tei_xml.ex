@@ -32,7 +32,8 @@ defmodule Emothe.Export.TeiXml do
   defp build_header(play) do
     element(:teiHeader, [
       build_file_desc(play),
-      build_encoding_desc(play)
+      build_encoding_desc(play),
+      build_profile_desc(play)
     ])
   end
 
@@ -263,6 +264,25 @@ defmodule Emothe.Export.TeiXml do
         else: children
 
     element(:encodingDesc, if(children == [], do: [element(:p, "")], else: children))
+  end
+
+  @language_ident_labels %{
+    "es" => {"es-ES", "Español"},
+    "en" => {"en-EN", "English"},
+    "it" => {"it-IT", "Italiano"},
+    "ca" => {"ca-ES", "Català"},
+    "fr" => {"fr-FR", "Français"},
+    "pt" => {"pt-PT", "Português"}
+  }
+
+  defp build_profile_desc(play) do
+    {ident, label} = Map.get(@language_ident_labels, play.language || "es", {"es-ES", "Español"})
+
+    element(:profileDesc, [
+      element(:langUsage, [
+        element(:language, %{ident: ident}, label)
+      ])
+    ])
   end
 
   # --- Text ---

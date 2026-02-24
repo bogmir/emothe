@@ -251,10 +251,14 @@ defmodule EmotheWeb.PlayShowLive do
               </span>
             </div>
 
-            <p :if={@play.verse_count} class="mt-2 text-xs text-base-content/50">
-              {if @play.is_verse,
-                do: "#{@play.verse_count} #{gettext("verses")}",
-                else: gettext("Prose")}
+            <p class="mt-2 text-xs text-base-content/50">
+              {Emothe.Catalogue.Play.language_name(@play.language)}{if @play.verse_count do
+                " · " <>
+                  if(@play.is_verse,
+                    do: "#{@play.verse_count} #{gettext("verses")}",
+                    else: gettext("Prose")
+                  )
+              end}
             </p>
             <p :if={@play.licence_url || @play.licence_text} class="mt-1 text-xs text-base-content/40">
               <%= if @play.licence_url do %>

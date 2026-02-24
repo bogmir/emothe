@@ -392,6 +392,12 @@ defmodule Emothe.RoundtripTest do
 
     # Funder should appear if present
     assert_export_includes_text(code, exported_xml, "metadata: funder", play.funder)
+
+    # Language: <language ident="xx-XX"> must start with the play's language code
+    if play.language && play.language != "" do
+      assert exported_xml =~ ~r/<language\s+ident="#{Regex.escape(play.language)}/,
+             "#{code} language: ident starting with '#{play.language}' not found in <language> element"
+    end
   end
 
   # Files that already pass roundtrip — skip them to speed up iteration.

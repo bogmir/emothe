@@ -11,7 +11,10 @@ defmodule EmotheWeb.Admin.ImportLive do
      socket
      |> assign(:page_title, gettext("Import TEI-XML"))
      |> assign(:successes, [])
+     |> assign(:errors, [])
      |> assign(:importing, false)
+     |> assign(:import_total, 0)
+     |> assign(:import_done, 0)
      |> assign(:breadcrumbs, [
        %{label: gettext("Admin"), to: ~p"/admin/plays"},
        %{label: gettext("Plays"), to: ~p"/admin/plays"},
@@ -34,25 +37,72 @@ defmodule EmotheWeb.Admin.ImportLive do
   end
 
   def handle_event("import", _params, socket) do
-    {successes, errors} =
+    # Consume uploads: copy each to a stable temp path so we can process async
+    pending_files =
       consume_uploaded_entries(socket, :tei_files, fn %{path: path}, entry ->
-        result =
-          case TeiParser.import_file(path) do
-            {:ok, play} ->
-              {:ok, {entry.client_name, play.title, play.code, play.id}}
-
-            {:error, reason} ->
-              {:error, {entry.client_name, reason}}
-          end
-
-        {:ok, result}
+        dest = Path.join(System.tmp_dir!(), "emothe-import-#{System.unique_integer([:positive])}.xml")
+        File.cp!(path, dest)
+        {:ok, {dest, entry.client_name}}
       end)
-      |> split_results()
 
-    socket =
-      socket
-      |> assign(:successes, successes)
-      |> assign(:importing, false)
+    send(self(), {:import_next, pending_files})
+
+    {:noreply,
+     socket
+     |> assign(:importing, true)
+     |> assign(:successes, [])
+     |> assign(:errors, [])
+     |> assign(:import_total, length(pending_files))
+     |> assign(:import_done, 0)}
+  end
+
+  def handle_event("import_directory", %{"directory" => dir}, socket) do
+    dir = String.trim(dir)
+
+    case File.ls(dir) do
+      {:ok, files} ->
+        xml_files =
+          files
+          |> Enum.filter(&String.ends_with?(&1, ".xml"))
+          |> Enum.sort()
+
+        if xml_files == [] do
+          {:noreply,
+           put_flash(socket, :error, gettext("No .xml files found in %{dir}", dir: dir))}
+        else
+          pending =
+            Enum.map(xml_files, fn file ->
+              {Path.join(dir, file), file}
+            end)
+
+          send(self(), {:import_next, pending})
+
+          {:noreply,
+           socket
+           |> assign(:importing, true)
+           |> assign(:successes, [])
+           |> assign(:errors, [])
+           |> assign(:import_total, length(pending))
+           |> assign(:import_done, 0)}
+        end
+
+      {:error, reason} ->
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "#{gettext("Cannot read directory")}: #{format_error(reason)}"
+         )}
+    end
+  end
+
+  @impl true
+  def handle_info({:import_next, []}, socket) do
+    successes = Enum.reverse(socket.assigns.successes)
+    errors = Enum.reverse(socket.assigns.errors)
+
+    socket = assign(socket, :importing, false)
+    socket = assign(socket, :successes, successes)
 
     socket =
       case errors do
@@ -84,79 +134,24 @@ defmodule EmotheWeb.Admin.ImportLive do
     {:noreply, socket}
   end
 
-  def handle_event("import_directory", %{"directory" => dir}, socket) do
-    dir = String.trim(dir)
+  def handle_info({:import_next, [{path, filename} | rest]}, socket) do
+    socket =
+      case TeiParser.import_file(path) do
+        {:ok, play} ->
+          success = {filename, play.title, play.code, play.id}
+          update(socket, :successes, &[success | &1])
 
-    case File.ls(dir) do
-      {:ok, files} ->
-        xml_files =
-          files
-          |> Enum.filter(&String.ends_with?(&1, ".xml"))
-          |> Enum.sort()
+        {:error, reason} ->
+          update(socket, :errors, &[{filename, reason} | &1])
+      end
 
-        if xml_files == [] do
-          {:noreply,
-           put_flash(socket, :error, gettext("No .xml files found in %{dir}", dir: dir))}
-        else
-          {successes, errors} =
-            xml_files
-            |> Enum.map(fn file ->
-              path = Path.join(dir, file)
-
-              case TeiParser.import_file(path) do
-                {:ok, play} -> {:ok, {file, play.title, play.code, play.id}}
-                {:error, reason} -> {:error, {file, reason}}
-              end
-            end)
-            |> split_results()
-
-          socket = assign(socket, :successes, successes)
-
-          socket =
-            case errors do
-              [] ->
-                socket
-
-              _ ->
-                error_msg =
-                  Enum.map_join(errors, "\n", fn {file, reason} ->
-                    "#{file}: #{format_error(reason)}"
-                  end)
-
-                put_flash(socket, :error, "#{gettext("Import errors")}:\n#{error_msg}")
-            end
-
-          socket =
-            case successes do
-              [] ->
-                socket
-
-              _ ->
-                put_flash(
-                  socket,
-                  :info,
-                  gettext("Successfully imported %{count} play(s).", count: length(successes))
-                )
-            end
-
-          {:noreply, socket}
-        end
-
-      {:error, reason} ->
-        {:noreply,
-         put_flash(
-           socket,
-           :error,
-           "#{gettext("Cannot read directory")}: #{format_error(reason)}"
-         )}
+    # Clean up temp files created by upload consume (not directory imports)
+    if String.starts_with?(path, System.tmp_dir!()) do
+      File.rm(path)
     end
-  end
 
-  defp split_results(results) do
-    {oks, errs} = Enum.split_with(results, fn {status, _} -> status == :ok end)
-    successes = Enum.map(oks, fn {:ok, val} -> val end)
-    errors = Enum.map(errs, fn {:error, val} -> val end)
-    {successes, errors}
+    send(self(), {:import_next, rest})
+    {:noreply, update(socket, :import_done, &(&1 + 1))}
   end
 
   defp format_error(reason) when is_atom(reason), do: to_string(reason)
@@ -191,6 +186,7 @@ defmodule EmotheWeb.Admin.ImportLive do
             <.live_file_input
               upload={@uploads.tei_files}
               class="file-input file-input-bordered w-full mb-4"
+              disabled={@importing}
             />
 
             <div
@@ -217,7 +213,7 @@ defmodule EmotheWeb.Admin.ImportLive do
             <button
               type="submit"
               class="btn btn-primary mt-2"
-              disabled={@uploads.tei_files.entries == []}
+              disabled={@uploads.tei_files.entries == [] || @importing}
             >
               {gettext("Import %{count} file(s)", count: length(@uploads.tei_files.entries))}
             </button>
@@ -225,8 +221,28 @@ defmodule EmotheWeb.Admin.ImportLive do
         </div>
       </div>
 
+      <%!-- Import progress --%>
+      <div :if={@importing} class="card mb-6 border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body">
+          <div class="flex items-center gap-3">
+            <span class="loading loading-spinner loading-md text-primary"></span>
+            <span class="font-medium">
+              {gettext("Importing file %{done} of %{total}...",
+                done: @import_done + 1,
+                total: @import_total
+              )}
+            </span>
+          </div>
+          <progress
+            value={@import_done}
+            max={@import_total}
+            class="progress progress-primary w-full mt-2"
+          />
+        </div>
+      </div>
+
       <%!-- Success results --%>
-      <div :if={@successes != []} class="card border border-base-300 bg-base-100 shadow-sm">
+      <div :if={@successes != [] && !@importing} class="card border border-base-300 bg-base-100 shadow-sm">
         <div class="card-body">
           <h2 class="card-title">{gettext("Imported Plays")}</h2>
           <div class="overflow-x-auto">

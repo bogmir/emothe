@@ -25,14 +25,14 @@ defmodule EmotheWeb.PlayShowLiveTest do
     refute has_element?(view, "#play-tab-statistics")
 
     view
-    |> element("#play-tab-nav button[phx-value-tab='statistics']")
+    |> element("#scroll-spy-nav button[phx-value-tab='statistics']")
     |> render_click()
 
     assert has_element?(view, "#play-tab-statistics")
     refute has_element?(view, "#play-tab-text")
 
     view
-    |> element("#play-tab-nav button[phx-value-tab='text']")
+    |> element("#scroll-spy-nav button[phx-value-tab='text']")
     |> render_click()
 
     assert has_element?(view, "#play-tab-text")

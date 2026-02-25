@@ -7,26 +7,28 @@ defmodule Emothe.Export.TeiValidatorTest do
   alias Emothe.Catalogue
 
   @fixture_path Path.expand("../../fixtures/tei_files", __DIR__)
+  @fixture_file Path.join(@fixture_path, "AL0514_ElAusenteEnElLugar.xml")
 
   describe "validate/1" do
-    test "validates exported TEI from an imported fixture" do
-      {:ok, play} =
-        TeiParser.import_file(Path.join(@fixture_path, "AL0514_ElAusenteEnElLugar.xml"))
+    if File.exists?(@fixture_file) do
+      test "validates exported TEI from an imported fixture" do
+        {:ok, play} = TeiParser.import_file(@fixture_file)
 
-      play = Catalogue.get_play_with_all!(play.id)
-      xml = TeiXml.generate(play)
+        play = Catalogue.get_play_with_all!(play.id)
+        xml = TeiXml.generate(play)
 
-      case TeiValidator.validate(xml) do
-        {:ok, :valid} ->
-          :ok
+        case TeiValidator.validate(xml) do
+          {:ok, :valid} ->
+            :ok
 
-        {:error, errors} when is_list(errors) ->
-          # Log validation errors for diagnostics but don't fail the test.
-          # The export may not be fully schema-compliant yet; this test
-          # verifies the validator itself works end-to-end.
-          IO.puts("\n[TEI Validator] #{length(errors)} schema error(s) found:")
-          Enum.each(Enum.take(errors, 5), &IO.puts("  #{&1}"))
-          if length(errors) > 5, do: IO.puts("  ... and #{length(errors) - 5} more")
+          {:error, errors} when is_list(errors) ->
+            # Log validation errors for diagnostics but don't fail the test.
+            # The export may not be fully schema-compliant yet; this test
+            # verifies the validator itself works end-to-end.
+            IO.puts("\n[TEI Validator] #{length(errors)} schema error(s) found:")
+            Enum.each(Enum.take(errors, 5), &IO.puts("  #{&1}"))
+            if length(errors) > 5, do: IO.puts("  ... and #{length(errors) - 5} more")
+        end
       end
     end
 

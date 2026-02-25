@@ -33,6 +33,11 @@ config :logger, level: :warning
 config :opentelemetry,
   traces_exporter: :none
 
+config :emothe, ChromicPDF,
+  on_demand: true,
+  no_sandbox: true,
+  discard_stderr: false
+
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 

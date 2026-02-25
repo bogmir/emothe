@@ -6,7 +6,7 @@ defmodule Emothe.Export.TeiValidatorTest do
   alias Emothe.Export.TeiXml
   alias Emothe.Catalogue
 
-  @fixture_path "test/fixtures/tei_files"
+  @fixture_path Path.expand("../../fixtures/tei_files", __DIR__)
 
   describe "validate/1" do
     test "validates exported TEI from an imported fixture" do

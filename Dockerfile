@@ -33,6 +33,8 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
   libstdc++6 \
   openssl \
   libncurses6 \
+  chromium \
+  libxml2-utils \
   locales \
   ca-certificates && \
   rm -rf /var/lib/apt/lists/*

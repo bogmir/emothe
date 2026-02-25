@@ -5,6 +5,32 @@ This is a web application written using the Phoenix web framework.
 - Use `mix precommit` alias when you are done with all changes and fix any pending issues
 - Use the already included and available `:req` (`Req`) library for HTTP requests, **avoid** `:httpoison`, `:tesla`, and `:httpc`. Req is included by default and is the preferred HTTP client for Phoenix apps
 
+### Deployment and server status checks
+
+- Local Phoenix server status (listening ports):
+
+  ss -ltnp | grep ':4000\|:4001\|:8080' || true
+
+- Fly app status:
+
+  flyctl status --app emothe
+
+- Fly machines state:
+
+  flyctl machine list --app emothe
+
+- Recent deployment history:
+
+  flyctl releases --app emothe
+
+- Public endpoint reachability:
+
+  curl -I -m 20 https://emothe.fly.dev
+
+Notes:
+- `stopped` machines on Fly can be expected when `auto_stop_machines = 'stop'` and `min_machines_running = 0` are enabled.
+- If the endpoint times out on first request, retry once after 20-30s to allow cold start.
+
 ### Phoenix v1.8 guidelines
 
 - **Always** begin your LiveView templates with `<Layouts.app flash={@flash} ...>` which wraps all inner content

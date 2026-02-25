@@ -20,7 +20,7 @@ defmodule Emothe.Application do
       # Start a worker by calling: Emothe.Worker.start_link(arg)
       # {Emothe.Worker, arg},
       # PDF generation via headless Chrome
-      ChromicPDF,
+      {ChromicPDF, Application.get_env(:emothe, ChromicPDF, [])},
       # Start to serve requests, typically the last entry
       EmotheWeb.Endpoint
     ]

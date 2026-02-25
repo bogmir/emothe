@@ -68,6 +68,26 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :emothe, ChromicPDF,
+    no_sandbox: true,
+    discard_stderr: false,
+    chrome_args: "--disable-dev-shm-usage",
+    session_pool: [size: 1, timeout: 60_000, checkout_timeout: 60_000, init_timeout: 30_000]
+
+  otel_traces_exporter =
+    System.get_env("OTEL_TRACES_EXPORTER", "none")
+    |> String.downcase()
+
+  otel_traces_exporter_config =
+    case otel_traces_exporter do
+      "stdout" -> {:otel_exporter_stdout, []}
+      "otlp" -> :otlp
+      _ -> :none
+    end
+
+  config :opentelemetry,
+    traces_exporter: otel_traces_exporter_config
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

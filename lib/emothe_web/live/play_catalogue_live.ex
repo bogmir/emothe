@@ -81,7 +81,8 @@ defmodule EmotheWeb.PlayCatalogueLive do
         >
           <div class="flex items-center gap-3">
             <.link
-              navigate={~p"/plays/#{play.code}"}
+              href={~p"/plays/#{play.code}"}
+              target="_blank"
               class="flex-1 min-w-0"
             >
               <span class="font-semibold text-base-content hover:text-primary transition-colors">

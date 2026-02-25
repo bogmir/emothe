@@ -41,7 +41,9 @@ defmodule EmotheWeb.Admin.ImportLive do
     # Consume uploads: copy each to a stable temp path so we can process async
     pending_files =
       consume_uploaded_entries(socket, :tei_files, fn %{path: path}, entry ->
-        dest = Path.join(System.tmp_dir!(), "emothe-import-#{System.unique_integer([:positive])}.xml")
+        dest =
+          Path.join(System.tmp_dir!(), "emothe-import-#{System.unique_integer([:positive])}.xml")
+
         File.cp!(path, dest)
         {:ok, {dest, entry.client_name}}
       end)
@@ -258,7 +260,10 @@ defmodule EmotheWeb.Admin.ImportLive do
       </div>
 
       <%!-- Success results --%>
-      <div :if={@successes != [] && !@importing} class="card border border-base-300 bg-base-100 shadow-sm">
+      <div
+        :if={@successes != [] && !@importing}
+        class="card border border-base-300 bg-base-100 shadow-sm"
+      >
         <div class="card-body">
           <h2 class="card-title">{gettext("Imported Plays")}</h2>
           <div class="overflow-x-auto">

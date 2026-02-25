@@ -31,7 +31,9 @@ defmodule Emothe.Export.TeiValidatorTest do
     end
 
     test "returns errors for malformed XML" do
-      invalid_xml = ~s(<?xml version="1.0"?>\n<TEI xmlns="http://www.tei-c.org/ns/1.0"><bad></TEI>)
+      invalid_xml =
+        ~s(<?xml version="1.0"?>\n<TEI xmlns="http://www.tei-c.org/ns/1.0"><bad></TEI>)
+
       assert {:error, errors} = TeiValidator.validate(invalid_xml)
       assert is_list(errors)
       assert length(errors) > 0

@@ -54,6 +54,7 @@ defmodule EmotheWeb.Router do
 
     # Public play catalogue and presentation
     live_session :public,
+      layout: {EmotheWeb.Layouts, :app},
       on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :mount_current_user}] do
       live "/plays", PlayCatalogueLive, :index
       live "/plays/:code", PlayShowLive, :show

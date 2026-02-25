@@ -219,6 +219,68 @@ defmodule Emothe.Catalogue do
     PlayEditorialNote.changeset(note, attrs)
   end
 
+  @doc """
+  Lists root plays (no parent) with their derived plays preloaded.
+  Search matches root or derived plays; if a derived play matches, its parent group is included.
+  """
+  def list_plays_grouped(opts \\ []) do
+    query =
+      Play
+      |> where([p], is_nil(p.parent_play_id))
+      |> apply_search_grouped(opts[:search])
+      |> apply_sort(opts[:sort] || :title_sort)
+
+    plays =
+      case opts[:page] do
+        nil ->
+          Repo.all(query)
+
+        page ->
+          per_page = opts[:per_page] || @per_page
+          offset = (page - 1) * per_page
+
+          query
+          |> limit(^per_page)
+          |> offset(^offset)
+          |> Repo.all()
+      end
+
+    Repo.preload(plays,
+      derived_plays: from(d in Play, order_by: [asc: d.title_sort, asc: d.title])
+    )
+  end
+
+  def count_plays_grouped(opts \\ []) do
+    Play
+    |> where([p], is_nil(p.parent_play_id))
+    |> apply_search_grouped(opts[:search])
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp apply_search_grouped(query, nil), do: query
+  defp apply_search_grouped(query, ""), do: query
+
+  defp apply_search_grouped(query, search) do
+    pattern = "%#{search}%"
+
+    derived_match =
+      from(d in Play,
+        where: not is_nil(d.parent_play_id),
+        where:
+          ilike(d.title, ^pattern) or
+            ilike(d.author_name, ^pattern) or
+            ilike(d.code, ^pattern),
+        select: d.parent_play_id
+      )
+
+    from p in query,
+      where:
+        ilike(p.title, ^pattern) or
+          ilike(p.author_name, ^pattern) or
+          ilike(p.code, ^pattern) or
+          p.id in subquery(derived_match)
+  end
+
   def list_plays_for_select do
     Play
     |> order_by([p], asc: p.title_sort, asc: p.title)

@@ -10,13 +10,25 @@
     <span class="text-base-content/30 hidden sm:inline">|</span>
     <nav class="hidden sm:flex items-center gap-1">
       <a href="/plays" class="btn btn-ghost btn-xs">{gettext("Catalogue")}</a>
+      <%= if assigns[:current_user] && @current_user.role == :admin do %>
+        <a href="/admin/plays" class="btn btn-ghost btn-xs">{gettext("Plays")}</a>
+        <a href="/admin/plays/import" class="btn btn-ghost btn-xs">{gettext("Import")}</a>
+      <% end %>
     </nav>
   </div>
   <div class="flex-none flex items-center gap-2">
     <.locale_toggle locale={assigns[:locale] || "es"} />
     <.theme_toggle />
+    <%= if assigns[:current_user] && @current_user.role == :admin do %>
+      <a
+        href="/admin/dashboard"
+        class="btn btn-ghost btn-xs btn-square text-base-content/70"
+        title={gettext("Dashboard")}
+      >
+        <.icon name="hero-chart-bar-micro" class="size-3.5" />
+      </a>
+    <% end %>
     <%= if assigns[:current_user] do %>
-      <a href="/admin/plays" class="btn btn-ghost btn-xs">{gettext("Admin")}</a>
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-xs gap-1">
           <.icon name="hero-user-circle-micro" class="size-4" />

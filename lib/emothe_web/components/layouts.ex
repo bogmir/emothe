@@ -145,6 +145,13 @@ defmodule EmotheWeb.Layouts do
             {gettext("Content")}
           </.link>
           <.link
+            :if={@play.relationship_type == "traduccion" && @play.parent_play_id}
+            navigate={~p"/admin/plays/#{@play.id}/compare"}
+            class={ctx_tab_class(@active_tab == :compare)}
+          >
+            <.icon name="hero-arrows-right-left-micro" class="size-3.5" /> {gettext("Comparison")}
+          </.link>
+          <.link
             navigate={~p"/plays/#{@play.code}"}
             class={ctx_tab_class(@active_tab == :public)}
           >

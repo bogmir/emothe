@@ -67,11 +67,106 @@ const ScrollSpy = {
   }
 }
 
+// SyncScroll hook: synchronizes scroll position between two comparison panels.
+// Tracks which panel the user is hovering over to avoid feedback loops.
+const SyncScroll = {
+  mounted() { this._setup() },
+  updated() { this._setup() },
+  destroyed() { this._cleanup() },
+  _cleanup() {
+    if (this._leftHandler) this._left?.removeEventListener("scroll", this._leftHandler)
+    if (this._rightHandler) this._right?.removeEventListener("scroll", this._rightHandler)
+    if (this._left) {
+      this._left.removeEventListener("pointerenter", this._leftEnter)
+      this._left.removeEventListener("pointerleave", this._leftLeave)
+    }
+    if (this._right) {
+      this._right.removeEventListener("pointerenter", this._rightEnter)
+      this._right.removeEventListener("pointerleave", this._rightLeave)
+    }
+  },
+  _setup() {
+    this._cleanup()
+
+    this._left = this.el.querySelector('[data-panel="left"]')
+    this._right = this.el.querySelector('[data-panel="right"]')
+    if (!this._left || !this._right) return
+
+    // Track which panel the user is actively scrolling
+    this._activePanel = null
+
+    this._leftEnter = () => { this._activePanel = "left" }
+    this._leftLeave = () => { if (this._activePanel === "left") this._activePanel = null }
+    this._rightEnter = () => { this._activePanel = "right" }
+    this._rightLeave = () => { if (this._activePanel === "right") this._activePanel = null }
+
+    this._left.addEventListener("pointerenter", this._leftEnter)
+    this._left.addEventListener("pointerleave", this._leftLeave)
+    this._right.addEventListener("pointerenter", this._rightEnter)
+    this._right.addEventListener("pointerleave", this._rightLeave)
+
+    // Find the topmost visible anchor (speech or division heading) in a panel
+    const findTopAnchor = (panel) => {
+      const anchors = panel.querySelectorAll("[data-speech-key], [data-sync-div]")
+      const panelTop = panel.getBoundingClientRect().top
+      let best = null
+      let bestDist = Infinity
+      let bestAttr = null
+      for (const el of anchors) {
+        const top = el.getBoundingClientRect().top - panelTop
+        if (top >= -50 && top < bestDist) {
+          bestDist = top
+          best = el
+          bestAttr = el.hasAttribute("data-speech-key") ? "data-speech-key" : "data-sync-div"
+        }
+      }
+      return best ? { el: best, attr: bestAttr, key: best.getAttribute(bestAttr) } : null
+    }
+
+    const syncTo = (source, target) => {
+      const anchor = findTopAnchor(source)
+      if (!anchor) return
+      const match = target.querySelector(`[${anchor.attr}="${anchor.key}"]`)
+      if (match) {
+        // How far the anchor is from the top of the source panel
+        const sourceOffset = anchor.el.getBoundingClientRect().top - source.getBoundingClientRect().top
+        // How far the match currently is from the top of the target panel
+        const matchOffset = match.getBoundingClientRect().top - target.getBoundingClientRect().top
+        // Scroll target so the match sits at the same offset as the anchor
+        target.scrollTop += (matchOffset - sourceOffset)
+      }
+    }
+
+    // Throttle sync to one rAF per scroll burst
+    let rafId = null
+    const throttledSync = (source, target) => {
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        syncTo(source, target)
+      })
+    }
+
+    this._leftHandler = () => {
+      if (this._activePanel === "left") throttledSync(this._left, this._right)
+    }
+    this._rightHandler = () => {
+      if (this._activePanel === "right") throttledSync(this._right, this._left)
+    }
+
+    this._left.addEventListener("scroll", this._leftHandler, { passive: true })
+    this._right.addEventListener("scroll", this._rightHandler, { passive: true })
+
+    // Initial alignment: sync right panel to left after DOM settles
+    requestAnimationFrame(() => syncTo(this._left, this._right))
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, ScrollSpy},
+  hooks: {...colocatedHooks, ScrollSpy, SyncScroll},
 })
 
 // Show progress bar on live navigation and form submits

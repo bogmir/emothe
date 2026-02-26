@@ -207,6 +207,7 @@ Then visit:
 - [ ] **Multi-character `who` attrs** (`who="#ALB #COR"`) — parser can't resolve to single character_id; speeches get `character_id=nil`, losing `who` on export (warn-only in roundtrip test)
 
 ### Low Priority / Future
+- [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
 - [ ] **User management** admin page (list users, change roles)

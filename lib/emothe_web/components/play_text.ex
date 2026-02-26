@@ -12,12 +12,14 @@ defmodule EmotheWeb.Components.PlayText do
   attr :show_asides, :boolean, default: true
   attr :show_split_verses, :boolean, default: true
   attr :show_verse_type, :boolean, default: false
+  attr :sync_keys, :boolean, default: false
 
   def play_body(assigns) do
     ~H"""
     <div class="play-text">
       <div :for={division <- @divisions} class="mb-8 scroll-mt-16" id={"div-#{division.id}"}>
-        <.division_heading division={division} />
+        <% div_key = if @sync_keys, do: div_key_for(division), else: nil %>
+        <.division_heading division={division} sync_key={div_key} />
 
         <%!-- Render inline cast list for elenco divisions --%>
         <.cast_list :if={division.type == "elenco"} characters={@characters} />
@@ -30,6 +32,7 @@ defmodule EmotheWeb.Components.PlayText do
             show_asides={@show_asides}
             show_split_verses={@show_split_verses}
             show_verse_type={@show_verse_type}
+            div_key={div_key}
           />
         </div>
 
@@ -38,7 +41,8 @@ defmodule EmotheWeb.Components.PlayText do
           class="mb-6 scroll-mt-16"
           id={"div-#{child.id}"}
         >
-          <.division_heading division={child} />
+          <% child_key = if @sync_keys, do: "#{div_key}/#{div_key_for(child)}", else: nil %>
+          <.division_heading division={child} sync_key={child_key} />
           <div :if={Map.has_key?(child, :loaded_elements)}>
             <.element_list
               elements={Map.get(child, :loaded_elements, [])}
@@ -47,6 +51,7 @@ defmodule EmotheWeb.Components.PlayText do
               show_asides={@show_asides}
               show_split_verses={@show_split_verses}
               show_verse_type={@show_verse_type}
+              div_key={child_key}
             />
           </div>
         </div>
@@ -55,9 +60,14 @@ defmodule EmotheWeb.Components.PlayText do
     """
   end
 
+  defp div_key_for(division) do
+    "#{division.type}-#{division.number || division.position}"
+  end
+
   @act_types ~w(acto act acte jornada play)
 
   attr :division, :map, required: true
+  attr :sync_key, :string, default: nil
 
   defp division_heading(assigns) do
     assigns = assign(assigns, :is_act, assigns.division.type in @act_types)
@@ -66,12 +76,14 @@ defmodule EmotheWeb.Components.PlayText do
     <h2
       :if={@division.title && @is_act}
       class="font-bold text-center my-6 text-lg uppercase tracking-wide play-act-title"
+      {if @sync_key, do: %{"data-sync-div" => @sync_key}, else: %{}}
     >
       {@division.title}
     </h2>
     <h3
       :if={@division.title && !@is_act}
       class="font-semibold text-center my-4 text-xs uppercase tracking-widest play-scene-title"
+      {if @sync_key, do: %{"data-sync-div" => @sync_key}, else: %{}}
     >
       {@division.title}
     </h3>
@@ -106,8 +118,22 @@ defmodule EmotheWeb.Components.PlayText do
   attr :show_asides, :boolean, default: true
   attr :show_split_verses, :boolean, default: true
   attr :show_verse_type, :boolean, default: false
+  attr :div_key, :string, default: nil
 
   defp element_list(assigns) do
+    # Assign speech-only ordinals for stable sync keys across translations
+    assigns =
+      if assigns.div_key do
+        {elements_with_idx, _} =
+          Enum.map_reduce(assigns.elements, 0, fn el, idx ->
+            if el.type == "speech", do: {Map.put(el, :speech_ordinal, idx), idx + 1}, else: {el, idx}
+          end)
+
+        assign(assigns, :elements, elements_with_idx)
+      else
+        assigns
+      end
+
     ~H"""
     <div>
       <div :for={element <- @elements}>
@@ -118,6 +144,7 @@ defmodule EmotheWeb.Components.PlayText do
           show_asides={@show_asides}
           show_split_verses={@show_split_verses}
           show_verse_type={@show_verse_type}
+          div_key={@div_key}
         />
       </div>
     </div>
@@ -130,12 +157,22 @@ defmodule EmotheWeb.Components.PlayText do
   attr :show_asides, :boolean, default: true
   attr :show_split_verses, :boolean, default: true
   attr :show_verse_type, :boolean, default: false
+  attr :div_key, :string, default: nil
 
   defp render_element(%{element: %{type: "speech"}} = assigns) do
+    assigns =
+      assign(assigns, :speech_key,
+        if assigns.div_key do
+          ordinal = Map.get(assigns.element, :speech_ordinal, assigns.element.position)
+          "#{assigns.div_key}/speech-#{ordinal}"
+        end
+      )
+
     ~H"""
     <div
       :if={!@element.is_aside || @show_asides}
       class={["speech mt-3 mb-5", @element.is_aside && "pl-6 aside-border"]}
+      {if @speech_key, do: %{"data-speech-key" => @speech_key}, else: %{}}
     >
       <div :if={@element.speaker_label} class="speaker mb-1">
         {@element.speaker_label}
@@ -148,6 +185,7 @@ defmodule EmotheWeb.Components.PlayText do
           show_asides={@show_asides}
           show_split_verses={@show_split_verses}
           show_verse_type={@show_verse_type}
+          div_key={@div_key}
         />
       </div>
     </div>
@@ -174,6 +212,7 @@ defmodule EmotheWeb.Components.PlayText do
           show_asides={@show_asides}
           show_split_verses={@show_split_verses}
           show_verse_type={@show_verse_type}
+          div_key={@div_key}
         />
       </div>
     </div>

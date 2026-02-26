@@ -79,6 +79,7 @@ msgstr ""
 
 #: lib/emothe_web/components/layouts/app.html.heex:19
 #: lib/emothe_web/live/admin/import_live.ex:20
+#: lib/emothe_web/live/admin/play_compare_live.ex:40
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:42
 #: lib/emothe_web/live/admin/play_detail_live.ex:27
 #: lib/emothe_web/live/admin/play_editors_live.ex:20
@@ -111,6 +112,7 @@ msgid "Aside Verses"
 msgstr ""
 
 #: lib/emothe_web/components/statistics_panel.ex:65
+#: lib/emothe_web/live/admin/play_compare_live.ex:99
 #: lib/emothe_web/live/play_show_live.ex:192
 #, elixir-autogen, elixir-format
 msgid "Asides"
@@ -622,6 +624,7 @@ msgstr ""
 msgid "Line Number"
 msgstr ""
 
+#: lib/emothe_web/live/admin/play_compare_live.ex:83
 #: lib/emothe_web/live/play_show_live.ex:176
 #, elixir-autogen, elixir-format
 msgid "Line numbers"
@@ -829,6 +832,7 @@ msgstr ""
 #: lib/emothe_web/components/layouts/admin.html.heex:12
 #: lib/emothe_web/components/statistics_panel.ex:189
 #: lib/emothe_web/live/admin/import_live.ex:21
+#: lib/emothe_web/live/admin/play_compare_live.ex:41
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:43
 #: lib/emothe_web/live/admin/play_detail_live.ex:28
 #: lib/emothe_web/live/admin/play_editors_live.ex:21
@@ -870,7 +874,7 @@ msgstr ""
 msgid "Prose text..."
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:151
+#: lib/emothe_web/components/layouts.ex:158
 #, elixir-autogen, elixir-format
 msgid "Public"
 msgstr ""
@@ -1065,6 +1069,7 @@ msgstr ""
 msgid "Stage direction text..."
 msgstr ""
 
+#: lib/emothe_web/live/admin/play_compare_live.ex:91
 #: lib/emothe_web/live/play_show_live.ex:184
 #, elixir-autogen, elixir-format
 msgid "Stage directions"
@@ -1596,6 +1601,7 @@ msgstr ""
 msgid "Sources"
 msgstr ""
 
+#: lib/emothe_web/live/admin/play_compare_live.ex:107
 #: lib/emothe_web/live/play_show_live.ex:200
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Split verses"
@@ -1634,6 +1640,7 @@ msgstr ""
 msgid "Usage terms and citation info"
 msgstr ""
 
+#: lib/emothe_web/live/admin/play_compare_live.ex:115
 #: lib/emothe_web/live/play_show_live.ex:208
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Verse type"
@@ -1985,6 +1992,7 @@ msgstr ""
 msgid "Title (sort)"
 msgstr ""
 
+#: lib/emothe_web/live/admin/play_compare_live.ex:150
 #: lib/emothe_web/live/admin/play_detail_live.ex:52
 #: lib/emothe_web/live/admin/play_form_live.ex:136
 #: lib/emothe_web/live/play_show_live.ex:401
@@ -2093,4 +2101,30 @@ msgstr ""
 #: lib/emothe_web/live/admin/import_live.ex:297
 #, elixir-autogen, elixir-format
 msgid "and %{count} more"
+msgstr ""
+
+#: lib/emothe_web/live/admin/play_compare_live.ex:27
+#, elixir-autogen, elixir-format
+msgid "Compare: %{title}"
+msgstr ""
+
+#: lib/emothe_web/components/layouts.ex:152
+#: lib/emothe_web/live/admin/play_compare_live.ex:43
+#, elixir-autogen, elixir-format
+msgid "Comparison"
+msgstr ""
+
+#: lib/emothe_web/live/admin/play_compare_live.ex:76
+#, elixir-autogen, elixir-format
+msgid "Display"
+msgstr ""
+
+#: lib/emothe_web/live/admin/play_compare_live.ex:125
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Original"
+msgstr ""
+
+#: lib/emothe_web/live/admin/play_compare_live.ex:16
+#, elixir-autogen, elixir-format
+msgid "This play is not a translation with a linked original."
 msgstr ""

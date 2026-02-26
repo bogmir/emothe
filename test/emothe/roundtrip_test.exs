@@ -472,9 +472,27 @@ defmodule Emothe.RoundtripTest do
     AL0845_LaQuintaDeFlorencia.xml
     AL2000_LaEstrellaDeSevilla.xml
     EMOTHE0008_LeCid.xml
+    EMOTHE0010_TheTragedyOfHamletPrinceOfDenmark_test.xml
     EMOTHE0020_LaVidaEsSueno.xml
     EMOTHE0033_Athalie.xml
+    EMOTHE0038_AntonyAndCleopatra.xml
+    EMOTHE0050_Amleto.xml
+    EMOTHE0052_AntonioYCleopatra.xml
+    EMOTHE0053_Hamlet.xml
+    EMOTHE0059_LaTragiqueHistoireDeHamletPrinceDeDanemark.xml
+    EMOTHE0084_AntoineEtCleopatre.xml
+    EMOTHE0139_AntonioECleopatra.xml
     EMOTHE0254_JulesCesar.xml
+    EMOTHE0281_AChasteMaidInCheapside.xml
+    EMOTHE0647_ElReyLear.xml
+    EMOTHE0648_LeRoiLear.xml
+    EMOTHE0663_LaSilvia.xml
+    EMOTHE0670_LasMocedadesDelCidComediaSegunda.xml
+    EMOTHE0703_RicardoIii.xml
+    EMOTHE0744_ComediaDeLosVillalpandos.xml
+    EMOTHE0756_LaDianaComedia.xml
+    EMOTHE0761_TheWonderOfWomenOrSophonisba.xml
+    EMOTHE0775_TheCoffer.xml
   )
 
   if File.dir?(@fixtures_dir) do

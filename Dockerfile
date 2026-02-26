@@ -47,12 +47,13 @@ ENV LC_ALL=en_US.UTF-8
 WORKDIR /app
 
 COPY --from=build /app/_build/prod/rel/emothe ./
+COPY entrypoint.sh /app/entrypoint.sh
 
-RUN chown -R nobody:nogroup /app
+RUN chmod +x /app/entrypoint.sh && chown -R nobody:nogroup /app
 USER nobody:nogroup
 
 ENV HOME=/app
 ENV PHX_SERVER=true
 EXPOSE 8080
 
-CMD ["/app/bin/emothe", "start"]
+ENTRYPOINT ["/app/entrypoint.sh"]

@@ -1,0 +1,30 @@
+databases:
+  - name: emothe-db
+    databaseName: emothe
+    user: emothe
+    plan: free
+
+services:
+  - type: web
+    name: emothe-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    autoDeploy: true
+    preDeployCommand: /app/bin/emothe eval Emothe.Release.migrate
+    envVars:
+      - key: PHX_SERVER
+        value: "true"
+      - key: MIX_ENV
+        value: prod
+      - key: POOL_SIZE
+        value: "10"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: emothe-db
+          property: connectionString
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: OTEL_TRACES_EXPORTER
+        value: none

@@ -8,7 +8,7 @@ services:
   - type: web
     name: emothe-web
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Dockerfile.render
     plan: free
     healthCheckPath: /
     autoDeploy: true

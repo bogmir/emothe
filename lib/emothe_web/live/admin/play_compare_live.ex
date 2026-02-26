@@ -129,7 +129,11 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
               {@parent_play.author_name} — {@parent_play.code}
             </p>
           </div>
-          <div class="overflow-y-auto px-4 py-4 compare-panel" data-panel="left" style="max-height: calc(100vh - 220px);">
+          <div
+            class="overflow-y-auto px-4 py-4 compare-panel"
+            data-panel="left"
+            style="max-height: calc(100vh - 220px);"
+          >
             <.play_body
               divisions={@parent_divisions}
               characters={@parent_characters}
@@ -154,7 +158,11 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
               {@play.author_name} — {@play.code}
             </p>
           </div>
-          <div class="overflow-y-auto px-4 py-4 compare-panel" data-panel="right" style="max-height: calc(100vh - 220px);">
+          <div
+            class="overflow-y-auto px-4 py-4 compare-panel"
+            data-panel="right"
+            style="max-height: calc(100vh - 220px);"
+          >
             <.play_body
               divisions={@play_divisions}
               characters={@play_characters}

@@ -126,7 +126,9 @@ defmodule EmotheWeb.Components.PlayText do
       if assigns.div_key do
         {elements_with_idx, _} =
           Enum.map_reduce(assigns.elements, 0, fn el, idx ->
-            if el.type == "speech", do: {Map.put(el, :speech_ordinal, idx), idx + 1}, else: {el, idx}
+            if el.type == "speech",
+              do: {Map.put(el, :speech_ordinal, idx), idx + 1},
+              else: {el, idx}
           end)
 
         assign(assigns, :elements, elements_with_idx)
@@ -161,7 +163,9 @@ defmodule EmotheWeb.Components.PlayText do
 
   defp render_element(%{element: %{type: "speech"}} = assigns) do
     assigns =
-      assign(assigns, :speech_key,
+      assign(
+        assigns,
+        :speech_key,
         if assigns.div_key do
           ordinal = Map.get(assigns.element, :speech_ordinal, assigns.element.position)
           "#{assigns.div_key}/speech-#{ordinal}"

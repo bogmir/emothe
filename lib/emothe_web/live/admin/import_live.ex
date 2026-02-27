@@ -1,7 +1,7 @@
 defmodule EmotheWeb.Admin.ImportLive do
   use EmotheWeb, :live_view
 
-  alias Emothe.Export.TeiValidator
+  # alias Emothe.Export.TeiValidator
   alias Emothe.Import.TeiParser
 
   require Logger
@@ -141,7 +141,8 @@ defmodule EmotheWeb.Admin.ImportLive do
     socket =
       case TeiParser.import_file(path) do
         {:ok, play} ->
-          validation_warnings = validate_source_file(path)
+          # validation_warnings = validate_source_file(path)
+          validation_warnings = []
           success = {filename, play.title, play.code, play.id, validation_warnings}
           update(socket, :successes, &[success | &1])
 

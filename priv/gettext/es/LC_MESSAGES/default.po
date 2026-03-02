@@ -570,7 +570,7 @@ msgstr "Errores de importación"
 #: lib/emothe_web/live/admin/import_live.ex:191
 #, elixir-autogen, elixir-format
 msgid "Import one or many TEI files and review successful ingestions."
-msgstr "Importe uno o varios archivos TEI y revise las ingestas correctas."
+msgstr "Importe uno o varios archivos TEI y verifique que se hayan importado correctamente."
 
 #: lib/emothe_web/live/admin/import_live.ex:267
 #, elixir-autogen, elixir-format

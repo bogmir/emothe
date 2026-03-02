@@ -140,6 +140,5 @@ if config_env() == :prod do
       no_mx_lookups: true
   end
 
-  config :emothe, :mail_from,
-    System.get_env("MAIL_FROM", "noreply@emothe.uv.es")
+  config :emothe, :mail_from, System.get_env("MAIL_FROM", "noreply@emothe.uv.es")
 end

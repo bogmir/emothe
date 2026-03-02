@@ -177,9 +177,7 @@ defmodule EmotheWeb.Admin.UserListLive do
                         phx-click="set_role"
                         phx-value-id={user.id}
                         phx-value-role="researcher"
-                        data-confirm={
-                          gettext("Demote %{email} to researcher?", email: user.email)
-                        }
+                        data-confirm={gettext("Demote %{email} to researcher?", email: user.email)}
                         class="btn btn-ghost btn-xs tooltip tooltip-left"
                         data-tip={gettext("Demote to researcher")}
                       >
@@ -190,9 +188,7 @@ defmodule EmotheWeb.Admin.UserListLive do
                         phx-click="set_role"
                         phx-value-id={user.id}
                         phx-value-role="admin"
-                        data-confirm={
-                          gettext("Promote %{email} to admin?", email: user.email)
-                        }
+                        data-confirm={gettext("Promote %{email} to admin?", email: user.email)}
                         class="btn btn-ghost btn-xs tooltip tooltip-left"
                         data-tip={gettext("Promote to admin")}
                       >

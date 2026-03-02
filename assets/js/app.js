@@ -67,43 +67,35 @@ const ScrollSpy = {
   }
 }
 
-// SyncScroll hook: synchronizes scroll position between two comparison panels.
+// SyncScroll hook: synchronizes scroll position between N comparison panels.
 // Tracks which panel the user is hovering over to avoid feedback loops.
 const SyncScroll = {
   mounted() { this._setup() },
   updated() { this._setup() },
   destroyed() { this._cleanup() },
   _cleanup() {
-    if (this._leftHandler) this._left?.removeEventListener("scroll", this._leftHandler)
-    if (this._rightHandler) this._right?.removeEventListener("scroll", this._rightHandler)
-    if (this._left) {
-      this._left.removeEventListener("pointerenter", this._leftEnter)
-      this._left.removeEventListener("pointerleave", this._leftLeave)
+    if (this._handlers) {
+      this._panels.forEach((panel, i) => {
+        panel.removeEventListener("scroll", this._handlers[i])
+        panel.removeEventListener("pointerenter", this._enters[i])
+        panel.removeEventListener("pointerleave", this._leaves[i])
+      })
     }
-    if (this._right) {
-      this._right.removeEventListener("pointerenter", this._rightEnter)
-      this._right.removeEventListener("pointerleave", this._rightLeave)
-    }
+    this._panels = []
+    this._handlers = []
+    this._enters = []
+    this._leaves = []
   },
   _setup() {
     this._cleanup()
 
-    this._left = this.el.querySelector('[data-panel="left"]')
-    this._right = this.el.querySelector('[data-panel="right"]')
-    if (!this._left || !this._right) return
+    this._panels = Array.from(this.el.querySelectorAll("[data-panel]"))
+    if (this._panels.length < 2) return
 
-    // Track which panel the user is actively scrolling
     this._activePanel = null
-
-    this._leftEnter = () => { this._activePanel = "left" }
-    this._leftLeave = () => { if (this._activePanel === "left") this._activePanel = null }
-    this._rightEnter = () => { this._activePanel = "right" }
-    this._rightLeave = () => { if (this._activePanel === "right") this._activePanel = null }
-
-    this._left.addEventListener("pointerenter", this._leftEnter)
-    this._left.addEventListener("pointerleave", this._leftLeave)
-    this._right.addEventListener("pointerenter", this._rightEnter)
-    this._right.addEventListener("pointerleave", this._rightLeave)
+    this._handlers = []
+    this._enters = []
+    this._leaves = []
 
     // Find the topmost visible anchor (speech or division heading) in a panel
     const findTopAnchor = (panel) => {
@@ -128,37 +120,46 @@ const SyncScroll = {
       if (!anchor) return
       const match = target.querySelector(`[${anchor.attr}="${anchor.key}"]`)
       if (match) {
-        // How far the anchor is from the top of the source panel
         const sourceOffset = anchor.el.getBoundingClientRect().top - source.getBoundingClientRect().top
-        // How far the match currently is from the top of the target panel
         const matchOffset = match.getBoundingClientRect().top - target.getBoundingClientRect().top
-        // Scroll target so the match sits at the same offset as the anchor
         target.scrollTop += (matchOffset - sourceOffset)
       }
     }
 
     // Throttle sync to one rAF per scroll burst
     let rafId = null
-    const throttledSync = (source, target) => {
+    const throttledSync = (source, targets) => {
       if (rafId) return
       rafId = requestAnimationFrame(() => {
         rafId = null
-        syncTo(source, target)
+        targets.forEach(t => syncTo(source, t))
       })
     }
 
-    this._leftHandler = () => {
-      if (this._activePanel === "left") throttledSync(this._left, this._right)
-    }
-    this._rightHandler = () => {
-      if (this._activePanel === "right") throttledSync(this._right, this._left)
-    }
+    this._panels.forEach((panel, i) => {
+      const enter = () => { this._activePanel = i }
+      const leave = () => { if (this._activePanel === i) this._activePanel = null }
+      const handler = () => {
+        if (this._activePanel === i) {
+          const others = this._panels.filter((_, j) => j !== i)
+          throttledSync(panel, others)
+        }
+      }
 
-    this._left.addEventListener("scroll", this._leftHandler, { passive: true })
-    this._right.addEventListener("scroll", this._rightHandler, { passive: true })
+      this._enters.push(enter)
+      this._leaves.push(leave)
+      this._handlers.push(handler)
 
-    // Initial alignment: sync right panel to left after DOM settles
-    requestAnimationFrame(() => syncTo(this._left, this._right))
+      panel.addEventListener("pointerenter", enter)
+      panel.addEventListener("pointerleave", leave)
+      panel.addEventListener("scroll", handler, { passive: true })
+    })
+
+    // Initial alignment: sync all panels to the first one
+    requestAnimationFrame(() => {
+      const others = this._panels.slice(1)
+      others.forEach(t => syncTo(this._panels[0], t))
+    })
   }
 }
 

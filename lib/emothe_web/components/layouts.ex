@@ -145,7 +145,6 @@ defmodule EmotheWeb.Layouts do
             {gettext("Content")}
           </.link>
           <.link
-            :if={@play.relationship_type == "traduccion" && @play.parent_play_id}
             navigate={~p"/admin/plays/#{@play.id}/compare"}
             class={ctx_tab_class(@active_tab == :compare)}
           >

@@ -410,6 +410,13 @@ defmodule Emothe.Accounts do
   Updates the role of a user.
   """
   def update_user_role(%User{} = user, role) do
-    user |> User.role_changeset(%{role: role}) |> Repo.update()
+    changeset = User.role_changeset(user, %{role: role})
+
+    changeset =
+      if role in ["admin", :admin] and is_nil(user.confirmed_at),
+        do: Ecto.Changeset.change(changeset, %{confirmed_at: DateTime.utc_now(:second)}),
+        else: changeset
+
+    Repo.update(changeset)
   end
 end

@@ -74,7 +74,7 @@ defmodule EmotheWeb.PlayShowLive do
     ~H"""
     <div class="play-text-page min-h-screen">
       <div class="max-w-7xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-6">
-        <%!-- Sidebar toggle (mobile + desktop) --%>
+        <%!-- Sidebar --%>
         <aside id="play-sections-panel" class="mb-4 lg:mb-0 lg:sticky lg:top-16 lg:self-start">
           <div class="rounded-box border border-base-300 bg-base-100/90 backdrop-blur-sm shadow-sm">
             <div class="flex items-center justify-between px-3 py-2.5">
@@ -85,7 +85,9 @@ defmodule EmotheWeb.PlayShowLive do
                 <.icon name="hero-list-bullet-micro" class="size-4" /> {gettext("Contents")}
                 <.icon
                   name={
-                    if @sidebar_open, do: "hero-chevron-up-micro", else: "hero-chevron-down-micro"
+                    if @sidebar_open,
+                      do: "hero-chevron-up-micro",
+                      else: "hero-chevron-down-micro"
                   }
                   class="size-4 text-base-content/40"
                 />
@@ -215,14 +217,16 @@ defmodule EmotheWeb.PlayShowLive do
             navigate={~p"/plays"}
             class="mt-2 flex items-center gap-1.5 rounded-box border border-base-300 bg-base-100/90 px-3 py-2 text-xs text-base-content/60 hover:text-primary hover:border-primary/30 transition-colors"
           >
-            <.icon name="hero-arrow-left-micro" class="size-3.5" /> {gettext("Back to Catalogue")}
+            <.icon name="hero-arrow-left-micro" class="size-3.5" />
+            {gettext("Back to Catalogue")}
           </.link>
           <.link
             :if={assigns[:current_user]}
             navigate={~p"/admin/plays/#{@play.id}"}
             class="mt-1 flex items-center gap-1.5 rounded-box border border-base-300 bg-base-100/90 px-3 py-2 text-xs text-base-content/60 hover:text-primary hover:border-primary/30 transition-colors"
           >
-            <.icon name="hero-pencil-square-micro" class="size-3.5" /> {gettext("Edit in Admin")}
+            <.icon name="hero-pencil-square-micro" class="size-3.5" />
+            {gettext("Edit in Admin")}
           </.link>
         </aside>
 
@@ -297,7 +301,10 @@ defmodule EmotheWeb.PlayShowLive do
                   )
               end}
             </p>
-            <p :if={@play.licence_url || @play.licence_text} class="mt-1 text-xs text-base-content/40">
+            <p
+              :if={@play.licence_url || @play.licence_text}
+              class="mt-1 text-xs text-base-content/40"
+            >
               <%= if @play.licence_url do %>
                 <a
                   href={@play.licence_url}

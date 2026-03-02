@@ -7,6 +7,23 @@
       <img src={~p"/images/logo.svg"} width="28" />
       <span class="text-sm font-bold tracking-tight">EMOTHE</span>
     </a>
+    <%!-- Mobile hamburger menu --%>
+    <div class="dropdown sm:hidden">
+      <label tabindex="0" class="btn btn-ghost btn-xs btn-square">
+        <.icon name="hero-bars-3-micro" class="size-4" />
+      </label>
+      <ul
+        tabindex="0"
+        class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-44 border border-base-300"
+      >
+        <li><a href="/plays">{gettext("Catalogue")}</a></li>
+        <%= if assigns[:current_user] && @current_user.role == :admin do %>
+          <li><a href="/admin/plays">{gettext("Plays")}</a></li>
+          <li><a href="/admin/plays/import">{gettext("Import")}</a></li>
+        <% end %>
+      </ul>
+    </div>
+    <%!-- Desktop navigation --%>
     <span class="text-base-content/30 hidden sm:inline">|</span>
     <nav class="hidden sm:flex items-center gap-1">
       <a href="/plays" class="btn btn-ghost btn-xs">{gettext("Catalogue")}</a>
@@ -46,7 +63,6 @@
         </ul>
       </div>
     <% else %>
-      <a href="/users/register" class="btn btn-ghost btn-xs">{gettext("Register")}</a>
       <a href="/users/log-in" class="btn btn-primary btn-xs">{gettext("Log in")}</a>
     <% end %>
   </div>

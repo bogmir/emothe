@@ -92,7 +92,6 @@ defmodule EmotheWeb.PlayShowLive do
                   class="size-4 text-base-content/40"
                 />
               </button>
-              <Layouts.theme_toggle />
             </div>
 
             <div

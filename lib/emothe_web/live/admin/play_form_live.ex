@@ -4,6 +4,12 @@ defmodule EmotheWeb.Admin.PlayFormLive do
   alias Emothe.Catalogue
   alias Emothe.Catalogue.Play
 
+  @al_project_description "El proyecto Artelope supone la creación de un banco de datos, argumentos y ediciones para un corpus fundamental del patrimonio literario español: el teatro de Lope de Vega y, extendido, en los últimos años, a Guillén de Castro."
+
+  @emothe_project_description "La Colección de Textos Clásicos Europeos (CTCE) supone la creación de una base de datos de Teatro canónico clásico europeo en diferentes idiomas, versiones y refundiciones, todas ellas hipervinculadas."
+
+  @default_editorial_declaration "Las presentes ediciones digitales están basadas, en su mayor parte, en ediciones científicas de reconocido prestigio y se ha tratado, en la mayoría de ocasiones, de respetar sus criterios de edición. Solo en casos muy puntuales el editor digital ha introducido leves cambios de los que da cumplida cuenta en el apartado de \u201cNotas\u201d."
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -63,6 +69,11 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   @impl true
   def handle_event("validate", %{"play" => play_params}, socket) do
+    play_params =
+      if socket.assigns.live_action == :new,
+        do: maybe_apply_corpus_defaults(play_params),
+        else: play_params
+
     changeset = Catalogue.change_play_form(socket.assigns.play, play_params)
     {:noreply, assign(socket, form: to_form(Map.put(changeset, :action, :validate)))}
   end
@@ -102,6 +113,31 @@ defmodule EmotheWeb.Admin.PlayFormLive do
      |> assign(:parent_play_label, "")
      |> assign(:parent_play_search, "")
      |> assign(:parent_play_suggestions, [])}
+  end
+
+  defp maybe_apply_corpus_defaults(params) do
+    code = params["code"] || ""
+
+    corpus_project =
+      cond do
+        String.starts_with?(code, "AL") -> @al_project_description
+        String.starts_with?(code, "EMOTHE") -> @emothe_project_description
+        true -> nil
+      end
+
+    if corpus_project do
+      params
+      |> fill_if_blank("project_description", corpus_project)
+      |> fill_if_blank("editorial_declaration", @default_editorial_declaration)
+    else
+      params
+    end
+  end
+
+  defp fill_if_blank(params, key, value) do
+    if String.trim(params[key] || "") == "",
+      do: Map.put(params, key, value),
+      else: params
   end
 
   defp save_play(socket, :new, play_params) do
@@ -405,6 +441,32 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           <label class="flex items-center gap-2 text-sm text-base-content/85">
             <.input field={@form[:is_verse]} type="checkbox" /> {gettext("Verse play")}
           </label>
+        </div>
+
+        <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-base-content/60">
+            {gettext("Project & Editorial")}
+          </h3>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Project Description")}</span>
+            </label>
+            <.input
+              field={@form[:project_description]}
+              type="textarea"
+              placeholder={gettext("Description of the digitization project")}
+            />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Editorial Declaration")}</span>
+            </label>
+            <.input
+              field={@form[:editorial_declaration]}
+              type="textarea"
+              placeholder={gettext("Editorial methodology and approach")}
+            />
+          </div>
         </div>
 
         <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">

@@ -161,33 +161,67 @@ defmodule EmotheWeb.UserAuth do
   def on_mount(:ensure_authenticated, _params, session, socket) do
     socket = mount_current_user(socket, session)
 
-    if socket.assigns.current_user do
-      {:cont, socket}
-    else
-      socket =
-        socket
-        |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
-        |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+    cond do
+      is_nil(socket.assigns.current_user) ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
+          |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
 
-      {:halt, socket}
+        {:halt, socket}
+
+      not Accounts.confirmed?(socket.assigns.current_user) ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(
+            :info,
+            gettext("Please confirm your email address first.")
+          )
+          |> Phoenix.LiveView.redirect(to: ~p"/users/confirm")
+
+        {:halt, socket}
+
+      true ->
+        {:cont, socket}
     end
   end
 
   def on_mount(:ensure_admin, _params, session, socket) do
     socket = mount_current_user(socket, session)
 
-    if socket.assigns.current_user && Accounts.admin?(socket.assigns.current_user) do
-      {:cont, socket}
-    else
-      socket =
-        socket
-        |> Phoenix.LiveView.put_flash(
-          :error,
-          gettext("You must be an admin to access this page.")
-        )
-        |> Phoenix.LiveView.redirect(to: ~p"/")
+    cond do
+      is_nil(socket.assigns.current_user) ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
+          |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
 
-      {:halt, socket}
+        {:halt, socket}
+
+      not Accounts.confirmed?(socket.assigns.current_user) ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(
+            :info,
+            gettext("Please confirm your email address first.")
+          )
+          |> Phoenix.LiveView.redirect(to: ~p"/users/confirm")
+
+        {:halt, socket}
+
+      not Accounts.admin?(socket.assigns.current_user) ->
+        socket =
+          socket
+          |> Phoenix.LiveView.put_flash(
+            :error,
+            gettext("You must be an admin to access this page.")
+          )
+          |> Phoenix.LiveView.redirect(to: ~p"/")
+
+        {:halt, socket}
+
+      true ->
+        {:cont, socket}
     end
   end
 
@@ -223,20 +257,25 @@ defmodule EmotheWeb.UserAuth do
   end
 
   @doc """
-  Used for routes that require the user to be authenticated.
-
-  If you want to enforce the user email is confirmed before
-  they use the application at all, here would be a good place.
+  Used for routes that require the user to be authenticated and have confirmed their email.
   """
   def require_authenticated_user(conn, _opts) do
-    if conn.assigns[:current_user] do
-      conn
-    else
-      conn
-      |> put_flash(:error, gettext("You must log in to access this page."))
-      |> maybe_store_return_to()
-      |> redirect(to: ~p"/users/log-in")
-      |> halt()
+    cond do
+      is_nil(conn.assigns[:current_user]) ->
+        conn
+        |> put_flash(:error, gettext("You must log in to access this page."))
+        |> maybe_store_return_to()
+        |> redirect(to: ~p"/users/log-in")
+        |> halt()
+
+      not Accounts.confirmed?(conn.assigns.current_user) ->
+        conn
+        |> put_flash(:info, gettext("Please confirm your email address first."))
+        |> redirect(to: ~p"/users/confirm")
+        |> halt()
+
+      true ->
+        conn
     end
   end
 

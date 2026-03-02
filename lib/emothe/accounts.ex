@@ -365,4 +365,51 @@ defmodule Emothe.Accounts do
   """
   def admin?(%User{role: :admin}), do: true
   def admin?(_), do: false
+
+  @doc """
+  Returns true if the user has confirmed their email address.
+  """
+  def confirmed?(%User{confirmed_at: confirmed_at}), do: not is_nil(confirmed_at)
+  def confirmed?(_), do: false
+
+  ## User listing (admin)
+
+  @doc """
+  Lists users with optional search and pagination.
+  """
+  def list_users(opts \\ []) do
+    search = Keyword.get(opts, :search, "")
+    page = Keyword.get(opts, :page, 1)
+    per_page = Keyword.get(opts, :per_page, 50)
+
+    User
+    |> search_users(search)
+    |> order_by(:inserted_at)
+    |> limit(^per_page)
+    |> offset(^((page - 1) * per_page))
+    |> Repo.all()
+  end
+
+  @doc """
+  Counts users with optional search filter.
+  """
+  def count_users(opts \\ []) do
+    User
+    |> search_users(Keyword.get(opts, :search, ""))
+    |> Repo.aggregate(:count)
+  end
+
+  defp search_users(query, ""), do: query
+
+  defp search_users(query, search) do
+    like = "%#{search}%"
+    where(query, [u], ilike(u.email, ^like))
+  end
+
+  @doc """
+  Updates the role of a user.
+  """
+  def update_user_role(%User{} = user, role) do
+    user |> User.role_changeset(%{role: role}) |> Repo.update()
+  end
 end

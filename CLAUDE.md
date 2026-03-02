@@ -188,6 +188,10 @@ Then visit:
 ### High Priority
 - [ ] **Create initial admin user** - promote a registered user to admin via IEx: `Emothe.Accounts.get_user_by_email("...") |> Emothe.Accounts.User.role_changeset(%{role: "admin"}) |> Emothe.Repo.update()`
 - [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs)
+- [x] **Email delivery** - SMTP adapter via `gen_smtp`; configure `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` (+ optional `SMTP_PORT`, `MAIL_FROM`) as Fly.io secrets
+- [x] **Email confirmation enforced** - unconfirmed users redirected to `/users/confirm` by `require_authenticated_user` plug and `ensure_authenticated`/`ensure_admin` LiveView hooks
+- [x] **Login rate limiting** - 20 attempts per minute per IP via ETS-backed `EmotheWeb.RateLimit`; applied in `UserSessionController.create/2`
+- [x] **User management admin UI** - `/admin/users` lists users with role badges, confirmed status; promote/demote role, resend confirmation email
 
 ### Medium Priority
 - [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
@@ -210,7 +214,6 @@ Then visit:
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
-- [ ] **User management** admin page (list users, change roles)
 - [ ] **Activity log** - track who imported/edited what
 - [ ] **TEI validation** - validate exported XML against TEI schema
 - [ ] **Responsive mobile design** refinements
@@ -218,6 +221,9 @@ Then visit:
 - [ ] **Batch export** - export multiple plays at once
 - [ ] **Custom OTel spans** for TEI import, export, statistics computation
 - [ ] **Line number frequency control** - "show every N lines" option (original Artelope had "Mostrar cada 5")
+- [ ] **HTML email templates** - replace plain-text bodies in `user_notifier.ex` with `html_body/1` using `Phoenix.Swoosh` for branded transactional emails
+- [ ] **Login audit log** - store failed/successful login attempts in a DB table for security review
+- [ ] **Session activity tracking** - add `last_active_at` to users table, update on each request
 
 ## Key Decisions
 

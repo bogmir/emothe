@@ -69,6 +69,7 @@ defmodule Emothe.MixProject do
 
       # Authentication
       {:bcrypt_elixir, "~> 3.0"},
+      {:gen_smtp, "~> 1.0"},
 
       # XML parsing & generation
       {:saxy, "~> 1.6"},

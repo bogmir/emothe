@@ -124,21 +124,22 @@ if config_env() == :prod do
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 
-  # ## Configuring the mailer
-  #
-  # In production you need to configure the mailer to use a different adapter.
-  # Here is an example configuration for Mailgun:
-  #
-  #     config :emothe, Emothe.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
-  #
-  # Most non-SMTP adapters require an API client. Swoosh supports Req, Hackney,
-  # and Finch out-of-the-box. This configuration is typically done at
-  # compile-time in your config/prod.exs:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Req
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  # Mailer — SMTP via any provider (Postmark, Mailgun, SendGrid, etc.)
+  # If SMTP_HOST is not set, emails are silently dropped (Local adapter).
+  # Optional env vars: SMTP_HOST, SMTP_PORT (default 587), SMTP_USERNAME,
+  #                    SMTP_PASSWORD, MAIL_FROM (default noreply@emothe.uv.es)
+  if smtp_host = System.get_env("SMTP_HOST") do
+    config :emothe, Emothe.Mailer,
+      adapter: Swoosh.Adapters.SMTP,
+      relay: smtp_host,
+      port: String.to_integer(System.get_env("SMTP_PORT", "587")),
+      username: System.get_env("SMTP_USERNAME"),
+      password: System.get_env("SMTP_PASSWORD"),
+      tls: :always,
+      auth: :always,
+      no_mx_lookups: true
+  end
+
+  config :emothe, :mail_from,
+    System.get_env("MAIL_FROM", "noreply@emothe.uv.es")
 end

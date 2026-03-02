@@ -12,6 +12,9 @@ defmodule Emothe.Application do
     OpentelemetryPhoenix.setup(adapter: :bandit)
     OpentelemetryEcto.setup([:emothe, :repo])
 
+    # ETS table for rate limiting (used by EmotheWeb.RateLimit)
+    :ets.new(:emothe_rate_limit, [:set, :public, :named_table])
+
     children = [
       EmotheWeb.Telemetry,
       Emothe.Repo,

@@ -33,6 +33,7 @@ msgstr ""
 
 #: lib/emothe_web/components/core_components.ex:449
 #: lib/emothe_web/live/admin/play_list_live.ex:136
+#: lib/emothe_web/live/admin/user_list_live.ex:137
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
@@ -77,7 +78,7 @@ msgstr ""
 msgid "Add Verse Line"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:20
+#: lib/emothe_web/live/admin/import_live.ex:18
 #: lib/emothe_web/live/admin/play_compare_live.ex:40
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:42
 #: lib/emothe_web/live/admin/play_detail_live.ex:27
@@ -86,6 +87,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_form_live.ex:56
 #: lib/emothe_web/live/admin/play_list_live.ex:19
 #: lib/emothe_web/live/admin/play_sources_live.ex:20
+#: lib/emothe_web/live/admin/user_list_live.ex:18
 #, elixir-autogen, elixir-format
 msgid "Admin"
 msgstr ""
@@ -169,7 +171,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:97
+#: lib/emothe_web/live/admin/import_live.ex:95
 #, elixir-autogen, elixir-format
 msgid "Cannot read directory"
 msgstr ""
@@ -228,12 +230,12 @@ msgstr ""
 msgid "Characters"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:201
+#: lib/emothe_web/live/admin/import_live.ex:200
 #, elixir-autogen, elixir-format
 msgid "Choose one or more TEI-XML files from your computer."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:275
+#: lib/emothe_web/live/admin/import_live.ex:274
 #: lib/emothe_web/live/admin/play_form_live.ex:215
 #: lib/emothe_web/live/admin/play_list_live.ex:133
 #, elixir-autogen, elixir-format
@@ -393,7 +395,7 @@ msgstr ""
 msgid "Edit Metadata"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:312
+#: lib/emothe_web/live/admin/import_live.ex:311
 #: lib/emothe_web/live/play_show_live.ex:225
 #, elixir-autogen, elixir-format
 msgid "Edit in Admin"
@@ -431,6 +433,7 @@ msgstr ""
 msgid "Element saved."
 msgstr ""
 
+#: lib/emothe_web/live/admin/user_list_live.ex:133
 #: lib/emothe_web/live/user_confirmation_instructions_live.ex:15
 #: lib/emothe_web/live/user_forgot_password_live.ex:15
 #: lib/emothe_web/live/user_login_live.ex:19
@@ -455,7 +458,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:343
+#: lib/emothe_web/live/admin/import_live.ex:342
 #, elixir-autogen, elixir-format
 msgid "Error"
 msgstr ""
@@ -490,12 +493,12 @@ msgstr ""
 msgid "Export TEI-XML"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:273
+#: lib/emothe_web/live/admin/import_live.ex:272
 #, elixir-autogen, elixir-format
 msgid "File"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:340
+#: lib/emothe_web/live/admin/import_live.ex:339
 #, elixir-autogen, elixir-format
 msgid "File is too large (max 20MB)"
 msgstr ""
@@ -537,19 +540,19 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:236
+#: lib/emothe_web/live/admin/import_live.ex:235
 #, elixir-autogen, elixir-format
 msgid "Import %{count} file(s)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:13
-#: lib/emothe_web/live/admin/import_live.ex:22
+#: lib/emothe_web/live/admin/import_live.ex:11
+#: lib/emothe_web/live/admin/import_live.ex:20
 #: lib/emothe_web/live/admin/play_list_live.ex:107
 #, elixir-autogen, elixir-format
 msgid "Import TEI-XML"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:189
+#: lib/emothe_web/live/admin/import_live.ex:188
 #, elixir-autogen, elixir-format
 msgid "Import TEI-XML Files"
 msgstr ""
@@ -559,17 +562,17 @@ msgstr ""
 msgid "Import and export scholarly editions in TEI P5 format"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:121
+#: lib/emothe_web/live/admin/import_live.ex:119
 #, elixir-autogen, elixir-format
 msgid "Import errors"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:192
+#: lib/emothe_web/live/admin/import_live.ex:191
 #, elixir-autogen, elixir-format
 msgid "Import one or many TEI files and review successful ingestions."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:268
+#: lib/emothe_web/live/admin/import_live.ex:267
 #, elixir-autogen, elixir-format
 msgid "Imported Plays"
 msgstr ""
@@ -582,7 +585,7 @@ msgstr ""
 msgid "Insert Above"
 msgstr ""
 
-#: lib/emothe_web/controllers/user_session_controller.ex:31
+#: lib/emothe_web/controllers/user_session_controller.ex:42
 #, elixir-autogen, elixir-format
 msgid "Invalid email or password"
 msgstr ""
@@ -652,7 +655,7 @@ msgstr ""
 msgid "Log out"
 msgstr ""
 
-#: lib/emothe_web/controllers/user_session_controller.ex:39
+#: lib/emothe_web/controllers/user_session_controller.ex:51
 #, elixir-autogen, elixir-format
 msgid "Logged out successfully."
 msgstr ""
@@ -701,12 +704,13 @@ msgstr ""
 
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1201
 #: lib/emothe_web/live/admin/play_list_live.ex:217
+#: lib/emothe_web/live/admin/user_list_live.ex:242
 #: lib/emothe_web/live/play_catalogue_live.ex:143
 #, elixir-autogen, elixir-format
 msgid "Next"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:74
+#: lib/emothe_web/live/admin/import_live.ex:72
 #, elixir-autogen, elixir-format
 msgid "No .xml files found in %{dir}"
 msgstr ""
@@ -751,7 +755,7 @@ msgstr ""
 msgid "Number"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:341
+#: lib/emothe_web/live/admin/import_live.ex:340
 #, elixir-autogen, elixir-format
 msgid "Only .xml files are accepted"
 msgstr ""
@@ -824,7 +828,7 @@ msgstr ""
 msgid "Play updated successfully."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:179
+#: lib/emothe_web/live/admin/import_live.ex:178
 #, elixir-autogen, elixir-format
 msgid "Play with code %{code} already exists"
 msgstr ""
@@ -832,7 +836,7 @@ msgstr ""
 #: lib/emothe_web/components/layouts/admin.html.heex:13
 #: lib/emothe_web/components/layouts/app.html.heex:14
 #: lib/emothe_web/components/statistics_panel.ex:189
-#: lib/emothe_web/live/admin/import_live.ex:21
+#: lib/emothe_web/live/admin/import_live.ex:19
 #: lib/emothe_web/live/admin/play_compare_live.ex:41
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:43
 #: lib/emothe_web/live/admin/play_detail_live.ex:28
@@ -852,6 +856,7 @@ msgstr ""
 
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1192
 #: lib/emothe_web/live/admin/play_list_live.ex:207
+#: lib/emothe_web/live/admin/user_list_live.ex:232
 #: lib/emothe_web/live/play_catalogue_live.ex:133
 #, elixir-autogen, elixir-format
 msgid "Previous"
@@ -914,7 +919,7 @@ msgstr ""
 msgid "Register for an account"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:221
+#: lib/emothe_web/live/admin/import_live.ex:220
 #, elixir-autogen, elixir-format
 msgid "Remove"
 msgstr ""
@@ -985,7 +990,7 @@ msgstr ""
 msgid "Sections"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:199
+#: lib/emothe_web/live/admin/import_live.ex:198
 #, elixir-autogen, elixir-format
 msgid "Select Files"
 msgstr ""
@@ -1093,7 +1098,7 @@ msgstr ""
 msgid "Structure"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:133
+#: lib/emothe_web/live/admin/import_live.ex:131
 #, elixir-autogen, elixir-format
 msgid "Successfully imported %{count} play(s)."
 msgstr ""
@@ -1108,7 +1113,7 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:274
+#: lib/emothe_web/live/admin/import_live.ex:273
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1689
 #: lib/emothe_web/live/admin/play_form_live.ex:173
 #: lib/emothe_web/live/admin/play_list_live.ex:134
@@ -1118,7 +1123,7 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:342
+#: lib/emothe_web/live/admin/import_live.ex:341
 #, elixir-autogen, elixir-format
 msgid "Too many files (max 20)"
 msgstr ""
@@ -1184,12 +1189,12 @@ msgstr ""
 msgid "Verses"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:331
+#: lib/emothe_web/live/admin/import_live.ex:330
 #, elixir-autogen, elixir-format
 msgid "View all plays"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:320
+#: lib/emothe_web/live/admin/import_live.ex:319
 #: lib/emothe_web/live/admin/play_list_live.ex:169
 #, elixir-autogen, elixir-format
 msgid "View public page"
@@ -1215,14 +1220,15 @@ msgstr ""
 msgid "Welcome back!"
 msgstr ""
 
-#: lib/emothe_web/user_auth.ex:186
-#: lib/emothe_web/user_auth.ex:251
+#: lib/emothe_web/user_auth.ex:217
+#: lib/emothe_web/user_auth.ex:290
 #, elixir-autogen, elixir-format
 msgid "You must be an admin to access this page."
 msgstr ""
 
-#: lib/emothe_web/user_auth.ex:169
-#: lib/emothe_web/user_auth.ex:236
+#: lib/emothe_web/user_auth.ex:168
+#: lib/emothe_web/user_auth.ex:196
+#: lib/emothe_web/user_auth.ex:266
 #, elixir-autogen, elixir-format
 msgid "You must log in to access this page."
 msgstr ""
@@ -1916,6 +1922,7 @@ msgid "Otro"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_list_live.ex:210
+#: lib/emothe_web/live/admin/user_list_live.ex:235
 #: lib/emothe_web/live/play_catalogue_live.ex:136
 #, elixir-autogen, elixir-format
 msgid "Page %{page} of %{total}"
@@ -1949,6 +1956,7 @@ msgid "Reworking"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_editors_live.ex:189
+#: lib/emothe_web/live/admin/user_list_live.ex:134
 #, elixir-autogen, elixir-format
 msgid "Role"
 msgstr ""
@@ -2044,7 +2052,7 @@ msgstr ""
 msgid "— (Original / standalone)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:248
+#: lib/emothe_web/live/admin/import_live.ex:247
 #, elixir-autogen, elixir-format
 msgid "Importing file %{done} of %{total}..."
 msgstr ""
@@ -2084,22 +2092,22 @@ msgstr ""
 msgid "xmllint is not installed. Cannot validate."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:297
+#: lib/emothe_web/live/admin/import_live.ex:296
 #, elixir-autogen, elixir-format
 msgid "%{count} warning(s)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:276
+#: lib/emothe_web/live/admin/import_live.ex:275
 #, elixir-autogen, elixir-format
 msgid "Schema"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:291
+#: lib/emothe_web/live/admin/import_live.ex:290
 #, elixir-autogen, elixir-format
 msgid "Valid"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:302
+#: lib/emothe_web/live/admin/import_live.ex:301
 #, elixir-autogen, elixir-format
 msgid "and %{count} more"
 msgstr ""
@@ -2148,4 +2156,116 @@ msgstr ""
 #: lib/emothe_web/live/play_catalogue_live.ex:56
 #, elixir-autogen, elixir-format
 msgid "translation"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:12
+#, elixir-autogen, elixir-format
+msgid "Admin - Users"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:83
+#, elixir-autogen, elixir-format
+msgid "Confirmation email sent to %{email}."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:135
+#, elixir-autogen, elixir-format
+msgid "Confirmed"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:181
+#, elixir-autogen, elixir-format
+msgid "Demote %{email} to researcher?"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:184
+#, elixir-autogen, elixir-format
+msgid "Demote to researcher"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:66
+#, elixir-autogen, elixir-format
+msgid "Failed to update role."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:113
+#, elixir-autogen, elixir-format
+msgid "Manage user roles and email confirmations."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:223
+#, elixir-autogen, elixir-format
+msgid "No users found."
+msgstr ""
+
+#: lib/emothe_web/user_auth.ex:178
+#: lib/emothe_web/user_auth.ex:206
+#: lib/emothe_web/user_auth.ex:273
+#, elixir-autogen, elixir-format
+msgid "Please confirm your email address first."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:194
+#, elixir-autogen, elixir-format
+msgid "Promote %{email} to admin?"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:197
+#, elixir-autogen, elixir-format
+msgid "Promote to admin"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:136
+#, elixir-autogen, elixir-format
+msgid "Registered"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:208
+#, elixir-autogen, elixir-format
+msgid "Resend confirmation email"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:123
+#, elixir-autogen, elixir-format
+msgid "Search by email..."
+msgstr ""
+
+#: lib/emothe_web/controllers/user_session_controller.ex:30
+#, elixir-autogen, elixir-format
+msgid "Too many login attempts. Please wait a minute and try again."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:110
+#, elixir-autogen, elixir-format
+msgid "User Management"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:87
+#, elixir-autogen, elixir-format
+msgid "User is already confirmed."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:19
+#, elixir-autogen, elixir-format
+msgid "Users"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:52
+#, elixir-autogen, elixir-format
+msgid "You cannot change your own role."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:165
+#, elixir-autogen, elixir-format
+msgid "confirmed"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:166
+#, elixir-autogen, elixir-format
+msgid "unconfirmed"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:148
+#, elixir-autogen, elixir-format
+msgid "you"
 msgstr ""

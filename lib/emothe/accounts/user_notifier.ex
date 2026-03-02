@@ -3,12 +3,16 @@ defmodule Emothe.Accounts.UserNotifier do
 
   alias Emothe.Mailer
 
+  defp from_address do
+    {"EMOTHE", Application.get_env(:emothe, :mail_from, "noreply@emothe.uv.es")}
+  end
+
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
     email =
       new()
       |> to(recipient)
-      |> from({"EMOTHE", "noreply@emothe.uv.es"})
+      |> from(from_address())
       |> subject(subject)
       |> text_body(body)
 

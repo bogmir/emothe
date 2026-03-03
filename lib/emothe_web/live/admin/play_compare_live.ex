@@ -29,7 +29,10 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
           parent_divisions = PlayContent.load_play_content(parent.id)
           parent_characters = PlayContent.list_characters(parent.id)
 
-          [%{play: parent_full, divisions: parent_divisions, characters: parent_characters} | panels]
+          [
+            %{play: parent_full, divisions: parent_divisions, characters: parent_characters}
+            | panels
+          ]
         else
           panels
         end

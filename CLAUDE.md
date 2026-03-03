@@ -216,7 +216,7 @@ Then visit:
 - [ ] **Full-text search** with PostgreSQL tsvector
 - [ ] **Activity log** - track who imported/edited what
 - [ ] **TEI validation** - validate exported XML against TEI schema
-- [ ] **Responsive mobile design** refinements
+**- [ ] **Responsive mobile design** refinements**
 - [ ] **API endpoints** for programmatic access
 - [ ] **Batch export** - export multiple plays at once
 - [ ] **Custom OTel spans** for TEI import, export, statistics computation

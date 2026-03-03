@@ -162,11 +162,21 @@
 }
 
 .play-text .verse-line .part-m {
-  padding-left: 50px;
+  padding-left: 25px;
 }
 
 .play-text .verse-line .part-f {
-  padding-left: 100px;
+  padding-left: 50px;
+}
+
+@media (min-width: 640px) {
+  .play-text .verse-line .part-m {
+    padding-left: 50px;
+  }
+
+  .play-text .verse-line .part-f {
+    padding-left: 100px;
+  }
 }
 
 .play-text .aside-border {

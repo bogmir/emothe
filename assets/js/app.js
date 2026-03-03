@@ -50,11 +50,32 @@ const ScrollSpy = {
         }
       }
 
-      // Pick the topmost visible section
+      // Prefer the section nearest the top reading line.
+      // This avoids parent sections (e.g., acts) staying active while
+      // their nested scenes are currently in view.
+      const readingLine = 96
       let activeId = null
-      let minTop = Infinity
+      let bestPastTop = -Infinity
+      let bestFutureTop = Infinity
+
       for (const [id, top] of visible) {
-        if (top < minTop) { minTop = top; activeId = id }
+        if (top <= readingLine && top > bestPastTop) {
+          bestPastTop = top
+          activeId = id
+        }
+
+        if (top > readingLine && top < bestFutureTop) {
+          bestFutureTop = top
+        }
+      }
+
+      if (!activeId && Number.isFinite(bestFutureTop)) {
+        for (const [id, top] of visible) {
+          if (top === bestFutureTop) {
+            activeId = id
+            break
+          }
+        }
       }
 
       links.forEach(link => {

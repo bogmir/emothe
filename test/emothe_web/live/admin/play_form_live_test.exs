@@ -18,7 +18,12 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
         "password" => "verysecurepass123"
       })
 
-    {:ok, user} = user |> User.role_changeset(%{role: :admin}) |> Repo.update()
+    {:ok, user} =
+      user
+      |> User.role_changeset(%{role: :admin})
+      |> Ecto.Changeset.change(%{confirmed_at: DateTime.utc_now(:second)})
+      |> Repo.update()
+
     token = Accounts.generate_user_session_token(user)
 
     conn

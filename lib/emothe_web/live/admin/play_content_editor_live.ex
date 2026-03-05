@@ -1528,11 +1528,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     end
   end
 
-  # --- Tab button component ---
-
-  attr :tab, :atom, required: true
-  attr :active, :atom, required: true
-  attr :icon, :string, required: true
   attr :characters, :list, required: true
   attr :speeches, :list, required: true
   attr :speaker_labels, :list, required: true
@@ -1708,6 +1703,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     """
   end
 
+  # --- Tab button component ---
+
+  attr :tab, :atom, required: true
+  attr :active, :atom, required: true
+  attr :icon, :string, required: true
   attr :label, :string, default: nil
   attr :count, :integer, default: nil
   attr :badge, :string, default: nil

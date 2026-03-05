@@ -127,6 +127,22 @@ The importer handles the TEI P5 format used by EMOTHE/Artelope. Key mappings:
 
 TEI fixture files are at `test/fixtures/tei_files/` (UTF-16 encoded, ~37 files covering Spanish/Italian/English/French plays).
 
+## Running Commands
+
+When using the Bash tool, `mix` and other Elixir/Erlang commands require the asdf shims on PATH. Always use the full path to mix:
+
+```bash
+/home/bogdan/.asdf/shims/mix test
+/home/bogdan/.asdf/shims/mix compile
+/home/bogdan/.asdf/shims/mix phx.server
+```
+
+For piping output, system commands like `tail` and `head` are at `/usr/bin/`:
+
+```bash
+/home/bogdan/.asdf/shims/mix test 2>&1 | /usr/bin/tail -10
+```
+
 ## Getting Started
 
 ```bash

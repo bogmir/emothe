@@ -6,6 +6,7 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
   alias Emothe.Catalogue
   alias Emothe.Export.TeiValidator
   alias Emothe.Export.TeiXml
+  alias Emothe.Import.WordParser
   alias Emothe.PlayContent
   alias Emothe.Statistics
 
@@ -30,7 +31,9 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
      ])
      |> assign(:play_context, %{play: play, active_tab: :overview})
      |> assign(:validation_result, nil)
-     |> assign(:validating, false)}
+     |> assign(:validating, false)
+     |> assign(:import_result, nil)
+     |> allow_upload(:docx, accept: ~w(.docx), max_entries: 1, max_file_size: 10_000_000)}
   end
 
   @impl true
@@ -40,6 +43,58 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
     result = TeiValidator.validate(xml)
 
     {:noreply, assign(socket, validation_result: result, validating: false)}
+  end
+
+  def handle_event("validate_upload", _, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("import_docx", _, socket) do
+    play = socket.assigns.play
+
+    consumed =
+      consume_uploaded_entries(socket, :docx, fn %{path: path}, _entry ->
+        # Copy to a temp file that persists after consume
+        dest =
+          Path.join(
+            System.tmp_dir!(),
+            "import-#{play.id}-#{System.unique_integer([:positive])}.docx"
+          )
+
+        File.cp!(path, dest)
+        {:ok, dest}
+      end)
+
+    case consumed do
+      [path] ->
+        case WordParser.import_content(play.id, path) do
+          {:ok, _play} ->
+            File.rm(path)
+            # Reload play data
+            play = Catalogue.get_play_with_all!(play.id)
+            characters = PlayContent.list_characters(play.id)
+            divisions = PlayContent.list_top_divisions(play.id)
+            statistic = Statistics.recompute(play.id)
+
+            {:noreply,
+             socket
+             |> assign(
+               play: play,
+               characters: characters,
+               divisions: divisions,
+               statistic: statistic
+             )
+             |> assign(import_result: {:ok, gettext("Content imported successfully.")})
+             |> put_flash(:info, gettext("Content imported successfully."))}
+
+          {:error, reason} ->
+            File.rm(path)
+            {:noreply, assign(socket, import_result: {:error, inspect(reason)})}
+        end
+
+      _ ->
+        {:noreply, assign(socket, import_result: {:error, gettext("No file uploaded.")})}
+    end
   end
 
   def handle_event("recompute_stats", _, socket) do
@@ -53,6 +108,11 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
   defp relationship_type_label("adaptacion"), do: gettext("Adaptation")
   defp relationship_type_label("refundicion"), do: gettext("Reworking")
   defp relationship_type_label(_), do: ""
+
+  defp error_to_string(:too_large), do: gettext("File is too large (max 10 MB).")
+  defp error_to_string(:not_accepted), do: gettext("Only .docx files are accepted.")
+  defp error_to_string(:too_many_files), do: gettext("Only one file allowed.")
+  defp error_to_string(other), do: inspect(other)
 
   defp role_label("principal"), do: gettext("Principal investigator")
   defp role_label("translator"), do: gettext("Translator")
@@ -149,6 +209,45 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
           </div>
         <% end %>
       </div>
+
+      <%!-- Import Content --%>
+      <section class="mb-8">
+        <h2 class="mb-3 text-lg font-semibold text-base-content">
+          {gettext("Import content")}
+        </h2>
+        <div class="rounded-box border border-base-300 bg-base-100 p-4 shadow-sm">
+          <p class="text-sm text-base-content/60 mb-3">
+            {gettext(
+              "Upload a premarcado .docx file to import play content (divisions, speeches, verses, stage directions). Existing content will be replaced."
+            )}
+          </p>
+          <form phx-submit="import_docx" phx-change="validate_upload" class="flex items-end gap-3">
+            <div class="flex-1">
+              <.live_file_input
+                upload={@uploads.docx}
+                class="file-input file-input-bordered file-input-sm w-full"
+              />
+              <div :for={entry <- @uploads.docx.entries} class="mt-1">
+                <div :for={err <- upload_errors(@uploads.docx, entry)} class="text-error text-xs">
+                  {error_to_string(err)}
+                </div>
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary btn-sm"
+              disabled={@uploads.docx.entries == []}
+            >
+              <.icon name="hero-arrow-up-tray-mini" class="size-4" />
+              {gettext("Import")}
+            </button>
+          </form>
+          <div :if={match?({:error, _}, @import_result)} class="mt-3 alert alert-error text-sm">
+            <.icon name="hero-x-circle-mini" class="size-4" />
+            {elem(@import_result, 1)}
+          </div>
+        </div>
+      </section>
 
       <%!-- Metadata --%>
       <section class="mb-8">

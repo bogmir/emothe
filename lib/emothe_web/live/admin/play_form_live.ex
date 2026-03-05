@@ -31,6 +31,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:parent_play_label, "")
     |> assign(:parent_play_search, "")
     |> assign(:parent_play_suggestions, [])
+    |> assign(:attribution_mode, :select)
     |> assign(:breadcrumbs, [
       %{label: gettext("Admin"), to: ~p"/admin/plays"},
       %{label: gettext("Plays"), to: ~p"/admin/plays"},
@@ -50,6 +51,11 @@ defmodule EmotheWeb.Admin.PlayFormLive do
         ""
       end
 
+    attribution_mode =
+      if play.author_attribution && !known_attribution?(play.author_attribution),
+        do: :custom,
+        else: :select
+
     socket
     |> assign(:page_title, "#{gettext("Edit")}: #{play.title}")
     |> assign(:play, play)
@@ -58,6 +64,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:parent_play_label, parent_label)
     |> assign(:parent_play_search, "")
     |> assign(:parent_play_suggestions, [])
+    |> assign(:attribution_mode, attribution_mode)
     |> assign(:breadcrumbs, [
       %{label: gettext("Admin"), to: ~p"/admin/plays"},
       %{label: gettext("Plays"), to: ~p"/admin/plays"},
@@ -73,6 +80,18 @@ defmodule EmotheWeb.Admin.PlayFormLive do
       if socket.assigns.live_action == :new,
         do: maybe_apply_corpus_defaults(play_params),
         else: play_params
+
+    # Auto-derive EMOTHE ID from code
+    play_params = maybe_derive_emothe_id(play_params)
+
+    # Handle attribution "Other..." selection
+    {play_params, socket} =
+      if play_params["author_attribution"] == "__other__" do
+        {Map.put(play_params, "author_attribution", ""),
+         assign(socket, :attribution_mode, :custom)}
+      else
+        {play_params, socket}
+      end
 
     changeset = Catalogue.change_play_form(socket.assigns.play, play_params)
     {:noreply, assign(socket, form: to_form(Map.put(changeset, :action, :validate)))}
@@ -113,6 +132,79 @@ defmodule EmotheWeb.Admin.PlayFormLive do
      |> assign(:parent_play_label, "")
      |> assign(:parent_play_search, "")
      |> assign(:parent_play_suggestions, [])}
+  end
+
+  def handle_event("copy_field", %{"source" => source, "target" => target}, socket) do
+    form_data = socket.assigns.form.source.changes
+    schema_data = socket.assigns.form.source.data
+
+    source_atom = String.to_existing_atom(source)
+    value = Map.get(form_data, source_atom) || Map.get(schema_data, source_atom) || ""
+
+    # Update the form with the copied value
+    current_params = form_params_from_changeset(socket.assigns.form.source)
+    updated_params = Map.put(current_params, target, value)
+
+    changeset = Catalogue.change_play_form(socket.assigns.play, updated_params)
+    {:noreply, assign(socket, form: to_form(Map.put(changeset, :action, :validate)))}
+  end
+
+  def handle_event("set_attribution_mode", %{"mode" => "custom"}, socket) do
+    {:noreply, assign(socket, :attribution_mode, :custom)}
+  end
+
+  def handle_event("set_attribution_mode", %{"mode" => "select"}, socket) do
+    {:noreply, assign(socket, :attribution_mode, :select)}
+  end
+
+  defp maybe_derive_emothe_id(params) do
+    code = params["code"] || ""
+
+    case Regex.run(~r/^(?:EMOTHE|CTCE)(\d+)/i, code) do
+      [_, numeric_id] -> Map.put(params, "emothe_id", numeric_id)
+      _ -> params
+    end
+  end
+
+  defp emothe_id_derived?(form) do
+    code = form_field_value(form, :code)
+    Regex.match?(~r/^(?:EMOTHE|CTCE)\d+/i, code || "")
+  end
+
+  defp form_field_value(form, field) do
+    case form[field] do
+      %{value: val} -> val
+      _ -> nil
+    end
+  end
+
+  defp form_params_from_changeset(changeset) do
+    data = changeset.data
+    changes = changeset.changes
+
+    Play.__schema__(:fields)
+    |> Enum.reduce(%{}, fn field, acc ->
+      val = Map.get(changes, field, Map.get(data, field))
+      if val, do: Map.put(acc, Atom.to_string(field), val), else: acc
+    end)
+  end
+
+  @attribution_options ~w(fiable dudosa atribuida anónima apócrifa)
+
+  defp known_attribution?(value) do
+    value in @attribution_options
+  end
+
+  defp attribution_options do
+    [
+      {"—", ""},
+      {gettext("Fiable (reliable)"), "fiable"},
+      {gettext("Dudosa (doubtful)"), "dudosa"},
+      {gettext("Atribuida (attributed)"), "atribuida"},
+      {gettext("Anónima (anonymous)"), "anónima"},
+      {gettext("Apócrifa (apocryphal)"), "apócrifa"},
+      {gettext("Other..."), "__other__"}
+    ]
   end
 
   defp maybe_apply_corpus_defaults(params) do
@@ -212,7 +304,19 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           </div>
           <div>
             <label class="label">
-              <span class="label-text font-medium">{gettext("Original Title")}</span>
+              <span class="label-text font-medium">
+                {gettext("Original Title")}
+                <button
+                  type="button"
+                  phx-click="copy_field"
+                  phx-value-source="title"
+                  phx-value-target="original_title"
+                  class="btn btn-ghost btn-xs ml-1"
+                  title={gettext("Copy from Title")}
+                >
+                  <.icon name="hero-clipboard-document-mini" class="size-3" />
+                </button>
+              </span>
             </label>
             <.input
               field={@form[:original_title]}
@@ -225,7 +329,19 @@ defmodule EmotheWeb.Admin.PlayFormLive do
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label class="label">
-              <span class="label-text font-medium">{gettext("Title (sort)")}</span>
+              <span class="label-text font-medium">
+                {gettext("Title (sort)")}
+                <button
+                  type="button"
+                  phx-click="copy_field"
+                  phx-value-source="title"
+                  phx-value-target="title_sort"
+                  class="btn btn-ghost btn-xs ml-1"
+                  title={gettext("Copy from Title")}
+                >
+                  <.icon name="hero-clipboard-document-mini" class="size-3" />
+                </button>
+              </span>
             </label>
             <.input
               field={@form[:title_sort]}
@@ -235,7 +351,19 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           </div>
           <div>
             <label class="label">
-              <span class="label-text font-medium">{gettext("Edition Title")}</span>
+              <span class="label-text font-medium">
+                {gettext("Edition Title")}
+                <button
+                  type="button"
+                  phx-click="copy_field"
+                  phx-value-source="title"
+                  phx-value-target="edition_title"
+                  class="btn btn-ghost btn-xs ml-1"
+                  title={gettext("Copy from Title")}
+                >
+                  <.icon name="hero-clipboard-document-mini" class="size-3" />
+                </button>
+              </span>
             </label>
             <.input
               field={@form[:edition_title]}
@@ -255,8 +383,16 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           <div>
             <label class="label">
               <span class="label-text font-medium">{gettext("EMOTHE ID")}</span>
+              <span :if={emothe_id_derived?(@form)} class="text-xs text-base-content/50 ml-1">
+                {gettext("(auto)")}
+              </span>
             </label>
-            <.input field={@form[:emothe_id]} type="text" placeholder={gettext("e.g. 0703")} />
+            <.input
+              field={@form[:emothe_id]}
+              type="text"
+              placeholder={gettext("e.g. 0703")}
+              readonly={emothe_id_derived?(@form)}
+            />
           </div>
         </div>
 
@@ -363,7 +499,19 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           </div>
           <div>
             <label class="label">
-              <span class="label-text font-medium">{gettext("Author (sort)")}</span>
+              <span class="label-text font-medium">
+                {gettext("Author (sort)")}
+                <button
+                  type="button"
+                  phx-click="copy_field"
+                  phx-value-source="author_name"
+                  phx-value-target="author_sort"
+                  class="btn btn-ghost btn-xs ml-1"
+                  title={gettext("Copy from Author Name")}
+                >
+                  <.icon name="hero-clipboard-document-mini" class="size-3" />
+                </button>
+              </span>
             </label>
             <.input field={@form[:author_sort]} type="text" placeholder={gettext("Surname, Name")} />
           </div>
@@ -380,11 +528,31 @@ defmodule EmotheWeb.Admin.PlayFormLive do
             <label class="label">
               <span class="label-text font-medium">{gettext("Attribution")}</span>
             </label>
-            <.input
-              field={@form[:author_attribution]}
-              type="text"
-              placeholder={gettext("fiable, dudosa...")}
-            />
+            <div :if={@attribution_mode == :select}>
+              <.input
+                field={@form[:author_attribution]}
+                type="select"
+                options={attribution_options()}
+              />
+            </div>
+            <div :if={@attribution_mode == :custom} class="flex items-center gap-2">
+              <div class="flex-1">
+                <.input
+                  field={@form[:author_attribution]}
+                  type="text"
+                  placeholder={gettext("Custom attribution...")}
+                />
+              </div>
+              <button
+                type="button"
+                phx-click="set_attribution_mode"
+                phx-value-mode="select"
+                class="btn btn-ghost btn-sm"
+                title={gettext("Switch to predefined values")}
+              >
+                <.icon name="hero-list-bullet-mini" class="size-4" />
+              </button>
+            </div>
           </div>
         </div>
 

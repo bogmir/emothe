@@ -145,7 +145,10 @@ defmodule EmotheWeb.Layouts do
             {gettext("Content")}
           </.link>
           <.link
-            :if={@play.parent_play_id || (@play.derived_plays || []) != []}
+            :if={
+              @play.parent_play_id ||
+                (Ecto.assoc_loaded?(@play.derived_plays) and @play.derived_plays != [])
+            }
             navigate={~p"/admin/plays/#{@play.id}/compare"}
             class={ctx_tab_class(@active_tab == :compare)}
           >

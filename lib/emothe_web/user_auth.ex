@@ -170,17 +170,6 @@ defmodule EmotheWeb.UserAuth do
 
         {:halt, socket}
 
-      not Accounts.confirmed?(socket.assigns.current_user) ->
-        socket =
-          socket
-          |> Phoenix.LiveView.put_flash(
-            :info,
-            gettext("Please confirm your email address first.")
-          )
-          |> Phoenix.LiveView.redirect(to: ~p"/users/confirm")
-
-        {:halt, socket}
-
       true ->
         {:cont, socket}
     end
@@ -195,17 +184,6 @@ defmodule EmotheWeb.UserAuth do
           socket
           |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
           |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
-
-        {:halt, socket}
-
-      not Accounts.confirmed?(socket.assigns.current_user) ->
-        socket =
-          socket
-          |> Phoenix.LiveView.put_flash(
-            :info,
-            gettext("Please confirm your email address first.")
-          )
-          |> Phoenix.LiveView.redirect(to: ~p"/users/confirm")
 
         {:halt, socket}
 
@@ -266,12 +244,6 @@ defmodule EmotheWeb.UserAuth do
         |> put_flash(:error, gettext("You must log in to access this page."))
         |> maybe_store_return_to()
         |> redirect(to: ~p"/users/log-in")
-        |> halt()
-
-      not Accounts.confirmed?(conn.assigns.current_user) ->
-        conn
-        |> put_flash(:info, gettext("Please confirm your email address first."))
-        |> redirect(to: ~p"/users/confirm")
         |> halt()
 
       true ->

@@ -3,10 +3,6 @@ defmodule Emothe.RoundtripTest do
 
   require Logger
 
-  alias Emothe.Import.TeiParser
-  alias Emothe.Export.TeiXml
-  alias Emothe.Catalogue
-
   @moduledoc """
   Roundtrip tests using real-world TEI fixture files from the EMOTHE corpus.
   Verifies that import → export preserves structural integrity:
@@ -23,6 +19,9 @@ defmodule Emothe.RoundtripTest do
   # characters (e.g. who="#ALB #COR") which the parser can't resolve to one ID.
   # We warn instead of failing so the delta is visible without blocking CI.
   @warn_fields ~w(speaker_refs)a
+
+  _ = @fields
+  _ = @warn_fields
 
   defp ms_since(t0_native) do
     System.convert_time_unit(System.monotonic_time() - t0_native, :native, :millisecond)
@@ -449,6 +448,87 @@ defmodule Emothe.RoundtripTest do
     end
   end
 
+  test "roundtrip helper functions smoke" do
+    sample_xml = """
+    <TEI><text><front><div type=\"dedicatoria\"><p>Nota</p></div><div type=\"elenco\"><castList><castItem ana=\"oculto\"><role>Don X</role></castItem></castList></div></front><body><div1><head>Acto I</head><div2><head>Escena I</head><sp who=\"#X\"><speaker>X</speaker><l n=\"1\" xml:id=\"l1\" part=\"I\"><seg type=\"aside\">Aparte</seg></l></sp><lg type=\"redondilla\"><l n=\"2\" xml:id=\"l2\">linea</l></lg><stage>Sale</stage></div2></div1></body></text></TEI>
+    """
+
+    t0 = System.monotonic_time()
+    assert ms_since(t0) >= 0
+    roundtrip_log("SMOKE", "helpers")
+
+    tmp =
+      Path.join(System.tmp_dir!(), "roundtrip-smoke-#{System.unique_integer([:positive])}.xml")
+
+    File.write!(tmp, sample_xml)
+    assert read_original(tmp) =~ "<TEI>"
+    File.rm!(tmp)
+
+    body = extract_body(sample_xml)
+    front = extract_front(sample_xml)
+
+    assert count_tag(body, "l") == 2
+    assert count_stage_dirs(body) == 1
+    assert count_part_attrs(body) == 1
+    assert count_who_attrs(body) == 1
+    assert count_verse_type_attrs(body) == 1
+    assert count_hidden_chars(front) == 1
+    assert count_front_note_divs(front) == 1
+    assert count_heads_in_body(body) == 2
+    assert count_aside_elements(body) == 1
+
+    counts = structural_counts(sample_xml)
+    assert counts.verses == 2
+    assert counts.speeches == 1
+    assert counts.scenes == 1
+    assert counts.acts == 1
+
+    assert xml_escape("A & B") == "A &amp; B"
+    assert_export_includes_text("SMOKE", "<x>abc</x>", "plain", "abc")
+    assert_export_includes_text("SMOKE", "<x></x>", "nil", nil)
+
+    assert normalize_ws("  a\n\tb  ") == "a b"
+    assert strip_tags("<p> Hola <b>mundo</b> </p>") == "Hola mundo"
+    assert extract_between("<a>z</a>", "<a>", "<\\/a>") == "z"
+    assert character_roles_in_order(sample_xml) == ["Don X"]
+
+    source_xml =
+      "<sourceDesc><bibl><title>Fuente A</title></bibl><bibl><title>Fuente B</title></bibl></sourceDesc>"
+
+    assert source_titles_in_order(source_xml) == ["Fuente A", "Fuente B"]
+
+    tokens = verse_line_tokens_in_order(sample_xml)
+    assert length(tokens) == 2
+    assert distinct_verse_numbers(sample_xml) == 2
+
+    assert_order_preserved("SMOKE", "order", [1, 2], [1, 2])
+
+    play = %{
+      verse_count: 2,
+      is_verse: true,
+      title: "Titulo",
+      author_name: "Autor",
+      code: "COD",
+      original_title: nil,
+      pub_place: nil,
+      publication_date: nil,
+      licence_url: nil,
+      sources: [],
+      edition_title: nil,
+      author_attribution: nil,
+      editors: [],
+      sponsor: nil,
+      funder: nil,
+      language: "es"
+    }
+
+    exported_xml =
+      "<TEI><title>Titulo</title><author>Autor</author><idno>COD</idno><extent>2 versos</extent><language ident=\"es-ES\">Español</language></TEI>"
+
+    assert_derived_verse_fields("SMOKE", play, sample_xml, exported_xml)
+    assert_metadata_roundtrip("SMOKE", play, exported_xml)
+  end
+
   # Files that already pass roundtrip — skip them to speed up iteration.
   # Move files back out of this list when re-verifying the full suite.
   @passing_files ~w(
@@ -518,15 +598,16 @@ defmodule Emothe.RoundtripTest do
         import_t0 = System.monotonic_time()
         roundtrip_log(@code, "IMPORT start")
 
-        assert {:ok, play} = TeiParser.import_file(path), "Failed to import #{@file_name}"
+        assert {:ok, play} = Emothe.Import.TeiParser.import_file(path),
+               "Failed to import #{@file_name}"
 
         roundtrip_log(@code, "IMPORT ok play_id=#{play.id} (#{ms_since(import_t0)}ms)")
 
         export_t0 = System.monotonic_time()
         roundtrip_log(@code, "EXPORT start")
 
-        play_full = Catalogue.get_play_with_all!(play.id)
-        exported_xml = TeiXml.generate(play_full)
+        play_full = Emothe.Catalogue.get_play_with_all!(play.id)
+        exported_xml = Emothe.Export.TeiXml.generate(play_full)
         export_counts = structural_counts(exported_xml)
 
         roundtrip_log(@code, "EXPORT ok (#{ms_since(export_t0)}ms)")

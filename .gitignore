@@ -37,3 +37,5 @@ npm-debug.log
 
 /test/fixtures/tei_files/
 /docs/screenshots/
+
+/.claude/

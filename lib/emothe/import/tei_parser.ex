@@ -1040,20 +1040,43 @@ defmodule Emothe.Import.TeiParser do
 
   defp find_children(_, _), do: []
 
-  defp text_content({_name, _attrs, children}) do
+  defp text_content({name, attrs, children}) do
+    if emph_element?(name, attrs) do
+      "<<" <> extract_plain_text(children) <> ">>"
+    else
+      children
+      |> Enum.map(fn
+        text when is_binary(text) -> String.trim(text)
+        child when is_tuple(child) -> text_content(child)
+        _ -> ""
+      end)
+      |> Enum.join(" ")
+      |> String.replace(~r/\s+/, " ")
+      |> String.trim()
+    end
+  end
+
+  defp text_content(text) when is_binary(text), do: String.trim(text)
+  defp text_content(_), do: ""
+
+  defp emph_element?("emph", _attrs), do: true
+
+  defp emph_element?("hi", attrs),
+    do: attr_value(attrs, "rend") in ["italic", "italics"]
+
+  defp emph_element?(_, _), do: false
+
+  defp extract_plain_text(children) when is_list(children) do
     children
     |> Enum.map(fn
       text when is_binary(text) -> String.trim(text)
-      child when is_tuple(child) -> text_content(child)
+      child when is_tuple(child) -> extract_plain_text(elem(child, 2))
       _ -> ""
     end)
     |> Enum.join(" ")
     |> String.replace(~r/\s+/, " ")
     |> String.trim()
   end
-
-  defp text_content(text) when is_binary(text), do: String.trim(text)
-  defp text_content(_), do: ""
 
   defp safe_text(nil), do: nil
   defp safe_text(element) when is_tuple(element), do: text_content(element)

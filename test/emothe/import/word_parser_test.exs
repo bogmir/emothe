@@ -429,6 +429,90 @@ defmodule Emothe.Import.WordParserTest do
       assert length(Enum.at(acts, 2).scenes) == 1
     end
 
+    test "detects prologue with 'The' prefix from plain text" do
+      paragraphs = [
+        "The Prologue to the King's Majesty",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Your Majesty is welcome."
+      ]
+
+      assert {:ok, %{acts: [act]}} = WordParser.parse_content(paragraphs)
+      assert act.type == "prologo"
+      assert act.head == "The Prologue to the King's Majesty"
+    end
+
+    test "detects epilogue with 'The' prefix from plain text" do
+      paragraphs = [
+        "{A}ACTO PRIMERO",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "THE EPILOGUE",
+        "{e}Escena 1",
+        "{p}RICARDO  {v}Goodbye."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      assert Enum.at(acts, 1).type == "epilogue"
+      assert Enum.at(acts, 1).head == "THE EPILOGUE"
+    end
+
+    test "{A} tag with 'The Prologue' prefix gets prologo type" do
+      paragraphs = [
+        "{A}The Prologue to the King",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello."
+      ]
+
+      assert {:ok, %{acts: [act]}} = WordParser.parse_content(paragraphs)
+      assert act.type == "prologo"
+    end
+
+    test "{e} tagged EPILOGUE creates act-level division, not scene" do
+      paragraphs = [
+        "{e}1.1",
+        "{p}JOHN  {v}Hello.",
+        "{e}EPILOGUE",
+        "{p}NARRATOR  {v}Goodbye."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      assert Enum.at(acts, 1).type == "epilogue"
+    end
+
+    test "{e} tagged PROLOGUE creates act-level division, not scene" do
+      paragraphs = [
+        "{e}Prologue",
+        "{p}NARRATOR  {v}Welcome.",
+        "{e}1.1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      assert Enum.at(acts, 0).type == "prologo"
+      assert Enum.at(acts, 1).type == "acto"
+    end
+
+    test "stores unrecognized text between structural elements" do
+      paragraphs = [
+        "PROLOGUE",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "THE SCENE: SMITHFIELD",
+        "{e}Escena 2",
+        "{p}RICARDO  {v}Goodbye."
+      ]
+
+      assert {:ok, %{acts: [act]}} = WordParser.parse_content(paragraphs)
+      # The unrecognized text should be stored as an element in the scene
+      all_elements = Enum.flat_map(act.scenes, & &1.elements)
+      unrecognized = Enum.filter(all_elements, &(&1.type == "unrecognized"))
+      assert length(unrecognized) == 1
+      assert hd(unrecognized).content == "THE SCENE: SMITHFIELD"
+    end
+
     test "prologue and epilogue have no act number in result" do
       paragraphs = [
         "{A}PROLOGUE",
@@ -564,6 +648,40 @@ defmodule Emothe.Import.WordParserTest do
       assert length(verse_lines) > 0
     end
 
+    test "prologue + M.N scenes: prologue nil, Act 1 gets number 1" do
+      play = insert_play()
+
+      paragraphs = [
+        "The Prologue to the King's Majesty",
+        "{e}Prol.1",
+        "{p}NARRATOR  {v}Your Majesty is welcome.",
+        "{e}1.1",
+        "{p}JOHN  {v}Act one scene one.",
+        "{e}1.2",
+        "{p}JANE  {v}Act one scene two.",
+        "{e}2.1",
+        "{p}JOHN  {v}Act two."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions =
+        list_divisions(play.id)
+        |> Enum.filter(&(is_nil(&1.parent_id) and &1.type != "elenco"))
+        |> Enum.sort_by(& &1.position)
+
+      assert length(divisions) == 3
+
+      [prologue, act1, act2] = divisions
+      assert prologue.type == "prologo"
+      assert prologue.number == nil
+      assert act1.type == "acto"
+      assert act1.number == 1
+      assert act2.type == "acto"
+      assert act2.number == 2
+    end
+
     test "prologue/epilogue get no division number, acts get sequential numbers" do
       play = insert_play()
 
@@ -586,7 +704,9 @@ defmodule Emothe.Import.WordParserTest do
       assert {:ok, _} = WordParser.import_content(play.id, path)
 
       divisions =
-        list_divisions(play.id) |> Enum.filter(&is_nil(&1.parent_id)) |> Enum.sort_by(& &1.position)
+        list_divisions(play.id)
+        |> Enum.filter(&(is_nil(&1.parent_id) and &1.type != "elenco"))
+        |> Enum.sort_by(& &1.position)
 
       assert length(divisions) == 4
 
@@ -599,6 +719,27 @@ defmodule Emothe.Import.WordParserTest do
       assert act2.number == 2
       assert epilogue.type == "epilogue"
       assert epilogue.number == nil
+    end
+
+    test "stores unrecognized text as element in DB" do
+      play = insert_play()
+
+      paragraphs = [
+        "PROLOGUE",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "THE SCENE: SMITHFIELD",
+        "{e}Escena 2",
+        "{p}RICARDO  {v}Goodbye."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      elements = list_elements(play.id)
+      unrecognized = Enum.filter(elements, &(&1.type == "unrecognized"))
+      assert length(unrecognized) == 1
+      assert hd(unrecognized).content == "THE SCENE: SMITHFIELD"
     end
 
     test "front matter is stored as editorial note" do
@@ -622,6 +763,49 @@ defmodule Emothe.Import.WordParserTest do
       assert note.section_type == "nota"
       assert note.content =~ "BARTHOLOMEW FAIR"
       assert note.content =~ "Ben Jonson"
+    end
+  end
+
+  # --- Phase 4b: Elenco auto-creation ---
+
+  describe "import_content/2 elenco division" do
+    test "creates elenco division when characters exist" do
+      play = insert_play()
+
+      paragraphs = [
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "{p}RICARDO  {v}Goodbye."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions = list_divisions(play.id)
+      elenco = Enum.find(divisions, &(&1.type == "elenco"))
+      assert elenco != nil
+      assert elenco.position == 0
+      assert elenco.parent_id == nil
+    end
+
+    test "elenco at position 0, acts start at position 1" do
+      play = insert_play()
+
+      paragraphs = [
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions =
+        list_divisions(play.id) |> Enum.filter(&is_nil(&1.parent_id)) |> Enum.sort_by(& &1.position)
+
+      [elenco | acts] = divisions
+      assert elenco.type == "elenco"
+      assert elenco.position == 0
+      assert Enum.all?(acts, &(&1.position >= 1))
     end
   end
 
@@ -706,6 +890,250 @@ defmodule Emothe.Import.WordParserTest do
       characters = list_characters(play.id)
       assert length(characters) == 1
       assert hd(characters).name == "RICARDO"
+    end
+  end
+
+  # --- Phase 6: Statistics ---
+
+  describe "import_content/2 statistics" do
+    test "statistics are available after import with character appearances" do
+      play = insert_play()
+
+      paragraphs = [
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "{p}FEBO  {v}Again.",
+        "{p}RICARDO  {v}Goodbye."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      stats = Emothe.Statistics.get_statistics(play.id)
+      assert stats != nil
+      appearances = stats.data["character_appearances"]
+      assert length(appearances) == 2
+      febo = Enum.find(appearances, &(&1["name"] == "FEBO"))
+      assert febo["speeches"] == 2
+    end
+  end
+
+  # --- Phase 7: Scene-less divisions & induction ---
+
+  describe "parse_content/1 induction and scene-less divisions" do
+    test "{e} tagged induction creates act-level division" do
+      paragraphs = [
+        "{e}The Induction on the Stage",
+        "{p}STAGE-KEEPER  {v}Welcome to the fair.",
+        "{e}1.1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      assert Enum.at(acts, 0).type == "induction"
+      assert Enum.at(acts, 0).head == "The Induction on the Stage"
+      assert Enum.at(acts, 1).type == "acto"
+    end
+
+    test "plain text THE INDUCTION creates act-level division" do
+      paragraphs = [
+        "THE INDUCTION",
+        "{e}Escena 1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      assert {:ok, %{acts: [act]}} = WordParser.parse_content(paragraphs)
+      assert act.type == "induction"
+      assert act.head == "THE INDUCTION"
+    end
+
+    test "{e}THE END stored as unrecognized, not as scene" do
+      paragraphs = [
+        "{e}1.1",
+        "{p}JOHN  {v}Hello.",
+        "{e}THE END"
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      # Should only have 1 act, THE END should not create a new act or scene
+      assert length(acts) == 1
+      act = hd(acts)
+      # THE END should be stored as unrecognized element
+      all_elements = Enum.flat_map(act.scenes, & &1.elements) ++
+        Map.get(act, :_direct_elements, [])
+      unrecognized = Enum.filter(all_elements, &(&1.type == "unrecognized"))
+      assert length(unrecognized) == 1
+      assert hd(unrecognized).content == "THE END"
+    end
+
+    test "prologue with {V} lines and no {e} scene stores direct elements" do
+      paragraphs = [
+        "{A}The Prologue to the King's Majesty",
+        "{V}Your Majesty is welcome to a Fair;",
+        "{V}To view the Scenes, Time hath not spar'd to share.",
+        "{A}ACTO PRIMERO",
+        "{e}1.1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      prologue = hd(acts)
+      assert prologue.type == "prologo"
+      # Prologue should have no scenes but have direct elements
+      assert prologue.scenes == []
+      direct = Map.get(prologue, :_direct_elements, [])
+      assert length(direct) >= 1
+      verse_lines = Enum.filter(direct, fn
+        %{type: "speech"} = s -> Enum.any?(s.children, &(&1.type == "verse_line"))
+        %{type: "verse_line"} -> true
+        _ -> false
+      end)
+      assert length(verse_lines) >= 1
+    end
+
+    test "epilogue with {V} lines and no {e} scene stores direct elements" do
+      paragraphs = [
+        "{e}1.1",
+        "{p}JOHN  {v}Hello.",
+        "{e}The Epilogue",
+        "{V}Your Majesty hath seen the play,",
+        "{V}And we do hope you liked the day."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      epilogue = Enum.at(acts, 1)
+      assert epilogue.type == "epilogue"
+      assert epilogue.scenes == []
+      direct = Map.get(epilogue, :_direct_elements, [])
+      assert length(direct) >= 1
+    end
+
+    test "induction with content and no {e} scene stores direct elements" do
+      paragraphs = [
+        "{e}The Induction on the Stage",
+        "{p}STAGE-KEEPER  {v}Welcome everyone.",
+        "{ac}Exit Stage-Keeper.",
+        "{e}1.1",
+        "{p}JOHN  {v}Act one."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 2
+      induction = hd(acts)
+      assert induction.type == "induction"
+      # Induction should have direct elements (no scenes)
+      direct = Map.get(induction, :_direct_elements, [])
+      assert length(direct) >= 1
+    end
+
+    test "normal acts still have scenes as before" do
+      paragraphs = [
+        "{A}ACTO PRIMERO",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "{e}Escena 2",
+        "{p}RICARDO  {v}Goodbye."
+      ]
+
+      assert {:ok, %{acts: [act]}} = WordParser.parse_content(paragraphs)
+      assert act.type == "acto"
+      assert length(act.scenes) == 2
+    end
+
+    test "unrecognized text in scene-less division goes to _direct_elements" do
+      paragraphs = [
+        "{A}PROLOGUE",
+        "THE SCENE: SMITHFIELD",
+        "{V}Welcome to Smithfield.",
+        "{A}ACTO PRIMERO",
+        "{e}1.1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      prologue = hd(acts)
+      assert prologue.type == "prologo"
+      direct = Map.get(prologue, :_direct_elements, [])
+      unrecognized = Enum.filter(direct, &(&1.type == "unrecognized"))
+      assert length(unrecognized) == 1
+      assert hd(unrecognized).content == "THE SCENE: SMITHFIELD"
+    end
+  end
+
+  describe "import_content/2 scene-less divisions" do
+    test "prologue division has elements directly, no child scene" do
+      play = insert_play()
+
+      paragraphs = [
+        "{A}The Prologue to the King's Majesty",
+        "{V}Your Majesty is welcome to a Fair;",
+        "{A}ACTO PRIMERO",
+        "{e}1.1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions = list_divisions(play.id)
+      prologue = Enum.find(divisions, &(&1.type == "prologo"))
+      assert prologue != nil
+
+      # No child scene divisions under prologue
+      child_scenes = Enum.filter(divisions, &(&1.parent_id == prologue.id))
+      assert child_scenes == []
+
+      # But elements exist directly on the prologue division
+      elements = list_elements(play.id)
+      prologue_elements = Enum.filter(elements, &(&1.division_id == prologue.id))
+      assert length(prologue_elements) >= 1
+    end
+
+    test "induction division type is stored correctly in DB" do
+      play = insert_play()
+
+      paragraphs = [
+        "{e}The Induction on the Stage",
+        "{p}STAGE-KEEPER  {v}Welcome everyone.",
+        "{e}1.1",
+        "{p}JOHN  {v}Hello."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions = list_divisions(play.id)
+      induction = Enum.find(divisions, &(&1.type == "induction"))
+      assert induction != nil
+      assert induction.title == "The Induction on the Stage"
+    end
+
+    test "induction gets no act number" do
+      play = insert_play()
+
+      paragraphs = [
+        "{e}The Induction on the Stage",
+        "{p}STAGE-KEEPER  {v}Welcome.",
+        "{e}1.1",
+        "{p}JOHN  {v}Act one."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions =
+        list_divisions(play.id)
+        |> Enum.filter(&(is_nil(&1.parent_id) and &1.type != "elenco"))
+        |> Enum.sort_by(& &1.position)
+
+      [induction, act1] = divisions
+      assert induction.type == "induction"
+      assert induction.number == nil
+      assert act1.type == "acto"
+      assert act1.number == 1
     end
   end
 

@@ -87,6 +87,7 @@ defmodule Emothe.Statistics do
   defp list_all_elements(play_id) do
     Element
     |> where(play_id: ^play_id)
+    |> preload(:character)
     |> Repo.all()
   end
 
@@ -186,10 +187,30 @@ defmodule Emothe.Statistics do
   end
 
   defp character_appearances(elements) do
+    # Build character name lookup from preloaded associations
+    char_names =
+      elements
+      |> Enum.filter(&(&1.type == "speech" && &1.character_id != nil))
+      |> Enum.map(& &1.character)
+      |> Enum.reject(&is_nil/1)
+      |> Map.new(&{&1.id, &1.name})
+
     elements
-    |> Enum.filter(&(&1.type == "speech" && &1.speaker_label != nil))
-    |> Enum.frequencies_by(& &1.speaker_label)
-    |> Enum.sort_by(fn {_name, count} -> -count end)
-    |> Enum.map(fn {name, count} -> %{"name" => name, "speeches" => count} end)
+    |> Enum.filter(&(&1.type == "speech"))
+    |> Enum.group_by(fn el ->
+      cond do
+        el.character_id && Map.has_key?(char_names, el.character_id) ->
+          char_names[el.character_id]
+
+        el.speaker_label && el.speaker_label != "" ->
+          el.speaker_label
+
+        true ->
+          nil
+      end
+    end)
+    |> Map.delete(nil)
+    |> Enum.map(fn {name, speeches} -> %{"name" => name, "speeches" => length(speeches)} end)
+    |> Enum.sort_by(fn %{"speeches" => count} -> -count end)
   end
 end

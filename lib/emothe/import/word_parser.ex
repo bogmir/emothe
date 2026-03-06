@@ -17,6 +17,15 @@ defmodule Emothe.Import.WordParser do
     end
   end
 
+  defp unescape_xml(text) do
+    text
+    |> String.replace("&amp;", "&")
+    |> String.replace("&lt;", "<")
+    |> String.replace("&gt;", ">")
+    |> String.replace("&quot;", "\"")
+    |> String.replace("&apos;", "'")
+  end
+
   defp open_zip(path) do
     path_charlist = String.to_charlist(path)
 
@@ -43,7 +52,7 @@ defmodule Emothe.Import.WordParser do
     |> Enum.map(fn [paragraph_xml] ->
       # Extract all <w:t> text content within this paragraph
       Regex.scan(~r/<w:t[^>]*>(.*?)<\/w:t>/s, paragraph_xml)
-      |> Enum.map(fn [_full, text] -> text end)
+      |> Enum.map(fn [_full, text] -> unescape_xml(text) end)
       |> Enum.join("")
     end)
   end
@@ -189,10 +198,9 @@ defmodule Emothe.Import.WordParser do
 
     cond do
       Regex.match?(~r/^JORNADA\b/iu, trimmed) -> "jornada"
-      Regex.match?(~r/^PR[OÓ]LOGO\b/iu, trimmed) -> "prologo"
-      Regex.match?(~r/^PROLOGUE\b/iu, trimmed) -> "prologo"
-      Regex.match?(~r/^EP[IÍ]LOGO\b/iu, trimmed) -> "epilogue"
-      Regex.match?(~r/^EPILOGUE\b/iu, trimmed) -> "epilogue"
+      Regex.match?(~r/^(THE\s+)?PR[OÓ]LOG(O|UE)\b/iu, trimmed) -> "prologo"
+      Regex.match?(~r/^(THE\s+)?EP[IÍ]LOG(O|UE)\b/iu, trimmed) -> "epilogue"
+      Regex.match?(~r/^(THE\s+)?INDUCTION\b/iu, trimmed) -> "induction"
       true -> "acto"
     end
   end
@@ -209,10 +217,9 @@ defmodule Emothe.Import.WordParser do
           Regex.match?(~r/^ACT\s/i, trimmed) -> {:ok, "acto", trimmed}
           Regex.match?(~r/^ACTE\s/i, trimmed) -> {:ok, "acto", trimmed}
           Regex.match?(~r/^ATTO\s/i, trimmed) -> {:ok, "acto", trimmed}
-          Regex.match?(~r/^PR[OÓ]LOGO\b/iu, trimmed) -> {:ok, "prologo", trimmed}
-          Regex.match?(~r/^PROLOGUE\b/iu, trimmed) -> {:ok, "prologo", trimmed}
-          Regex.match?(~r/^EP[IÍ]LOGO\b/iu, trimmed) -> {:ok, "epilogue", trimmed}
-          Regex.match?(~r/^EPILOGUE\b/iu, trimmed) -> {:ok, "epilogue", trimmed}
+          Regex.match?(~r/^(THE\s+)?PR[OÓ]LOG(O|UE)\b/iu, trimmed) -> {:ok, "prologo", trimmed}
+          Regex.match?(~r/^(THE\s+)?EP[IÍ]LOG(O|UE)\b/iu, trimmed) -> {:ok, "epilogue", trimmed}
+          Regex.match?(~r/^(THE\s+)?INDUCTION\b/iu, trimmed) -> {:ok, "induction", trimmed}
           true -> :not_act
         end
 
@@ -235,7 +242,7 @@ defmodule Emothe.Import.WordParser do
       has_tag?(segments, :act) ->
         heading = get_tag_text(segments, :act)
         act_type = detect_act_type(heading)
-        act = %{type: act_type, head: heading, scenes: [], _open: true}
+        act = %{type: act_type, head: heading, scenes: [], _direct_elements: [], _open: true}
 
         {acts ++ [act],
          %{state | current_act: length(acts), current_scene: nil, current_speech: nil}}
@@ -243,31 +250,83 @@ defmodule Emothe.Import.WordParser do
       # Auto-detected act heading from plain text (fallback)
       match?({:ok, _, _}, detect_act_heading(segments)) ->
         {:ok, act_type, heading} = detect_act_heading(segments)
-        act = %{type: act_type, head: heading, scenes: [], _open: true}
+        act = %{type: act_type, head: heading, scenes: [], _direct_elements: [], _open: true}
 
         {acts ++ [act],
          %{state | current_act: length(acts), current_scene: nil, current_speech: nil}}
 
       has_tag?(segments, :scene) ->
         scene_text = get_tag_text(segments, :scene)
-        scene = %{head: scene_text, elements: [], _open: true}
-        # Auto-detect act boundary from M.N scene numbering
-        acts = maybe_insert_act_from_scene_number(acts, scene_text)
-        acts = ensure_act(acts, state)
-        acts = append_scene(acts, scene)
-        act_idx = length(acts) - 1
-        scene_idx = length(List.last(acts).scenes) - 1
-        {acts, %{state | current_act: act_idx, current_scene: scene_idx, current_speech: nil}}
+
+        cond do
+          is_act_level_scene?(scene_text) ->
+            # {e}EPILOGUE or {e}Prologue or {e}Induction → treat as act-level division
+            act_type = detect_act_type(scene_text)
+            act = %{type: act_type, head: scene_text, scenes: [], _direct_elements: [], _open: true}
+
+            {acts ++ [act],
+             %{state | current_act: length(acts), current_scene: nil, current_speech: nil}}
+
+          is_end_marker?(scene_text) ->
+            # {e}THE END → store as unrecognized element, not as scene
+            if acts != [] do
+              el = %{type: "unrecognized", content: String.trim(scene_text)}
+              acts = append_element_smart(acts, el)
+              {acts, %{state | current_speech: nil}}
+            else
+              {acts, state}
+            end
+
+          true ->
+            scene = %{head: scene_text, elements: [], _open: true}
+            # Auto-detect act boundary from M.N scene numbering
+            acts = maybe_insert_act_from_scene_number(acts, scene_text)
+            acts = ensure_act(acts, state)
+            acts = append_scene(acts, scene)
+            act_idx = length(acts) - 1
+            scene_idx = length(List.last(acts).scenes) - 1
+            {acts, %{state | current_act: act_idx, current_scene: scene_idx, current_speech: nil}}
+        end
 
       is_untagged_text?(segments) ->
-        # Skip untagged text lines (titles, blank lines, etc.)
-        {acts, state}
+        text = segments_to_text(segments)
+
+        if String.trim(text) != "" and acts != [] do
+          # Store unrecognized text as an element so admin can review
+          el = %{type: "unrecognized", content: String.trim(text)}
+          acts = append_element_smart(acts, el)
+          {acts, %{state | current_speech: nil}}
+        else
+          {acts, state}
+        end
 
       true ->
         acts = ensure_act(acts, state)
-        acts = ensure_scene(acts)
-        process_content_segments(segments, acts, state)
+        current_act = List.last(acts)
+
+        if is_sceneless_type?(current_act.type) and current_act.scenes == [] do
+          process_direct_content(segments, acts, state)
+        else
+          acts = ensure_scene(acts)
+          process_content_segments(segments, acts, state)
+        end
     end
+  end
+
+  defp is_act_level_scene?(text) do
+    trimmed = String.trim(text)
+
+    Regex.match?(~r/^(THE\s+)?PR[OÓ]LOG(O|UE)\b/iu, trimmed) or
+      Regex.match?(~r/^(THE\s+)?EP[IÍ]LOG(O|UE)\b/iu, trimmed) or
+      Regex.match?(~r/^(THE\s+)?INDUCTION\b/iu, trimmed)
+  end
+
+  defp is_end_marker?(text) do
+    Regex.match?(~r/^THE\s+END\b/i, String.trim(text))
+  end
+
+  defp is_sceneless_type?(type) do
+    type in ["prologo", "epilogue", "induction"]
   end
 
   defp has_tag?(segments, tag), do: Enum.any?(segments, fn {t, _} -> t == tag end)
@@ -390,6 +449,81 @@ defmodule Emothe.Import.WordParser do
     end)
   end
 
+  # Appends element to either _direct_elements (for scene-less types) or scene
+  defp append_element_smart(acts, element) do
+    act = List.last(acts)
+
+    if is_sceneless_type?(act.type) and act.scenes == [] do
+      append_direct_element(acts, element)
+    else
+      acts = ensure_scene(acts)
+      append_element(acts, element)
+    end
+  end
+
+  defp append_direct_element(acts, element) do
+    act = List.last(acts)
+    direct = Map.get(act, :_direct_elements, [])
+    updated = %{act | _direct_elements: direct ++ [element]}
+    List.replace_at(acts, -1, updated)
+  end
+
+  defp process_direct_content(segments, acts, state) do
+    has_speaker = has_tag?(segments, :speaker)
+
+    if has_speaker do
+      speaker_label = get_tag_text(segments, :speaker)
+      children = build_children(segments)
+      speech = %{type: "speech", speaker_label: speaker_label, children: children, _open: true}
+      acts = append_direct_element(acts, speech)
+      {acts, %{state | current_speech: :open_direct}}
+    else
+      content_segments =
+        Enum.reject(segments, fn {t, _} ->
+          t in [:text] and String.trim(elem({t, ""}, 1)) == ""
+        end)
+
+      case content_segments do
+        [{:stage_direction, text}] ->
+          el = %{type: "stage_direction", content: text}
+          acts = append_direct_element(acts, el)
+          {acts, state}
+
+        [{:stanza, _}] ->
+          el = %{type: "line_group", content: ""}
+          acts = append_direct_element(acts, el)
+          {acts, state}
+
+        _ ->
+          children = build_children(segments)
+
+          if state.current_speech in [:open_direct] and children != [] do
+            acts = append_children_to_last_direct_speech(acts, children)
+            {acts, state}
+          else
+            Enum.reduce(children, {acts, state}, fn child, {a, s} ->
+              {append_direct_element(a, child), s}
+            end)
+          end
+      end
+    end
+  end
+
+  defp append_children_to_last_direct_speech(acts, children) do
+    act = List.last(acts)
+    direct = Map.get(act, :_direct_elements, [])
+
+    case List.last(direct) do
+      %{type: "speech"} = speech ->
+        updated = %{speech | children: speech.children ++ children}
+        updated_direct = List.replace_at(direct, -1, updated)
+        List.replace_at(acts, -1, %{act | _direct_elements: updated_direct})
+
+      _ ->
+        acts
+    end
+  end
+
   defp append_children_to_last_speech(acts, children) do
     update_last_scene(acts, fn scene ->
       elements = scene.elements
@@ -423,7 +557,9 @@ defmodule Emothe.Import.WordParser do
 
       act |> Map.drop([:_open, :_act_num]) |> Map.put(:scenes, scenes)
     end)
-    |> Enum.reject(&(&1.scenes == []))
+    |> Enum.reject(fn act ->
+      act.scenes == [] and Map.get(act, :_direct_elements, []) == []
+    end)
   end
 
   @doc """
@@ -463,13 +599,28 @@ defmodule Emothe.Import.WordParser do
         # Auto-create characters from unique speaker labels
         character_map = create_characters_from_acts(acts, play_id)
 
+        # Auto-create elenco division if characters were found
+        elenco_offset =
+          if character_map != %{} do
+            PlayContent.create_division(%{
+              play_id: play_id,
+              type: "elenco",
+              title: "Dramatis Personae",
+              position: 0
+            })
+
+            1
+          else
+            0
+          end
+
         # Create structure in DB
         verse_counter_ref = :counters.new(1, [:atomics])
 
         # Use reduce to track act numbering (skip prologo/epilogue)
-        Enum.with_index(acts)
+        Enum.with_index(acts, elenco_offset)
         |> Enum.reduce(1, fn {act, act_pos}, act_number ->
-          is_numbered = act.type not in ["prologo", "epilogue"]
+          is_numbered = act.type not in ["prologo", "epilogue", "induction"]
 
           {:ok, act_div} =
             PlayContent.create_division(%{
@@ -479,6 +630,20 @@ defmodule Emothe.Import.WordParser do
               number: if(is_numbered, do: act_number, else: nil),
               position: act_pos
             })
+
+          # Create elements directly on act division (for scene-less types)
+          direct_elements = Map.get(act, :_direct_elements, [])
+
+          if direct_elements != [] do
+            create_elements(
+              direct_elements,
+              play_id,
+              act_div.id,
+              nil,
+              verse_counter_ref,
+              character_map
+            )
+          end
 
           Enum.with_index(act.scenes)
           |> Enum.each(fn {scene, scene_pos} ->
@@ -505,8 +670,9 @@ defmodule Emothe.Import.WordParser do
           if is_numbered, do: act_number + 1, else: act_number
         end)
 
-        # Update verse count
+        # Update verse count and invalidate cached statistics
         Catalogue.update_verse_count(play_id)
+        Emothe.Statistics.delete_statistics(play_id)
 
         play
       end)
@@ -516,10 +682,17 @@ defmodule Emothe.Import.WordParser do
   defp create_characters_from_acts(acts, play_id) do
     alias Emothe.PlayContent
 
-    speaker_labels =
+    scene_elements =
       acts
       |> Enum.flat_map(& &1.scenes)
       |> Enum.flat_map(& &1.elements)
+
+    direct_elements =
+      acts
+      |> Enum.flat_map(&Map.get(&1, :_direct_elements, []))
+
+    speaker_labels =
+      (scene_elements ++ direct_elements)
       |> Enum.filter(&(&1.type == "speech" && &1[:speaker_label] && &1.speaker_label != ""))
       |> Enum.map(& &1.speaker_label)
       |> Enum.uniq()
@@ -585,6 +758,41 @@ defmodule Emothe.Import.WordParser do
             division_id: division_id,
             parent_id: parent_id,
             type: "line_group",
+            position: pos
+          })
+
+        %{type: "unrecognized"} ->
+          PlayContent.create_element(%{
+            play_id: play_id,
+            division_id: division_id,
+            parent_id: parent_id,
+            type: "unrecognized",
+            content: element.content,
+            position: pos
+          })
+
+        %{type: "verse_line"} ->
+          :counters.add(verse_counter, 1, 1)
+          line_num = :counters.get(verse_counter, 1)
+
+          PlayContent.create_element(%{
+            play_id: play_id,
+            division_id: division_id,
+            parent_id: parent_id,
+            type: "verse_line",
+            content: element.content,
+            part: element[:part],
+            line_number: line_num,
+            position: pos
+          })
+
+        %{type: "prose"} ->
+          PlayContent.create_element(%{
+            play_id: play_id,
+            division_id: division_id,
+            parent_id: parent_id,
+            type: "prose",
+            content: element.content,
             position: pos
           })
 

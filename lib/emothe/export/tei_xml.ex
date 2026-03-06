@@ -427,30 +427,60 @@ defmodule Emothe.Export.TeiXml do
     attrs = if el.part, do: Map.put(attrs, :part, el.part), else: attrs
     attrs = if el.rend, do: Map.put(attrs, :rend, el.rend), else: attrs
 
+    inline = build_inline_content(el.content)
+
     content =
       if el.is_aside do
-        [element(:seg, %{type: "aside"}, el.content || "")]
+        [element(:seg, %{type: "aside"}, inline)]
       else
-        el.content || ""
+        inline
       end
 
     element(:l, attrs, content)
   end
 
   defp build_element(%{type: "stage_direction"} = el) do
-    element(:stage, el.content || "")
+    element(:stage, build_inline_content(el.content))
   end
 
   defp build_element(%{type: "prose"} = el) do
+    inline = build_inline_content(el.content)
+
     content =
       if el.is_aside do
-        [element(:seg, %{type: "aside"}, el.content || "")]
+        [element(:seg, %{type: "aside"}, inline)]
       else
-        el.content || ""
+        inline
       end
 
     element(:p, content)
   end
 
   defp build_element(_), do: nil
+
+  # Converts <<text>> markers to <emph> elements for TEI export.
+  # Uses <emph> to match existing EMOTHE corpus convention.
+  # Could also use <hi rend="italic"> per TEI P5 for purely typographic italics.
+  defp build_inline_content(nil), do: ""
+
+  defp build_inline_content(text) do
+    parts =
+      Regex.split(~r/<<(.*?)>>/, text, include_captures: true)
+      |> Enum.map(fn part ->
+        case Regex.run(~r/^<<(.*)>>$/, part) do
+          [_, inner] -> element(:emph, inner)
+          nil -> part
+        end
+      end)
+      |> Enum.reject(fn
+        p when is_binary(p) -> p == ""
+        _ -> false
+      end)
+
+    case parts do
+      [] -> ""
+      [single] when is_binary(single) -> single
+      list -> list
+    end
+  end
 end

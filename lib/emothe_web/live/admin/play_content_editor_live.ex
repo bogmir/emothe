@@ -761,6 +761,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       {"Quintilla", "quintilla"},
       {"Lira", "lira"},
       {"Cancion", "cancion"},
+      {"Free", "free"},
       {"Otro", "otro"}
     ]
   end

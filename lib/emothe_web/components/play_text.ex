@@ -235,7 +235,7 @@ defmodule EmotheWeb.Components.PlayText do
         @show_split_verses && @element.part == "F" && "part-f",
         @show_split_verses && @element.part == "M" && "part-m"
       ]}>
-        {@element.content}
+        <.inline_content text={@element.content} />
       </span>
       <span
         :if={@element.line_number}
@@ -257,7 +257,7 @@ defmodule EmotheWeb.Components.PlayText do
   defp render_element(%{element: %{type: "stage_direction"}} = assigns) do
     ~H"""
     <div :if={@show_stage_directions} class="stage-direction text-center my-4 px-2 sm:px-8">
-      ({@element.content})
+      (<.inline_content text={@element.content} />)
     </div>
     """
   end
@@ -265,7 +265,7 @@ defmodule EmotheWeb.Components.PlayText do
   defp render_element(%{element: %{type: "prose"}} = assigns) do
     ~H"""
     <div :if={!@element.is_aside || @show_asides} class="ml-1 sm:ml-4 mb-2 text-justify">
-      {@element.content}
+      <.inline_content text={@element.content} />
     </div>
     """
   end
@@ -276,5 +276,33 @@ defmodule EmotheWeb.Components.PlayText do
       {@element.content}
     </div>
     """
+  end
+
+  attr :text, :string, required: true
+
+  defp inline_content(assigns) do
+    parts = split_inline_markup(assigns.text || "")
+    assigns = assign(assigns, :parts, parts)
+
+    ~H"""
+    <%= for part <- @parts do %><em :if={part.italic}>{part.text}</em><%= if !part.italic do %>{part.text}<% end %><% end %>
+    """
+  end
+
+  defp split_inline_markup(text) do
+    # Handle both literal << >> and HTML-entity &lt;&lt; &gt;&gt; forms
+    text
+    |> String.replace("&lt;&lt;", "<<")
+    |> String.replace("&gt;&gt;", ">>")
+    |> then(fn t ->
+      Regex.split(~r/<<(.*?)>>/, t, include_captures: true)
+      |> Enum.map(fn part ->
+        case Regex.run(~r/^<<(.*)>>$/, part) do
+          [_, inner] -> %{text: inner, italic: true}
+          nil -> %{text: part, italic: false}
+        end
+      end)
+      |> Enum.reject(&(&1.text == ""))
+    end)
   end
 end

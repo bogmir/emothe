@@ -27,7 +27,7 @@ defmodule Emothe.PlayContent.Division do
     |> validate_required([:type])
     |> validate_inclusion(:type, ~w(
       acto escena prologo argumento dedicatoria elenco front jornada introduccion_editor
-      act scene prologue epilogue
+      act scene prologue epilogue induction
       acte scene prologue epilogue
       play circunstancia_accion introduccion_editor_digital nota_edicion_digital head_title
     ))

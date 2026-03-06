@@ -257,6 +257,45 @@ defmodule Emothe.Export.TeiXmlTest do
     assert exported_xml =~ "An aside line"
   end
 
+  test "export converts <<text>> markers to <emph> elements" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>NIGHTINGALE</speaker>
+          <lg type="free">
+            <l n="1"><emph>Hear for your love, and buy for your money</emph></l>
+            <l n="2">Normal text here</l>
+          </lg>
+        </sp>
+        <stage><emph>Exit singing.</emph></stage>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body, code: "EMPH01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    # Verify import preserved emph as <<>>
+    elements = Emothe.Repo.all(
+      from e in Emothe.PlayContent.Element,
+      where: e.play_id == ^play.id and e.type == "verse_line",
+      order_by: e.line_number
+    )
+    emph_line = Enum.find(elements, &(&1.content =~ "Hear"))
+    assert emph_line.content == "<<Hear for your love, and buy for your money>>"
+
+    # Verify export regenerates <emph>
+    play_with_all = Catalogue.get_play_with_all!(play.id)
+    exported_xml = TeiXml.generate(play_with_all)
+
+    assert exported_xml =~ "<emph>Hear for your love, and buy for your money</emph>"
+    assert exported_xml =~ "Normal text here"
+    refute exported_xml =~ "<<Hear"
+    # Stage direction emph
+    assert exported_xml =~ "<emph>Exit singing.</emph>"
+  end
+
   test "exported TEI can be reimported without data loss" do
     front = """
     <div type="elenco">

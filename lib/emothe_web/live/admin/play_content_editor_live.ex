@@ -262,40 +262,13 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       PlayContent.update_element(element, %{character_id: character_id})
     end)
 
+    PlayContent.broadcast_content_changed(socket.assigns.play.id)
     speeches = list_speeches(socket.assigns.play.id)
 
     {:noreply,
      socket
      |> assign(speeches: speeches, selected_speeches: MapSet.new())
      |> put_flash(:info, gettext("Characters assigned."))}
-  end
-
-  def handle_event("cr_create_from_label", %{"label" => label}, socket) do
-    play = socket.assigns.play
-
-    xml_id =
-      label
-      |> String.downcase()
-      |> String.replace(~r/[^a-z0-9]+/, "_")
-      |> String.trim("_")
-
-    case PlayContent.create_character_unless_exists(%{
-           play_id: play.id,
-           xml_id: xml_id,
-           name: label,
-           position: length(socket.assigns.characters)
-         }) do
-      {:ok, _char} ->
-        characters = PlayContent.list_characters(play.id)
-
-        {:noreply,
-         socket
-         |> assign(characters: characters)
-         |> put_flash(:info, gettext("Character created."))}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, gettext("Failed to create character."))}
-    end
   end
 
   def handle_event("new_division", params, socket) do
@@ -1202,8 +1175,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             <div class="flex items-center justify-between px-4 py-3 bg-base-200/30">
               <div class="flex items-center gap-2">
                 <.icon name="hero-folder-mini" class="size-4 text-base-content/40" />
-                <span class="font-semibold">{div.title || String.capitalize(div.type)}</span>
-                <span class="text-sm text-base-content/50">{div.type} {div.number}</span>
+                <span class="font-semibold">{division_label(div)}</span>
+                <span class="badge badge-ghost badge-xs">{div.type}{if div.number, do: " #{div.number}"}</span>
               </div>
               <div class="flex items-center gap-1">
                 <button
@@ -1250,7 +1223,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   ]}
                 >
                   <.icon name="hero-document-mini" class="size-3.5" />
-                  {child.title || String.capitalize(child.type)} {child.number}
+                  {division_label(child)}
                   <span
                     :if={@selected_division_id == child.id}
                     class="badge badge-primary badge-xs ml-1"
@@ -1460,12 +1433,18 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     """
   end
 
+  defp division_label(div) do
+    if div.title do
+      div.title
+    else
+      if div.number, do: "#{String.capitalize(div.type)} #{div.number}", else: String.capitalize(div.type)
+    end
+  end
+
   defp parent_division_label(divisions, id) do
     Enum.find_value(divisions, nil, fn div ->
       Enum.find_value(div.children || [], nil, fn child ->
-        if child.id == id do
-          div.title || "#{String.capitalize(div.type)} #{div.number}"
-        end
+        if child.id == id, do: division_label(div)
       end)
     end)
   end
@@ -1473,12 +1452,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   defp current_division_label(divisions, id) do
     Enum.find_value(divisions, "Unknown", fn div ->
       if div.id == id do
-        div.title || "#{String.capitalize(div.type)} #{div.number}"
+        division_label(div)
       else
         Enum.find_value(div.children || [], nil, fn child ->
-          if child.id == id do
-            child.title || "#{String.capitalize(child.type)} #{child.number}"
-          end
+          if child.id == id, do: division_label(child)
         end)
       end
     end)
@@ -1487,11 +1464,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   defp selected_division_short_label(divisions, id) do
     Enum.find_value(divisions, nil, fn div ->
       if div.id == id do
-        String.slice(div.title || "#{String.capitalize(div.type)} #{div.number}", 0..15)
+        String.slice(division_label(div), 0..15)
       else
         Enum.find_value(div.children || [], nil, fn child ->
           if child.id == id do
-            String.slice(div.title || "#{String.capitalize(div.type)} #{div.number}", 0..15)
+            String.slice(division_label(div), 0..15)
           end
         end)
       end
@@ -1569,31 +1546,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             </div>
           </div>
 
-          <div
-            :if={@speaker_labels != []}
-            class="mt-4 rounded-box border border-base-300 bg-base-100 shadow-sm"
-          >
-            <div class="border-b border-base-300 px-4 py-3">
-              <h3 class="font-semibold text-sm">{gettext("Speaker labels in text")}</h3>
-            </div>
-            <div class="divide-y divide-base-200 max-h-64 overflow-y-auto">
-              <div
-                :for={label <- @speaker_labels}
-                :if={label && label != ""}
-                class="flex items-center justify-between px-4 py-2"
-              >
-                <span class="text-sm">{label}</span>
-                <button
-                  phx-click="cr_create_from_label"
-                  phx-value-label={label}
-                  class="btn btn-ghost btn-xs"
-                  title={gettext("Create character")}
-                >
-                  <.icon name="hero-plus-mini" class="size-3" />
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
         <%!-- Right: Speeches list --%>

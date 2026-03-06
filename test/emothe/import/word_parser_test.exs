@@ -366,6 +366,88 @@ defmodule Emothe.Import.WordParserTest do
       assert length(act.scenes) == 1
       assert hd(act.scenes).head == "Escena 1"
     end
+
+    test "extracts front matter before first {e} tag" do
+      paragraphs = [
+        "BARTHOLOMEW FAIR",
+        "Ben Jonson",
+        "Copyright 2020",
+        "{e}1.1",
+        "{p}FEBO  {v}Hello."
+      ]
+
+      assert {:ok, %{front_matter: front_matter}} = WordParser.parse_content(paragraphs)
+      assert front_matter =~ "BARTHOLOMEW FAIR"
+      assert front_matter =~ "Ben Jonson"
+      assert front_matter =~ "Copyright 2020"
+    end
+
+    test "front matter includes tagged content before first {e}" do
+      paragraphs = [
+        "{PR}THE PROLOGUE TO THE KING",
+        "{V}Your Majesty is welcome",
+        "{e}1.1",
+        "{p}FEBO  {v}Hello."
+      ]
+
+      assert {:ok, %{front_matter: front_matter}} = WordParser.parse_content(paragraphs)
+      assert front_matter =~ "THE PROLOGUE TO THE KING"
+      assert front_matter =~ "Your Majesty is welcome"
+    end
+
+    test "no front matter when first line is {e} tag" do
+      paragraphs = [
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello."
+      ]
+
+      assert {:ok, %{front_matter: nil}} = WordParser.parse_content(paragraphs)
+    end
+
+    test "auto-detects act boundaries from M.N scene numbering" do
+      paragraphs = [
+        "{e}1.1",
+        "{p}FEBO  {v}Hello.",
+        "{e}1.2",
+        "{p}RICARDO  {v}Goodbye.",
+        "{e}2.1",
+        "{p}FEBO  {v}Act two.",
+        "{e}2.2",
+        "{p}RICARDO  {v}Still act two.",
+        "{e}3.1",
+        "{p}FEBO  {v}Act three."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 3
+      assert Enum.at(acts, 0).head == "Act 1"
+      assert Enum.at(acts, 1).head == "Act 2"
+      assert Enum.at(acts, 2).head == "Act 3"
+      # Act 1 has 2 scenes, Act 2 has 2 scenes, Act 3 has 1 scene
+      assert length(Enum.at(acts, 0).scenes) == 2
+      assert length(Enum.at(acts, 1).scenes) == 2
+      assert length(Enum.at(acts, 2).scenes) == 1
+    end
+
+    test "prologue and epilogue have no act number in result" do
+      paragraphs = [
+        "{A}PROLOGUE",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Hello.",
+        "{A}ACTO PRIMERO",
+        "{e}Escena 1",
+        "{p}RICARDO  {v}Main play.",
+        "{A}EPILOGUE",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Goodbye."
+      ]
+
+      assert {:ok, %{acts: acts}} = WordParser.parse_content(paragraphs)
+      assert length(acts) == 3
+      assert Enum.at(acts, 0).type == "prologo"
+      assert Enum.at(acts, 1).type == "acto"
+      assert Enum.at(acts, 2).type == "epilogue"
+    end
   end
 
   # --- Phase 4: DB integration ---
@@ -480,6 +562,66 @@ defmodule Emothe.Import.WordParserTest do
       verse_lines = Enum.filter(elements, &(&1.type == "verse_line"))
       assert length(speeches) > 0
       assert length(verse_lines) > 0
+    end
+
+    test "prologue/epilogue get no division number, acts get sequential numbers" do
+      play = insert_play()
+
+      paragraphs = [
+        "{A}PROLOGUE",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Prologue speech.",
+        "{A}ACTO PRIMERO",
+        "{e}Escena 1",
+        "{p}RICARDO  {v}Act one.",
+        "{A}ACTO SEGUNDO",
+        "{e}Escena 1",
+        "{p}FEBO  {v}Act two.",
+        "{A}EPILOGUE",
+        "{e}Escena 1",
+        "{p}RICARDO  {v}Epilogue speech."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      divisions =
+        list_divisions(play.id) |> Enum.filter(&is_nil(&1.parent_id)) |> Enum.sort_by(& &1.position)
+
+      assert length(divisions) == 4
+
+      [prologue, act1, act2, epilogue] = divisions
+      assert prologue.type == "prologo"
+      assert prologue.number == nil
+      assert act1.type == "acto"
+      assert act1.number == 1
+      assert act2.type == "acto"
+      assert act2.number == 2
+      assert epilogue.type == "epilogue"
+      assert epilogue.number == nil
+    end
+
+    test "front matter is stored as editorial note" do
+      play = insert_play()
+
+      paragraphs = [
+        "BARTHOLOMEW FAIR",
+        "Ben Jonson",
+        "{e}1.1",
+        "{p}FEBO  {v}Hello."
+      ]
+
+      path = write_test_docx(paragraphs)
+      assert {:ok, _} = WordParser.import_content(play.id, path)
+
+      alias Emothe.Catalogue.PlayEditorialNote
+      notes = Emothe.Repo.all(from n in PlayEditorialNote, where: n.play_id == ^play.id)
+      assert length(notes) == 1
+      note = hd(notes)
+      assert note.heading == "Front matter"
+      assert note.section_type == "nota"
+      assert note.content =~ "BARTHOLOMEW FAIR"
+      assert note.content =~ "Ben Jonson"
     end
   end
 

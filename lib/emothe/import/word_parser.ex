@@ -129,8 +129,11 @@ defmodule Emothe.Import.WordParser do
   def parse_content(paragraphs) do
     parsed_lines = Enum.map(paragraphs, &parse_line/1)
 
+    # Split front matter (before first {e} or {A} tag) from play content
+    {front_lines, content_lines} = split_front_matter(parsed_lines)
+
     {acts, _state} =
-      parsed_lines
+      content_lines
       |> Enum.reduce({[], %{current_act: nil, current_scene: nil, current_speech: nil}}, fn
         segments, {acts, state} ->
           process_line(segments, acts, state)
@@ -147,7 +150,37 @@ defmodule Emothe.Import.WordParser do
         acts
       end
 
-    {:ok, %{acts: acts, warnings: []}}
+    # Build front matter text from non-empty lines
+    front_matter =
+      front_lines
+      |> Enum.map(&segments_to_text/1)
+      |> Enum.filter(&(&1 != ""))
+      |> Enum.join("\n")
+
+    front_matter = if front_matter == "", do: nil, else: front_matter
+
+    {:ok, %{acts: acts, front_matter: front_matter, warnings: []}}
+  end
+
+  defp split_front_matter(parsed_lines) do
+    boundary =
+      Enum.find_index(parsed_lines, fn segments ->
+        has_tag?(segments, :scene) or has_tag?(segments, :act) or
+          match?({:ok, _, _}, detect_act_heading(segments))
+      end)
+
+    case boundary do
+      nil -> {[], parsed_lines}
+      0 -> {[], parsed_lines}
+      idx -> Enum.split(parsed_lines, idx)
+    end
+  end
+
+  defp segments_to_text(segments) do
+    segments
+    |> Enum.map(fn {_tag, text} -> text end)
+    |> Enum.join(" ")
+    |> String.trim()
   end
 
   # Detect act type from heading text (used by both {A} tag and auto-detection)
@@ -218,6 +251,8 @@ defmodule Emothe.Import.WordParser do
       has_tag?(segments, :scene) ->
         scene_text = get_tag_text(segments, :scene)
         scene = %{head: scene_text, elements: [], _open: true}
+        # Auto-detect act boundary from M.N scene numbering
+        acts = maybe_insert_act_from_scene_number(acts, scene_text)
         acts = ensure_act(acts, state)
         acts = append_scene(acts, scene)
         act_idx = length(acts) - 1
@@ -242,6 +277,30 @@ defmodule Emothe.Import.WordParser do
       {_, text} -> text
       nil -> ""
     end
+  end
+
+  defp maybe_insert_act_from_scene_number(acts, scene_text) do
+    case Regex.run(~r/^(\d+)\.(\d+)/, String.trim(scene_text)) do
+      [_, act_num_str, _] ->
+        act_num = String.to_integer(act_num_str)
+        current = get_current_act_number(acts)
+
+        if current == nil or act_num != current do
+          acts ++
+            [%{type: "acto", head: "Act #{act_num}", scenes: [], _open: true, _act_num: act_num}]
+        else
+          acts
+        end
+
+      _ ->
+        acts
+    end
+  end
+
+  defp get_current_act_number([]), do: nil
+
+  defp get_current_act_number(acts) do
+    Map.get(List.last(acts), :_act_num)
   end
 
   defp ensure_act([], _state) do
@@ -362,7 +421,7 @@ defmodule Emothe.Import.WordParser do
         |> Enum.map(&Map.drop(&1, [:_open]))
         |> Enum.reject(&(&1.elements == []))
 
-      act |> Map.drop([:_open]) |> Map.put(:scenes, scenes)
+      act |> Map.drop([:_open, :_act_num]) |> Map.put(:scenes, scenes)
     end)
     |> Enum.reject(&(&1.scenes == []))
   end
@@ -375,18 +434,31 @@ defmodule Emothe.Import.WordParser do
   """
   def import_content(play_id, path) do
     alias Emothe.{Repo, Catalogue, PlayContent}
+    alias Emothe.Catalogue.PlayEditorialNote
     alias Emothe.PlayContent.{Character, Division, Element}
     import Ecto.Query
 
     with {:ok, paragraphs} <- extract_paragraphs(path),
-         {:ok, %{acts: acts}} <- parse_content(paragraphs) do
+         {:ok, %{acts: acts, front_matter: front_matter}} <- parse_content(paragraphs) do
       Repo.transaction(fn ->
         play = Catalogue.get_play!(play_id)
 
-        # Delete existing content (elements first due to FK, then divisions, then characters)
+        # Delete existing content
         Repo.delete_all(from e in Element, where: e.play_id == ^play_id)
         Repo.delete_all(from d in Division, where: d.play_id == ^play_id)
         Repo.delete_all(from c in Character, where: c.play_id == ^play_id)
+        Repo.delete_all(from n in PlayEditorialNote, where: n.play_id == ^play_id)
+
+        # Store front matter as editorial note
+        if front_matter do
+          Catalogue.create_play_editorial_note(%{
+            play_id: play_id,
+            section_type: "nota",
+            heading: "Front matter",
+            content: front_matter,
+            position: 0
+          })
+        end
 
         # Auto-create characters from unique speaker labels
         character_map = create_characters_from_acts(acts, play_id)
@@ -394,14 +466,17 @@ defmodule Emothe.Import.WordParser do
         # Create structure in DB
         verse_counter_ref = :counters.new(1, [:atomics])
 
+        # Use reduce to track act numbering (skip prologo/epilogue)
         Enum.with_index(acts)
-        |> Enum.each(fn {act, act_pos} ->
+        |> Enum.reduce(1, fn {act, act_pos}, act_number ->
+          is_numbered = act.type not in ["prologo", "epilogue"]
+
           {:ok, act_div} =
             PlayContent.create_division(%{
               play_id: play_id,
               type: act.type,
               title: act.head,
-              number: act_pos + 1,
+              number: if(is_numbered, do: act_number, else: nil),
               position: act_pos
             })
 
@@ -426,6 +501,8 @@ defmodule Emothe.Import.WordParser do
               character_map
             )
           end)
+
+          if is_numbered, do: act_number + 1, else: act_number
         end)
 
         # Update verse count

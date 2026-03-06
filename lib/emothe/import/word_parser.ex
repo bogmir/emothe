@@ -262,7 +262,14 @@ defmodule Emothe.Import.WordParser do
           is_act_level_scene?(scene_text) ->
             # {e}EPILOGUE or {e}Prologue or {e}Induction → treat as act-level division
             act_type = detect_act_type(scene_text)
-            act = %{type: act_type, head: scene_text, scenes: [], _direct_elements: [], _open: true}
+
+            act = %{
+              type: act_type,
+              head: scene_text,
+              scenes: [],
+              _direct_elements: [],
+              _open: true
+            }
 
             {acts ++ [act],
              %{state | current_act: length(acts), current_scene: nil, current_speech: nil}}

@@ -285,7 +285,12 @@ defmodule EmotheWeb.Components.PlayText do
     assigns = assign(assigns, :parts, parts)
 
     ~H"""
-    <%= for part <- @parts do %><em :if={part.italic}>{part.text}</em><%= if !part.italic do %>{part.text}<% end %><% end %>
+    <%= for part <- @parts do %>
+      <em :if={part.italic}>{part.text}</em>
+      <%= if !part.italic do %>
+        {part.text}
+      <% end %>
+    <% end %>
     """
   end
 

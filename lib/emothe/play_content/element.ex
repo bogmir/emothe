@@ -45,6 +45,9 @@ defmodule Emothe.PlayContent.Element do
       :character_id
     ])
     |> validate_required([:type])
-    |> validate_inclusion(:type, ~w(speech stage_direction verse_line prose line_group unrecognized))
+    |> validate_inclusion(
+      :type,
+      ~w(speech stage_direction verse_line prose line_group unrecognized)
+    )
   end
 end

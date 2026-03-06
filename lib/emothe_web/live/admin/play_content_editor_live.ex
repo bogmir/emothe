@@ -1177,7 +1177,9 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
               <div class="flex items-center gap-2">
                 <.icon name="hero-folder-mini" class="size-4 text-base-content/40" />
                 <span class="font-semibold">{division_label(div)}</span>
-                <span class="badge badge-ghost badge-xs">{div.type}{if div.number, do: " #{div.number}"}</span>
+                <span class="badge badge-ghost badge-xs">
+                  {div.type}{if div.number, do: " #{div.number}"}
+                </span>
               </div>
               <div class="flex items-center gap-1">
                 <button
@@ -1438,7 +1440,9 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     if div.title do
       div.title
     else
-      if div.number, do: "#{String.capitalize(div.type)} #{div.number}", else: String.capitalize(div.type)
+      if div.number,
+        do: "#{String.capitalize(div.type)} #{div.number}",
+        else: String.capitalize(div.type)
     end
   end
 
@@ -1546,7 +1550,6 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
               </div>
             </div>
           </div>
-
         </div>
 
         <%!-- Right: Speeches list --%>

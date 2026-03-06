@@ -277,11 +277,13 @@ defmodule Emothe.Export.TeiXmlTest do
     assert {:ok, play} = TeiParser.import_file(path)
 
     # Verify import preserved emph as <<>>
-    elements = Emothe.Repo.all(
-      from e in Emothe.PlayContent.Element,
-      where: e.play_id == ^play.id and e.type == "verse_line",
-      order_by: e.line_number
-    )
+    elements =
+      Emothe.Repo.all(
+        from e in Emothe.PlayContent.Element,
+          where: e.play_id == ^play.id and e.type == "verse_line",
+          order_by: e.line_number
+      )
+
     emph_line = Enum.find(elements, &(&1.content =~ "Hear"))
     assert emph_line.content == "<<Hear for your love, and buy for your money>>"
 

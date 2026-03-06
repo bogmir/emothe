@@ -800,7 +800,9 @@ defmodule Emothe.Import.WordParserTest do
       assert {:ok, _} = WordParser.import_content(play.id, path)
 
       divisions =
-        list_divisions(play.id) |> Enum.filter(&is_nil(&1.parent_id)) |> Enum.sort_by(& &1.position)
+        list_divisions(play.id)
+        |> Enum.filter(&is_nil(&1.parent_id))
+        |> Enum.sort_by(& &1.position)
 
       [elenco | acts] = divisions
       assert elenco.type == "elenco"
@@ -960,8 +962,10 @@ defmodule Emothe.Import.WordParserTest do
       assert length(acts) == 1
       act = hd(acts)
       # THE END should be stored as unrecognized element
-      all_elements = Enum.flat_map(act.scenes, & &1.elements) ++
-        Map.get(act, :_direct_elements, [])
+      all_elements =
+        Enum.flat_map(act.scenes, & &1.elements) ++
+          Map.get(act, :_direct_elements, [])
+
       unrecognized = Enum.filter(all_elements, &(&1.type == "unrecognized"))
       assert length(unrecognized) == 1
       assert hd(unrecognized).content == "THE END"
@@ -985,11 +989,14 @@ defmodule Emothe.Import.WordParserTest do
       assert prologue.scenes == []
       direct = Map.get(prologue, :_direct_elements, [])
       assert length(direct) >= 1
-      verse_lines = Enum.filter(direct, fn
-        %{type: "speech"} = s -> Enum.any?(s.children, &(&1.type == "verse_line"))
-        %{type: "verse_line"} -> true
-        _ -> false
-      end)
+
+      verse_lines =
+        Enum.filter(direct, fn
+          %{type: "speech"} = s -> Enum.any?(s.children, &(&1.type == "verse_line"))
+          %{type: "verse_line"} -> true
+          _ -> false
+        end)
+
       assert length(verse_lines) >= 1
     end
 

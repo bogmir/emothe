@@ -42,6 +42,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        speeches: speeches,
        speaker_labels: speaker_labels,
        selected_speeches: MapSet.new(),
+       selected_elements: MapSet.new(),
        filter_label: nil,
        filter_assigned: nil,
        editor_tab: :characters,
@@ -328,25 +329,38 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("select_division", %{"id" => id}, socket) do
     {:noreply,
      socket
-     |> assign(selected_division_id: id, editor_tab: :content)
+     |> assign(selected_division_id: id, editor_tab: :content, selected_elements: MapSet.new())
      |> reload_elements()}
   end
 
   def handle_event("select_division_auto", %{"id" => id}, socket) do
     case find_division(socket.assigns.divisions, id) do
       %{type: "elenco"} ->
-        {:noreply, assign(socket, editor_tab: :characters, selected_division_id: nil)}
+        {:noreply,
+         assign(socket,
+           editor_tab: :characters,
+           selected_division_id: nil,
+           selected_elements: MapSet.new()
+         )}
 
       %{children: [first_child | _]} ->
         {:noreply,
          socket
-         |> assign(selected_division_id: first_child.id, editor_tab: :content)
+         |> assign(
+           selected_division_id: first_child.id,
+           editor_tab: :content,
+           selected_elements: MapSet.new()
+         )
          |> reload_elements()}
 
       _ ->
         {:noreply,
          socket
-         |> assign(selected_division_id: id, editor_tab: :content)
+         |> assign(
+           selected_division_id: id,
+           editor_tab: :content,
+           selected_elements: MapSet.new()
+         )
          |> reload_elements()}
     end
   end
@@ -448,6 +462,45 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:noreply,
      socket
      |> put_flash(:info, gettext("Element deleted."))
+     |> reload_elements()}
+  end
+
+  def handle_event("el_toggle_element", %{"id" => id}, socket) do
+    selected = socket.assigns.selected_elements
+
+    selected =
+      if MapSet.member?(selected, id),
+        do: MapSet.delete(selected, id),
+        else: MapSet.put(selected, id)
+
+    {:noreply, assign(socket, selected_elements: selected)}
+  end
+
+  def handle_event("el_select_all", _params, socket) do
+    ids = socket.assigns.elements |> Enum.map(& &1.id) |> MapSet.new()
+    {:noreply, assign(socket, selected_elements: ids)}
+  end
+
+  def handle_event("el_deselect_all", _params, socket) do
+    {:noreply, assign(socket, selected_elements: MapSet.new())}
+  end
+
+  def handle_event("el_delete_selected", _params, socket) do
+    play_id = socket.assigns.play.id
+    selected = socket.assigns.selected_elements
+    count = MapSet.size(selected)
+
+    Enum.each(selected, fn id ->
+      element = PlayContent.get_element!(id)
+      {:ok, _} = PlayContent.delete_element(element)
+    end)
+
+    PlayContent.broadcast_content_changed(play_id)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, gettext("%{count} elements deleted.", count: count))
+     |> assign(selected_elements: MapSet.new())
      |> reload_elements()}
   end
 
@@ -1371,12 +1424,51 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             <.icon name="hero-document-text" class="mx-auto mb-2 size-8 text-base-content/30" />
             <p>{gettext("No content yet. Add a speech, stage direction, or prose.")}</p>
           </div>
+
+          <div :if={@elements != []} class="flex items-center gap-2 mb-2">
+            <button phx-click="el_select_all" class="btn btn-ghost btn-xs">
+              {gettext("Select all")}
+            </button>
+            <button
+              :if={MapSet.size(@selected_elements) > 0}
+              phx-click="el_deselect_all"
+              class="btn btn-ghost btn-xs"
+            >
+              {gettext("Deselect")}
+            </button>
+          </div>
+
+          <div
+            :if={MapSet.size(@selected_elements) > 0}
+            class="mb-3 flex items-center gap-3 rounded-box border border-error/30 bg-error/5 p-3"
+          >
+            <span class="text-sm font-medium">
+              {gettext("%{count} selected", count: MapSet.size(@selected_elements))}
+            </span>
+            <button
+              phx-click="el_delete_selected"
+              data-confirm={
+                gettext("Delete %{count} elements and their children?",
+                  count: MapSet.size(@selected_elements)
+                )
+              }
+              class="btn btn-error btn-sm"
+            >
+              <.icon name="hero-trash-mini" class="size-4" />
+              {gettext("Delete selected")}
+            </button>
+            <button phx-click="el_deselect_all" class="btn btn-ghost btn-sm">
+              {gettext("Cancel")}
+            </button>
+          </div>
+
           <div :if={@elements != []} class="space-y-2">
             <.element_card
               :for={element <- @elements}
               element={element}
               characters={@characters}
               depth={0}
+              selected_elements={@selected_elements}
             />
           </div>
         </div>
@@ -1695,12 +1787,25 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :element, :map, required: true
   attr :characters, :list, required: true
   attr :depth, :integer, default: 0
+  attr :selected_elements, :any, default: MapSet.new()
 
   defp element_card(assigns) do
     ~H"""
-    <div class={"rounded-box border border-base-300 bg-base-100 shadow-sm #{if @depth > 0, do: "ml-4 mt-1"}"}>
+    <div class={[
+      "rounded-box border border-base-300 bg-base-100 shadow-sm",
+      @depth > 0 && "ml-4 mt-1",
+      @depth == 0 && MapSet.member?(@selected_elements, @element.id) && "ring-2 ring-primary/30"
+    ]}>
       <div class="flex items-center justify-between p-3">
-        <div class="flex-1">
+        <div class="flex items-center flex-1">
+          <input
+            :if={@depth == 0}
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-primary mr-2 shrink-0"
+            checked={MapSet.member?(@selected_elements, @element.id)}
+            phx-click="el_toggle_element"
+            phx-value-id={@element.id}
+          />
           <span class="badge badge-sm badge-outline mr-2">{element_type_label(@element.type)}</span>
           <span :if={@element.speaker_label} class="font-medium">{@element.speaker_label}</span>
           <span :if={@element.content} class="text-sm text-base-content/80">
@@ -1807,6 +1912,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           element={child}
           characters={@characters}
           depth={@depth + 1}
+          selected_elements={@selected_elements}
         />
       </div>
       <%!-- Add child buttons --%>

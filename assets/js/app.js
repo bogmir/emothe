@@ -184,11 +184,25 @@ const SyncScroll = {
   }
 }
 
+// ShiftClick hook: captures shiftKey on click and pushes el_toggle_element with shift flag
+const ShiftClick = {
+  mounted() {
+    this.el.addEventListener("click", (e) => {
+      e.preventDefault()
+      if (e.shiftKey) window.getSelection()?.removeAllRanges()
+      this.pushEvent("el_toggle_element", {
+        id: this.el.dataset.id,
+        shift: e.shiftKey
+      })
+    })
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, ScrollSpy, SyncScroll},
+  hooks: {...colocatedHooks, ScrollSpy, SyncScroll, ShiftClick},
 })
 
 // Show progress bar on live navigation and form submits

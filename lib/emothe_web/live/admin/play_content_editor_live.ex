@@ -22,6 +22,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     divisions = PlayContent.list_top_divisions(play.id)
     speeches = list_speeches(play.id)
     speaker_labels = speeches |> Enum.map(& &1.speaker_label) |> Enum.uniq() |> Enum.sort()
+    first_child_contents = load_first_child_contents(Enum.map(speeches, & &1.id))
 
     {:ok,
      socket
@@ -41,8 +42,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        preview_divisions: [],
        speeches: speeches,
        speaker_labels: speaker_labels,
+       first_child_contents: first_child_contents,
        selected_speeches: MapSet.new(),
        selected_elements: MapSet.new(),
+       last_toggled_element: nil,
        filter_label: nil,
        filter_assigned: nil,
        editor_tab: :characters,
@@ -329,7 +332,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("select_division", %{"id" => id}, socket) do
     {:noreply,
      socket
-     |> assign(selected_division_id: id, editor_tab: :content, selected_elements: MapSet.new())
+     |> assign(
+       selected_division_id: id,
+       editor_tab: :content,
+       selected_elements: MapSet.new(),
+       last_toggled_element: nil
+     )
      |> reload_elements()}
   end
 
@@ -340,7 +348,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
          assign(socket,
            editor_tab: :characters,
            selected_division_id: nil,
-           selected_elements: MapSet.new()
+           selected_elements: MapSet.new(),
+           last_toggled_element: nil
          )}
 
       %{children: [first_child | _]} ->
@@ -349,7 +358,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
          |> assign(
            selected_division_id: first_child.id,
            editor_tab: :content,
-           selected_elements: MapSet.new()
+           selected_elements: MapSet.new(),
+           last_toggled_element: nil
          )
          |> reload_elements()}
 
@@ -359,7 +369,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
          |> assign(
            selected_division_id: id,
            editor_tab: :content,
-           selected_elements: MapSet.new()
+           selected_elements: MapSet.new(),
+           last_toggled_element: nil
          )
          |> reload_elements()}
     end
@@ -465,15 +476,28 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      |> reload_elements()}
   end
 
+  def handle_event("el_toggle_element", %{"id" => id, "shift" => true}, socket) do
+    last = socket.assigns.last_toggled_element
+
+    if last do
+      ids = Enum.map(socket.assigns.elements, & &1.id)
+      i1 = Enum.find_index(ids, &(&1 == last))
+      i2 = Enum.find_index(ids, &(&1 == id))
+
+      if i1 && i2 do
+        range = Enum.slice(ids, min(i1, i2)..max(i1, i2)) |> MapSet.new()
+        selected = MapSet.union(socket.assigns.selected_elements, range)
+        {:noreply, assign(socket, selected_elements: selected, last_toggled_element: id)}
+      else
+        el_toggle_single(socket, id)
+      end
+    else
+      el_toggle_single(socket, id)
+    end
+  end
+
   def handle_event("el_toggle_element", %{"id" => id}, socket) do
-    selected = socket.assigns.selected_elements
-
-    selected =
-      if MapSet.member?(selected, id),
-        do: MapSet.delete(selected, id),
-        else: MapSet.put(selected, id)
-
-    {:noreply, assign(socket, selected_elements: selected)}
+    el_toggle_single(socket, id)
   end
 
   def handle_event("el_select_all", _params, socket) do
@@ -502,6 +526,19 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      |> put_flash(:info, gettext("%{count} elements deleted.", count: count))
      |> assign(selected_elements: MapSet.new())
      |> reload_elements()}
+  end
+
+  # --- Element selection helpers ---
+
+  defp el_toggle_single(socket, id) do
+    selected = socket.assigns.selected_elements
+
+    selected =
+      if MapSet.member?(selected, id),
+        do: MapSet.delete(selected, id),
+        else: MapSet.put(selected, id)
+
+    {:noreply, assign(socket, selected_elements: selected, last_toggled_element: id)}
   end
 
   # --- Save helpers ---
@@ -685,7 +722,13 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   defp reload_speeches(socket) do
     speeches = list_speeches(socket.assigns.play.id)
     speaker_labels = speeches |> Enum.map(& &1.speaker_label) |> Enum.uniq() |> Enum.sort()
-    assign(socket, speeches: speeches, speaker_labels: speaker_labels)
+    first_child_contents = load_first_child_contents(Enum.map(speeches, & &1.id))
+
+    assign(socket,
+      speeches: speeches,
+      speaker_labels: speaker_labels,
+      first_child_contents: first_child_contents
+    )
   end
 
   defp list_speeches(play_id) do
@@ -717,17 +760,19 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     end
   end
 
-  defp cr_first_child_content(speech) do
+  defp load_first_child_contents(speech_ids) when speech_ids == [], do: %{}
+
+  defp load_first_child_contents(speech_ids) do
     import Ecto.Query
 
-    Emothe.Repo.one(
-      from(e in Element,
-        where: e.parent_id == ^speech.id,
-        order_by: e.position,
-        limit: 1,
-        select: e.content
-      )
+    Emothe.Repo.all(
+      from e in Element,
+        where: e.parent_id in ^speech_ids,
+        distinct: e.parent_id,
+        order_by: [e.parent_id, e.position],
+        select: {e.parent_id, e.content}
     )
+    |> Map.new()
   end
 
   defp reload_preview(socket) do
@@ -1330,6 +1375,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         selected_speeches={@selected_speeches}
         filter_label={@filter_label}
         filter_assigned={@filter_assigned}
+        first_child_contents={@first_child_contents}
       />
 
       <%!-- Tab: Content --%>
@@ -1608,6 +1654,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :selected_speeches, :any, required: true
   attr :filter_label, :string, default: nil
   attr :filter_assigned, :any, default: nil
+  attr :first_child_contents, :map, required: true
 
   defp cr_tab(assigns) do
     assigns = assign(assigns, :visible_speeches, cr_filtered_speeches(assigns))
@@ -1723,10 +1770,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   </span>
                 </div>
                 <p
-                  :if={cr_first_child_content(speech)}
+                  :if={@first_child_contents[speech.id]}
                   class="text-xs text-base-content/50 truncate mt-0.5"
                 >
-                  {cr_first_child_content(speech)}
+                  {@first_child_contents[speech.id]}
                 </p>
               </div>
               <div class="flex-shrink-0">
@@ -1800,11 +1847,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         <div class="flex items-center flex-1">
           <input
             :if={@depth == 0}
+            id={"el-chk-#{@element.id}"}
+            phx-hook="ShiftClick"
+            data-id={@element.id}
             type="checkbox"
             class="checkbox checkbox-sm checkbox-primary mr-2 shrink-0"
             checked={MapSet.member?(@selected_elements, @element.id)}
-            phx-click="el_toggle_element"
-            phx-value-id={@element.id}
           />
           <span class="badge badge-sm badge-outline mr-2">{element_type_label(@element.type)}</span>
           <span :if={@element.speaker_label} class="font-medium">{@element.speaker_label}</span>

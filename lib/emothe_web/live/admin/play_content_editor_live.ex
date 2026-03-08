@@ -220,7 +220,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   # --- Character Review handlers ---
 
   def handle_event("cr_filter", %{"label" => label, "assigned" => assigned}, socket) do
-    filter_label = if label == "", do: nil, else: label
+    filter_label =
+      case label do
+        "" -> nil
+        "__none__" -> :none
+        other -> other
+      end
 
     filter_assigned =
       case assigned do
@@ -257,21 +262,37 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:noreply, assign(socket, selected_speeches: MapSet.new())}
   end
 
-  def handle_event("cr_assign_character", %{"character_id" => character_id}, socket) do
-    character_id = if character_id == "", do: nil, else: character_id
+  def handle_event("cr_assign_character", params, socket) do
+    character_id = if params["character_id"] == "", do: nil, else: params["character_id"]
+    update_label? = params["update_label"] == "true"
+
+    label =
+      case params["speaker_label"] do
+        "" -> nil
+        val -> val
+      end
 
     socket.assigns.selected_speeches
     |> Enum.each(fn speech_id ->
       element = PlayContent.get_element!(speech_id)
-      PlayContent.update_element(element, %{character_id: character_id})
+      attrs = %{character_id: character_id}
+      attrs = if update_label?, do: Map.put(attrs, :speaker_label, label), else: attrs
+      PlayContent.update_element(element, attrs)
     end)
 
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
-    speeches = list_speeches(socket.assigns.play.id)
+
+    filter_updates =
+      if update_label? do
+        %{filter_label: label || :none, filter_assigned: true}
+      else
+        %{}
+      end
 
     {:noreply,
      socket
-     |> assign(speeches: speeches, selected_speeches: MapSet.new())
+     |> reload_speeches()
+     |> assign(Map.merge(%{selected_speeches: MapSet.new()}, filter_updates))
      |> put_flash(:info, gettext("Characters assigned."))}
   end
 
@@ -750,6 +771,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     speeches =
       case assigns.filter_label do
         nil -> speeches
+        :none -> Enum.filter(speeches, &is_nil(&1.speaker_label))
         label -> Enum.filter(speeches, &(&1.speaker_label == label))
       end
 
@@ -757,6 +779,17 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       nil -> speeches
       true -> Enum.filter(speeches, &(&1.character_id != nil))
       false -> Enum.filter(speeches, &is_nil(&1.character_id))
+    end
+  end
+
+  defp cr_common_character_id(selected_speeches, speeches) do
+    speeches
+    |> Enum.filter(&MapSet.member?(selected_speeches, &1.id))
+    |> Enum.map(& &1.character_id)
+    |> Enum.uniq()
+    |> case do
+      [id] -> id
+      _ -> nil
     end
   end
 
@@ -1659,6 +1692,13 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   defp cr_tab(assigns) do
     assigns = assign(assigns, :visible_speeches, cr_filtered_speeches(assigns))
 
+    assigns =
+      assign(
+        assigns,
+        :common_character_id,
+        cr_common_character_id(assigns.selected_speeches, assigns.speeches)
+      )
+
     ~H"""
     <div class="animate-in fade-in">
       <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -1697,6 +1737,9 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             <form phx-change="cr_filter" class="flex items-center gap-2 flex-1">
               <select name="label" class="select select-bordered select-sm">
                 <option value="">{gettext("All speakers")}</option>
+                <option value="__none__" selected={@filter_label == :none}>
+                  {gettext("(No label)")}
+                </option>
                 <option
                   :for={label <- @speaker_labels}
                   :if={label && label != ""}
@@ -1734,10 +1777,24 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             <form phx-submit="cr_assign_character" class="flex items-center gap-2">
               <select name="character_id" class="select select-bordered select-sm">
                 <option value="">{gettext("— Unassign —")}</option>
-                <option :for={char <- @characters} value={char.id}>
+                <option
+                  :for={char <- @characters}
+                  value={char.id}
+                  selected={@common_character_id && @common_character_id == char.id}
+                >
                   {char.name}
                 </option>
               </select>
+              <label class="flex items-center gap-1 text-sm cursor-pointer">
+                <input type="checkbox" name="update_label" value="true" class="checkbox checkbox-xs" />
+                {gettext("Set label")}
+              </label>
+              <input
+                type="text"
+                name="speaker_label"
+                placeholder={gettext("Leave empty to clear")}
+                class="input input-bordered input-sm w-32"
+              />
               <button type="submit" class="btn btn-primary btn-sm">
                 {gettext("Assign")}
               </button>

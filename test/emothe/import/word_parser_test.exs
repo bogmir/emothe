@@ -831,7 +831,7 @@ defmodule Emothe.Import.WordParserTest do
       assert names == ["FEBO", "RICARDO"]
     end
 
-    test "auto-assigns character_id on speeches" do
+    test "auto-assigns characters on speeches" do
       play = insert_play()
 
       paragraphs = [
@@ -843,8 +843,8 @@ defmodule Emothe.Import.WordParserTest do
       path = write_test_docx(paragraphs)
       assert {:ok, _} = WordParser.import_content(play.id, path)
 
-      speeches = list_elements(play.id) |> Enum.filter(&(&1.type == "speech"))
-      assert Enum.all?(speeches, &(&1.character_id != nil))
+      speeches = list_elements_with_characters(play.id) |> Enum.filter(&(&1.type == "speech"))
+      assert Enum.all?(speeches, &(Emothe.PlayContent.Element.characters(&1) != []))
 
       characters = list_characters(play.id)
       febo = Enum.find(characters, &(&1.name == "FEBO"))
@@ -853,11 +853,11 @@ defmodule Emothe.Import.WordParserTest do
       febo_speech = Enum.find(speeches, &(&1.speaker_label == "FEBO"))
       ricardo_speech = Enum.find(speeches, &(&1.speaker_label == "RICARDO"))
 
-      assert febo_speech.character_id == febo.id
-      assert ricardo_speech.character_id == ricardo.id
+      assert hd(Emothe.PlayContent.Element.characters(febo_speech)).id == febo.id
+      assert hd(Emothe.PlayContent.Element.characters(ricardo_speech)).id == ricardo.id
     end
 
-    test "child elements inherit character_id from speech" do
+    test "child elements do not inherit characters from speech" do
       play = insert_play()
 
       paragraphs = [
@@ -869,12 +869,9 @@ defmodule Emothe.Import.WordParserTest do
       path = write_test_docx(paragraphs)
       assert {:ok, _} = WordParser.import_content(play.id, path)
 
-      characters = list_characters(play.id)
-      febo = Enum.find(characters, &(&1.name == "FEBO"))
-
-      verse_lines = list_elements(play.id) |> Enum.filter(&(&1.type == "verse_line"))
+      verse_lines = list_elements_with_characters(play.id) |> Enum.filter(&(&1.type == "verse_line"))
       assert length(verse_lines) == 2
-      assert Enum.all?(verse_lines, &(&1.character_id == febo.id))
+      assert Enum.all?(verse_lines, &(Emothe.PlayContent.Element.characters(&1) == []))
     end
 
     test "re-import replaces characters" do
@@ -1156,6 +1153,18 @@ defmodule Emothe.Import.WordParserTest do
 
   defp list_elements(play_id) do
     Emothe.Repo.all(from e in Element, where: e.play_id == ^play_id, order_by: e.position)
+  end
+
+  defp list_elements_with_characters(play_id) do
+    alias Emothe.PlayContent.ElementCharacter
+    ec_preload = from(ec in ElementCharacter, order_by: ec.position, preload: :character)
+
+    Emothe.Repo.all(
+      from e in Element,
+        where: e.play_id == ^play_id,
+        order_by: e.position,
+        preload: [element_characters: ^ec_preload]
+    )
   end
 
   defp insert_play do

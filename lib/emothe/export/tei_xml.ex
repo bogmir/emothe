@@ -402,7 +402,14 @@ defmodule Emothe.Export.TeiXml do
       |> Enum.map(&build_element/1)
       |> Enum.reject(&is_nil/1)
 
-    attrs = if el.character, do: %{who: "##{el.character.xml_id}"}, else: %{}
+    chars = Emothe.PlayContent.Element.characters(el)
+
+    attrs =
+      case chars do
+        [] -> %{}
+        list -> %{who: Enum.map_join(list, " ", &"##{&1.xml_id}")}
+      end
+
     element(:sp, attrs, children ++ child_elements)
   end
 

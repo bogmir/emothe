@@ -39,6 +39,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        editing: nil,
        modal_parent_id: nil,
        modal_element_type: nil,
+       editing_character_ids: [],
+       cr_selected_character_ids: [],
        preview_divisions: [],
        speeches: speeches,
        speaker_labels: speaker_labels,
@@ -48,6 +50,9 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        last_toggled_element: nil,
        filter_label: nil,
        filter_assigned: nil,
+       cr_display_limit: 50,
+       content_search: "",
+       content_search_results: [],
        editor_tab: :characters,
        breadcrumbs: [
          %{label: gettext("Admin"), to: ~p"/admin/plays"},
@@ -69,7 +74,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   @impl true
   def handle_event("close_modal", _, socket) do
-    {:noreply, assign(socket, modal: nil, form: nil, editing: nil)}
+    {:noreply, assign(socket, modal: nil, form: nil, editing: nil, editing_character_ids: [])}
   end
 
   def handle_event("switch_tab", %{"tab" => tab}, socket) do
@@ -238,7 +243,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
      assign(socket,
        filter_label: filter_label,
        filter_assigned: filter_assigned,
-       selected_speeches: MapSet.new()
+       selected_speeches: MapSet.new(),
+       cr_display_limit: 50
      )}
   end
 
@@ -250,22 +256,58 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         do: MapSet.delete(selected, id),
         else: MapSet.put(selected, id)
 
-    {:noreply, assign(socket, selected_speeches: selected)}
+    # Update tag picker to reflect common characters of new selection
+    common = cr_common_character_ids(selected, socket.assigns.speeches)
+
+    {:noreply, assign(socket, selected_speeches: selected, cr_selected_character_ids: common)}
   end
 
   def handle_event("cr_select_all_visible", _, socket) do
     visible = cr_filtered_speeches(socket.assigns) |> Enum.map(& &1.id)
-    {:noreply, assign(socket, selected_speeches: MapSet.new(visible))}
+    selected = MapSet.new(visible)
+    common = cr_common_character_ids(selected, socket.assigns.speeches)
+    {:noreply, assign(socket, selected_speeches: selected, cr_selected_character_ids: common)}
   end
 
   def handle_event("cr_deselect_all", _, socket) do
-    {:noreply, assign(socket, selected_speeches: MapSet.new())}
+    {:noreply, assign(socket, selected_speeches: MapSet.new(), cr_selected_character_ids: [])}
   end
 
-  def handle_event("cr_assign_character", params, socket) do
-    character_id = if params["character_id"] == "", do: nil, else: params["character_id"]
-    update_label? = params["update_label"] == "true"
+  def handle_event("cr_add_character", %{"character_id" => ""}, socket), do: {:noreply, socket}
 
+  def handle_event("cr_add_character", %{"character_id" => id}, socket) do
+    current = socket.assigns.cr_selected_character_ids
+
+    if id in current do
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, cr_selected_character_ids: current ++ [id])}
+    end
+  end
+
+  def handle_event("cr_remove_character", %{"id" => id}, socket) do
+    current = socket.assigns.cr_selected_character_ids
+    {:noreply, assign(socket, cr_selected_character_ids: List.delete(current, id))}
+  end
+
+  def handle_event("cr_assign_characters", _params, socket) do
+    character_ids = socket.assigns.cr_selected_character_ids
+
+    socket.assigns.selected_speeches
+    |> Enum.each(fn speech_id ->
+      PlayContent.set_element_characters(speech_id, character_ids)
+    end)
+
+    PlayContent.broadcast_content_changed(socket.assigns.play.id)
+
+    {:noreply,
+     socket
+     |> reload_speeches()
+     |> assign(selected_speeches: MapSet.new(), cr_selected_character_ids: [])
+     |> put_flash(:info, gettext("Characters assigned."))}
+  end
+
+  def handle_event("cr_set_label", params, socket) do
     label =
       case params["speaker_label"] do
         "" -> nil
@@ -275,25 +317,89 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     socket.assigns.selected_speeches
     |> Enum.each(fn speech_id ->
       element = PlayContent.get_element!(speech_id)
-      attrs = %{character_id: character_id}
-      attrs = if update_label?, do: Map.put(attrs, :speaker_label, label), else: attrs
-      PlayContent.update_element(element, attrs)
+      PlayContent.update_element(element, %{speaker_label: label})
     end)
 
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
 
-    filter_updates =
-      if update_label? do
-        %{filter_label: label || :none, filter_assigned: true}
-      else
-        %{}
-      end
+    {:noreply,
+     socket
+     |> reload_speeches()
+     |> assign(filter_label: label || :none)
+     |> put_flash(:info, gettext("Label updated."))}
+  end
+
+  def handle_event("cr_clear_label", _params, socket) do
+    socket.assigns.selected_speeches
+    |> Enum.each(fn speech_id ->
+      element = PlayContent.get_element!(speech_id)
+      PlayContent.update_element(element, %{speaker_label: nil})
+    end)
+
+    PlayContent.broadcast_content_changed(socket.assigns.play.id)
 
     {:noreply,
      socket
      |> reload_speeches()
-     |> assign(Map.merge(%{selected_speeches: MapSet.new()}, filter_updates))
-     |> put_flash(:info, gettext("Characters assigned."))}
+     |> assign(filter_label: :none)
+     |> put_flash(:info, gettext("Label cleared."))}
+  end
+
+  def handle_event("cr_go_to_speech", %{"id" => id}, socket) do
+    speech = Enum.find(socket.assigns.speeches, &(&1.id == id))
+
+    if speech && speech.division_id do
+      {:noreply,
+       socket
+       |> assign(
+         selected_division_id: speech.division_id,
+         editor_tab: :content,
+         selected_elements: MapSet.new([speech.id]),
+         last_toggled_element: nil
+       )
+       |> reload_elements()
+       |> push_event("scroll-to-element", %{id: "element-#{id}"})}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("cr_show_more", _, socket) do
+    {:noreply, update(socket, :cr_display_limit, &(&1 + 50))}
+  end
+
+  # --- Content search handlers ---
+
+  def handle_event("content_search", %{"query" => query}, socket) do
+    query = String.trim(query)
+    results = PlayContent.search_elements(socket.assigns.play.id, query)
+    {:noreply, assign(socket, content_search: query, content_search_results: results)}
+  end
+
+  def handle_event("content_search_clear", _, socket) do
+    {:noreply, assign(socket, content_search: "", content_search_results: [])}
+  end
+
+  def handle_event("content_search_go", params, socket) do
+    div_id = params["division-id"]
+    parent_id = params["parent-id"]
+    id = params["id"]
+
+    # Navigate to root element: if child (verse_line), select the parent speech
+    target_id = if parent_id && parent_id != "", do: parent_id, else: id
+
+    {:noreply,
+     socket
+     |> assign(
+       selected_division_id: div_id,
+       editor_tab: :content,
+       content_search: "",
+       content_search_results: [],
+       selected_elements: MapSet.new([target_id]),
+       last_toggled_element: nil
+     )
+     |> reload_elements()
+     |> push_event("scroll-to-element", %{id: "element-#{target_id}"})}
   end
 
   def handle_event("new_division", params, socket) do
@@ -420,6 +526,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        modal: :element,
        editing: nil,
        modal_element_type: element_type,
+       editing_character_ids: [],
        form: to_form(changeset)
      )}
   end
@@ -457,6 +564,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        modal: :element,
        editing: nil,
        modal_element_type: element_type,
+       editing_character_ids: [],
        form: to_form(changeset)
      )}
   end
@@ -464,14 +572,33 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("edit_element", %{"id" => id}, socket) do
     element = PlayContent.get_element!(id)
     changeset = PlayContent.change_element(element)
+    editing_character_ids = element.element_characters |> Enum.map(& &1.character_id)
 
     {:noreply,
      assign(socket,
        modal: :element,
        editing: element,
        modal_element_type: element.type,
+       editing_character_ids: editing_character_ids,
        form: to_form(changeset)
      )}
+  end
+
+  def handle_event("el_add_character", params, socket) do
+    id = params["character_id"] || params["el_add_char"]
+
+    if id && id != "" do
+      current = socket.assigns.editing_character_ids
+      updated = if id in current, do: current, else: current ++ [id]
+      {:noreply, assign(socket, editing_character_ids: updated)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  def handle_event("el_remove_character", %{"id" => id}, socket) do
+    updated = Enum.reject(socket.assigns.editing_character_ids, &(&1 == id))
+    {:noreply, assign(socket, editing_character_ids: updated)}
   end
 
   def handle_event("delete_element", %{"id" => id}, socket) do
@@ -655,6 +782,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   defp save_element(socket, params) do
     el_params = params["element"] || %{}
+    character_ids = List.wrap(params["character_ids"] || []) |> Enum.reject(&(&1 == ""))
     play = socket.assigns.play
 
     result =
@@ -686,7 +814,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       end
 
     case result do
-      {:ok, _} ->
+      {:ok, el} ->
+        # Set character associations for speech elements
+        if el.type == "speech" do
+          PlayContent.set_element_characters(el.id, character_ids)
+        end
+
         PlayContent.broadcast_content_changed(play.id)
 
         {:noreply,
@@ -754,13 +887,15 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   defp list_speeches(play_id) do
     import Ecto.Query
+    alias Emothe.PlayContent.ElementCharacter
+
+    ec_preload = from(ec in ElementCharacter, order_by: ec.position, preload: :character)
 
     Emothe.Repo.all(
       from e in Element,
         where: e.play_id == ^play_id and e.type == "speech",
-        left_join: c in assoc(e, :character),
         left_join: d in assoc(e, :division),
-        preload: [character: c, division: d],
+        preload: [element_characters: ^ec_preload, division: d],
         order_by: [e.position]
     )
   end
@@ -777,19 +912,31 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
     case assigns.filter_assigned do
       nil -> speeches
-      true -> Enum.filter(speeches, &(&1.character_id != nil))
-      false -> Enum.filter(speeches, &is_nil(&1.character_id))
+      true -> Enum.filter(speeches, &(&1.element_characters != []))
+      false -> Enum.filter(speeches, &(&1.element_characters == []))
     end
   end
 
-  defp cr_common_character_id(selected_speeches, speeches) do
-    speeches
-    |> Enum.filter(&MapSet.member?(selected_speeches, &1.id))
-    |> Enum.map(& &1.character_id)
-    |> Enum.uniq()
-    |> case do
-      [id] -> id
-      _ -> nil
+  defp cr_common_character_ids(selected_speeches, speeches) do
+    selected =
+      speeches
+      |> Enum.filter(&MapSet.member?(selected_speeches, &1.id))
+
+    case selected do
+      [] ->
+        []
+
+      list ->
+        id_sets =
+          Enum.map(list, fn s ->
+            s.element_characters |> Enum.map(& &1.character_id) |> MapSet.new()
+          end)
+
+        common = Enum.reduce(id_sets, List.first(id_sets), &MapSet.intersection/2)
+
+        if Enum.all?(id_sets, &(&1 == common)),
+          do: MapSet.to_list(common),
+          else: []
     end
   end
 
@@ -1409,10 +1556,96 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         filter_label={@filter_label}
         filter_assigned={@filter_assigned}
         first_child_contents={@first_child_contents}
+        cr_selected_character_ids={@cr_selected_character_ids}
+        cr_display_limit={@cr_display_limit}
       />
 
       <%!-- Tab: Content --%>
-      <div :if={@editor_tab == :content} class="animate-in fade-in">
+      <div :if={@editor_tab == :content} id="content-tab" phx-hook=".ScrollToElement" class="animate-in fade-in">
+        <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrollToElement">
+          export default {
+            mounted() {
+              this.handleEvent("scroll-to-element", ({id}) => {
+                requestAnimationFrame(() => {
+                  const el = document.getElementById(id)
+                  if (el) el.scrollIntoView({behavior: "smooth", block: "center"})
+                })
+              })
+            }
+          }
+        </script>
+        <%!-- Search bar --%>
+        <div class="mb-4">
+          <form phx-change="content_search" phx-submit="content_search">
+            <div class="relative">
+              <.icon
+                name="hero-magnifying-glass-mini"
+                class="absolute left-3 top-2.5 size-4 text-base-content/40 pointer-events-none"
+              />
+              <input
+                type="text"
+                name="query"
+                value={@content_search}
+                placeholder={gettext("Search text across all scenes...")}
+                phx-debounce="300"
+                class="input input-bordered input-sm w-full pl-9"
+                autocomplete="off"
+              />
+              <button
+                :if={@content_search != ""}
+                type="button"
+                phx-click="content_search_clear"
+                class="absolute right-2 top-1.5 btn btn-ghost btn-xs btn-circle"
+              >
+                <.icon name="hero-x-mark-mini" class="size-3.5" />
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <%!-- Search results --%>
+        <div :if={@content_search != ""} class="mb-4">
+          <p class="text-xs text-base-content/50 mb-2">
+            {ngettext(
+              "1 result",
+              "%{count} results",
+              length(@content_search_results),
+              count: length(@content_search_results)
+            )}
+          </p>
+          <div class="rounded-box border border-base-300 bg-base-100 shadow-sm divide-y divide-base-200 max-h-64 overflow-y-auto">
+            <div
+              :for={result <- @content_search_results}
+              class="px-4 py-2 cursor-pointer hover:bg-base-200/50"
+              phx-click="content_search_go"
+              phx-value-id={result.id}
+              phx-value-division-id={result.division_id}
+              phx-value-parent-id={result.parent_id || ""}
+            >
+              <div class="flex items-center gap-2">
+                <span class="badge badge-xs badge-outline">
+                  {element_type_label(result.type)}
+                </span>
+                <span :if={result.speaker_label} class="text-xs font-medium">
+                  {result.speaker_label}
+                </span>
+                <span :if={result.division} class="text-xs text-base-content/40">
+                  {result.division.title || result.division.type}
+                </span>
+              </div>
+              <p class="text-sm text-base-content/70 truncate mt-0.5">
+                {String.slice(result.content || result.speaker_label || "", 0..120)}
+              </p>
+            </div>
+            <div
+              :if={@content_search_results == []}
+              class="px-4 py-6 text-center text-sm text-base-content/50"
+            >
+              {gettext("No results found.")}
+            </div>
+          </div>
+        </div>
+
         <%!-- No division selected --%>
         <div
           :if={!@selected_division_id}
@@ -1601,6 +1834,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           editing={@editing}
           characters={@characters}
           modal_element_type={@modal_element_type}
+          editing_character_ids={@editing_character_ids}
         />
       </.modal>
     </div>
@@ -1685,19 +1919,27 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :speeches, :list, required: true
   attr :speaker_labels, :list, required: true
   attr :selected_speeches, :any, required: true
+  attr :cr_selected_character_ids, :list, required: true
   attr :filter_label, :string, default: nil
   attr :filter_assigned, :any, default: nil
   attr :first_child_contents, :map, required: true
+  attr :cr_display_limit, :integer, default: 50
 
   defp cr_tab(assigns) do
-    assigns = assign(assigns, :visible_speeches, cr_filtered_speeches(assigns))
+    all_filtered = cr_filtered_speeches(assigns)
+    total = length(all_filtered)
+    limited = Enum.take(all_filtered, assigns.cr_display_limit)
+    assigns = assign(assigns, visible_speeches: limited, total_filtered: total)
 
-    assigns =
-      assign(
-        assigns,
-        :common_character_id,
-        cr_common_character_id(assigns.selected_speeches, assigns.speeches)
-      )
+    # Build lookup of selected character objects for tag display
+    selected_chars =
+      Enum.filter(assigns.characters, &(&1.id in assigns.cr_selected_character_ids))
+      |> Enum.sort_by(fn c -> Enum.find_index(assigns.cr_selected_character_ids, &(&1 == c.id)) end)
+
+    available_chars =
+      Enum.reject(assigns.characters, &(&1.id in assigns.cr_selected_character_ids))
+
+    assigns = assign(assigns, selected_chars: selected_chars, available_chars: available_chars)
 
     ~H"""
     <div class="animate-in fade-in">
@@ -1769,34 +2011,70 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
           <div
             :if={MapSet.size(@selected_speeches) > 0}
-            class="mb-4 flex items-center gap-3 rounded-box border border-primary/30 bg-primary/5 p-3"
+            class="mb-4 rounded-box border border-primary/30 bg-primary/5 p-4 space-y-3"
           >
-            <span class="text-sm font-medium">
+            <span class="text-sm font-semibold">
               {gettext("%{count} selected", count: MapSet.size(@selected_speeches))}
             </span>
-            <form phx-submit="cr_assign_character" class="flex items-center gap-2">
-              <select name="character_id" class="select select-bordered select-sm">
-                <option value="">{gettext("— Unassign —")}</option>
-                <option
-                  :for={char <- @characters}
-                  value={char.id}
-                  selected={@common_character_id && @common_character_id == char.id}
+
+            <%!-- Character assignment section --%>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm text-base-content/60">{gettext("Characters:")}</span>
+              <span
+                :for={char <- @selected_chars}
+                class="badge badge-sm badge-primary gap-1"
+              >
+                {char.name}
+                <button
+                  type="button"
+                  phx-click="cr_remove_character"
+                  phx-value-id={char.id}
+                  class="hover:text-primary-content/60"
+                  aria-label={gettext("Remove %{name}", name: char.name)}
                 >
-                  {char.name}
-                </option>
-              </select>
-              <label class="flex items-center gap-1 text-sm cursor-pointer">
-                <input type="checkbox" name="update_label" value="true" class="checkbox checkbox-xs" />
-                {gettext("Set label")}
-              </label>
+                  <.icon name="hero-x-mark-mini" class="size-3" />
+                </button>
+              </span>
+              <span :if={@selected_chars == []} class="text-sm text-base-content/40 italic">
+                {gettext("none")}
+              </span>
+              <form :if={@available_chars != []} phx-change="cr_add_character" class="inline">
+                <select name="character_id" class="select select-bordered select-xs">
+                  <option value="">{gettext("Add...")}</option>
+                  <option :for={char <- @available_chars} value={char.id}>
+                    {char.name}
+                  </option>
+                </select>
+              </form>
+              <form phx-submit="cr_assign_characters" class="inline">
+                <button type="submit" class="btn btn-primary btn-xs">
+                  {gettext("Assign Characters")}
+                </button>
+              </form>
+            </div>
+
+            <div class="divider my-0 h-0"></div>
+
+            <%!-- Label editing section --%>
+            <form phx-submit="cr_set_label" class="flex flex-wrap items-center gap-2">
+              <span class="text-sm text-base-content/60">{gettext("Label:")}</span>
               <input
                 type="text"
                 name="speaker_label"
                 placeholder={gettext("Leave empty to clear")}
-                class="input input-bordered input-sm w-32"
+                class="input input-bordered input-xs w-40"
               />
-              <button type="submit" class="btn btn-primary btn-sm">
-                {gettext("Assign")}
+              <button type="submit" class="btn btn-secondary btn-xs">
+                {gettext("Set Label")}
+              </button>
+              <button
+                type="button"
+                phx-click="cr_clear_label"
+                class="btn btn-ghost btn-xs tooltip"
+                data-tip={gettext("Clear label")}
+              >
+                <.icon name="hero-x-mark-mini" class="size-3.5" />
+                {gettext("Clear")}
               </button>
             </form>
           </div>
@@ -1833,13 +2111,28 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
                   {@first_child_contents[speech.id]}
                 </p>
               </div>
-              <div class="flex-shrink-0">
-                <span :if={speech.character} class="badge badge-sm badge-outline badge-success">
-                  {speech.character.name}
+              <div class="flex-shrink-0 flex gap-1 flex-wrap items-center">
+                <span
+                  :for={char <- Emothe.PlayContent.Element.characters(speech)}
+                  class="badge badge-sm badge-outline badge-success"
+                >
+                  {char.name}
                 </span>
-                <span :if={is_nil(speech.character_id)} class="badge badge-sm badge-ghost">
+                <span
+                  :if={speech.element_characters == []}
+                  class="badge badge-sm badge-ghost"
+                >
                   {gettext("unassigned")}
                 </span>
+                <button
+                  phx-click="cr_go_to_speech"
+                  phx-value-id={speech.id}
+                  class="btn btn-ghost btn-xs btn-square ml-1 tooltip"
+                  data-tip={gettext("View in content")}
+                  title={gettext("View in content")}
+                >
+                  <.icon name="hero-arrow-top-right-on-square-mini" class="size-3.5" />
+                </button>
               </div>
             </div>
             <div
@@ -1848,6 +2141,15 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             >
               {gettext("No speeches found.")}
             </div>
+          </div>
+          <div
+            :if={length(@visible_speeches) < @total_filtered}
+            class="mt-2 text-center"
+          >
+            <button phx-click="cr_show_more" class="btn btn-ghost btn-sm">
+              {gettext("Show more (%{remaining} remaining)",
+                remaining: @total_filtered - length(@visible_speeches))}
+            </button>
           </div>
         </div>
       </div>
@@ -1895,11 +2197,14 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
 
   defp element_card(assigns) do
     ~H"""
-    <div class={[
-      "rounded-box border border-base-300 bg-base-100 shadow-sm",
-      @depth > 0 && "ml-4 mt-1",
-      @depth == 0 && MapSet.member?(@selected_elements, @element.id) && "ring-2 ring-primary/30"
-    ]}>
+    <div
+      id={"element-#{@element.id}"}
+      class={[
+        "rounded-box border border-base-300 bg-base-100 shadow-sm",
+        @depth > 0 && "ml-4 mt-1",
+        @depth == 0 && MapSet.member?(@selected_elements, @element.id) && "ring-2 ring-primary/30"
+      ]}
+    >
       <div class="flex items-center justify-between p-3">
         <div class="flex items-center flex-1">
           <input
@@ -2075,6 +2380,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :editing, :any, default: nil
   attr :characters, :list, default: []
   attr :modal_element_type, :string, default: nil
+  attr :editing_character_ids, :list, default: []
 
   defp modal_content(%{modal: :editorial_note} = assigns) do
     ~H"""
@@ -2226,13 +2532,63 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         </div>
         <div class="mb-4">
           <label class="label">
-            <span class="label-text font-medium">{gettext("Character")}</span>
+            <span class="label-text font-medium">{gettext("Characters")}</span>
           </label>
-          <.input
-            field={@form[:character_id]}
-            type="select"
-            options={[{gettext("(none)"), ""} | Enum.map(@characters, &{&1.name, &1.id})]}
+          <%
+            selected_chars = Enum.filter(@characters, & &1.id in @editing_character_ids)
+            available_chars = Enum.reject(@characters, & &1.id in @editing_character_ids)
+          %>
+          <input
+            :for={cid <- @editing_character_ids}
+            type="hidden"
+            name="character_ids[]"
+            value={cid}
           />
+          <div class="flex flex-wrap gap-1 mb-2">
+            <span
+              :for={char <- selected_chars}
+              class="badge badge-sm badge-primary gap-1"
+            >
+              {char.name}
+              <button
+                type="button"
+                phx-click="el_remove_character"
+                phx-value-id={char.id}
+                class="hover:text-primary-content/60"
+                aria-label={gettext("Remove %{name}", name: char.name)}
+              >
+                <.icon name="hero-x-mark-mini" class="size-3" />
+              </button>
+            </span>
+            <span :if={selected_chars == []} class="text-sm text-base-content/40 italic">
+              {gettext("none")}
+            </span>
+          </div>
+          <select
+            :if={available_chars != []}
+            id="el-char-select"
+            phx-hook=".ElCharSelect"
+            class="select select-bordered select-sm w-full"
+          >
+            <option value="">{gettext("Add character...")}</option>
+            <option :for={char <- available_chars} value={char.id}>
+              {char.name} ({char.xml_id})
+            </option>
+          </select>
+          <script :type={Phoenix.LiveView.ColocatedHook} name=".ElCharSelect">
+            export default {
+              mounted() {
+                this.el.addEventListener("change", () => {
+                  if (this.el.value) {
+                    this.pushEvent("el_add_character", {character_id: this.el.value})
+                  }
+                })
+              }
+            }
+          </script>
+          <div :if={@characters == []} class="text-sm text-base-content/50 text-center py-2">
+            {gettext("No characters defined.")}
+          </div>
         </div>
         <div>
           <label class="flex items-center gap-2">

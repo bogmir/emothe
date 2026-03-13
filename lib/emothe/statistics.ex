@@ -6,7 +6,7 @@ defmodule Emothe.Statistics do
   import Ecto.Query
   alias Emothe.Repo
   alias Emothe.Statistics.PlayStatistic
-  alias Emothe.PlayContent.{Division, Element}
+  alias Emothe.PlayContent.{Division, Element, ElementCharacter}
 
   def get_statistics(play_id) do
     case Repo.get_by(PlayStatistic, play_id: play_id) do
@@ -85,9 +85,11 @@ defmodule Emothe.Statistics do
   defp act_label([]), do: "act"
 
   defp list_all_elements(play_id) do
+    ec_preload = from(ec in ElementCharacter, order_by: ec.position, preload: :character)
+
     Element
     |> where(play_id: ^play_id)
-    |> preload(:character)
+    |> preload(element_characters: ^ec_preload)
     |> Repo.all()
   end
 
@@ -187,30 +189,27 @@ defmodule Emothe.Statistics do
   end
 
   defp character_appearances(elements) do
-    # Build character name lookup from preloaded associations
-    char_names =
-      elements
-      |> Enum.filter(&(&1.type == "speech" && &1.character_id != nil))
-      |> Enum.map(& &1.character)
-      |> Enum.reject(&is_nil/1)
-      |> Map.new(&{&1.id, &1.name})
+    speeches = Enum.filter(elements, &(&1.type == "speech"))
 
-    elements
-    |> Enum.filter(&(&1.type == "speech"))
-    |> Enum.group_by(fn el ->
-      cond do
-        el.character_id && Map.has_key?(char_names, el.character_id) ->
-          char_names[el.character_id]
+    # For multi-character speeches, count once per character
+    char_counts =
+      Enum.flat_map(speeches, fn el ->
+        chars = Element.characters(el)
 
-        el.speaker_label && el.speaker_label != "" ->
-          el.speaker_label
+        case chars do
+          [] ->
+            if el.speaker_label && el.speaker_label != "",
+              do: [{el.speaker_label, 1}],
+              else: []
 
-        true ->
-          nil
-      end
-    end)
-    |> Map.delete(nil)
-    |> Enum.map(fn {name, speeches} -> %{"name" => name, "speeches" => length(speeches)} end)
-    |> Enum.sort_by(fn %{"speeches" => count} -> -count end)
+          list ->
+            Enum.map(list, fn c -> {c.name, 1} end)
+        end
+      end)
+      |> Enum.group_by(fn {name, _} -> name end, fn {_, count} -> count end)
+      |> Enum.map(fn {name, counts} -> %{"name" => name, "speeches" => Enum.sum(counts)} end)
+      |> Enum.sort_by(fn %{"speeches" => count} -> -count end)
+
+    char_counts
   end
 end

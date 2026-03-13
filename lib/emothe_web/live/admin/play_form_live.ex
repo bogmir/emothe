@@ -22,11 +22,15 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   defp apply_action(socket, :new, _params) do
     play = %Play{}
+    initial_params =
+      %{"code" => Catalogue.next_play_code()}
+      |> maybe_derive_emothe_id()
+      |> maybe_apply_corpus_defaults()
 
     socket
     |> assign(:page_title, gettext("New Play"))
     |> assign(:play, play)
-    |> assign(:form, to_form(Catalogue.change_play_form(play)))
+    |> assign(:form, to_form(Catalogue.change_play_form(play, initial_params)))
     |> assign(:parent_play_id, nil)
     |> assign(:parent_play_label, "")
     |> assign(:parent_play_search, "")

@@ -90,9 +90,10 @@ defmodule Emothe.TestFixtures do
         division_id: scene.id,
         type: "speech",
         speaker_label: "ALFA",
-        character_id: character.id,
         position: 1
       })
+
+    PlayContent.set_element_characters(speech.id, [character.id])
 
     {:ok, line_group} =
       PlayContent.create_element(%{
@@ -108,7 +109,6 @@ defmodule Emothe.TestFixtures do
         play_id: play.id,
         division_id: scene.id,
         parent_id: line_group.id,
-        character_id: character.id,
         type: "verse_line",
         content: "A verse line",
         line_number: 1,
@@ -121,7 +121,6 @@ defmodule Emothe.TestFixtures do
         play_id: play.id,
         division_id: scene.id,
         parent_id: speech.id,
-        character_id: character.id,
         type: "prose",
         content: "A prose fragment",
         position: 2

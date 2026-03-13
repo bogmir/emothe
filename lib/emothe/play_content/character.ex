@@ -13,7 +13,8 @@ defmodule Emothe.PlayContent.Character do
     field :position, :integer, default: 0
 
     belongs_to :play, Emothe.Catalogue.Play
-    has_many :elements, Emothe.PlayContent.Element, foreign_key: :character_id
+    has_many :element_characters, Emothe.PlayContent.ElementCharacter
+    many_to_many :elements, Emothe.PlayContent.Element, join_through: Emothe.PlayContent.ElementCharacter
 
     timestamps(type: :utc_datetime)
   end
@@ -22,6 +23,6 @@ defmodule Emothe.PlayContent.Character do
     character
     |> cast(attrs, [:xml_id, :name, :description, :is_hidden, :position, :play_id])
     |> validate_required([:xml_id, :name])
-    |> unique_constraint([:play_id, :xml_id])
+    |> unique_constraint([:play_id, :xml_id], error_key: :xml_id, message: "is already in use for this play")
   end
 end

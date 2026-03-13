@@ -282,7 +282,7 @@ defmodule Emothe.Import.TeiParserTest do
 
     assert speech
     assert speech.speaker_label == "ANA"
-    assert speech.character_id != nil
+    assert Emothe.PlayContent.Element.characters(speech) != []
 
     assert stage_dir
     assert stage_dir.content == "Sale ANA por la puerta"

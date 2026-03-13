@@ -20,11 +20,21 @@ defmodule Emothe.PlayContent.Element do
     belongs_to :play, Emothe.Catalogue.Play
     belongs_to :division, Emothe.PlayContent.Division
     belongs_to :parent, __MODULE__
-    belongs_to :character, Emothe.PlayContent.Character
     has_many :children, __MODULE__, foreign_key: :parent_id
+    has_many :element_characters, Emothe.PlayContent.ElementCharacter
+    many_to_many :characters, Emothe.PlayContent.Character, join_through: Emothe.PlayContent.ElementCharacter, on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
+
+  @doc """
+  Returns the ordered list of characters from preloaded element_characters.
+  """
+  def characters(%__MODULE__{element_characters: ecs}) when is_list(ecs) do
+    Enum.map(ecs, & &1.character)
+  end
+
+  def characters(%__MODULE__{}), do: []
 
   def changeset(element, attrs) do
     element
@@ -41,8 +51,7 @@ defmodule Emothe.PlayContent.Element do
       :position,
       :play_id,
       :division_id,
-      :parent_id,
-      :character_id
+      :parent_id
     ])
     |> validate_required([:type])
     |> validate_inclusion(

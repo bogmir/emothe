@@ -742,12 +742,15 @@ defmodule Emothe.Import.WordParser do
               parent_id: parent_id,
               type: "speech",
               speaker_label: element.speaker_label,
-              character_id: character_id,
               position: pos
             })
 
+          if character_id do
+            PlayContent.set_element_characters(speech.id, [character_id])
+          end
+
           children = Map.get(element, :children, [])
-          create_children(children, play_id, division_id, speech.id, verse_counter, character_id)
+          create_children(children, play_id, division_id, speech.id, verse_counter)
 
         %{type: "stage_direction"} ->
           PlayContent.create_element(%{
@@ -809,8 +812,7 @@ defmodule Emothe.Import.WordParser do
     end)
   end
 
-  # Child elements (verse, prose) inherit character_id from their parent speech
-  defp create_children(children, play_id, division_id, parent_id, verse_counter, character_id) do
+  defp create_children(children, play_id, division_id, parent_id, verse_counter) do
     alias Emothe.PlayContent
 
     children
@@ -829,7 +831,6 @@ defmodule Emothe.Import.WordParser do
             content: element.content,
             part: element[:part],
             line_number: line_num,
-            character_id: character_id,
             position: pos
           })
 
@@ -840,7 +841,6 @@ defmodule Emothe.Import.WordParser do
             parent_id: parent_id,
             type: "prose",
             content: element.content,
-            character_id: character_id,
             position: pos
           })
 

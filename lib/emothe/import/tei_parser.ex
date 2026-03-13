@@ -765,8 +765,8 @@ defmodule Emothe.Import.TeiParser do
     speaker_elem = find_child(children, "speaker")
     speaker_label = safe_text(speaker_elem)
 
-    # Resolve character from who attribute
-    character_id = resolve_character(play.id, who)
+    # Resolve characters from who attribute (supports multi-character who="#ALB #COR")
+    character_ids = resolve_characters(play.id, who)
 
     speech =
       case PlayContent.create_element(%{
@@ -774,12 +774,16 @@ defmodule Emothe.Import.TeiParser do
              division_id: division.id,
              type: "speech",
              speaker_label: speaker_label,
-             character_id: character_id,
              position: start_pos
            }) do
         {:ok, el} -> el
         {:error, cs} -> Repo.rollback({:element_create_failed, :speech, cs})
       end
+
+    # Associate characters with the speech
+    if character_ids != [] do
+      PlayContent.set_element_characters(speech.id, character_ids)
+    end
 
     # Import child elements (lg groups, individual l elements, stage directions, p elements)
     _child_pos =
@@ -791,7 +795,7 @@ defmodule Emothe.Import.TeiParser do
           import_line_group(attrs, lg_children, play, division, speech, pos)
 
         {"l", _, _} = line, pos ->
-          import_verse_line(line, play, division, speech, nil, pos)
+          import_verse_line(line, play, division, speech, pos)
           pos + 1
 
         {"stage", _, _} = stage, pos ->
@@ -831,7 +835,7 @@ defmodule Emothe.Import.TeiParser do
 
     Enum.reduce(children, 0, fn
       {"l", _, _} = line, pos ->
-        import_verse_line(line, play, division, lg, speech.character_id, pos)
+        import_verse_line(line, play, division, lg, pos)
         pos + 1
 
       {"stage", _, _} = stage, pos ->
@@ -852,7 +856,6 @@ defmodule Emothe.Import.TeiParser do
          play,
          division,
          parent,
-         character_id,
          pos
        ) do
     line_id = attr_value(attrs, "xml:id") || attr_value(attrs, "id")
@@ -862,13 +865,10 @@ defmodule Emothe.Import.TeiParser do
     is_aside = aside_delivery?(children)
     content = verse_line_content({name, attrs, children}, is_aside)
 
-    char_id = character_id || parent.character_id
-
     case PlayContent.create_element(%{
            play_id: play.id,
            division_id: division.id,
            parent_id: parent.id,
-           character_id: char_id,
            type: "verse_line",
            content: content,
            line_number: line_number,
@@ -970,7 +970,6 @@ defmodule Emothe.Import.TeiParser do
            play_id: play.id,
            division_id: division.id,
            parent_id: speech.id,
-           character_id: speech.character_id,
            type: "prose",
            content: content,
            is_aside: is_aside,
@@ -1005,19 +1004,18 @@ defmodule Emothe.Import.TeiParser do
 
   # --- Character resolution ---
 
-  defp resolve_character(_play_id, nil), do: nil
+  defp resolve_characters(_play_id, nil), do: []
 
-  defp resolve_character(play_id, who) do
-    # who is like "#ALFONSO" or "#DONPEDRODELARA.\n"
-    xml_id =
-      who
-      |> String.replace("#", "")
-      |> String.trim()
-
-    case PlayContent.find_character_by_xml_id(play_id, xml_id) do
-      nil -> nil
-      char -> char.id
-    end
+  defp resolve_characters(play_id, who) do
+    # who can be "#ALFONSO" (single) or "#ALB #COR" (multi-character, space-separated)
+    who
+    |> String.split(~r/\s+/, trim: true)
+    |> Enum.map(fn ref ->
+      xml_id = ref |> String.replace("#", "") |> String.trim()
+      PlayContent.find_character_by_xml_id(play_id, xml_id)
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(& &1.id)
   end
 
   # --- XML helpers ---

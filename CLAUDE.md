@@ -27,7 +27,8 @@ lib/
 │   ├── play_content/
 │   │   ├── character.ex              # Dramatis personae
 │   │   ├── division.ex               # Acts, scenes, prologues (self-referencing tree)
-│   │   └── element.ex                # Speeches, verse lines, stage directions, prose (self-referencing tree)
+│   │   ├── element.ex                # Speeches, verse lines, stage directions, prose (self-referencing tree)
+│   │   └── element_character.ex      # Join table: element ↔ character (multi-speaker support)
 │   ├── statistics.ex                 # Compute & cache play statistics
 │   ├── statistics/
 │   │   └── play_statistic.ex         # Cached JSONB statistics per play
@@ -78,7 +79,7 @@ All tables use UUID primary keys. Key relationships:
 - `plays` has_many `play_editors`, `play_sources`, `play_editorial_notes`, `characters`, `play_divisions`, `play_elements`
 - `play_divisions` self-references via `parent_id` (acts contain scenes)
 - `play_elements` self-references via `parent_id` (speeches contain line_groups contain verse_lines)
-- `play_elements` belongs_to `characters` (for speaker attribution)
+- `element_characters` join table links `play_elements` to `characters` (many-to-many, supports multi-speaker speeches like `who="#ALB #COR"`)
 - `play_statistics` stores computed JSONB data per play
 
 Element types: `speech`, `stage_direction`, `verse_line`, `prose`, `line_group`
@@ -224,7 +225,7 @@ Then visit:
 - [x] **PlayEditorialNotes admin UI** — first tab ("Editorial Notes") inside `/admin/plays/:id/content`; full CRUD with section_type dropdown (introduccion_editor/dedicatoria/argumento/prologo/nota); uses same modal pattern as characters/divisions/elements. NOTE: plays imported with older parser versions will have empty notes — delete and re-import to populate from TEI.
 - [x] **`front_notes` roundtrip check** — roundtrip test now verifies that front-matter `<div>` elements (prologo/dedicatoria/introduccion_editor/argumento/nota with non-empty `<p>` content) survive import→export
 - [ ] **`project_description`/`editorial_declaration`** — imported and exported but no admin UI to edit
-- [ ] **Multi-character `who` attrs** (`who="#ALB #COR"`) — parser can't resolve to single character_id; speeches get `character_id=nil`, losing `who` on export (warn-only in roundtrip test)
+- [x] **Multi-character `who` attrs** (`who="#ALB #COR"`) — replaced single `character_id` FK with `element_characters` join table (many-to-many). Parser splits space-separated `who` refs and resolves each independently. Export reconstructs multi-character `who` attribute. Character Review UI supports multi-select assignment. `speaker_refs` promoted to strict roundtrip assertion.
 
 ### Low Priority / Future
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.

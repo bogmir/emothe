@@ -6,7 +6,7 @@ defmodule Emothe.StatisticsTest do
   alias Emothe.TestFixtures
 
   test "get_statistics/1 computes and stores aggregate public metrics" do
-    %{play: play, line_group: line_group, character: character, scene: scene} =
+    %{play: play, line_group: line_group, scene: scene} =
       TestFixtures.play_with_structure_fixture()
 
     {:ok, _aside_verse} =
@@ -14,7 +14,6 @@ defmodule Emothe.StatisticsTest do
         play_id: play.id,
         division_id: scene.id,
         parent_id: line_group.id,
-        character_id: character.id,
         type: "verse_line",
         content: "Aside line",
         line_number: 2,
@@ -39,7 +38,7 @@ defmodule Emothe.StatisticsTest do
   end
 
   test "recompute/1 refreshes cached statistics after content changes" do
-    %{play: play, line_group: line_group, character: character, scene: scene} =
+    %{play: play, line_group: line_group, scene: scene} =
       TestFixtures.play_with_structure_fixture()
 
     first = Statistics.get_statistics(play.id)
@@ -49,7 +48,6 @@ defmodule Emothe.StatisticsTest do
         play_id: play.id,
         division_id: scene.id,
         parent_id: line_group.id,
-        character_id: character.id,
         type: "verse_line",
         content: "New line",
         line_number: 10,

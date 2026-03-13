@@ -126,6 +126,23 @@ defmodule Emothe.Catalogue do
     |> Repo.update()
   end
 
+  def next_play_code do
+    max_number =
+      Play
+      |> select([p], p.code)
+      |> Repo.all()
+      |> Enum.map(fn code ->
+        case Regex.run(~r/^(?:EMOTHE|CTCE|AL)(\d+)/i, code || "") do
+          [_, num_str] -> String.to_integer(num_str)
+          _ -> 0
+        end
+      end)
+      |> Enum.max(fn -> 0 end)
+
+    next = max_number + 1
+    "EMOTHE#{String.pad_leading(Integer.to_string(next), 4, "0")}"
+  end
+
   # --- Editors ---
 
   def list_play_editors(play_id) do

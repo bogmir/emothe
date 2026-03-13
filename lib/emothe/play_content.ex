@@ -9,7 +9,7 @@ defmodule Emothe.PlayContent do
 
   import Ecto.Query
   alias Emothe.Repo
-  alias Emothe.PlayContent.{Character, Division, Element}
+  alias Emothe.PlayContent.{Character, Division, Element, ElementCharacter}
 
   @pubsub Emothe.PubSub
 
@@ -205,30 +205,48 @@ defmodule Emothe.PlayContent do
   # --- Elements ---
 
   def list_elements_for_division(division_id) do
+    ec_preload = from(ec in ElementCharacter, order_by: ec.position, preload: :character)
+
     Element
     |> where(division_id: ^division_id)
     |> where([e], is_nil(e.parent_id))
     |> order_by(:position)
     |> Repo.all()
     |> Repo.preload([
-      :character,
+      element_characters: ec_preload,
       children:
         from(e in Element,
           order_by: e.position,
           preload: [
-            :character,
+            element_characters: ^ec_preload,
             children:
               ^from(c in Element,
                 order_by: c.position,
                 preload: [
-                  :character,
-                  children: ^from(v in Element, order_by: v.position, preload: :character)
+                  element_characters: ^ec_preload,
+                  children: ^from(v in Element, order_by: v.position, preload: [element_characters: ^ec_preload])
                 ]
               )
           ]
         )
     ])
   end
+
+  def search_elements(play_id, query) when is_binary(query) and byte_size(query) >= 2 do
+    pattern = "%#{query}%"
+
+    from(e in Element,
+      where: e.play_id == ^play_id,
+      where: ilike(e.content, ^pattern) or ilike(e.speaker_label, ^pattern),
+      left_join: d in assoc(e, :division),
+      preload: [division: d],
+      order_by: [e.position],
+      limit: 50
+    )
+    |> Repo.all()
+  end
+
+  def search_elements(_play_id, _query), do: []
 
   def list_all_elements(play_id) do
     Element
@@ -237,7 +255,10 @@ defmodule Emothe.PlayContent do
     |> Repo.all()
   end
 
-  def get_element!(id), do: Repo.get!(Element, id) |> Repo.preload(:character)
+  def get_element!(id) do
+    Repo.get!(Element, id)
+    |> Repo.preload(element_characters: from(ec in ElementCharacter, order_by: ec.position, preload: :character))
+  end
 
   def create_element(attrs) do
     %Element{}
@@ -390,6 +411,8 @@ defmodule Emothe.PlayContent do
     # Load elements per division (including sub-divisions)
     all_division_ids = collect_division_ids(divisions)
 
+    ec_preload = from(ec in ElementCharacter, order_by: ec.position, preload: :character)
+
     elements =
       Element
       |> where([e], e.division_id in ^all_division_ids)
@@ -397,13 +420,13 @@ defmodule Emothe.PlayContent do
       |> order_by(:position)
       |> Repo.all()
       |> Repo.preload([
-        :character,
+        element_characters: ec_preload,
         children:
           from(e in Element,
             order_by: e.position,
             preload: [
-              :character,
-              children: ^from(c in Element, order_by: c.position)
+              element_characters: ^ec_preload,
+              children: ^from(c in Element, order_by: c.position, preload: [element_characters: ^ec_preload])
             ]
           )
       ])
@@ -411,6 +434,47 @@ defmodule Emothe.PlayContent do
     elements_by_division = Enum.group_by(elements, & &1.division_id)
 
     attach_elements(divisions, elements_by_division)
+  end
+
+  # --- Element-Character associations ---
+
+  @doc """
+  Replaces all character associations for an element with the given character_ids.
+  Position is assigned based on list order (0, 1, 2, ...).
+  """
+  def set_element_characters(element_id, character_ids) when is_list(character_ids) do
+    Repo.transaction(fn ->
+      # Delete existing associations
+      ElementCharacter
+      |> where(element_id: ^element_id)
+      |> Repo.delete_all()
+
+      # Insert new associations with position
+      character_ids
+      |> Enum.with_index()
+      |> Enum.each(fn {character_id, position} ->
+        %ElementCharacter{}
+        |> ElementCharacter.changeset(%{
+          element_id: element_id,
+          character_id: character_id,
+          position: position
+        })
+        |> Repo.insert!()
+      end)
+
+      :ok
+    end)
+  end
+
+  @doc """
+  Returns ordered character_ids for an element.
+  """
+  def get_element_character_ids(element_id) do
+    ElementCharacter
+    |> where(element_id: ^element_id)
+    |> order_by(:position)
+    |> select([ec], ec.character_id)
+    |> Repo.all()
   end
 
   defp collect_division_ids(divisions) do

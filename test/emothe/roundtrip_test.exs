@@ -13,12 +13,9 @@ defmodule Emothe.RoundtripTest do
 
   @fixtures_dir Path.expand("../fixtures/tei_files", __DIR__)
   @fields ~w(acts scenes characters speeches verses line_groups stage_dirs asides
-             split_parts verse_type_attrs hidden_chars heads front_notes)a
+             split_parts verse_type_attrs hidden_chars heads front_notes speaker_refs)a
 
-  # speaker_refs may lose a few who= attrs when a speech references multiple
-  # characters (e.g. who="#ALB #COR") which the parser can't resolve to one ID.
-  # We warn instead of failing so the delta is visible without blocking CI.
-  @warn_fields ~w(speaker_refs)a
+  @warn_fields ~w()a
 
   _ = @fields
   _ = @warn_fields

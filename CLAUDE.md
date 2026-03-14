@@ -130,24 +130,37 @@ TEI fixture files are at `test/fixtures/tei_files/` (UTF-16 encoded, ~37 files c
 
 ## Running Commands
 
-When using the Bash tool, `mix` and other Elixir/Erlang commands require the asdf shims on PATH. Always use the full path to mix:
+When using the Bash tool, the asdf shims don't work in the sandbox (they are bash scripts that need `/bin/bash`). Instead, set PATH directly to the Erlang and Elixir binary directories before running any mix/elixir/iex command:
 
 ```bash
-/home/bogdan/.asdf/shims/mix test
-/home/bogdan/.asdf/shims/mix compile
-/home/bogdan/.asdf/shims/mix phx.server
+export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/bin:/usr/local/bin:/bin:$PATH"
+mix test
+mix compile
+mix phx.server
 ```
 
 For piping output, system commands like `tail` and `head` are at `/usr/bin/`:
 
 ```bash
-/home/bogdan/.asdf/shims/mix test 2>&1 | /usr/bin/tail -10
+export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/bin:/usr/local/bin:/bin:$PATH" && mix test 2>&1 | /usr/bin/tail -10
+```
+
+### Finding missing gettext translations without mix
+
+When `mix gettext.extract --merge` is not runnable, find missing translations manually:
+
+```bash
+# Strings in code but not in PO file:
+grep -rho 'gettext("[^"]*")' lib/ | sed 's/.*gettext("\(.*\)")/\1/' | sort -u > /tmp/code_strings.txt
+grep '^msgid ' priv/gettext/es/LC_MESSAGES/default.po | sed 's/msgid "\(.*\)"/\1/' | sort -u > /tmp/po_strings.txt
+comm -23 /tmp/code_strings.txt /tmp/po_strings.txt
 ```
 
 ## Getting Started
 
 ```bash
 cd ~/Projects/emothe
+export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/bin:/usr/local/bin:/bin:$PATH"
 mix deps.get
 mix ecto.create
 mix ecto.migrate

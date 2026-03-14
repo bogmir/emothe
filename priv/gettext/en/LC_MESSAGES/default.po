@@ -27,67 +27,68 @@ msgid "Account created successfully!"
 msgstr ""
 
 #: lib/emothe_web/components/core_components.ex:449
-#: lib/emothe_web/live/admin/play_list_live.ex:136
-#: lib/emothe_web/live/admin/user_list_live.ex:137
+#: lib/emothe_web/live/admin/play_list_live.ex:146
+#: lib/emothe_web/live/admin/user_list_live.ex:148
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1002
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1026
 #, elixir-autogen, elixir-format
 msgid "Add"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1469
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1493
 #, elixir-autogen, elixir-format
 msgid "Add Act"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1237
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1261
 #, elixir-autogen, elixir-format
 msgid "Add Character"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2405
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2429
 #, elixir-autogen, elixir-format
 msgid "Add Line Group"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2421
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2445
 #, elixir-autogen, elixir-format
 msgid "Add Prose"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1572
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1596
 #, elixir-autogen, elixir-format
 msgid "Add Scene"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2413
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2437
 #, elixir-autogen, elixir-format
 msgid "Add Stage Direction"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2431
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2455
 #, elixir-autogen, elixir-format
 msgid "Add Verse Line"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:18
+#: lib/emothe_web/live/admin/activity_log_live.ex:23
+#: lib/emothe_web/live/admin/import_live.ex:19
 #: lib/emothe_web/live/admin/play_compare_live.ex:55
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:59
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:60
 #: lib/emothe_web/live/admin/play_detail_live.ex:28
-#: lib/emothe_web/live/admin/play_editors_live.ex:20
-#: lib/emothe_web/live/admin/play_form_live.ex:40
-#: lib/emothe_web/live/admin/play_form_live.ex:73
-#: lib/emothe_web/live/admin/play_list_live.ex:19
-#: lib/emothe_web/live/admin/play_sources_live.ex:20
-#: lib/emothe_web/live/admin/user_list_live.ex:18
+#: lib/emothe_web/live/admin/play_editors_live.ex:21
+#: lib/emothe_web/live/admin/play_form_live.ex:41
+#: lib/emothe_web/live/admin/play_form_live.ex:74
+#: lib/emothe_web/live/admin/play_list_live.ex:20
+#: lib/emothe_web/live/admin/play_sources_live.ex:21
+#: lib/emothe_web/live/admin/user_list_live.ex:19
 #, elixir-autogen, elixir-format
 msgid "Admin"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:13
+#: lib/emothe_web/live/admin/play_list_live.ex:14
 #, elixir-autogen, elixir-format
 msgid "Admin - Plays"
 msgstr ""
@@ -97,7 +98,7 @@ msgstr ""
 msgid "Already registered?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2687
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2711
 #, elixir-autogen, elixir-format
 msgid "Aside"
 msgstr ""
@@ -120,7 +121,7 @@ msgstr ""
 msgid "Attempting to reconnect"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:533
+#: lib/emothe_web/live/admin/play_form_live.ex:552
 #, elixir-autogen, elixir-format
 msgid "Attribution"
 msgstr ""
@@ -130,12 +131,12 @@ msgstr ""
 msgid "Attribution:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:507
+#: lib/emothe_web/live/admin/play_form_live.ex:526
 #, elixir-autogen, elixir-format
 msgid "Author (sort)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:500
+#: lib/emothe_web/live/admin/play_form_live.ex:519
 #, elixir-autogen, elixir-format
 msgid "Author Name"
 msgstr ""
@@ -150,29 +151,29 @@ msgstr ""
 msgid "Browse the Catalogue"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:99
+#: lib/emothe_web/live/admin/play_list_live.ex:109
 #, elixir-autogen, elixir-format
 msgid "Browse, edit, and curate imported plays."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1803
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2519
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2560
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2593
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2762
-#: lib/emothe_web/live/admin/play_editors_live.ex:221
-#: lib/emothe_web/live/admin/play_form_live.ex:695
-#: lib/emothe_web/live/admin/play_sources_live.ex:223
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1827
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2543
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2584
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2617
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2786
+#: lib/emothe_web/live/admin/play_editors_live.ex:250
+#: lib/emothe_web/live/admin/play_form_live.ex:714
+#: lib/emothe_web/live/admin/play_sources_live.ex:252
 #, elixir-autogen, elixir-format
 msgid "Cancel"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:95
+#: lib/emothe_web/live/admin/import_live.ex:96
 #, elixir-autogen, elixir-format
 msgid "Cannot read directory"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:279
+#: lib/emothe_web/live/admin/play_form_live.ex:298
 #, elixir-autogen, elixir-format
 msgid "Catalan"
 msgstr ""
@@ -201,7 +202,7 @@ msgstr ""
 msgid "Changing..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2528
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2552
 #, elixir-autogen, elixir-format
 msgid "Character"
 msgstr ""
@@ -211,31 +212,31 @@ msgstr ""
 msgid "Character Speeches"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:217
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:222
 #, elixir-autogen, elixir-format
 msgid "Character deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:771
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:791
 #, elixir-autogen, elixir-format
 msgid "Character saved."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1993
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2626
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2017
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2650
 #: lib/emothe_web/live/admin/play_detail_live.ex:398
 #, elixir-autogen, elixir-format
 msgid "Characters"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:200
+#: lib/emothe_web/live/admin/import_live.ex:210
 #, elixir-autogen, elixir-format
 msgid "Choose one or more TEI-XML files from your computer."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:274
-#: lib/emothe_web/live/admin/play_form_live.ex:383
-#: lib/emothe_web/live/admin/play_list_live.ex:133
+#: lib/emothe_web/live/admin/import_live.ex:284
+#: lib/emothe_web/live/admin/play_form_live.ex:402
+#: lib/emothe_web/live/admin/play_list_live.ex:143
 #, elixir-autogen, elixir-format
 msgid "Code"
 msgstr ""
@@ -262,10 +263,10 @@ msgid "Confirming..."
 msgstr ""
 
 #: lib/emothe_web/components/layouts.ex:145
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2506
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2696
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2713
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2734
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2530
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2720
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2737
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2758
 #, elixir-autogen, elixir-format
 msgid "Content"
 msgstr ""
@@ -291,50 +292,50 @@ msgstr ""
 msgid "Current password"
 msgstr ""
 
-#: lib/emothe_web/components/layouts/admin.html.heex:23
+#: lib/emothe_web/components/layouts/admin.html.heex:24
 #: lib/emothe_web/components/layouts/app.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Dashboard"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1199
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1308
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1513
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1559
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2377
-#: lib/emothe_web/live/admin/play_editors_live.ex:275
-#: lib/emothe_web/live/admin/play_list_live.ex:182
-#: lib/emothe_web/live/admin/play_sources_live.ex:313
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1223
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1332
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1537
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1583
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2401
+#: lib/emothe_web/live/admin/play_editors_live.ex:304
+#: lib/emothe_web/live/admin/play_list_live.ex:192
+#: lib/emothe_web/live/admin/play_sources_live.ex:342
 #, elixir-autogen, elixir-format
 msgid "Delete"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1305
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1329
 #, elixir-autogen, elixir-format
 msgid "Delete this character? Speeches referencing it will lose their speaker."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1511
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1535
 #, elixir-autogen, elixir-format
 msgid "Delete this division and all its content?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2375
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2399
 #, elixir-autogen, elixir-format
 msgid "Delete this element and its children?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1557
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1581
 #, elixir-autogen, elixir-format
 msgid "Delete this scene and all its content?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:177
+#: lib/emothe_web/live/admin/play_list_live.ex:187
 #, elixir-autogen, elixir-format
 msgid "Delete «%{title}» and all its content? This cannot be undone."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2546
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2570
 #, elixir-autogen, elixir-format
 msgid "Description"
 msgstr ""
@@ -344,17 +345,17 @@ msgstr ""
 msgid "Digital editions and catalogue of early modern European theatre plays (16th-17th century)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2569
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2593
 #, elixir-autogen, elixir-format
 msgid "Division"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:454
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:467
 #, elixir-autogen, elixir-format
 msgid "Division deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:804
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:826
 #, elixir-autogen, elixir-format
 msgid "Division saved."
 msgstr ""
@@ -369,44 +370,44 @@ msgstr ""
 msgid "EMOTHE Digital Library"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1003
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1191
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1297
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2368
-#: lib/emothe_web/live/admin/play_editors_live.ex:267
-#: lib/emothe_web/live/admin/play_form_live.ex:64
-#: lib/emothe_web/live/admin/play_sources_live.ex:305
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1027
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1215
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1321
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2392
+#: lib/emothe_web/live/admin/play_editors_live.ex:296
+#: lib/emothe_web/live/admin/play_form_live.ex:65
+#: lib/emothe_web/live/admin/play_sources_live.ex:334
 #, elixir-autogen, elixir-format
 msgid "Edit"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:30
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:62
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1095
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1498
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:31
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:63
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1119
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1522
 #, elixir-autogen, elixir-format
 msgid "Edit Content"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:76
+#: lib/emothe_web/live/admin/play_form_live.ex:77
 #, elixir-autogen, elixir-format
 msgid "Edit Metadata"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:311
+#: lib/emothe_web/live/admin/import_live.ex:321
 #: lib/emothe_web/live/play_show_live.ex:228
 #, elixir-autogen, elixir-format
 msgid "Edit in Admin"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1504
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1550
-#: lib/emothe_web/live/admin/play_list_live.ex:161
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1528
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1574
+#: lib/emothe_web/live/admin/play_list_live.ex:171
 #, elixir-autogen, elixir-format
 msgid "Edit metadata"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2479
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2503
 #: lib/emothe_web/live/play_show_live.ex:388
 #, elixir-autogen, elixir-format
 msgid "Editorial Note"
@@ -414,24 +415,24 @@ msgstr ""
 
 #: lib/emothe_web/components/layouts.ex:133
 #: lib/emothe_web/live/admin/play_detail_live.ex:384
-#: lib/emothe_web/live/admin/play_editors_live.ex:14
-#: lib/emothe_web/live/admin/play_editors_live.ex:23
+#: lib/emothe_web/live/admin/play_editors_live.ex:15
+#: lib/emothe_web/live/admin/play_editors_live.ex:24
 #: lib/emothe_web/live/play_show_live.ex:374
 #, elixir-autogen, elixir-format
 msgid "Editors"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:653
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:668
 #, elixir-autogen, elixir-format
 msgid "Element deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:857
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:881
 #, elixir-autogen, elixir-format
 msgid "Element saved."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:133
+#: lib/emothe_web/live/admin/user_list_live.ex:144
 #: lib/emothe_web/live/user_confirmation_instructions_live.ex:15
 #: lib/emothe_web/live/user_forgot_password_live.ex:15
 #: lib/emothe_web/live/user_login_live.ex:19
@@ -451,12 +452,12 @@ msgstr ""
 msgid "Email changed successfully."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:277
+#: lib/emothe_web/live/admin/play_form_live.ex:296
 #, elixir-autogen, elixir-format
 msgid "English"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:342
+#: lib/emothe_web/live/admin/import_live.ex:352
 #, elixir-autogen, elixir-format
 msgid "Error"
 msgstr ""
@@ -492,12 +493,12 @@ msgstr ""
 msgid "Export TEI-XML"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:272
+#: lib/emothe_web/live/admin/import_live.ex:282
 #, elixir-autogen, elixir-format
 msgid "File"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:339
+#: lib/emothe_web/live/admin/import_live.ex:349
 #, elixir-autogen, elixir-format
 msgid "File is too large (max 20MB)"
 msgstr ""
@@ -508,17 +509,17 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:280
+#: lib/emothe_web/live/admin/play_form_live.ex:299
 #, elixir-autogen, elixir-format
 msgid "French"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1693
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1717
 #, elixir-autogen, elixir-format
 msgid "Go to Structure"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2553
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2577
 #, elixir-autogen, elixir-format
 msgid "Hidden character"
 msgstr ""
@@ -541,19 +542,19 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:235
+#: lib/emothe_web/live/admin/import_live.ex:245
 #, elixir-autogen, elixir-format
 msgid "Import %{count} file(s)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:11
-#: lib/emothe_web/live/admin/import_live.ex:20
-#: lib/emothe_web/live/admin/play_list_live.ex:107
+#: lib/emothe_web/live/admin/import_live.ex:12
+#: lib/emothe_web/live/admin/import_live.ex:21
+#: lib/emothe_web/live/admin/play_list_live.ex:117
 #, elixir-autogen, elixir-format
 msgid "Import TEI-XML"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:188
+#: lib/emothe_web/live/admin/import_live.ex:198
 #, elixir-autogen, elixir-format
 msgid "Import TEI-XML Files"
 msgstr ""
@@ -563,25 +564,25 @@ msgstr ""
 msgid "Import and export scholarly editions in TEI P5 format"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:119
+#: lib/emothe_web/live/admin/import_live.ex:120
 #, elixir-autogen, elixir-format
 msgid "Import errors"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:191
+#: lib/emothe_web/live/admin/import_live.ex:201
 #, elixir-autogen, elixir-format
 msgid "Import one or many TEI files and review successful ingestions."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:267
+#: lib/emothe_web/live/admin/import_live.ex:277
 #, elixir-autogen, elixir-format
 msgid "Imported Plays"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2310
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2311
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2359
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2360
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2334
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2335
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2383
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2384
 #, elixir-autogen, elixir-format
 msgid "Insert Above"
 msgstr ""
@@ -591,7 +592,7 @@ msgstr ""
 msgid "Invalid email or password"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:278
+#: lib/emothe_web/live/admin/play_form_live.ex:297
 #, elixir-autogen, elixir-format
 msgid "Italian"
 msgstr ""
@@ -601,9 +602,9 @@ msgstr ""
 msgid "Keep me logged in"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:527
-#: lib/emothe_web/live/admin/play_sources_live.ex:192
-#: lib/emothe_web/live/admin/play_sources_live.ex:289
+#: lib/emothe_web/live/admin/play_form_live.ex:546
+#: lib/emothe_web/live/admin/play_sources_live.ex:221
+#: lib/emothe_web/live/admin/play_sources_live.ex:318
 #, elixir-autogen, elixir-format
 msgid "Language"
 msgstr ""
@@ -618,12 +619,12 @@ msgstr ""
 msgid "Last computed:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2464
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2488
 #, elixir-autogen, elixir-format
 msgid "Line Group"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2746
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2770
 #, elixir-autogen, elixir-format
 msgid "Line Number"
 msgstr ""
@@ -650,7 +651,7 @@ msgstr ""
 msgid "Log in to EMOTHE"
 msgstr ""
 
-#: lib/emothe_web/components/layouts/admin.html.heex:40
+#: lib/emothe_web/components/layouts/admin.html.heex:41
 #: lib/emothe_web/components/layouts/app.html.heex:61
 #, elixir-autogen, elixir-format
 msgid "Log out"
@@ -684,15 +685,15 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2541
-#: lib/emothe_web/live/admin/play_editors_live.ex:183
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2565
+#: lib/emothe_web/live/admin/play_editors_live.ex:212
 #, elixir-autogen, elixir-format
 msgid "Name"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:31
-#: lib/emothe_web/live/admin/play_form_live.ex:42
-#: lib/emothe_web/live/admin/play_list_live.ex:113
+#: lib/emothe_web/live/admin/play_form_live.ex:32
+#: lib/emothe_web/live/admin/play_form_live.ex:43
+#: lib/emothe_web/live/admin/play_list_live.ex:123
 #, elixir-autogen, elixir-format
 msgid "New Play"
 msgstr ""
@@ -703,25 +704,26 @@ msgstr ""
 msgid "New password"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1730
-#: lib/emothe_web/live/admin/play_list_live.ex:217
-#: lib/emothe_web/live/admin/user_list_live.ex:238
+#: lib/emothe_web/live/admin/activity_log_live.ex:336
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1754
+#: lib/emothe_web/live/admin/play_list_live.ex:227
+#: lib/emothe_web/live/admin/user_list_live.ex:249
 #: lib/emothe_web/live/play_catalogue_live.ex:143
 #, elixir-autogen, elixir-format
 msgid "Next"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:72
+#: lib/emothe_web/live/admin/import_live.ex:73
 #, elixir-autogen, elixir-format
 msgid "No .xml files found in %{dir}"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1477
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1501
 #, elixir-autogen, elixir-format
 msgid "No acts or scenes yet. Add an act to get started."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1245
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1269
 #, elixir-autogen, elixir-format
 msgid "No characters yet. Add one to get started."
 msgstr ""
@@ -731,12 +733,12 @@ msgstr ""
 msgid "No confirmation instructions received?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1849
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1873
 #, elixir-autogen, elixir-format
 msgid "No content to preview yet."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1767
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1791
 #, elixir-autogen, elixir-format
 msgid "No content yet. Add a speech, stage direction, or prose."
 msgstr ""
@@ -746,17 +748,17 @@ msgstr ""
 msgid "No plays found. Try a different search term."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:197
+#: lib/emothe_web/live/admin/play_list_live.ex:207
 #, elixir-autogen, elixir-format
 msgid "No plays yet. Import a TEI-XML file or create a new play."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2582
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2606
 #, elixir-autogen, elixir-format
 msgid "Number"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:340
+#: lib/emothe_web/live/admin/import_live.ex:350
 #, elixir-autogen, elixir-format
 msgid "Only .xml files are accepted"
 msgstr ""
@@ -773,12 +775,12 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: lib/emothe_web/controllers/admin/export_controller.ex:51
+#: lib/emothe_web/controllers/admin/export_controller.ex:58
 #, elixir-autogen, elixir-format
 msgid "PDF generation failed: %{reason}"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2752
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2776
 #, elixir-autogen, elixir-format
 msgid "Part (split line)"
 msgstr ""
@@ -804,32 +806,32 @@ msgstr ""
 msgid "Play Catalogue"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:96
+#: lib/emothe_web/live/admin/play_list_live.ex:106
 #, elixir-autogen, elixir-format
 msgid "Play Management"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1463
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1487
 #, elixir-autogen, elixir-format
 msgid "Play Structure"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1823
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1847
 #, elixir-autogen, elixir-format
 msgid "Play Text Preview"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:244
+#: lib/emothe_web/live/admin/play_form_live.ex:254
 #, elixir-autogen, elixir-format
 msgid "Play created successfully."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:257
+#: lib/emothe_web/live/admin/play_form_live.ex:276
 #, elixir-autogen, elixir-format
 msgid "Play updated successfully."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:178
+#: lib/emothe_web/live/admin/import_live.ex:188
 #, elixir-autogen, elixir-format
 msgid "Play with code %{code} already exists"
 msgstr ""
@@ -838,35 +840,36 @@ msgstr ""
 #: lib/emothe_web/components/layouts/app.html.heex:21
 #: lib/emothe_web/components/layouts/app.html.heex:31
 #: lib/emothe_web/components/statistics_panel.ex:189
-#: lib/emothe_web/live/admin/import_live.ex:19
+#: lib/emothe_web/live/admin/import_live.ex:20
 #: lib/emothe_web/live/admin/play_compare_live.ex:56
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:60
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:61
 #: lib/emothe_web/live/admin/play_detail_live.ex:29
-#: lib/emothe_web/live/admin/play_editors_live.ex:21
-#: lib/emothe_web/live/admin/play_form_live.ex:41
-#: lib/emothe_web/live/admin/play_form_live.ex:74
-#: lib/emothe_web/live/admin/play_list_live.ex:20
-#: lib/emothe_web/live/admin/play_sources_live.ex:21
+#: lib/emothe_web/live/admin/play_editors_live.ex:22
+#: lib/emothe_web/live/admin/play_form_live.ex:42
+#: lib/emothe_web/live/admin/play_form_live.ex:75
+#: lib/emothe_web/live/admin/play_list_live.ex:21
+#: lib/emothe_web/live/admin/play_sources_live.ex:22
 #, elixir-autogen, elixir-format
 msgid "Plays"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:281
+#: lib/emothe_web/live/admin/play_form_live.ex:300
 #, elixir-autogen, elixir-format
 msgid "Portuguese"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1721
-#: lib/emothe_web/live/admin/play_list_live.ex:207
-#: lib/emothe_web/live/admin/user_list_live.ex:228
+#: lib/emothe_web/live/admin/activity_log_live.ex:326
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1745
+#: lib/emothe_web/live/admin/play_list_live.ex:217
+#: lib/emothe_web/live/admin/user_list_live.ex:239
 #: lib/emothe_web/live/play_catalogue_live.ex:133
 #, elixir-autogen, elixir-format
 msgid "Previous"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1757
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2346
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2463
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1781
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2370
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2487
 #: lib/emothe_web/live/play_show_live.ex:299
 #, elixir-autogen, elixir-format
 msgid "Prose"
@@ -877,7 +880,7 @@ msgstr ""
 msgid "Prose Fragments"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2718
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2742
 #, elixir-autogen, elixir-format
 msgid "Prose text..."
 msgstr ""
@@ -887,12 +890,12 @@ msgstr ""
 msgid "Public"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:572
+#: lib/emothe_web/live/admin/play_form_live.ex:591
 #, elixir-autogen, elixir-format
 msgid "Publication Date"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:566
+#: lib/emothe_web/live/admin/play_form_live.ex:585
 #, elixir-autogen, elixir-format
 msgid "Publication Place"
 msgstr ""
@@ -920,7 +923,7 @@ msgstr ""
 msgid "Register for an account"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:220
+#: lib/emothe_web/live/admin/import_live.ex:230
 #: lib/emothe_web/live/admin/play_compare_live.ex:242
 #, elixir-autogen, elixir-format
 msgid "Remove"
@@ -947,17 +950,17 @@ msgstr ""
 msgid "Resetting..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2517
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2558
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2591
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2760
-#: lib/emothe_web/live/admin/play_editors_live.ex:224
-#: lib/emothe_web/live/admin/play_sources_live.ex:226
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2541
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2582
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2615
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2784
+#: lib/emothe_web/live/admin/play_editors_live.ex:253
+#: lib/emothe_web/live/admin/play_sources_live.ex:255
 #, elixir-autogen, elixir-format
 msgid "Save"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:692
+#: lib/emothe_web/live/admin/play_form_live.ex:711
 #, elixir-autogen, elixir-format
 msgid "Save Play"
 msgstr ""
@@ -982,7 +985,7 @@ msgstr ""
 msgid "Search by title, author, or code..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:123
+#: lib/emothe_web/live/admin/play_list_live.ex:133
 #, elixir-autogen, elixir-format
 msgid "Search plays..."
 msgstr ""
@@ -992,12 +995,12 @@ msgstr ""
 msgid "Sections"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:198
+#: lib/emothe_web/live/admin/import_live.ex:208
 #, elixir-autogen, elixir-format
 msgid "Select Files"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1686
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1710
 #, elixir-autogen, elixir-format
 msgid "Select a scene or act from the Structure tab to edit its content."
 msgstr ""
@@ -1013,7 +1016,7 @@ msgstr ""
 msgid "Sending..."
 msgstr ""
 
-#: lib/emothe_web/components/layouts/admin.html.heex:38
+#: lib/emothe_web/components/layouts/admin.html.heex:39
 #: lib/emothe_web/components/layouts/app.html.heex:59
 #, elixir-autogen, elixir-format
 msgid "Settings"
@@ -1034,19 +1037,19 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:276
+#: lib/emothe_web/live/admin/play_form_live.ex:295
 #, elixir-autogen, elixir-format
 msgid "Spanish"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2620
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2644
 #, elixir-autogen, elixir-format
 msgid "Speaker Label"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1743
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2326
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2460
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1767
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2350
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2484
 #, elixir-autogen, elixir-format
 msgid "Speech"
 msgstr ""
@@ -1056,13 +1059,13 @@ msgstr ""
 msgid "Split Verses"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1750
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2461
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1774
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2485
 #, elixir-autogen, elixir-format
 msgid "Stage Dir."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2336
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2360
 #, elixir-autogen, elixir-format
 msgid "Stage Direction"
 msgstr ""
@@ -1072,7 +1075,7 @@ msgstr ""
 msgid "Stage Directions"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2702
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2726
 #, elixir-autogen, elixir-format
 msgid "Stage direction text..."
 msgstr ""
@@ -1100,12 +1103,12 @@ msgstr ""
 msgid "Structure"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:131
+#: lib/emothe_web/live/admin/import_live.ex:132
 #, elixir-autogen, elixir-format
 msgid "Successfully imported %{count} play(s)."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:520
+#: lib/emothe_web/live/admin/play_form_live.ex:539
 #, elixir-autogen, elixir-format
 msgid "Surname, Name"
 msgstr ""
@@ -1115,27 +1118,27 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:273
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2586
-#: lib/emothe_web/live/admin/play_form_live.ex:305
-#: lib/emothe_web/live/admin/play_list_live.ex:134
-#: lib/emothe_web/live/admin/play_sources_live.ex:164
-#: lib/emothe_web/live/admin/play_sources_live.ex:254
+#: lib/emothe_web/live/admin/import_live.ex:283
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2610
+#: lib/emothe_web/live/admin/play_form_live.ex:324
+#: lib/emothe_web/live/admin/play_list_live.ex:144
+#: lib/emothe_web/live/admin/play_sources_live.ex:193
+#: lib/emothe_web/live/admin/play_sources_live.ex:283
 #, elixir-autogen, elixir-format
 msgid "Title"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:341
+#: lib/emothe_web/live/admin/import_live.ex:351
 #, elixir-autogen, elixir-format
 msgid "Too many files (max 20)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2578
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2602
 #, elixir-autogen, elixir-format
 msgid "Type"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:292
+#: lib/emothe_web/live/admin/play_form_live.ex:311
 #, elixir-autogen, elixir-format
 msgid "Update bibliographic and editorial metadata for this play."
 msgstr ""
@@ -1150,7 +1153,7 @@ msgstr ""
 msgid "User confirmed successfully."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2462
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2486
 #, elixir-autogen, elixir-format
 msgid "Verse"
 msgstr ""
@@ -1160,7 +1163,7 @@ msgstr ""
 msgid "Verse Distribution"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2725
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2749
 #, elixir-autogen, elixir-format
 msgid "Verse Type"
 msgstr ""
@@ -1175,29 +1178,29 @@ msgstr ""
 msgid "Verse distribution, character analysis, and more"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2740
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2764
 #, elixir-autogen, elixir-format
 msgid "Verse line text..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:614
+#: lib/emothe_web/live/admin/play_form_live.ex:633
 #, elixir-autogen, elixir-format
 msgid "Verse play"
 msgstr ""
 
 #: lib/emothe_web/components/statistics_panel.ex:22
-#: lib/emothe_web/live/admin/play_list_live.ex:135
+#: lib/emothe_web/live/admin/play_list_live.ex:145
 #, elixir-autogen, elixir-format
 msgid "Verses"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:330
+#: lib/emothe_web/live/admin/import_live.ex:340
 #, elixir-autogen, elixir-format
 msgid "View all plays"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:319
-#: lib/emothe_web/live/admin/play_list_live.ex:169
+#: lib/emothe_web/live/admin/import_live.ex:329
+#: lib/emothe_web/live/admin/play_list_live.ex:179
 #, elixir-autogen, elixir-format
 msgid "View public page"
 msgstr ""
@@ -1235,12 +1238,12 @@ msgstr ""
 msgid "You must log in to access this page."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1465
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1489
 #, elixir-autogen, elixir-format
 msgid "acts"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2301
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2325
 #, elixir-autogen, elixir-format
 msgid "aside"
 msgstr ""
@@ -1250,42 +1253,42 @@ msgstr ""
 msgid "close"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2587
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2611
 #, elixir-autogen, elixir-format
 msgid "e.g. ACTO PRIMERO"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:385
+#: lib/emothe_web/live/admin/play_form_live.ex:404
 #, elixir-autogen, elixir-format
 msgid "e.g. AL0569"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2622
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2646
 #, elixir-autogen, elixir-format
 msgid "e.g. ANA"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2538
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2562
 #, elixir-autogen, elixir-format
 msgid "e.g. DONA_ANA"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2542
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2566
 #, elixir-autogen, elixir-format
 msgid "e.g. Dona Ana"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2707
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2731
 #, elixir-autogen, elixir-format
 msgid "e.g. italics"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2548
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2572
 #, elixir-autogen, elixir-format
 msgid "e.g. una dama"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1542
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1566
 #, elixir-autogen, elixir-format
 msgid "editing"
 msgstr ""
@@ -1295,7 +1298,7 @@ msgstr ""
 msgid "for an account now."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1283
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1307
 #: lib/emothe_web/live/admin/play_detail_live.ex:407
 #, elixir-autogen, elixir-format
 msgid "hidden"
@@ -1311,40 +1314,40 @@ msgstr ""
 msgid "verses"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1045
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1069
 #, elixir-autogen, elixir-format
 msgid "Act (act)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1044
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1068
 #, elixir-autogen, elixir-format
 msgid "Act (acto)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:143
+#: lib/emothe_web/live/admin/play_sources_live.ex:172
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Add source"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:240
+#: lib/emothe_web/live/admin/play_sources_live.ex:269
 #, elixir-autogen, elixir-format
 msgid "Add the first source"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1029
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1037
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1050
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1053
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1061
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1074
 #, elixir-autogen, elixir-format
 msgid "Argument"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:170
-#: lib/emothe_web/live/admin/play_sources_live.ex:259
+#: lib/emothe_web/live/admin/play_sources_live.ex:199
+#: lib/emothe_web/live/admin/play_sources_live.ex:288
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Author"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:591
+#: lib/emothe_web/live/admin/play_form_live.ex:610
 #, elixir-autogen, elixir-format
 msgid "Authority"
 msgstr ""
@@ -1354,7 +1357,7 @@ msgstr ""
 msgid "Authority:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:603
+#: lib/emothe_web/live/admin/play_form_live.ex:622
 #, elixir-autogen, elixir-format
 msgid "Availability Note"
 msgstr ""
@@ -1364,45 +1367,45 @@ msgstr ""
 msgid "Availability:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:132
+#: lib/emothe_web/live/admin/play_sources_live.ex:161
 #, elixir-autogen, elixir-format
 msgid "Bibliographic Sources"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1053
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1118
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1233
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1077
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1142
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1257
 #, elixir-autogen, elixir-format
 msgid "Cast list"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:210
-#: lib/emothe_web/live/admin/play_sources_live.ex:284
+#: lib/emothe_web/live/admin/play_sources_live.ex:239
+#: lib/emothe_web/live/admin/play_sources_live.ex:313
 #, elixir-autogen, elixir-format
 msgid "Date"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1028
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1036
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1052
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1060
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1076
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Dedication"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:310
+#: lib/emothe_web/live/admin/play_sources_live.ex:339
 #, elixir-autogen, elixir-format
 msgid "Delete this source?"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:121
-#: lib/emothe_web/live/admin/play_editors_live.ex:131
-#: lib/emothe_web/live/admin/play_editors_live.ex:140
+#: lib/emothe_web/live/admin/play_editors_live.ex:160
+#: lib/emothe_web/live/admin/play_editors_live.ex:169
 #: lib/emothe_web/live/play_show_live.ex:422
 #, elixir-autogen, elixir-format
 msgid "Digital editor"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:389
+#: lib/emothe_web/live/admin/play_form_live.ex:408
 #, elixir-autogen, elixir-format
 msgid "EMOTHE ID"
 msgstr ""
@@ -1412,37 +1415,37 @@ msgstr ""
 msgid "EMOTHE ID:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:153
+#: lib/emothe_web/live/admin/play_sources_live.ex:182
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Edit source"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:120
-#: lib/emothe_web/live/admin/play_editors_live.ex:130
-#: lib/emothe_web/live/admin/play_editors_live.ex:139
-#: lib/emothe_web/live/admin/play_sources_live.ex:176
-#: lib/emothe_web/live/admin/play_sources_live.ex:264
+#: lib/emothe_web/live/admin/play_editors_live.ex:159
+#: lib/emothe_web/live/admin/play_editors_live.ex:168
+#: lib/emothe_web/live/admin/play_sources_live.ex:205
+#: lib/emothe_web/live/admin/play_sources_live.ex:293
 #: lib/emothe_web/live/play_show_live.ex:421
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editor"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:182
+#: lib/emothe_web/live/admin/play_sources_live.ex:211
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editor role"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1049
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1073
 #, elixir-autogen, elixir-format
 msgid "Epilogue"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1054
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1078
 #, elixir-autogen, elixir-format
 msgid "Front matter"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:660
+#: lib/emothe_web/live/admin/play_form_live.ex:679
 #, elixir-autogen, elixir-format
 msgid "Funder"
 msgstr ""
@@ -1452,34 +1455,34 @@ msgstr ""
 msgid "Funder:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:646
+#: lib/emothe_web/live/admin/play_form_live.ex:665
 #, elixir-autogen, elixir-format
 msgid "Funding & Licence"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:665
+#: lib/emothe_web/live/admin/play_form_live.ex:684
 #, elixir-autogen, elixir-format
 msgid "Funding organization(s) and grant references"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:596
+#: lib/emothe_web/live/admin/play_form_live.ex:615
 #, elixir-autogen, elixir-format
 msgid "Institutional authority"
 msgstr ""
 
 #: lib/emothe_web/components/statistics_panel.ex:177
 #: lib/emothe_web/components/statistics_panel.ex:181
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1051
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1075
 #, elixir-autogen, elixir-format
 msgid "Jornada"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:680
+#: lib/emothe_web/live/admin/play_form_live.ex:699
 #, elixir-autogen, elixir-format
 msgid "Licence Text"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:670
+#: lib/emothe_web/live/admin/play_form_live.ex:689
 #, elixir-autogen, elixir-format
 msgid "Licence URL"
 msgstr ""
@@ -1489,22 +1492,22 @@ msgstr ""
 msgid "Licence:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:135
+#: lib/emothe_web/live/admin/play_sources_live.ex:164
 #, elixir-autogen, elixir-format
 msgid "Manage the bibliographic sources for this play."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:153
+#: lib/emothe_web/live/admin/play_sources_live.ex:182
 #, elixir-autogen, elixir-format
 msgid "New source"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:238
+#: lib/emothe_web/live/admin/play_sources_live.ex:267
 #, elixir-autogen, elixir-format
 msgid "No bibliographic sources yet."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:312
+#: lib/emothe_web/live/admin/play_form_live.ex:331
 #, elixir-autogen, elixir-format
 msgid "Original Title"
 msgstr ""
@@ -1514,30 +1517,30 @@ msgstr ""
 msgid "Original title:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:204
-#: lib/emothe_web/live/admin/play_sources_live.ex:279
+#: lib/emothe_web/live/admin/play_sources_live.ex:233
+#: lib/emothe_web/live/admin/play_sources_live.ex:308
 #, elixir-autogen, elixir-format
 msgid "Place"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:117
-#: lib/emothe_web/live/admin/play_editors_live.ex:127
-#: lib/emothe_web/live/admin/play_editors_live.ex:136
+#: lib/emothe_web/live/admin/play_editors_live.ex:156
+#: lib/emothe_web/live/admin/play_editors_live.ex:165
 #: lib/emothe_web/live/play_show_live.ex:418
 #, elixir-autogen, elixir-format
 msgid "Principal investigator"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1030
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1038
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1048
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1054
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1062
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1072
 #, elixir-autogen, elixir-format
 msgid "Prologue"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:585
-#: lib/emothe_web/live/admin/play_sources_live.ex:198
-#: lib/emothe_web/live/admin/play_sources_live.ex:274
+#: lib/emothe_web/live/admin/play_form_live.ex:604
+#: lib/emothe_web/live/admin/play_sources_live.ex:227
+#: lib/emothe_web/live/admin/play_sources_live.ex:303
 #, elixir-autogen, elixir-format
 msgid "Publisher"
 msgstr ""
@@ -1547,60 +1550,60 @@ msgstr ""
 msgid "Publisher:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:294
+#: lib/emothe_web/live/admin/play_sources_live.ex:323
 #, elixir-autogen, elixir-format
 msgid "Reference"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:217
+#: lib/emothe_web/live/admin/play_sources_live.ex:246
 #, elixir-autogen, elixir-format
 msgid "Reference / citation"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:119
-#: lib/emothe_web/live/admin/play_editors_live.ex:129
-#: lib/emothe_web/live/admin/play_editors_live.ex:138
+#: lib/emothe_web/live/admin/play_editors_live.ex:158
+#: lib/emothe_web/live/admin/play_editors_live.ex:167
 #: lib/emothe_web/live/play_show_live.ex:420
 #, elixir-autogen, elixir-format
 msgid "Researcher"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:122
-#: lib/emothe_web/live/admin/play_editors_live.ex:132
-#: lib/emothe_web/live/admin/play_editors_live.ex:141
+#: lib/emothe_web/live/admin/play_editors_live.ex:161
+#: lib/emothe_web/live/admin/play_editors_live.ex:170
 #: lib/emothe_web/live/play_show_live.ex:423
 #, elixir-autogen, elixir-format
 msgid "Reviewer"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1046
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1070
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Scene (escena)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1047
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1071
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Scene (scene)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:90
+#: lib/emothe_web/live/admin/play_sources_live.ex:100
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Source added."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:122
+#: lib/emothe_web/live/admin/play_sources_live.ex:151
 #, elixir-autogen, elixir-format
 msgid "Source deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:106
+#: lib/emothe_web/live/admin/play_sources_live.ex:125
 #, elixir-autogen, elixir-format
 msgid "Source updated."
 msgstr ""
 
 #: lib/emothe_web/components/layouts.ex:139
-#: lib/emothe_web/live/admin/play_sources_live.ex:14
-#: lib/emothe_web/live/admin/play_sources_live.ex:23
+#: lib/emothe_web/live/admin/play_sources_live.ex:15
+#: lib/emothe_web/live/admin/play_sources_live.ex:24
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Sources"
 msgstr ""
@@ -1611,7 +1614,7 @@ msgstr ""
 msgid "Split verses"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:650
+#: lib/emothe_web/live/admin/play_form_live.ex:669
 #, elixir-autogen, elixir-format
 msgid "Sponsor"
 msgstr ""
@@ -1621,25 +1624,25 @@ msgstr ""
 msgid "Sponsor:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:655
+#: lib/emothe_web/live/admin/play_form_live.ex:674
 #, elixir-autogen, elixir-format
 msgid "Sponsoring organization"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:328
+#: lib/emothe_web/live/admin/play_form_live.ex:347
 #, elixir-autogen, elixir-format
 msgid "Title in original language"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:118
-#: lib/emothe_web/live/admin/play_editors_live.ex:128
-#: lib/emothe_web/live/admin/play_editors_live.ex:137
+#: lib/emothe_web/live/admin/play_editors_live.ex:157
+#: lib/emothe_web/live/admin/play_editors_live.ex:166
 #: lib/emothe_web/live/play_show_live.ex:419
 #, elixir-autogen, elixir-format
 msgid "Translator"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:608
+#: lib/emothe_web/live/admin/play_form_live.ex:627
 #, elixir-autogen, elixir-format
 msgid "Usage terms and citation info"
 msgstr ""
@@ -1655,17 +1658,17 @@ msgstr ""
 msgid "Visual markers"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:397
+#: lib/emothe_web/live/admin/play_form_live.ex:416
 #, elixir-autogen, elixir-format
 msgid "e.g. 0703"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:685
+#: lib/emothe_web/live/admin/play_form_live.ex:704
 #, elixir-autogen, elixir-format
 msgid "e.g. CC BY-NC-ND 4.0"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_sources_live.ex:187
+#: lib/emothe_web/live/admin/play_sources_live.ex:216
 #, elixir-autogen, elixir-format
 msgid "e.g. traductor"
 msgstr ""
@@ -1709,33 +1712,34 @@ msgid "Jornadas"
 msgstr ""
 
 #: lib/emothe_web/components/statistics_panel.ex:180
+#: lib/emothe_web/live/admin/activity_log_live.ex:277
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Play"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:108
-#: lib/emothe_web/live/admin/play_form_live.ex:269
+#: lib/emothe_web/live/admin/play_form_live.ex:288
 #: lib/emothe_web/live/play_show_live.ex:414
 #, elixir-autogen, elixir-format
 msgid "Adaptation"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1150
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1174
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Add Note"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:162
+#: lib/emothe_web/live/admin/play_editors_live.ex:191
 #, elixir-autogen, elixir-format
 msgid "Add editor"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:238
+#: lib/emothe_web/live/admin/play_editors_live.ex:267
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Add the first editor"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:353
+#: lib/emothe_web/live/admin/play_form_live.ex:372
 #, elixir-autogen, elixir-format
 msgid "Alphabetical sorting form"
 msgstr ""
@@ -1745,18 +1749,19 @@ msgstr ""
 msgid "Canción"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2108
-#: lib/emothe_web/live/admin/play_form_live.ex:434
+#: lib/emothe_web/live/admin/activity_log_live.ex:264
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2132
+#: lib/emothe_web/live/admin/play_form_live.ex:453
 #, elixir-autogen, elixir-format
 msgid "Clear"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:272
+#: lib/emothe_web/live/admin/play_editors_live.ex:301
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Delete this editor?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1196
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1220
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Delete this editorial note?"
 msgstr ""
@@ -1771,17 +1776,17 @@ msgstr ""
 msgid "Décima"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:172
+#: lib/emothe_web/live/admin/play_editors_live.ex:201
 #, elixir-autogen, elixir-format
 msgid "Edit editor"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1224
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1248
 #, elixir-autogen, elixir-format
 msgid "Edit header"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:359
+#: lib/emothe_web/live/admin/play_form_live.ex:378
 #, elixir-autogen, elixir-format
 msgid "Edition Title"
 msgstr ""
@@ -1791,64 +1796,64 @@ msgstr ""
 msgid "Edition title:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:90
+#: lib/emothe_web/live/admin/play_editors_live.ex:100
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editor added."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:122
+#: lib/emothe_web/live/admin/play_editors_live.ex:151
 #, elixir-autogen, elixir-format
 msgid "Editor deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:106
+#: lib/emothe_web/live/admin/play_editors_live.ex:125
 #, elixir-autogen, elixir-format
 msgid "Editor updated."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1027
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1035
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1051
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1059
 #, elixir-autogen, elixir-format
 msgid "Editor's Introduction"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1105
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1146
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1129
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1170
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editorial Notes"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:177
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:180
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editorial note deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:742
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:760
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editorial note saved."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:151
+#: lib/emothe_web/live/admin/play_editors_live.ex:180
 #, elixir-autogen, elixir-format
 msgid "Editors & Researchers"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1154
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1178
 #, elixir-autogen, elixir-format
 msgid "Front-matter sections: dedications, editor's introductions, prologues, arguments."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:375
+#: lib/emothe_web/live/admin/play_form_live.ex:394
 #, elixir-autogen, elixir-format
 msgid "Full editorial citation"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1213
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1237
 #, elixir-autogen, elixir-format
 msgid "Header"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2496
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2520
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Heading"
 msgstr ""
@@ -1858,38 +1863,38 @@ msgstr ""
 msgid "Lira"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:154
+#: lib/emothe_web/live/admin/play_editors_live.ex:183
 #, elixir-autogen, elixir-format
 msgid "Manage the editorial team for this play."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:172
+#: lib/emothe_web/live/admin/play_editors_live.ex:201
 #, elixir-autogen, elixir-format
 msgid "New editor"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1163
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1187
 #, elixir-autogen, elixir-format
 msgid "No editorial notes yet."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:236
+#: lib/emothe_web/live/admin/play_editors_live.ex:265
 #, elixir-autogen, elixir-format
 msgid "No editors listed yet."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:483
+#: lib/emothe_web/live/admin/play_form_live.ex:502
 #, elixir-autogen, elixir-format
 msgid "No plays found"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1031
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1039
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1055
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1063
 #, elixir-autogen, elixir-format
 msgid "Note"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2512
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2536
 #, elixir-autogen, elixir-format
 msgid "Note text..."
 msgstr ""
@@ -1899,17 +1904,17 @@ msgstr ""
 msgid "Octava real"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2501
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2525
 #, elixir-autogen, elixir-format
 msgid "Optional section heading"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:200
+#: lib/emothe_web/live/admin/play_editors_live.ex:229
 #, elixir-autogen, elixir-format
 msgid "Organization"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:420
+#: lib/emothe_web/live/admin/play_form_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "Original Work"
 msgstr ""
@@ -1919,14 +1924,15 @@ msgstr ""
 msgid "Otro"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:210
-#: lib/emothe_web/live/admin/user_list_live.ex:231
+#: lib/emothe_web/live/admin/activity_log_live.ex:329
+#: lib/emothe_web/live/admin/play_list_live.ex:220
+#: lib/emothe_web/live/admin/user_list_live.ex:242
 #: lib/emothe_web/live/play_catalogue_live.ex:136
 #, elixir-autogen, elixir-format
 msgid "Page %{page} of %{total}"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:210
+#: lib/emothe_web/live/admin/play_editors_live.ex:239
 #, elixir-autogen, elixir-format
 msgid "Position"
 msgstr ""
@@ -1941,20 +1947,20 @@ msgstr ""
 msgid "Redondilla"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:410
+#: lib/emothe_web/live/admin/play_form_live.ex:429
 #, elixir-autogen, elixir-format
 msgid "Relationship Type"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:109
-#: lib/emothe_web/live/admin/play_form_live.ex:270
+#: lib/emothe_web/live/admin/play_form_live.ex:289
 #: lib/emothe_web/live/play_show_live.ex:415
 #, elixir-autogen, elixir-format
 msgid "Reworking"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:189
-#: lib/emothe_web/live/admin/user_list_live.ex:134
+#: lib/emothe_web/live/admin/play_editors_live.ex:218
+#: lib/emothe_web/live/admin/user_list_live.ex:145
 #, elixir-autogen, elixir-format
 msgid "Role"
 msgstr ""
@@ -1969,12 +1975,12 @@ msgstr ""
 msgid "Romance (tirada)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:447
+#: lib/emothe_web/live/admin/play_form_live.ex:466
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Search by title or code..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2490
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2514
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Section Type"
 msgstr ""
@@ -1994,24 +2000,24 @@ msgstr ""
 msgid "Terceto"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:337
+#: lib/emothe_web/live/admin/play_form_live.ex:356
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Title (sort)"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:107
-#: lib/emothe_web/live/admin/play_form_live.ex:268
+#: lib/emothe_web/live/admin/play_form_live.ex:287
 #: lib/emothe_web/live/play_show_live.ex:413
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Translation"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:477
+#: lib/emothe_web/live/admin/play_form_live.ex:496
 #, elixir-autogen, elixir-format
 msgid "Type to search for a play"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_editors_live.ex:205
+#: lib/emothe_web/live/admin/play_editors_live.ex:234
 #, elixir-autogen, elixir-format
 msgid "University or institution"
 msgstr ""
@@ -2027,7 +2033,7 @@ msgid "View"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:337
-#: lib/emothe_web/live/admin/play_form_live.ex:405
+#: lib/emothe_web/live/admin/play_form_live.ex:424
 #, elixir-autogen, elixir-format
 msgid "Work Relationship"
 msgstr ""
@@ -2044,12 +2050,12 @@ msgstr ""
 msgid "of"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:267
+#: lib/emothe_web/live/admin/play_form_live.ex:286
 #, elixir-autogen, elixir-format
 msgid "— (Original / standalone)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:247
+#: lib/emothe_web/live/admin/import_live.ex:257
 #, elixir-autogen, elixir-format
 msgid "Importing file %{done} of %{total}..."
 msgstr ""
@@ -2089,22 +2095,22 @@ msgstr ""
 msgid "xmllint is not installed. Cannot validate."
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:296
+#: lib/emothe_web/live/admin/import_live.ex:306
 #, elixir-autogen, elixir-format
 msgid "%{count} warning(s)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:275
+#: lib/emothe_web/live/admin/import_live.ex:285
 #, elixir-autogen, elixir-format
 msgid "Schema"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:290
+#: lib/emothe_web/live/admin/import_live.ex:300
 #, elixir-autogen, elixir-format
 msgid "Valid"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:301
+#: lib/emothe_web/live/admin/import_live.ex:311
 #, elixir-autogen, elixir-format
 msgid "and %{count} more"
 msgstr ""
@@ -2145,67 +2151,67 @@ msgstr ""
 msgid "translation"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:12
+#: lib/emothe_web/live/admin/user_list_live.ex:13
 #, elixir-autogen, elixir-format
 msgid "Admin - Users"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:83
+#: lib/emothe_web/live/admin/user_list_live.ex:94
 #, elixir-autogen, elixir-format
 msgid "Confirmation email sent to %{email}."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:135
+#: lib/emothe_web/live/admin/user_list_live.ex:146
 #, elixir-autogen, elixir-format
 msgid "Confirmed"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:180
+#: lib/emothe_web/live/admin/user_list_live.ex:191
 #, elixir-autogen, elixir-format
 msgid "Demote %{email} to researcher?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:182
+#: lib/emothe_web/live/admin/user_list_live.ex:193
 #, elixir-autogen, elixir-format
 msgid "Demote to researcher"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:66
+#: lib/emothe_web/live/admin/user_list_live.ex:77
 #, elixir-autogen, elixir-format
 msgid "Failed to update role."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:113
+#: lib/emothe_web/live/admin/user_list_live.ex:124
 #, elixir-autogen, elixir-format
 msgid "Manage user roles and email confirmations."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:219
+#: lib/emothe_web/live/admin/user_list_live.ex:230
 #, elixir-autogen, elixir-format
 msgid "No users found."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:191
+#: lib/emothe_web/live/admin/user_list_live.ex:202
 #, elixir-autogen, elixir-format
 msgid "Promote %{email} to admin?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:193
+#: lib/emothe_web/live/admin/user_list_live.ex:204
 #, elixir-autogen, elixir-format
 msgid "Promote to admin"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:136
+#: lib/emothe_web/live/admin/user_list_live.ex:147
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Registered"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:204
+#: lib/emothe_web/live/admin/user_list_live.ex:215
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Resend confirmation email"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:123
+#: lib/emothe_web/live/admin/user_list_live.ex:134
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Search by email..."
 msgstr ""
@@ -2215,37 +2221,37 @@ msgstr ""
 msgid "Too many login attempts. Please wait a minute and try again."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:110
+#: lib/emothe_web/live/admin/user_list_live.ex:121
 #, elixir-autogen, elixir-format
 msgid "User Management"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:87
+#: lib/emothe_web/live/admin/user_list_live.ex:98
 #, elixir-autogen, elixir-format
 msgid "User is already confirmed."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:19
+#: lib/emothe_web/live/admin/user_list_live.ex:20
 #, elixir-autogen, elixir-format
 msgid "Users"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:52
+#: lib/emothe_web/live/admin/user_list_live.ex:53
 #, elixir-autogen, elixir-format
 msgid "You cannot change your own role."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:165
+#: lib/emothe_web/live/admin/user_list_live.ex:176
 #, elixir-autogen, elixir-format
 msgid "confirmed"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:166
+#: lib/emothe_web/live/admin/user_list_live.ex:177
 #, elixir-autogen, elixir-format
 msgid "unconfirmed"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:148
+#: lib/emothe_web/live/admin/user_list_live.ex:159
 #, elixir-autogen, elixir-format
 msgid "you"
 msgstr ""
@@ -2255,17 +2261,17 @@ msgstr ""
 msgid "Add play to compare..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:629
+#: lib/emothe_web/live/admin/play_form_live.ex:648
 #, elixir-autogen, elixir-format
 msgid "Description of the digitization project"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:634
+#: lib/emothe_web/live/admin/play_form_live.ex:653
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editorial Declaration"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:639
+#: lib/emothe_web/live/admin/play_form_live.ex:658
 #, elixir-autogen, elixir-format
 msgid "Editorial methodology and approach"
 msgstr ""
@@ -2275,12 +2281,12 @@ msgstr ""
 msgid "Maximum %{max} plays allowed."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:620
+#: lib/emothe_web/live/admin/play_form_live.ex:639
 #, elixir-autogen, elixir-format
 msgid "Project & Editorial"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:624
+#: lib/emothe_web/live/admin/play_form_live.ex:643
 #, elixir-autogen, elixir-format
 msgid "Project Description"
 msgstr ""
@@ -2321,253 +2327,394 @@ msgstr ""
 msgid "Upload a premarcado .docx file to import play content (divisions, speeches, verses, stage directions). Existing content will be replaced."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1788
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2048
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1812
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2072
 #, elixir-autogen, elixir-format
 msgid "%{count} selected"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:391
+#: lib/emothe_web/live/admin/play_form_live.ex:410
 #, elixir-autogen, elixir-format
 msgid "(auto)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2132
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2156
 #, elixir-autogen, elixir-format
 msgid "(no speaker)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2026
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2050
 #, elixir-autogen, elixir-format
 msgid "All"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2012
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2036
 #, elixir-autogen, elixir-format
 msgid "All speakers"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:208
+#: lib/emothe_web/live/admin/play_form_live.ex:209
 #, elixir-autogen, elixir-format
 msgid "Anónima (anonymous)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:209
+#: lib/emothe_web/live/admin/play_form_live.ex:210
 #, elixir-autogen, elixir-format
 msgid "Apócrifa (apocryphal)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1981
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2005
 #, elixir-autogen, elixir-format
 msgid "Assign characters to speeches. Create characters from speaker labels found in the text."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2027
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2051
 #, elixir-autogen, elixir-format
 msgid "Assigned"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:207
+#: lib/emothe_web/live/admin/play_form_live.ex:208
 #, elixir-autogen, elixir-format
 msgid "Atribuida (attributed)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1125
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1979
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1149
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2003
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Character Review"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:308
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:319
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Characters assigned."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:514
+#: lib/emothe_web/live/admin/play_form_live.ex:533
 #, elixir-autogen, elixir-format
 msgid "Copy from Author Name"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:319
-#: lib/emothe_web/live/admin/play_form_live.ex:344
-#: lib/emothe_web/live/admin/play_form_live.ex:366
+#: lib/emothe_web/live/admin/play_form_live.ex:338
+#: lib/emothe_web/live/admin/play_form_live.ex:363
+#: lib/emothe_web/live/admin/play_form_live.ex:385
 #, elixir-autogen, elixir-format
 msgid "Copy from Title"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:547
+#: lib/emothe_web/live/admin/play_form_live.ex:566
 #, elixir-autogen, elixir-format
 msgid "Custom attribution..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1779
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2038
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1803
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2062
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Deselect"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:206
+#: lib/emothe_web/live/admin/play_form_live.ex:207
 #, elixir-autogen, elixir-format
 msgid "Dudosa (doubtful)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:205
+#: lib/emothe_web/live/admin/play_form_live.ex:206
 #, elixir-autogen, elixir-format
 msgid "Fiable (reliable)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2001
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2025
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No characters yet."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2173
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2197
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No speeches found."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:210
+#: lib/emothe_web/live/admin/play_form_live.ex:211
 #, elixir-autogen, elixir-format
 msgid "Other..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1772
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2035
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1796
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2059
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Select all"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_form_live.ex:555
+#: lib/emothe_web/live/admin/play_form_live.ex:574
 #, elixir-autogen, elixir-format
 msgid "Switch to predefined values"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2029
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2053
 #, elixir-autogen, elixir-format
 msgid "Unassigned"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2156
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2180
 #, elixir-autogen, elixir-format
 msgid "unassigned"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:704
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:719
 #, elixir-autogen, elixir-format, fuzzy
 msgid "%{count} elements deleted."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1793
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1817
 #, elixir-autogen, elixir-format
 msgid "Delete %{count} elements and their children?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1800
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1824
 #, elixir-autogen, elixir-format
 msgid "Delete selected"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2095
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2119
 #, elixir-autogen, elixir-format
 msgid "Leave empty to clear"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2014
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2038
 #, elixir-autogen, elixir-format
 msgid "(No label)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1639
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1663
 #, elixir-autogen, elixir-format
 msgid "1 result"
 msgid_plural "%{count} results"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2664
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2688
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Add character..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2074
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2098
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Add..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2082
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2106
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Assign Characters"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2053
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2077
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Characters:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2105
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2129
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Clear label"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:625
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:639
 #, elixir-autogen, elixir-format
 msgid "Could not save element."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:346
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:357
 #, elixir-autogen, elixir-format
 msgid "Label cleared."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:330
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:341
 #, elixir-autogen, elixir-format
 msgid "Label updated."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2091
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2115
 #, elixir-autogen, elixir-format
 msgid "Label:"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2681
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2705
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No characters defined."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1674
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1698
 #, elixir-autogen, elixir-format, fuzzy
 msgid "No results found."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2064
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2649
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2088
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2673
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Remove %{name}"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:1619
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:1643
 #, elixir-autogen, elixir-format
 msgid "Search text across all scenes..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2099
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2123
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Set Label"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2181
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2205
 #, elixir-autogen, elixir-format
 msgid "Show more (%{remaining} remaining)"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2162
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2163
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2186
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2187
 #, elixir-autogen, elixir-format
 msgid "View in content"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2070
-#: lib/emothe_web/live/admin/play_content_editor_live.ex:2655
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2094
+#: lib/emothe_web/live/admin/play_content_editor_live.ex:2679
 #, elixir-autogen, elixir-format, fuzzy
 msgid "none"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:208
+#: lib/emothe_web/live/admin/activity_log_live.ex:275
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Action"
+msgstr ""
+
+#: lib/emothe_web/components/layouts/admin.html.heex:15
+#: lib/emothe_web/live/admin/activity_log_live.ex:16
+#: lib/emothe_web/live/admin/activity_log_live.ex:24
+#: lib/emothe_web/live/admin/activity_log_live.ex:198
+#, elixir-autogen, elixir-format
+msgid "Activity Log"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:210
+#, elixir-autogen, elixir-format, fuzzy
+msgid "All actions"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:222
+#, elixir-autogen, elixir-format
+msgid "All resources"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:236
+#, elixir-autogen, elixir-format, fuzzy
+msgid "All users"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:278
+#, elixir-autogen, elixir-format
+msgid "Details"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:244
+#, elixir-autogen, elixir-format
+msgid "From"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:284
+#, elixir-autogen, elixir-format
+msgid "No activity logged yet."
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:219
+#: lib/emothe_web/live/admin/activity_log_live.ex:276
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Resource"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:254
+#, elixir-autogen, elixir-format
+msgid "To"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:201
+#, elixir-autogen, elixir-format
+msgid "Track who imported, edited, or exported plays."
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:234
+#: lib/emothe_web/live/admin/activity_log_live.ex:274
+#, elixir-autogen, elixir-format, fuzzy
+msgid "User"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:273
+#, elixir-autogen, elixir-format
+msgid "When"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:122
+#, elixir-autogen, elixir-format, fuzzy
+msgid "character"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:109
+#, elixir-autogen, elixir-format
+msgid "create"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:111
+#, elixir-autogen, elixir-format, fuzzy
+msgid "delete"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:123
+#, elixir-autogen, elixir-format, fuzzy
+msgid "division"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:125
+#, elixir-autogen, elixir-format, fuzzy
+msgid "editor"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:127
+#, elixir-autogen, elixir-format, fuzzy
+msgid "editorial note"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:124
+#, elixir-autogen, elixir-format
+msgid "element"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:113
+#, elixir-autogen, elixir-format, fuzzy
+msgid "export"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:112
+#, elixir-autogen, elixir-format, fuzzy
+msgid "import"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:121
+#, elixir-autogen, elixir-format, fuzzy
+msgid "play"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:114
+#, elixir-autogen, elixir-format
+msgid "role change"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:126
+#, elixir-autogen, elixir-format, fuzzy
+msgid "source"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:110
+#, elixir-autogen, elixir-format
+msgid "update"
+msgstr ""
+
+#: lib/emothe_web/live/admin/activity_log_live.ex:128
+#, elixir-autogen, elixir-format
+msgid "user"
 msgstr ""

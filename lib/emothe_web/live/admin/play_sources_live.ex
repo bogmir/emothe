@@ -3,6 +3,7 @@ defmodule EmotheWeb.Admin.PlaySourcesLive do
 
   alias Emothe.Catalogue
   alias Emothe.Catalogue.PlaySource
+  alias Emothe.ActivityLog
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -79,7 +80,16 @@ defmodule EmotheWeb.Admin.PlaySourcesLive do
         params = Map.put(params, "play_id", socket.assigns.play.id)
 
         case Catalogue.create_play_source(params) do
-          {:ok, _source} ->
+          {:ok, source} ->
+            ActivityLog.log!(%{
+              user_id: socket.assigns.current_user.id,
+              play_id: socket.assigns.play.id,
+              action: "create",
+              resource_type: "source",
+              resource_id: source.id,
+              metadata: %{title: source.title}
+            })
+
             sources = Catalogue.list_play_sources(socket.assigns.play.id)
 
             {:noreply,
@@ -95,7 +105,16 @@ defmodule EmotheWeb.Admin.PlaySourcesLive do
 
       source ->
         case Catalogue.update_play_source(source, params) do
-          {:ok, _source} ->
+          {:ok, updated} ->
+            ActivityLog.log!(%{
+              user_id: socket.assigns.current_user.id,
+              play_id: socket.assigns.play.id,
+              action: "update",
+              resource_type: "source",
+              resource_id: updated.id,
+              metadata: %{title: updated.title}
+            })
+
             sources = Catalogue.list_play_sources(socket.assigns.play.id)
 
             {:noreply,
@@ -114,6 +133,16 @@ defmodule EmotheWeb.Admin.PlaySourcesLive do
   def handle_event("delete_source", %{"id" => id}, socket) do
     source = Catalogue.get_play_source!(id)
     {:ok, _} = Catalogue.delete_play_source(source)
+
+    ActivityLog.log!(%{
+      user_id: socket.assigns.current_user.id,
+      play_id: socket.assigns.play.id,
+      action: "delete",
+      resource_type: "source",
+      resource_id: source.id,
+      metadata: %{title: source.title}
+    })
+
     sources = Catalogue.list_play_sources(socket.assigns.play.id)
 
     {:noreply,

@@ -3,6 +3,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   alias Emothe.Catalogue
   alias Emothe.Catalogue.Play
+  alias Emothe.ActivityLog
 
   @al_project_description "El proyecto Artelope supone la creación de un banco de datos, argumentos y ediciones para un corpus fundamental del patrimonio literario español: el teatro de Lope de Vega y, extendido, en los últimos años, a Guillén de Castro."
 
@@ -239,6 +240,15 @@ defmodule EmotheWeb.Admin.PlayFormLive do
   defp save_play(socket, :new, play_params) do
     case Catalogue.create_play_from_form(play_params) do
       {:ok, play} ->
+        ActivityLog.log!(%{
+          user_id: socket.assigns.current_user.id,
+          play_id: play.id,
+          action: "create",
+          resource_type: "play",
+          resource_id: play.id,
+          metadata: %{title: play.title, code: play.code}
+        })
+
         {:noreply,
          socket
          |> put_flash(:info, gettext("Play created successfully."))
@@ -252,6 +262,15 @@ defmodule EmotheWeb.Admin.PlayFormLive do
   defp save_play(socket, :edit, play_params) do
     case Catalogue.update_play_from_form(socket.assigns.play, play_params) do
       {:ok, play} ->
+        ActivityLog.log!(%{
+          user_id: socket.assigns.current_user.id,
+          play_id: play.id,
+          action: "update",
+          resource_type: "play",
+          resource_id: play.id,
+          metadata: %{title: play.title, code: play.code}
+        })
+
         {:noreply,
          socket
          |> put_flash(:info, gettext("Play updated successfully."))

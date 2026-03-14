@@ -3,6 +3,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
 
   alias Emothe.Catalogue
   alias Emothe.PlayContent
+  alias Emothe.ActivityLog
 
   @per_page 50
 
@@ -52,6 +53,15 @@ defmodule EmotheWeb.Admin.PlayListLive do
 
   def handle_event("delete", %{"id" => id}, socket) do
     play = Catalogue.get_play!(id)
+
+    ActivityLog.log!(%{
+      user_id: socket.assigns.current_user.id,
+      action: "delete",
+      resource_type: "play",
+      resource_id: play.id,
+      metadata: %{title: play.title, code: play.code}
+    })
+
     {:ok, _} = Catalogue.delete_play(play)
 
     total = Catalogue.count_plays(search: socket.assigns.search)

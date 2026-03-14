@@ -2,6 +2,7 @@ defmodule EmotheWeb.Admin.UserListLive do
   use EmotheWeb, :live_view
 
   alias Emothe.Accounts
+  alias Emothe.ActivityLog
 
   @per_page 50
 
@@ -51,8 +52,18 @@ defmodule EmotheWeb.Admin.UserListLive do
     if user.id == socket.assigns.current_user.id do
       {:noreply, put_flash(socket, :error, gettext("You cannot change your own role."))}
     else
+      old_role = user.role
       case Accounts.update_user_role(user, role) do
         {:ok, _user} ->
+          ActivityLog.log!(%{
+            user_id: socket.assigns.current_user.id,
+            action: "role_change",
+            resource_type: "user",
+            resource_id: user.id,
+            changes: %{"role" => [to_string(old_role), role]},
+            metadata: %{email: user.email}
+          })
+
           users =
             Accounts.list_users(
               search: socket.assigns.search,

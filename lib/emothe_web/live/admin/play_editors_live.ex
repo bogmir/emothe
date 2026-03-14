@@ -3,6 +3,7 @@ defmodule EmotheWeb.Admin.PlayEditorsLive do
 
   alias Emothe.Catalogue
   alias Emothe.Catalogue.PlayEditor
+  alias Emothe.ActivityLog
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -79,7 +80,16 @@ defmodule EmotheWeb.Admin.PlayEditorsLive do
         params = Map.put(params, "play_id", socket.assigns.play.id)
 
         case Catalogue.create_play_editor(params) do
-          {:ok, _editor} ->
+          {:ok, editor} ->
+            ActivityLog.log!(%{
+              user_id: socket.assigns.current_user.id,
+              play_id: socket.assigns.play.id,
+              action: "create",
+              resource_type: "editor",
+              resource_id: editor.id,
+              metadata: %{person_name: editor.person_name, role: editor.role}
+            })
+
             editors = Catalogue.list_play_editors(socket.assigns.play.id)
 
             {:noreply,
@@ -95,7 +105,16 @@ defmodule EmotheWeb.Admin.PlayEditorsLive do
 
       editor ->
         case Catalogue.update_play_editor(editor, params) do
-          {:ok, _editor} ->
+          {:ok, updated} ->
+            ActivityLog.log!(%{
+              user_id: socket.assigns.current_user.id,
+              play_id: socket.assigns.play.id,
+              action: "update",
+              resource_type: "editor",
+              resource_id: updated.id,
+              metadata: %{person_name: updated.person_name, role: updated.role}
+            })
+
             editors = Catalogue.list_play_editors(socket.assigns.play.id)
 
             {:noreply,
@@ -114,6 +133,16 @@ defmodule EmotheWeb.Admin.PlayEditorsLive do
   def handle_event("delete_editor", %{"id" => id}, socket) do
     editor = Catalogue.get_play_editor!(id)
     {:ok, _} = Catalogue.delete_play_editor(editor)
+
+    ActivityLog.log!(%{
+      user_id: socket.assigns.current_user.id,
+      play_id: socket.assigns.play.id,
+      action: "delete",
+      resource_type: "editor",
+      resource_id: editor.id,
+      metadata: %{person_name: editor.person_name, role: editor.role}
+    })
+
     editors = Catalogue.list_play_editors(socket.assigns.play.id)
 
     {:noreply,

@@ -7,6 +7,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   alias Emothe.Catalogue.PlayEditorialNote
   alias Emothe.PlayContent
   alias Emothe.PlayContent.{Character, Division, Element}
+  alias Emothe.ActivityLog
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -172,6 +173,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     note = Catalogue.get_play_editorial_note!(id)
     {:ok, _} = Catalogue.delete_play_editorial_note(note)
 
+    log_action(socket, "delete", "editorial_note", note.id, %{section_type: note.section_type})
+
     {:noreply,
      socket
      |> put_flash(:info, gettext("Editorial note deleted."))
@@ -211,6 +214,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     character = PlayContent.get_character!(id)
     {:ok, _} = PlayContent.delete_character(character)
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
+
+    log_action(socket, "delete", "character", character.id, %{name: character.name, xml_id: character.xml_id})
 
     {:noreply,
      socket
@@ -300,6 +305,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     end)
 
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
+
+    log_action(socket, "update", "element", nil, %{
+      bulk: true,
+      count: MapSet.size(socket.assigns.selected_speeches),
+      action: "assign_characters"
+    })
 
     {:noreply,
      socket
@@ -443,6 +454,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     division = PlayContent.get_division!(id)
     {:ok, _} = PlayContent.delete_division(division)
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
+
+    log_action(socket, "delete", "division", division.id, %{type: division.type, number: division.number})
 
     selected =
       if socket.assigns.selected_division_id == id,
@@ -615,6 +628,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       case PlayContent.update_element(element, %{"content" => value}) do
         {:ok, _el} ->
           PlayContent.broadcast_content_changed(socket.assigns.play.id)
+          log_action(socket, "update", "element", element.id, %{type: element.type, inline: true})
 
           {:noreply,
            socket
@@ -647,6 +661,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     end
 
     PlayContent.broadcast_content_changed(play_id)
+    log_action(socket, "delete", "element", element.id, %{type: element.type})
 
     {:noreply,
      socket
@@ -736,7 +751,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       end
 
     case result do
-      {:ok, _} ->
+      {:ok, saved} ->
+        action = if socket.assigns.editing, do: "update", else: "create"
+        log_action(socket, action, "editorial_note", saved.id, %{section_type: saved.section_type})
+
         {:noreply,
          socket
          |> put_flash(:info, gettext("Editorial note saved."))
@@ -763,8 +781,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       end
 
     case result do
-      {:ok, _} ->
+      {:ok, saved} ->
         PlayContent.broadcast_content_changed(play.id)
+        action = if socket.assigns.editing, do: "update", else: "create"
+        log_action(socket, action, "character", saved.id, %{name: saved.name, xml_id: saved.xml_id})
 
         {:noreply,
          socket
@@ -796,8 +816,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       end
 
     case result do
-      {:ok, _} ->
+      {:ok, saved} ->
         PlayContent.broadcast_content_changed(play.id)
+        action = if socket.assigns.editing, do: "update", else: "create"
+        log_action(socket, action, "division", saved.id, %{type: saved.type, number: saved.number})
 
         {:noreply,
          socket
@@ -851,6 +873,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
         end
 
         PlayContent.broadcast_content_changed(play.id)
+        action = if socket.assigns.editing, do: "update", else: "create"
+        log_action(socket, action, "element", el.id, %{type: el.type})
 
         {:noreply,
          socket
@@ -2764,5 +2788,16 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       </div>
     </.form>
     """
+  end
+
+  defp log_action(socket, action, resource_type, resource_id, metadata) do
+    ActivityLog.log!(%{
+      user_id: socket.assigns.current_user.id,
+      play_id: socket.assigns.play.id,
+      action: action,
+      resource_type: resource_type,
+      resource_id: resource_id,
+      metadata: metadata
+    })
   end
 end

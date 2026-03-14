@@ -30,6 +30,10 @@ lib/
 │   │   ├── element.ex                # Speeches, verse lines, stage directions, prose (self-referencing tree)
 │   │   └── element_character.ex      # Join table: element ↔ character (multi-speaker support)
 │   ├── statistics.ex                 # Compute & cache play statistics
+│   ├── activity_log.ex                   # Activity log context (log, list, count)
+│   ├── activity_log/
+│   │   ├── entry.ex                  # Activity log entry schema
+│   │   └── diff.ex                   # Changeset diff extractor
 │   ├── statistics/
 │   │   └── play_statistic.ex         # Cached JSONB statistics per play
 │   ├── accounts.ex                   # User registration, login, session context
@@ -60,7 +64,8 @@ lib/
     │       ├── play_list_live.ex     # Admin: /admin/plays - manage plays
     │       ├── play_form_live.ex     # Admin: /admin/plays/new|:id/edit
     │       ├── play_detail_live.ex   # Admin: /admin/plays/:id - detail + exports
-    │       └── import_live.ex        # Admin: /admin/plays/import - TEI file import
+    │       ├── import_live.ex        # Admin: /admin/plays/import - TEI file import
+    │       └── activity_log_live.ex  # Admin: /admin/activity-log - activity audit log
     ├── controllers/
     │   ├── user_session_controller.ex # Login/logout session handling
     │   └── admin/
@@ -81,6 +86,7 @@ All tables use UUID primary keys. Key relationships:
 - `play_elements` self-references via `parent_id` (speeches contain line_groups contain verse_lines)
 - `element_characters` join table links `play_elements` to `characters` (many-to-many, supports multi-speaker speeches like `who="#ALB #COR"`)
 - `play_statistics` stores computed JSONB data per play
+- `activity_logs` tracks admin actions with user_id, play_id, action, resource_type, resource_id, changes (JSONB), metadata (JSONB)
 
 Element types: `speech`, `stage_direction`, `verse_line`, `prose`, `line_group`
 Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco`, `front`
@@ -109,6 +115,7 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 - `GET /admin/plays/:id/edit` - Edit play metadata
 - `GET /admin/plays/:id` - Play detail (structure, stats, export buttons)
 - `GET /admin/plays/import` - Import TEI-XML files (upload, server path, or directory)
+- `GET /admin/activity-log` - Activity audit log with filters
 - `GET /admin/plays/:id/export/tei` - Download TEI-XML
 - `GET /admin/plays/:id/export/html` - Download HTML
 - `GET /admin/plays/:id/export/pdf` - Download PDF
@@ -244,7 +251,7 @@ Then visit:
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
-- [ ] **Activity log** - track who imported/edited what
+- [x] **Activity log** - `activity_logs` table tracks all admin actions (create/update/delete/import/export/role_change) with user, play, resource type, changes, and metadata; admin UI at `/admin/activity-log` with filters (action, resource, user, date range) and pagination
 - [ ] **TEI validation** - validate exported XML against TEI schema
 **- [ ] **Responsive mobile design** refinements**
 - [ ] **API endpoints** for programmatic access

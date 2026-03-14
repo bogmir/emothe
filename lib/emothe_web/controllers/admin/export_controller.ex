@@ -3,6 +3,7 @@ defmodule EmotheWeb.Admin.ExportController do
 
   alias Emothe.Catalogue
   alias Emothe.Export
+  alias Emothe.ActivityLog
 
   def compare_html(conn, %{"plays" => play_ids_str}) do
     play_ids = String.split(play_ids_str, ",", trim: true)
@@ -20,6 +21,8 @@ defmodule EmotheWeb.Admin.ExportController do
     play = Catalogue.get_play_with_all!(id)
     xml = Export.TeiXml.generate(play)
 
+    log_export(conn, play, "tei")
+
     conn
     |> put_resp_content_type("application/xml")
     |> put_resp_header("content-disposition", ~s(attachment; filename="#{play.code}.xml"))
@@ -29,6 +32,8 @@ defmodule EmotheWeb.Admin.ExportController do
   def html(conn, %{"id" => id}) do
     play = Catalogue.get_play_with_all!(id)
     html = Export.Html.generate(play)
+
+    log_export(conn, play, "html")
 
     conn
     |> put_resp_content_type("text/html")
@@ -41,6 +46,8 @@ defmodule EmotheWeb.Admin.ExportController do
 
     case Export.Pdf.generate(play) do
       {:ok, pdf_binary} ->
+        log_export(conn, play, "pdf")
+
         conn
         |> put_resp_content_type("application/pdf")
         |> put_resp_header("content-disposition", ~s(attachment; filename="#{play.code}.pdf"))
@@ -51,5 +58,18 @@ defmodule EmotheWeb.Admin.ExportController do
         |> put_flash(:error, gettext("PDF generation failed: %{reason}", reason: inspect(reason)))
         |> redirect(to: ~p"/admin/plays/#{id}")
     end
+  end
+
+  defp log_export(conn, play, format) do
+    user = conn.assigns[:current_user]
+
+    ActivityLog.log!(%{
+      user_id: user && user.id,
+      play_id: play.id,
+      action: "export",
+      resource_type: "play",
+      resource_id: play.id,
+      metadata: %{format: format, title: play.title, code: play.code}
+    })
   end
 end

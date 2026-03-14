@@ -3,6 +3,7 @@ defmodule EmotheWeb.Admin.ImportLive do
 
   # alias Emothe.Export.TeiValidator
   alias Emothe.Import.TeiParser
+  alias Emothe.ActivityLog
 
   @impl true
   def mount(_params, _session, socket) do
@@ -139,6 +140,15 @@ defmodule EmotheWeb.Admin.ImportLive do
     socket =
       case TeiParser.import_file(path) do
         {:ok, play} ->
+          ActivityLog.log!(%{
+            user_id: socket.assigns[:current_user] && socket.assigns.current_user.id,
+            play_id: play.id,
+            action: "import",
+            resource_type: "play",
+            resource_id: play.id,
+            metadata: %{filename: filename, title: play.title, code: play.code}
+          })
+
           # validation_warnings = validate_source_file(path)
           validation_warnings = []
           success = {filename, play.title, play.code, play.id, validation_warnings}

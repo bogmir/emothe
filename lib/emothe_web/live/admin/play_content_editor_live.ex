@@ -53,6 +53,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
        cr_display_limit: 50,
        content_search: "",
        content_search_results: [],
+       inline_editing_id: nil,
        editor_tab: :characters,
        breadcrumbs: [
          %{label: gettext("Admin"), to: ~p"/admin/plays"},
@@ -599,6 +600,35 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def handle_event("el_remove_character", %{"id" => id}, socket) do
     updated = Enum.reject(socket.assigns.editing_character_ids, &(&1 == id))
     {:noreply, assign(socket, editing_character_ids: updated)}
+  end
+
+  def handle_event("inline_edit", %{"id" => id}, socket) do
+    {:noreply, assign(socket, inline_editing_id: id)}
+  end
+
+  def handle_event("inline_save", %{"element_id" => id, "value" => value}, socket) do
+    if socket.assigns.inline_editing_id == nil do
+      {:noreply, socket}
+    else
+      element = PlayContent.get_element!(id)
+
+      case PlayContent.update_element(element, %{"content" => value}) do
+        {:ok, _el} ->
+          PlayContent.broadcast_content_changed(socket.assigns.play.id)
+
+          {:noreply,
+           socket
+           |> assign(inline_editing_id: nil)
+           |> reload_elements()}
+
+        {:error, _changeset} ->
+          {:noreply, put_flash(socket, :error, gettext("Could not save element."))}
+      end
+    end
+  end
+
+  def handle_event("inline_cancel", _params, socket) do
+    {:noreply, assign(socket, inline_editing_id: nil)}
   end
 
   def handle_event("delete_element", %{"id" => id}, socket) do
@@ -1781,6 +1811,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
               characters={@characters}
               depth={0}
               selected_elements={@selected_elements}
+              inline_editing_id={@inline_editing_id}
             />
           </div>
         </div>
@@ -2194,8 +2225,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   attr :characters, :list, required: true
   attr :depth, :integer, default: 0
   attr :selected_elements, :any, default: MapSet.new()
+  attr :inline_editing_id, :string, default: nil
 
   defp element_card(assigns) do
+    assigns = assign(assigns, :is_inline_editing, assigns.inline_editing_id == assigns.element.id)
+
     ~H"""
     <div
       id={"element-#{@element.id}"}
@@ -2206,7 +2240,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       ]}
     >
       <div class="flex items-center justify-between p-3">
-        <div class="flex items-center flex-1">
+        <div class="flex items-center flex-1 min-w-0">
           <input
             :if={@depth == 0}
             id={"el-chk-#{@element.id}"}
@@ -2216,13 +2250,47 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
             class="checkbox checkbox-sm checkbox-primary mr-2 shrink-0"
             checked={MapSet.member?(@selected_elements, @element.id)}
           />
-          <span class="badge badge-sm badge-outline mr-2">{element_type_label(@element.type)}</span>
-          <span :if={@element.speaker_label} class="font-medium">{@element.speaker_label}</span>
-          <span :if={@element.content} class="text-sm text-base-content/80">
+          <span class="badge badge-sm badge-outline mr-2 shrink-0">
+            {element_type_label(@element.type)}
+          </span>
+          <%!-- Speaker label: click opens modal --%>
+          <span
+            :if={@element.speaker_label}
+            phx-click="edit_element"
+            phx-value-id={@element.id}
+            class="font-medium cursor-pointer hover:text-primary shrink-0"
+          >
+            {@element.speaker_label}
+          </span>
+          <%!-- Content: inline editing or click to edit --%>
+          <span
+            :if={@element.content && !@is_inline_editing}
+            phx-click="inline_edit"
+            phx-value-id={@element.id}
+            class="text-sm text-base-content/80 cursor-pointer hover:text-base-content truncate"
+            title={@element.content}
+          >
             {String.slice(@element.content || "", 0..80)}{if String.length(@element.content || "") >
                                                                80,
                                                              do: "..."}
           </span>
+          <form
+            :if={@is_inline_editing}
+            id={"inline-edit-#{@element.id}"}
+            phx-hook=".InlineEdit"
+            phx-submit="inline_save"
+            class="flex-1 min-w-0 ml-1"
+          >
+            <input type="hidden" name="element_id" value={@element.id} />
+            <input
+              type="text"
+              name="value"
+              value={@element.content || ""}
+              class="input input-sm input-bordered w-full"
+              phx-key="Escape"
+              phx-keydown="inline_cancel"
+            />
+          </form>
           <span :if={@element.verse_type} class="text-xs text-base-content/50 ml-2">
             ({@element.verse_type})
           </span>
@@ -2323,6 +2391,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           characters={@characters}
           depth={@depth + 1}
           selected_elements={@selected_elements}
+          inline_editing_id={@inline_editing_id}
         />
       </div>
       <%!-- Add child buttons --%>
@@ -2362,6 +2431,28 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           {gettext("Add Verse Line")}
         </button>
       </div>
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".InlineEdit">
+        export default {
+          mounted() {
+            this._cancelled = false
+            const input = this.el.querySelector("input[name='value']")
+            if (input) {
+              input.focus()
+              input.select()
+              input.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                  this._cancelled = true
+                }
+              })
+              input.addEventListener("blur", () => {
+                if (!this._cancelled) {
+                  this.el.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}))
+                }
+              })
+            }
+          }
+        }
+      </script>
     </div>
     """
   end

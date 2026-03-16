@@ -157,6 +157,14 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
           >
             <.icon name="hero-document-arrow-down-mini" class="size-4" />
           </a>
+          <a
+            href={~p"/admin/plays/#{@play.id}/export/epub"}
+            target="_blank"
+            class="btn btn-ghost btn-xs tooltip"
+            data-tip={gettext("Export EPUB")}
+          >
+            <.icon name="hero-book-open-mini" class="size-4" />
+          </a>
           <span class="border-l border-base-300 h-4 mx-1"></span>
           <button
             phx-click="validate_tei"

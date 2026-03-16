@@ -171,6 +171,13 @@ defmodule EmotheWeb.PlayCatalogueLive do
       >
         <.icon name="hero-document-arrow-down-mini" class="size-3.5" />
       </a>
+      <a
+        href={~p"/export/#{@play.id}/epub"}
+        class="btn btn-xs btn-ghost btn-square text-base-content/50 hover:text-primary tooltip tooltip-bottom"
+        data-tip="EPUB"
+      >
+        <.icon name="hero-book-open-mini" class="size-3.5" />
+      </a>
     </div>
     """
   end

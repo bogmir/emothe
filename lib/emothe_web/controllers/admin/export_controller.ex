@@ -60,6 +60,25 @@ defmodule EmotheWeb.Admin.ExportController do
     end
   end
 
+  def epub(conn, %{"id" => id}) do
+    play = Catalogue.get_play_with_all!(id)
+
+    case Export.Epub.generate(play) do
+      {:ok, epub_binary} ->
+        log_export(conn, play, "epub")
+
+        conn
+        |> put_resp_content_type("application/epub+zip")
+        |> put_resp_header("content-disposition", ~s(attachment; filename="#{play.code}.epub"))
+        |> send_resp(200, epub_binary)
+
+      {:error, reason} ->
+        conn
+        |> put_flash(:error, gettext("EPUB generation failed: %{reason}", reason: inspect(reason)))
+        |> redirect(to: ~p"/admin/plays/#{id}")
+    end
+  end
+
   defp log_export(conn, play, format) do
     user = conn.assigns[:current_user]
 

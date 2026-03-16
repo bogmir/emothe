@@ -78,6 +78,9 @@ defmodule Emothe.MixProject do
       # PDF generation via headless Chrome
       {:chromic_pdf, "~> 1.17"},
 
+      # EPUB generation
+      {:bupe, "~> 0.6"},
+
       # OpenTelemetry
       {:opentelemetry, "~> 1.5"},
       {:opentelemetry_api, "~> 1.4"},

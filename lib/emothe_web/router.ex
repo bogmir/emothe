@@ -51,6 +51,7 @@ defmodule EmotheWeb.Router do
     get "/export/:id/tei", ExportController, :tei
     get "/export/:id/html", ExportController, :html
     get "/export/:id/pdf", ExportController, :pdf
+    get "/export/:id/epub", ExportController, :epub
 
     # Public play catalogue and presentation
     live_session :public,
@@ -127,6 +128,7 @@ defmodule EmotheWeb.Router do
     get "/plays/:id/export/tei", ExportController, :tei
     get "/plays/:id/export/html", ExportController, :html
     get "/plays/:id/export/pdf", ExportController, :pdf
+    get "/plays/:id/export/epub", ExportController, :epub
   end
 
   # LiveDashboard for admin users (all environments)

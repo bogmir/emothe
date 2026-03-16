@@ -488,6 +488,16 @@ msgstr "Exportar HTML"
 msgid "Export PDF"
 msgstr "Exportar PDF"
 
+#: lib/emothe_web/live/admin/play_detail_live.ex:163
+#, elixir-autogen, elixir-format
+msgid "Export EPUB"
+msgstr "Exportar EPUB"
+
+#: lib/emothe_web/controllers/admin/export_controller.ex:75
+#, elixir-autogen, elixir-format
+msgid "EPUB generation failed: %{reason}"
+msgstr "Error al generar EPUB: %{reason}"
+
 #: lib/emothe_web/live/admin/play_detail_live.ex:140
 #, elixir-autogen, elixir-format
 msgid "Export TEI-XML"

@@ -39,3 +39,6 @@ npm-debug.log
 /docs/screenshots/
 
 /.claude/
+
+# Static site export output
+/_site/

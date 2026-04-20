@@ -121,9 +121,11 @@ defmodule EmotheWeb.Router do
       live "/plays/:id/compare", PlayCompareLive, :compare
       live "/users", UserListLive, :index
       live "/activity-log", ActivityLogLive, :index
+      live "/export", ExportSiteLive, :index
     end
 
     # Export endpoints
+    get "/export/download-zip", ExportController, :download_zip
     get "/plays/compare/export/html", ExportController, :compare_html
     get "/plays/:id/export/tei", ExportController, :tei
     get "/plays/:id/export/html", ExportController, :html

@@ -148,7 +148,14 @@ defmodule EmotheWeb.Admin.PlayListLive do
           </thead>
           <tbody>
             <tr :for={play <- @plays} class="hover">
-              <td class="font-mono text-xs text-base-content/60">{play.code}</td>
+              <td class="font-mono text-xs text-base-content/60">
+                {play.code}
+                <.icon
+                  :if={play.is_complete}
+                  name="hero-check-circle-mini"
+                  class="size-4 text-success ml-1 inline"
+                />
+              </td>
               <td>
                 <.link
                   navigate={~p"/admin/plays/#{play.id}"}

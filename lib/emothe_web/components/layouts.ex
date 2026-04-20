@@ -121,24 +121,28 @@ defmodule EmotheWeb.Layouts do
             {gettext("Overview")}
           </.link>
           <.link
+            :if={!@play.is_complete}
             navigate={~p"/admin/plays/#{@play.id}/edit"}
             class={ctx_tab_class(@active_tab == :metadata)}
           >
             {gettext("Metadata")}
           </.link>
           <.link
+            :if={!@play.is_complete}
             navigate={~p"/admin/plays/#{@play.id}/editors"}
             class={ctx_tab_class(@active_tab == :editors)}
           >
             {gettext("Editors")}
           </.link>
           <.link
+            :if={!@play.is_complete}
             navigate={~p"/admin/plays/#{@play.id}/sources"}
             class={ctx_tab_class(@active_tab == :sources)}
           >
             {gettext("Sources")}
           </.link>
           <.link
+            :if={!@play.is_complete}
             navigate={~p"/admin/plays/#{@play.id}/content"}
             class={ctx_tab_class(@active_tab == :content)}
           >

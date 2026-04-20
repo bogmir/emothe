@@ -14,6 +14,7 @@ defmodule Emothe.Catalogue do
   def list_plays(opts \\ []) do
     query =
       Play
+      |> apply_complete(opts[:complete])
       |> apply_search(opts[:search])
       |> apply_sort(opts[:sort] || :title_sort)
 
@@ -35,6 +36,12 @@ defmodule Emothe.Catalogue do
   def count_plays(opts \\ []) do
     Play
     |> apply_search(opts[:search])
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def count_complete_plays do
+    Play
+    |> where([p], p.is_complete == true)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -307,6 +314,9 @@ defmodule Emothe.Catalogue do
   end
 
   # --- Private ---
+
+  defp apply_complete(query, true), do: where(query, [p], p.is_complete == true)
+  defp apply_complete(query, _), do: query
 
   defp apply_search(query, nil), do: query
   defp apply_search(query, ""), do: query

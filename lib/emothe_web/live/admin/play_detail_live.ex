@@ -97,6 +97,28 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
     end
   end
 
+  def handle_event("toggle_complete", _, socket) do
+    play = socket.assigns.play
+    new_value = !play.is_complete
+
+    case Catalogue.update_play_from_form(play, %{"is_complete" => to_string(new_value)}) do
+      {:ok, updated_play} ->
+        msg =
+          if new_value,
+            do: gettext("Marked as complete."),
+            else: gettext("Marked as draft.")
+
+        {:noreply,
+         socket
+         |> assign(:play, updated_play)
+         |> assign(:play_context, %{play: updated_play, active_tab: :overview})
+         |> put_flash(:info, msg)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, gettext("Failed to update status."))}
+    end
+  end
+
   def handle_event("recompute_stats", _, socket) do
     statistic = Statistics.recompute(socket.assigns.play.id)
 
@@ -129,7 +151,9 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
       <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 class="text-3xl font-semibold tracking-tight text-base-content">{@play.title}</h1>
-          <p class="mt-1 text-sm text-base-content/60">{@play.author_name} — {@play.code}</p>
+          <p class="mt-1 text-sm text-base-content/60">
+            {@play.author_name} — {@play.code}
+          </p>
         </div>
         <div class="flex items-center gap-1">
           <span class="text-xs text-base-content/40 mr-1">{gettext("Export")}</span>
@@ -218,8 +242,25 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
         <% end %>
       </div>
 
-      <%!-- Import Content --%>
+      <%!-- Status Toggle --%>
       <section class="mb-8">
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-base-content/70">{gettext("Status")}</span>
+          <button
+            phx-click="toggle_complete"
+            class={"btn btn-sm gap-1.5 #{if @play.is_complete, do: "btn-success", else: "btn-error btn-outline"}"}
+          >
+            <.icon
+              name={if @play.is_complete, do: "hero-check-circle-mini", else: "hero-pencil-mini"}
+              class="size-4"
+            />
+            {if @play.is_complete, do: gettext("Complete"), else: gettext("Draft")}
+          </button>
+        </div>
+      </section>
+
+      <%!-- Import Content --%>
+      <section :if={!@play.is_complete} class="mb-8">
         <h2 class="mb-3 text-lg font-semibold text-base-content">
           {gettext("Import content")}
         </h2>

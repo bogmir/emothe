@@ -13,6 +13,17 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
   def mount(%{"id" => id}, _session, socket) do
     play = Catalogue.get_play!(id)
 
+    if play.is_complete do
+      {:ok,
+       socket
+       |> put_flash(:warning, gettext("Set to Draft to edit."))
+       |> push_navigate(to: ~p"/admin/plays/#{play.id}")}
+    else
+      mount_editor(socket, play)
+    end
+  end
+
+  defp mount_editor(socket, play) do
     if connected?(socket) do
       PlayContent.subscribe(play.id)
     end

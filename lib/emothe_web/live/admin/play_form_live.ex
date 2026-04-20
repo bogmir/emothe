@@ -48,6 +48,16 @@ defmodule EmotheWeb.Admin.PlayFormLive do
   defp apply_action(socket, :edit, %{"id" => id}) do
     play = Catalogue.get_play!(id)
 
+    if play.is_complete do
+      socket
+      |> put_flash(:warning, gettext("Set to Draft to edit."))
+      |> push_navigate(to: ~p"/admin/plays/#{play.id}")
+    else
+      apply_edit_action(socket, play)
+    end
+  end
+
+  defp apply_edit_action(socket, play) do
     parent_label =
       if play.parent_play_id do
         parent = Catalogue.get_play!(play.parent_play_id)
@@ -312,10 +322,43 @@ defmodule EmotheWeb.Admin.PlayFormLive do
         </p>
       </div>
 
+      <script :type={Phoenix.LiveView.ColocatedHook} name=".DirtyForm">
+        export default {
+          mounted() {
+            this.dirty = false
+
+            this.el.addEventListener("input", () => { this.dirty = true })
+            this.el.addEventListener("submit", () => { this.dirty = false })
+
+            this.navHandler = (e) => {
+              if (!this.dirty) return
+              const link = e.target.closest("a[data-phx-link]")
+              if (!link) return
+              if (!window.confirm("You have unsaved changes. Discard them?")) {
+                e.preventDefault()
+                e.stopPropagation()
+              }
+            }
+            document.addEventListener("click", this.navHandler, true)
+
+            this.beforeUnload = (e) => {
+              if (this.dirty) { e.preventDefault(); e.returnValue = "" }
+            }
+            window.addEventListener("beforeunload", this.beforeUnload)
+          },
+          destroyed() {
+            document.removeEventListener("click", this.navHandler, true)
+            window.removeEventListener("beforeunload", this.beforeUnload)
+          }
+        }
+      </script>
+
       <.form
         for={@form}
+        id="play-form"
         phx-change="validate"
         phx-submit="save"
+        phx-hook=".DirtyForm"
         class="space-y-6 rounded-box border border-base-300 bg-base-100 p-5 shadow-sm"
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -628,10 +671,17 @@ defmodule EmotheWeb.Admin.PlayFormLive do
           />
         </div>
 
-        <div class="rounded-box bg-base-200 px-3 py-2">
-          <label class="flex items-center gap-2 text-sm text-base-content/85">
-            <.input field={@form[:is_verse]} type="checkbox" /> {gettext("Verse play")}
-          </label>
+        <div class="flex gap-4">
+          <div class="rounded-box bg-base-200 px-3 py-2">
+            <label class="flex items-center gap-2 text-sm text-base-content/85">
+              <.input field={@form[:is_verse]} type="checkbox" /> {gettext("Verse play")}
+            </label>
+          </div>
+          <div class="rounded-box bg-base-200 px-3 py-2">
+            <label class="flex items-center gap-2 text-sm text-base-content/85">
+              <.input field={@form[:is_complete]} type="checkbox" /> {gettext("Complete")}
+            </label>
+          </div>
         </div>
 
         <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">

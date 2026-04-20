@@ -46,7 +46,13 @@ lib/
 │   └── export/
 │       ├── tei_xml.ex                # Generate TEI-XML from DB
 │       ├── html.ex                   # Standalone HTML document export
-│       └── pdf.ex                    # PDF via ChromicPDF (headless Chrome)
+│       ├── pdf.ex                    # PDF via ChromicPDF (headless Chrome)
+│       ├── epub.ex                   # EPUB 3 generation via BUPE
+│       ├── compare_html.ex           # Standalone comparison HTML with sync scroll
+│       └── static_site.ex            # Static site orchestrator
+│           ├── renderer.ex           # HTML/CSS page templates
+│           ├── search.ex             # Client-side search index + JS
+│           └── deployer.ex           # GitHub Pages deployment
 └── emothe_web/
     ├── router.ex
     ├── user_auth.ex                  # Auth plugs & LiveView on_mount hooks
@@ -65,11 +71,14 @@ lib/
     │       ├── play_form_live.ex     # Admin: /admin/plays/new|:id/edit
     │       ├── play_detail_live.ex   # Admin: /admin/plays/:id - detail + exports
     │       ├── import_live.ex        # Admin: /admin/plays/import - TEI file import
-    │       └── activity_log_live.ex  # Admin: /admin/activity-log - activity audit log
+    │       ├── activity_log_live.ex  # Admin: /admin/activity-log - activity audit log
+    │       ├── export_site_live.ex   # Admin: /admin/export - static site generation UI
+    │       ├── play_compare_live.ex  # Admin: /admin/plays/:id/compare - side-by-side comparison
+    │       └── user_list_live.ex     # Admin: /admin/users - user management
     ├── controllers/
     │   ├── user_session_controller.ex # Login/logout session handling
     │   └── admin/
-    │       └── export_controller.ex  # Download endpoints for TEI/HTML/PDF
+    │       └── export_controller.ex  # Download endpoints for TEI/HTML/PDF/EPUB
     └── components/
         ├── play_text.ex              # Play text rendering (speeches, verses, stage dirs)
         └── statistics_panel.ex       # Modern stats visualization (cards, bar charts)
@@ -116,9 +125,14 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 - `GET /admin/plays/:id` - Play detail (structure, stats, export buttons)
 - `GET /admin/plays/import` - Import TEI-XML files (upload, server path, or directory)
 - `GET /admin/activity-log` - Activity audit log with filters
+- `GET /admin/users` - User management (roles, confirmation)
+- `GET /admin/export` - Static site generation UI
+- `GET /admin/export/download-zip` - Download generated static site as .zip
+- `GET /admin/plays/compare/export/html` - Comparison HTML export
 - `GET /admin/plays/:id/export/tei` - Download TEI-XML
 - `GET /admin/plays/:id/export/html` - Download HTML
 - `GET /admin/plays/:id/export/pdf` - Download PDF
+- `GET /admin/plays/:id/export/epub` - Download EPUB
 
 ## TEI-XML Format
 
@@ -134,6 +148,49 @@ The importer handles the TEI P5 format used by EMOTHE/Artelope. Key mappings:
 - `stage` -> stage directions
 
 TEI fixture files are at `test/fixtures/tei_files/` (UTF-16 encoded, ~37 files covering Spanish/Italian/English/French plays).
+
+## Static Site Export
+
+Generates an Endings Project-compliant static website — pure HTML/CSS/JS, no server required. Only plays marked as **complete** (`is_complete: true`) are included by default.
+
+### Architecture
+
+- `Emothe.Export.StaticSite` — orchestrator: loads plays, writes assets, delegates to Renderer/Search
+- `Emothe.Export.StaticSite.Renderer` — generates HTML pages (catalogue index + per-play pages) with embedded CSS
+- `Emothe.Export.StaticSite.Search` — builds a JSON search index and client-side JS for filtering
+- `Emothe.Export.StaticSite.Deployer` — pushes `_site/` to a GitHub Pages `gh-pages` branch
+
+### Output structure
+
+```
+_site/
+├── index.html          # Catalogue page with search
+├── style.css           # Shared stylesheet
+├── search.js           # Client-side search
+├── search-index.json   # Play metadata for search
+├── data/               # Reserved for future data files
+└── plays/
+    └── <CODE>/
+        ├── index.html  # Play page (text, characters, stats tabs)
+        └── <CODE>.xml  # TEI-XML source file
+```
+
+### Usage
+
+**Admin UI**: `GET /admin/export` (`EmotheWeb.Admin.ExportSiteLive`) — configure version, base URL, GitHub repo; generate with progress bar; download as .zip or deploy to GitHub Pages.
+
+**Mix task**:
+```bash
+mix emothe.export.site                              # complete plays → _site/
+mix emothe.export.site -o /tmp/archive              # custom output dir
+mix emothe.export.site --plays AL0001,AL0002        # specific plays only
+mix emothe.export.site --all                        # include incomplete plays
+mix emothe.export.site --base-url /emothe/ --version 2.0
+```
+
+### Completeness gate
+
+The `plays.is_complete` boolean (default `false`) controls which plays are exported. Toggle it in the play edit form. The export site page shows "X of Y plays marked as complete". Pass `--all` to the mix task or `all: true` to `StaticSite.generate/1` to override.
 
 ## Running Commands
 
@@ -192,6 +249,12 @@ Then visit:
 - [x] `Emothe.Export.TeiXml` - reconstructs TEI-XML from DB using xml_builder
 - [x] `Emothe.Export.Html` - standalone HTML document with CSS styling
 - [x] `Emothe.Export.Pdf` - PDF generation via ChromicPDF (reuses HTML export)
+- [x] `Emothe.Export.Epub` - EPUB 3 generation via BUPE (chapters per division, embedded CSS)
+- [x] `Emothe.Export.CompareHtml` - standalone comparison HTML with synchronized scrolling between panels
+- [x] `Emothe.Export.StaticSite` - generates Endings Project-compliant static website from DB (pure HTML/CSS/JS, no server needed)
+- [x] `Emothe.Export.StaticSite.Renderer` - HTML/CSS templates for static site pages
+- [x] `Emothe.Export.StaticSite.Search` - client-side search index (JSON) and JS
+- [x] `Emothe.Export.StaticSite.Deployer` - GitHub Pages deployment via git push
 - [x] Public catalogue page (`/plays`) with search
 - [x] Public play presentation page (`/plays/:code`) with Text/Characters/Statistics tabs, line number and stage direction toggles
 - [x] Statistics panel with modern cards and CSS bar charts

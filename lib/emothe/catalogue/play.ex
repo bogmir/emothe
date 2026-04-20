@@ -31,6 +31,7 @@ defmodule Emothe.Catalogue.Play do
     field :parent_play_id, :binary_id
     field :relationship_type, :string
     field :edition_title, :string
+    field :is_complete, :boolean, default: false
 
     belongs_to :parent_play, Emothe.Catalogue.Play, define_field: false
     has_many :derived_plays, Emothe.Catalogue.Play, foreign_key: :parent_play_id
@@ -88,7 +89,8 @@ defmodule Emothe.Catalogue.Play do
       :authority,
       :parent_play_id,
       :relationship_type,
-      :edition_title
+      :edition_title,
+      :is_complete
     ])
     |> validate_required([:title, :code])
     |> validate_inclusion(:language, @valid_languages)

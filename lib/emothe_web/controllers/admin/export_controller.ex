@@ -79,6 +79,21 @@ defmodule EmotheWeb.Admin.ExportController do
     end
   end
 
+  def download_zip(conn, _params) do
+    zip_path = Path.join(System.tmp_dir!(), "emothe-static-site.zip")
+
+    if File.exists?(zip_path) do
+      conn
+      |> put_resp_content_type("application/zip")
+      |> put_resp_header("content-disposition", ~s(attachment; filename="emothe-static-site.zip"))
+      |> send_file(200, zip_path)
+    else
+      conn
+      |> put_flash(:error, gettext("No zip file found. Generate the static site first."))
+      |> redirect(to: ~p"/admin/export")
+    end
+  end
+
   defp log_export(conn, play, format) do
     user = conn.assigns[:current_user]
 

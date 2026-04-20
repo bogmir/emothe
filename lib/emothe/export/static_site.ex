@@ -30,7 +30,8 @@ defmodule Emothe.Export.StaticSite do
     * `:build_date` - ISO date string (default: today)
     * `:on_progress` - `fun(progress_info) -> :ok` callback for progress reporting
   """
-  @spec generate(keyword()) :: {:ok, %{plays: integer(), size: term(), output_dir: String.t()}} | {:error, String.t()}
+  @spec generate(keyword()) ::
+          {:ok, %{plays: integer(), size: term(), output_dir: String.t()}} | {:error, String.t()}
   def generate(opts \\ []) do
     output_dir = opts[:output_dir] || "_site"
     build_date = opts[:build_date] || Date.utc_today() |> Date.to_iso8601()
@@ -56,7 +57,13 @@ defmodule Emothe.Export.StaticSite do
       File.write!(Path.join(output_dir, "search.js"), Search.search_js())
 
       # 4. Write catalogue index
-      on_progress.(%{step: :catalogue, current: 0, total: total, detail: "Generating catalogue..."})
+      on_progress.(%{
+        step: :catalogue,
+        current: 0,
+        total: total,
+        detail: "Generating catalogue..."
+      })
+
       File.write!(Path.join(output_dir, "index.html"), Renderer.catalogue_page(plays, opts))
 
       # 5. Write search index and data

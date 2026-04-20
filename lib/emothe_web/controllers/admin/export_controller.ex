@@ -74,7 +74,10 @@ defmodule EmotheWeb.Admin.ExportController do
 
       {:error, reason} ->
         conn
-        |> put_flash(:error, gettext("EPUB generation failed: %{reason}", reason: inspect(reason)))
+        |> put_flash(
+          :error,
+          gettext("EPUB generation failed: %{reason}", reason: inspect(reason))
+        )
         |> redirect(to: ~p"/admin/plays/#{id}")
     end
   end

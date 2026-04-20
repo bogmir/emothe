@@ -568,7 +568,7 @@ defmodule Emothe.Export.StaticSite.Renderer do
         act_link = "<a href=\"#div-#{div.id}\">#{escape(div.title || div.type)}</a>"
 
         scene_links =
-          (Map.get(div, :children, []))
+          Map.get(div, :children, [])
           |> Enum.filter(fn child -> child.title && child.title != "" end)
           |> Enum.map(fn child ->
             "<a href=\"#div-#{child.id}\">#{escape(child.title)}</a>"
@@ -714,7 +714,8 @@ defmodule Emothe.Export.StaticSite.Renderer do
 
   # --- Statistics rendering ---
 
-  defp render_statistics(nil), do: "      <p style=\"text-align:center;color:#888;\">No statistics available.</p>"
+  defp render_statistics(nil),
+    do: "      <p style=\"text-align:center;color:#888;\">No statistics available.</p>"
 
   defp render_statistics(%{data: data}) when data == %{} or is_nil(data) do
     "      <p style=\"text-align:center;color:#888;\">No statistics available.</p>"
@@ -739,7 +740,8 @@ defmodule Emothe.Export.StaticSite.Renderer do
         render_bar_chart(
           "Scenes per #{act_label_singular(raw_label)}",
           get_in(data, ["scenes", "per_act"]) || [],
-          "act", "count",
+          "act",
+          "count",
           "#{act_label_singular(raw_label)} ",
           "bar-amber"
         )
@@ -751,7 +753,8 @@ defmodule Emothe.Export.StaticSite.Renderer do
       render_bar_chart(
         "Verse Distribution",
         data["verse_distribution"] || [],
-        "act", "count",
+        "act",
+        "count",
         "#{act_label_singular(raw_label)} ",
         "bar-indigo"
       )
@@ -761,7 +764,8 @@ defmodule Emothe.Export.StaticSite.Renderer do
         render_bar_chart(
           "Prose Fragments",
           data["prose_fragments"] || [],
-          "act", "count",
+          "act",
+          "count",
           "#{act_label_singular(raw_label)} ",
           "bar-emerald"
         )
@@ -771,13 +775,20 @@ defmodule Emothe.Export.StaticSite.Renderer do
 
     verse_type_chart =
       case data["verse_type_distribution"] do
-        nil -> ""
-        [] -> ""
+        nil ->
+          ""
+
+        [] ->
+          ""
+
         items ->
           render_bar_chart(
             "Verse Type Distribution",
-            Enum.map(items, fn vt -> %{"label" => verse_type_label(vt["verse_type"]), "count" => vt["count"]} end),
-            "label", "count",
+            Enum.map(items, fn vt ->
+              %{"label" => verse_type_label(vt["verse_type"]), "count" => vt["count"]}
+            end),
+            "label",
+            "count",
             "",
             "bar-violet"
           )
@@ -785,13 +796,18 @@ defmodule Emothe.Export.StaticSite.Renderer do
 
     char_chart =
       case data["character_appearances"] do
-        nil -> ""
-        [] -> ""
+        nil ->
+          ""
+
+        [] ->
+          ""
+
         items ->
           render_bar_chart(
             "Character Speeches",
             Enum.map(items, fn c -> %{"label" => c["name"], "count" => c["speeches"]} end),
-            "label", "count",
+            "label",
+            "count",
             "",
             "bar-amber"
           )
@@ -828,7 +844,7 @@ defmodule Emothe.Export.StaticSite.Renderer do
   defp render_bar_chart(_title, [], _label_key, _value_key, _prefix, _color), do: ""
 
   defp render_bar_chart(title, items, label_key, value_key, prefix, color_class) do
-    max_val = items |> Enum.map(&((&1[value_key] || 0))) |> Enum.max(fn -> 1 end)
+    max_val = items |> Enum.map(&(&1[value_key] || 0)) |> Enum.max(fn -> 1 end)
 
     rows =
       Enum.map(items, fn item ->
@@ -855,7 +871,7 @@ defmodule Emothe.Export.StaticSite.Renderer do
 
   defp bar_percent(0, _max), do: 0
   defp bar_percent(_val, 0), do: 0
-  defp bar_percent(val, max), do: val / max * 100 |> round() |> min(100) |> max(5)
+  defp bar_percent(val, max), do: (val / max * 100) |> round() |> min(100) |> max(5)
 
   # --- Statistics label helpers ---
 

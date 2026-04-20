@@ -63,7 +63,9 @@ defmodule Mix.Tasks.Emothe.Export.Site do
 
     case result do
       {:ok, %{plays: count, size: size, output_dir: dir}} ->
-        Mix.shell().info("\n✓ Static site generated: #{count} plays → #{dir}/ (#{format_size(size)})")
+        Mix.shell().info(
+          "\n✓ Static site generated: #{count} plays → #{dir}/ (#{format_size(size)})"
+        )
 
       {:error, reason} ->
         Mix.shell().error("Failed: #{inspect(reason)}")

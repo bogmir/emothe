@@ -226,7 +226,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:ok, _} = PlayContent.delete_character(character)
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
 
-    log_action(socket, "delete", "character", character.id, %{name: character.name, xml_id: character.xml_id})
+    log_action(socket, "delete", "character", character.id, %{
+      name: character.name,
+      xml_id: character.xml_id
+    })
 
     {:noreply,
      socket
@@ -466,7 +469,10 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     {:ok, _} = PlayContent.delete_division(division)
     PlayContent.broadcast_content_changed(socket.assigns.play.id)
 
-    log_action(socket, "delete", "division", division.id, %{type: division.type, number: division.number})
+    log_action(socket, "delete", "division", division.id, %{
+      type: division.type,
+      number: division.number
+    })
 
     selected =
       if socket.assigns.selected_division_id == id,
@@ -764,6 +770,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     case result do
       {:ok, saved} ->
         action = if socket.assigns.editing, do: "update", else: "create"
+
         log_action(socket, action, "editorial_note", saved.id, %{section_type: saved.section_type})
 
         {:noreply,
@@ -795,7 +802,11 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       {:ok, saved} ->
         PlayContent.broadcast_content_changed(play.id)
         action = if socket.assigns.editing, do: "update", else: "create"
-        log_action(socket, action, "character", saved.id, %{name: saved.name, xml_id: saved.xml_id})
+
+        log_action(socket, action, "character", saved.id, %{
+          name: saved.name,
+          xml_id: saved.xml_id
+        })
 
         {:noreply,
          socket
@@ -830,6 +841,7 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       {:ok, saved} ->
         PlayContent.broadcast_content_changed(play.id)
         action = if socket.assigns.editing, do: "update", else: "create"
+
         log_action(socket, action, "division", saved.id, %{type: saved.type, number: saved.number})
 
         {:noreply,
@@ -1626,7 +1638,12 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
       />
 
       <%!-- Tab: Content --%>
-      <div :if={@editor_tab == :content} id="content-tab" phx-hook=".ScrollToElement" class="animate-in fade-in">
+      <div
+        :if={@editor_tab == :content}
+        id="content-tab"
+        phx-hook=".ScrollToElement"
+        class="animate-in fade-in"
+      >
         <script :type={Phoenix.LiveView.ColocatedHook} name=".ScrollToElement">
           export default {
             mounted() {
@@ -2000,7 +2017,9 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
     # Build lookup of selected character objects for tag display
     selected_chars =
       Enum.filter(assigns.characters, &(&1.id in assigns.cr_selected_character_ids))
-      |> Enum.sort_by(fn c -> Enum.find_index(assigns.cr_selected_character_ids, &(&1 == c.id)) end)
+      |> Enum.sort_by(fn c ->
+        Enum.find_index(assigns.cr_selected_character_ids, &(&1 == c.id))
+      end)
 
     available_chars =
       Enum.reject(assigns.characters, &(&1.id in assigns.cr_selected_character_ids))
@@ -2214,7 +2233,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           >
             <button phx-click="cr_show_more" class="btn btn-ghost btn-sm">
               {gettext("Show more (%{remaining} remaining)",
-                remaining: @total_filtered - length(@visible_speeches))}
+                remaining: @total_filtered - length(@visible_speeches)
+              )}
             </button>
           </div>
         </div>
@@ -2660,10 +2680,8 @@ defmodule EmotheWeb.Admin.PlayContentEditorLive do
           <label class="label">
             <span class="label-text font-medium">{gettext("Characters")}</span>
           </label>
-          <%
-            selected_chars = Enum.filter(@characters, & &1.id in @editing_character_ids)
-            available_chars = Enum.reject(@characters, & &1.id in @editing_character_ids)
-          %>
+          <% selected_chars = Enum.filter(@characters, &(&1.id in @editing_character_ids))
+          available_chars = Enum.reject(@characters, &(&1.id in @editing_character_ids)) %>
           <input
             :for={cid <- @editing_character_ids}
             type="hidden"

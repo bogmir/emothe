@@ -4,8 +4,13 @@ defmodule Emothe.Repo.Migrations.CreateElementCharacters do
   def up do
     create table(:element_characters, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :element_id, references(:play_elements, type: :binary_id, on_delete: :delete_all), null: false
-      add :character_id, references(:characters, type: :binary_id, on_delete: :delete_all), null: false
+
+      add :element_id, references(:play_elements, type: :binary_id, on_delete: :delete_all),
+        null: false
+
+      add :character_id, references(:characters, type: :binary_id, on_delete: :delete_all),
+        null: false
+
       add :position, :integer, default: 0, null: false
 
       timestamps(type: :utc_datetime)

@@ -13,7 +13,9 @@ defmodule Emothe.Export.Epub do
     characters = PlayContent.list_characters(play.id)
     divisions = PlayContent.load_play_content(play.id)
 
-    tmp_dir = Path.join(System.tmp_dir!(), "emothe_epub_#{play.id}_#{System.unique_integer([:positive])}")
+    tmp_dir =
+      Path.join(System.tmp_dir!(), "emothe_epub_#{play.id}_#{System.unique_integer([:positive])}")
+
     File.mkdir_p!(tmp_dir)
 
     try do
@@ -22,7 +24,8 @@ defmodule Emothe.Export.Epub do
       File.write!(css_path, css())
 
       # Front matter: title, author, sources, editors, editorial notes, cast list
-      front_path = write_chapter(tmp_dir, "front", play.title, play.language, render_front(play, characters))
+      front_path =
+        write_chapter(tmp_dir, "front", play.title, play.language, render_front(play, characters))
 
       # One chapter per top-level division
       chapter_entries =
@@ -31,7 +34,16 @@ defmodule Emothe.Export.Epub do
         |> Enum.map(fn {div, i} ->
           filename = "chapter-#{String.pad_leading("#{i}", 3, "0")}"
           title = div.title || "#{div.type} #{i}"
-          path = write_chapter(tmp_dir, filename, title, play.language, render_division(div, characters))
+
+          path =
+            write_chapter(
+              tmp_dir,
+              filename,
+              title,
+              play.language,
+              render_division(div, characters)
+            )
+
           {path, title}
         end)
 

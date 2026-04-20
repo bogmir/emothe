@@ -23,7 +23,15 @@ defmodule Emothe.ActivityLog.Entry do
 
   def changeset(entry, attrs) do
     entry
-    |> cast(attrs, [:user_id, :play_id, :action, :resource_type, :resource_id, :changes, :metadata])
+    |> cast(attrs, [
+      :user_id,
+      :play_id,
+      :action,
+      :resource_type,
+      :resource_id,
+      :changes,
+      :metadata
+    ])
     |> validate_required([:action, :resource_type])
     |> validate_inclusion(:action, @actions)
     |> validate_inclusion(:resource_type, @resource_types)

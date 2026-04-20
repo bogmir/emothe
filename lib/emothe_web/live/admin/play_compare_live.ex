@@ -196,7 +196,9 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
         <%!-- Export & Add play --%>
         <div class="ml-auto flex items-center gap-2">
           <a
-            href={~p"/admin/plays/compare/export/html?plays=#{Enum.map_join(@panels, ",", & &1.play.id)}"}
+            href={
+              ~p"/admin/plays/compare/export/html?plays=#{Enum.map_join(@panels, ",", & &1.play.id)}"
+            }
             class="btn btn-xs btn-outline gap-1"
           >
             <.icon name="hero-arrow-down-tray-mini" class="size-3.5" />

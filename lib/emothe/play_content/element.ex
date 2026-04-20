@@ -22,7 +22,10 @@ defmodule Emothe.PlayContent.Element do
     belongs_to :parent, __MODULE__
     has_many :children, __MODULE__, foreign_key: :parent_id
     has_many :element_characters, Emothe.PlayContent.ElementCharacter
-    many_to_many :characters, Emothe.PlayContent.Character, join_through: Emothe.PlayContent.ElementCharacter, on_replace: :delete
+
+    many_to_many :characters, Emothe.PlayContent.Character,
+      join_through: Emothe.PlayContent.ElementCharacter,
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end

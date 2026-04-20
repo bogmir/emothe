@@ -23,6 +23,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   defp apply_action(socket, :new, _params) do
     play = %Play{}
+
     initial_params =
       %{"code" => Catalogue.next_play_code()}
       |> maybe_derive_emothe_id()

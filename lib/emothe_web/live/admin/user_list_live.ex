@@ -53,6 +53,7 @@ defmodule EmotheWeb.Admin.UserListLive do
       {:noreply, put_flash(socket, :error, gettext("You cannot change your own role."))}
     else
       old_role = user.role
+
       case Accounts.update_user_role(user, role) do
         {:ok, _user} ->
           ActivityLog.log!(%{

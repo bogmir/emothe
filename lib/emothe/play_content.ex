@@ -212,7 +212,7 @@ defmodule Emothe.PlayContent do
     |> where([e], is_nil(e.parent_id))
     |> order_by(:position)
     |> Repo.all()
-    |> Repo.preload([
+    |> Repo.preload(
       element_characters: ec_preload,
       children:
         from(e in Element,
@@ -224,12 +224,16 @@ defmodule Emothe.PlayContent do
                 order_by: c.position,
                 preload: [
                   element_characters: ^ec_preload,
-                  children: ^from(v in Element, order_by: v.position, preload: [element_characters: ^ec_preload])
+                  children:
+                    ^from(v in Element,
+                      order_by: v.position,
+                      preload: [element_characters: ^ec_preload]
+                    )
                 ]
               )
           ]
         )
-    ])
+    )
   end
 
   def search_elements(play_id, query) when is_binary(query) and byte_size(query) >= 2 do
@@ -257,7 +261,9 @@ defmodule Emothe.PlayContent do
 
   def get_element!(id) do
     Repo.get!(Element, id)
-    |> Repo.preload(element_characters: from(ec in ElementCharacter, order_by: ec.position, preload: :character))
+    |> Repo.preload(
+      element_characters: from(ec in ElementCharacter, order_by: ec.position, preload: :character)
+    )
   end
 
   def create_element(attrs) do
@@ -419,17 +425,21 @@ defmodule Emothe.PlayContent do
       |> where([e], is_nil(e.parent_id))
       |> order_by(:position)
       |> Repo.all()
-      |> Repo.preload([
+      |> Repo.preload(
         element_characters: ec_preload,
         children:
           from(e in Element,
             order_by: e.position,
             preload: [
               element_characters: ^ec_preload,
-              children: ^from(c in Element, order_by: c.position, preload: [element_characters: ^ec_preload])
+              children:
+                ^from(c in Element,
+                  order_by: c.position,
+                  preload: [element_characters: ^ec_preload]
+                )
             ]
           )
-      ])
+      )
 
     elements_by_division = Enum.group_by(elements, & &1.division_id)
 

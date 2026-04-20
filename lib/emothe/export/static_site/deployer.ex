@@ -17,7 +17,11 @@ defmodule Emothe.Export.StaticSite.Deployer do
   """
   def deploy_to_github_pages(site_dir, repo, opts \\ []) do
     branch = opts[:branch] || "gh-pages"
-    message = opts[:message] || "Deploy EMOTHE static site — #{DateTime.utc_now() |> DateTime.to_iso8601()}"
+
+    message =
+      opts[:message] ||
+        "Deploy EMOTHE static site — #{DateTime.utc_now() |> DateTime.to_iso8601()}"
+
     on_progress = opts[:on_progress] || fn _ -> :ok end
 
     with :ok <- validate_site_dir(site_dir),
@@ -63,15 +67,17 @@ defmodule Emothe.Export.StaticSite.Deployer do
 
     steps = [
       {"Initializing git repository...", fn -> System.cmd("git", ["init"], git_opts) end},
-      {"Configuring git...", fn ->
-        System.cmd("git", ["config", "user.email", "emothe-deploy@noreply"], git_opts)
-        System.cmd("git", ["config", "user.name", "EMOTHE Deploy"], git_opts)
-      end},
+      {"Configuring git...",
+       fn ->
+         System.cmd("git", ["config", "user.email", "emothe-deploy@noreply"], git_opts)
+         System.cmd("git", ["config", "user.name", "EMOTHE Deploy"], git_opts)
+       end},
       {"Staging files...", fn -> System.cmd("git", ["add", "-A"], git_opts) end},
       {"Creating commit...", fn -> System.cmd("git", ["commit", "-m", message], git_opts) end},
-      {"Pushing to #{branch}...", fn ->
-        System.cmd("git", ["push", "--force", repo_url, "HEAD:#{branch}"], git_opts)
-      end}
+      {"Pushing to #{branch}...",
+       fn ->
+         System.cmd("git", ["push", "--force", repo_url, "HEAD:#{branch}"], git_opts)
+       end}
     ]
 
     Enum.reduce_while(steps, :ok, fn {status, cmd_fn}, _acc ->

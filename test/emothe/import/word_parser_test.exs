@@ -869,7 +869,9 @@ defmodule Emothe.Import.WordParserTest do
       path = write_test_docx(paragraphs)
       assert {:ok, _} = WordParser.import_content(play.id, path)
 
-      verse_lines = list_elements_with_characters(play.id) |> Enum.filter(&(&1.type == "verse_line"))
+      verse_lines =
+        list_elements_with_characters(play.id) |> Enum.filter(&(&1.type == "verse_line"))
+
       assert length(verse_lines) == 2
       assert Enum.all?(verse_lines, &(Emothe.PlayContent.Element.characters(&1) == []))
     end

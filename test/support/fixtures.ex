@@ -54,6 +54,28 @@ defmodule Emothe.TestFixtures do
     Catalogue.get_play_with_all!(play.id)
   end
 
+  @doc """
+  Creates an original play with one derived translation linked via
+  `parent_play_id`. Returns `%{original: original, translation: translation}`
+  with both plays reloaded with associations.
+  """
+  def translation_family_fixture do
+    original = play_fixture(%{"title" => "Original Play", "is_complete" => true})
+
+    translation =
+      play_fixture(%{
+        "title" => "Translated Play",
+        "parent_play_id" => original.id,
+        "relationship_type" => "traduccion",
+        "is_complete" => true
+      })
+
+    %{
+      original: Catalogue.get_play_with_all!(original.id),
+      translation: Catalogue.get_play_with_all!(translation.id)
+    }
+  end
+
   def play_with_structure_fixture do
     play = play_fixture(%{"title" => "Structured Play", "author_name" => "Tester"})
 

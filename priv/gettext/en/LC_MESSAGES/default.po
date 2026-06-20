@@ -2718,3 +2718,13 @@ msgstr ""
 #, elixir-autogen, elixir-format
 msgid "user"
 msgstr ""
+
+#: lib/emothe_web/live/play_catalogue_live.ex:98
+#, elixir-autogen, elixir-format
+msgid "Compare"
+msgstr ""
+
+#: lib/emothe_web/live/play_compare_live.ex:77
+#, elixir-autogen, elixir-format
+msgid "Back to play"
+msgstr ""

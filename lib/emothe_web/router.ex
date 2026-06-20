@@ -59,6 +59,7 @@ defmodule EmotheWeb.Router do
       on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :mount_current_user}] do
       live "/plays", PlayCatalogueLive, :index
       live "/plays/:code", PlayShowLive, :show
+      live "/plays/:code/compare", PlayCompareLive, :compare
     end
   end
 

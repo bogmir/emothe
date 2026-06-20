@@ -91,6 +91,14 @@ defmodule EmotheWeb.PlayCatalogueLive do
                   {play.author_name}
                 </span>
               </.link>
+              <.link
+                :if={play.derived_plays != []}
+                navigate={~p"/plays/#{play.code}/compare"}
+                class="btn btn-xs btn-ghost btn-square text-base-content/50 hover:text-primary tooltip tooltip-bottom"
+                data-tip={gettext("Compare")}
+              >
+                <.icon name="hero-arrows-right-left-mini" class="size-3.5" />
+              </.link>
               <.export_buttons play={play} />
             </div>
           </div>

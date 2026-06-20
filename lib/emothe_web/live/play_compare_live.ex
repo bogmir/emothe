@@ -1,4 +1,4 @@
-defmodule EmotheWeb.Admin.PlayCompareLive do
+defmodule EmotheWeb.PlayCompareLive do
   use EmotheWeb, :live_view
 
   import EmotheWeb.Components.PlayText
@@ -7,8 +7,8 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
   alias EmotheWeb.PlayComparison
 
   @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    play = Catalogue.get_play_with_all!(id)
+  def mount(%{"code" => code}, _session, socket) do
+    play = Catalogue.get_play_by_code_with_all!(code)
     family = PlayComparison.build_family(play)
     panels = PlayComparison.build_initial_panels(play, family)
 
@@ -20,12 +20,10 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
      |> assign(:family, family)
      |> PlayComparison.assign_display_defaults()
      |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Plays"), to: ~p"/admin/plays"},
-       %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
+       %{label: gettext("Catalogue"), to: ~p"/plays"},
+       %{label: play.title, to: ~p"/plays/#{play.code}"},
        %{label: gettext("Comparison")}
-     ])
-     |> assign(:play_context, %{play: play, active_tab: :compare})}
+     ])}
   end
 
   @impl true
@@ -71,6 +69,13 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
     <div class="mx-auto max-w-full px-4 py-4">
       <%!-- Toolbar --%>
       <div class="mb-4 flex flex-wrap items-center gap-4 rounded-box border border-base-300 bg-base-100 px-4 py-2 shadow-sm">
+        <.link
+          navigate={~p"/plays/#{@play.code}"}
+          class="btn btn-xs btn-ghost gap-1 text-base-content/60 hover:text-primary"
+        >
+          <.icon name="hero-arrow-left-mini" class="size-3.5" />
+          {gettext("Back to play")}
+        </.link>
         <span class="text-xs font-semibold text-base-content/50">{gettext("Display")}</span>
         <label class="flex items-center gap-1.5 text-xs cursor-pointer">
           <input
@@ -113,19 +118,8 @@ defmodule EmotheWeb.Admin.PlayCompareLive do
           /> {gettext("Verse type")}
         </label>
 
-        <%!-- Export & Add play --%>
-        <div class="ml-auto flex items-center gap-2">
-          <a
-            href={
-              ~p"/admin/plays/compare/export/html?plays=#{Enum.map_join(@panels, ",", & &1.play.id)}"
-            }
-            class="btn btn-xs btn-outline gap-1"
-          >
-            <.icon name="hero-arrow-down-tray-mini" class="size-3.5" />
-            {gettext("Export HTML")}
-          </a>
-        </div>
-        <div :if={@available != [] && length(@panels) < 4} class="flex items-center gap-2">
+        <%!-- Add play --%>
+        <div :if={@available != [] && length(@panels) < 4} class="ml-auto flex items-center gap-2">
           <form phx-change="add_play" class="inline">
             <select name="id" class="select select-xs select-bordered w-64">
               <option value="">{gettext("Add play to compare...")}</option>

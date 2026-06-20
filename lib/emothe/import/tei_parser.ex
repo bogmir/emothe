@@ -1016,6 +1016,9 @@ defmodule Emothe.Import.TeiParser do
     end)
     |> Enum.reject(&is_nil/1)
     |> Enum.map(& &1.id)
+    # A who attribute may repeat the same ref (e.g. "#horatio #barnardo #marcellus #barnardo")
+    # which would otherwise violate the element_characters unique index.
+    |> Enum.uniq()
   end
 
   # --- XML helpers ---

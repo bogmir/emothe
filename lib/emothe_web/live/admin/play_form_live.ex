@@ -48,14 +48,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     play = Catalogue.get_play!(id)
-
-    if play.is_complete do
-      socket
-      |> put_flash(:warning, gettext("Set to Draft to edit."))
-      |> push_navigate(to: ~p"/admin/plays/#{play.id}")
-    else
-      apply_edit_action(socket, play)
-    end
+    apply_edit_action(socket, play)
   end
 
   defp apply_edit_action(socket, play) do

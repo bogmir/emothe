@@ -251,6 +251,7 @@ defmodule Emothe.Catalogue do
     query =
       Play
       |> where([p], is_nil(p.parent_play_id))
+      |> where([p], p.is_complete == true)
       |> apply_search_grouped(opts[:search])
       |> apply_sort(opts[:sort] || :title_sort)
 
@@ -270,13 +271,18 @@ defmodule Emothe.Catalogue do
       end
 
     Repo.preload(plays,
-      derived_plays: from(d in Play, order_by: [asc: d.title_sort, asc: d.title])
+      derived_plays:
+        from(d in Play,
+          where: d.is_complete == true,
+          order_by: [asc: d.title_sort, asc: d.title]
+        )
     )
   end
 
   def count_plays_grouped(opts \\ []) do
     Play
     |> where([p], is_nil(p.parent_play_id))
+    |> where([p], p.is_complete == true)
     |> apply_search_grouped(opts[:search])
     |> Repo.aggregate(:count, :id)
   end
@@ -290,6 +296,7 @@ defmodule Emothe.Catalogue do
     derived_match =
       from(d in Play,
         where: not is_nil(d.parent_play_id),
+        where: d.is_complete == true,
         where:
           ilike(d.title, ^pattern) or
             ilike(d.author_name, ^pattern) or

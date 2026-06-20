@@ -8,30 +8,22 @@ defmodule EmotheWeb.Admin.PlaySourcesLive do
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     play = Catalogue.get_play!(id)
+    sources = Catalogue.list_play_sources(play.id)
 
-    if play.is_complete do
-      {:ok,
-       socket
-       |> put_flash(:warning, gettext("Set to Draft to edit."))
-       |> push_navigate(to: ~p"/admin/plays/#{play.id}")}
-    else
-      sources = Catalogue.list_play_sources(play.id)
-
-      {:ok,
-       socket
-       |> assign(:page_title, "#{play.title} — #{gettext("Sources")}")
-       |> assign(:play, play)
-       |> assign(:sources, sources)
-       |> assign(:editing_source, nil)
-       |> assign(:source_form, nil)
-       |> assign(:breadcrumbs, [
+    {:ok,
+     socket
+     |> assign(:page_title, "#{play.title} — #{gettext("Sources")}")
+     |> assign(:play, play)
+     |> assign(:sources, sources)
+     |> assign(:editing_source, nil)
+     |> assign(:source_form, nil)
+     |> assign(:breadcrumbs, [
          %{label: gettext("Admin"), to: ~p"/admin/plays"},
          %{label: gettext("Plays"), to: ~p"/admin/plays"},
          %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
          %{label: gettext("Sources")}
        ])
        |> assign(:play_context, %{play: play, active_tab: :sources})}
-    end
   end
 
   @impl true

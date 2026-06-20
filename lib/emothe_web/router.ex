@@ -68,6 +68,7 @@ defmodule EmotheWeb.Router do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
+      layout: {EmotheWeb.Layouts, :app},
       on_mount: [
         EmotheWeb.SetLocaleHook,
         {EmotheWeb.UserAuth, :redirect_if_user_is_authenticated}

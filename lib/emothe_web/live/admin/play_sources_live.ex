@@ -18,12 +18,12 @@ defmodule EmotheWeb.Admin.PlaySourcesLive do
      |> assign(:editing_source, nil)
      |> assign(:source_form, nil)
      |> assign(:breadcrumbs, [
-         %{label: gettext("Admin"), to: ~p"/admin/plays"},
-         %{label: gettext("Plays"), to: ~p"/admin/plays"},
-         %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
-         %{label: gettext("Sources")}
-       ])
-       |> assign(:play_context, %{play: play, active_tab: :sources})}
+       %{label: gettext("Admin"), to: ~p"/admin/plays"},
+       %{label: gettext("Plays"), to: ~p"/admin/plays"},
+       %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
+       %{label: gettext("Sources")}
+     ])
+     |> assign(:play_context, %{play: play, active_tab: :sources})}
   end
 
   @impl true

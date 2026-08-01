@@ -268,6 +268,17 @@ mix emothe.import.tei --dry-run   # report what would happen, write nothing
 mix emothe.import.tei --force     # re-import every file, updating in place
 ```
 
+Correct `language`, `relationship_type` and `parent_play_id` from the FileMaker published index
+(`doc/w3emothe_T01_tituloEM.ndjson`, git-ignored):
+
+```bash
+mix emothe.import.filemaker --dry-run   # print the changes, write nothing
+mix emothe.import.filemaker             # apply them
+```
+
+The TEI header is not authoritative for language — every EMOTHE file carries `xml:lang="es"` for
+the editorial platform. The index's `[EN]`/`[FR]` tag is.
+
 `mix gettext.extract --merge` works in this repo; note that it fuzzy-matches new strings onto unrelated existing translations. Check every entry it marks fuzzy before trusting it.
 
 Then visit:
@@ -351,7 +362,8 @@ Then visit:
 ### Low Priority / Future
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
 - [x] **Soft delete & re-importable plays (S0b)** — `plays.deleted_at`, `origin` on the three mixed-ownership child tables, re-import updates in place, import preview + `--dry-run`, admin archive filter and restore. Plan: `docs/superpowers/plans/2026-08-01-soft-delete-and-reimport.md`
-- [ ] **FileMaker import (S1-S8)** — work families and language, version metadata, witnesses, bibliography, historical performances, credits, genre. Roadmap: `docs/superpowers/plans/2026-08-01-filemaker-import-slices.md`; S1 has a full plan. Governing rule: the export is a bootstrap, not a dependency — every field it carries gets a permanent column *and* an admin form
+- [ ] **FileMaker import (S2-S8)** — version metadata, witnesses, bibliography, historical performances, credits, genre. Roadmap: `docs/superpowers/plans/2026-08-01-filemaker-import-slices.md`. Governing rule: the export is a bootstrap, not a dependency — every field it carries gets a permanent column *and* an admin form
+- [x] **FileMaker work families and language (S1)** — `Emothe.Import.Filemaker` parses the published index out of the NDJSON export; `Emothe.Import.FilemakerSync` diffs it against the database and writes `language`, `relationship_type` and `parent_play_id`. `mix emothe.import.filemaker [--dry-run] [--path ...]`. Creates nothing; codes absent from the index (every `AL####`) are reported, not failed. Plan: `docs/superpowers/plans/2026-08-01-s1-work-families-and-language.md`
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
 - [x] **Activity log** - `activity_logs` table tracks all admin actions (create/update/delete/import/export/role_change) with user, play, resource type, changes, and metadata; admin UI at `/admin/activity-log` with filters (action, resource, user, date range) and pagination

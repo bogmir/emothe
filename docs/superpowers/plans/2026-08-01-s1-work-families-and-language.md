@@ -59,7 +59,7 @@ task gives the same thing a mix task, deduplicated, so it can be re-run.
     option `:force` (default `false`) re-imports codes already in the database
   - `Emothe.Import.TeiCorpus.base_code(code :: String.t()) :: String.t()`
 
-- [ ] **Step 1: Write the failing test for file collection**
+- [x] **Step 1: Write the failing test for file collection**
 
 Create `test/emothe/import/tei_corpus_test.exs`:
 
@@ -110,7 +110,7 @@ defmodule Emothe.Import.TeiCorpusTest do
 end
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 mix test test/emothe/import/tei_corpus_test.exs
@@ -118,7 +118,7 @@ mix test test/emothe/import/tei_corpus_test.exs
 
 Expected: FAIL with `** (UndefinedFunctionError) function Emothe.Import.TeiCorpus.base_code/1 is undefined (module Emothe.Import.TeiCorpus is not available)`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `lib/emothe/import/tei_corpus.ex`:
 
@@ -189,7 +189,7 @@ defmodule Emothe.Import.TeiCorpus do
 end
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe/import/tei_corpus_test.exs
@@ -197,7 +197,7 @@ mix test test/emothe/import/tei_corpus_test.exs
 
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the failing test for import_all**
+- [x] **Step 5: Write the failing test for import_all**
 
 Append to `test/emothe/import/tei_corpus_test.exs`, inside the module:
 
@@ -232,7 +232,7 @@ Append to `test/emothe/import/tei_corpus_test.exs`, inside the module:
   end
 ```
 
-- [ ] **Step 6: Run the test to verify it passes**
+- [x] **Step 6: Run the test to verify it passes**
 
 The implementation from Step 3 already covers this — it is a behaviour check on code written for
 the previous test, so it should pass without new code.
@@ -244,7 +244,7 @@ mix test test/emothe/import/tei_corpus_test.exs
 Expected: PASS, 4 tests. If the first assertion fails on `play.code`, read
 `lib/emothe/import/tei_parser.ex:190` — the code comes from `<title key="archivo">`.
 
-- [ ] **Step 7: Add the mix task**
+- [x] **Step 7: Add the mix task**
 
 Create `lib/mix/tasks/emothe.import.tei.ex`:
 
@@ -295,7 +295,7 @@ defmodule Mix.Tasks.Emothe.Import.Tei do
 end
 ```
 
-- [ ] **Step 8: Run it against the real corpus**
+- [x] **Step 8: Run it against the real corpus**
 
 ```bash
 mix emothe.import.tei
@@ -305,7 +305,7 @@ Expected: `82 file(s) in test/fixtures, test/fixtures/tei_files` and a summary l
 already present are skipped. Any file that fails to parse is printed with its reason — record the
 list in the commit message, do not fix parser bugs in this task.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 mix format
@@ -340,7 +340,7 @@ git commit -m "feat: mix task to bulk-import the local TEI corpus"
   ```
 - Produces: `Emothe.Import.Filemaker.default_path() :: String.t()`
 
-- [ ] **Step 1: Create the test fixture**
+- [x] **Step 1: Create the test fixture**
 
 Create `test/fixtures/filemaker/index_sample.ndjson`. Three lines, mirroring the real export's
 shape (envelope line, then one record per work; every field value is a one-element array):
@@ -351,7 +351,7 @@ shape (envelope line, then one record per work; every field value is a one-eleme
 {"record_id":"90","mod_id":"12","fields":{"_kp_IdIndiceEM":["90"],"_IdIndiceCtce":["393"],"bus_autor":["Rojas, Fernando de"],"pub_tituloOrden":["Spanish Bawd"],"bus_paralelo":[""],"pub_listaObras":["<ul>\n<li><span style=\"font-size: x-small\">[EN] </span><a href=\"textosEMOTHE/HIE0393_TheSpanishBawd.php\" target=\"_blank\"><i>THE SPANISH BAWD</i></a><span style=\"font-size: x-small;margin-left: 25px;\">James Mabbe, tra.</span><span style=\"font-size: x-small;margin-left: 25px;\"><a href=\"textosXML/HIE0393_TheSpanishBawd.xml\" download=\"HIE0393_TheSpanishBawd.xml\">[xml]</a></span></li>\n</ul>"]}}
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Create `test/emothe/import/filemaker_test.exs`:
 
@@ -409,7 +409,7 @@ defmodule Emothe.Import.FilemakerTest do
 end
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 ```bash
 mix test test/emothe/import/filemaker_test.exs
@@ -417,7 +417,7 @@ mix test test/emothe/import/filemaker_test.exs
 
 Expected: FAIL — `Emothe.Import.Filemaker is not available`.
 
-- [ ] **Step 4: Write the implementation**
+- [x] **Step 4: Write the implementation**
 
 Create `lib/emothe/import/filemaker.ex`:
 
@@ -519,7 +519,7 @@ defmodule Emothe.Import.Filemaker do
 end
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe/import/filemaker_test.exs
@@ -529,7 +529,7 @@ Expected: PASS, 8 tests. If `family` comes back empty, the `@version` regex did 
 `Regex.scan(@version, html)` in IEx against the fixture and compare against the `<li>` shape in the
 fixture file.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 mix format
@@ -574,7 +574,7 @@ Pure function, no writes. This is what `--dry-run` prints and what the apply ste
 | family has an `ed.` version we have not imported | leave `parent_play_id` alone |
 | code not in the index at all | report under `missing`, change nothing |
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `test/emothe/import/filemaker_sync_test.exs`:
 
@@ -676,7 +676,7 @@ defmodule Emothe.Import.FilemakerSyncTest do
 end
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -684,7 +684,7 @@ mix test test/emothe/import/filemaker_sync_test.exs
 
 Expected: FAIL — `Emothe.Import.FilemakerSync is not available`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `lib/emothe/import/filemaker_sync.ex`:
 
@@ -782,7 +782,7 @@ defmodule Emothe.Import.FilemakerSync do
 end
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -790,7 +790,7 @@ mix test test/emothe/import/filemaker_sync_test.exs
 
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 mix format
@@ -812,7 +812,7 @@ git commit -m "feat: diff the FileMaker index against imported plays"
   where `result` is `{:ok, code}` | `{:error, code, %Ecto.Changeset{}}`; option `:user_id`
   (default `nil`) is attached to each activity-log entry
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `test/emothe/import/filemaker_sync_test.exs`, inside the module:
 
@@ -854,7 +854,7 @@ Append to `test/emothe/import/filemaker_sync_test.exs`, inside the module:
   end
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -862,7 +862,7 @@ mix test test/emothe/import/filemaker_sync_test.exs
 
 Expected: FAIL — `function Emothe.Import.FilemakerSync.apply_plan/1 is undefined or private`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Add to `lib/emothe/import/filemaker_sync.ex`:
 
@@ -901,7 +901,7 @@ Add to `lib/emothe/import/filemaker_sync.ex`:
   end
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -918,7 +918,7 @@ If `Catalogue.update_play/2` rejects `relationship_type: nil`, re-read
 must pass. A failure there means the changeset gained a `validate_required` since this plan was
 written; fix the changeset, not the sync.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 mix format
@@ -937,7 +937,7 @@ git commit -m "feat: apply FileMaker index changes with an activity log entry"
 - Consumes: `Emothe.Import.Filemaker.load_index/1`, `Emothe.Import.FilemakerSync.all_plays/0`,
   `plan/2`, `apply_plan/2`
 
-- [ ] **Step 1: Write the task**
+- [x] **Step 1: Write the task**
 
 Create `lib/mix/tasks/emothe.import.filemaker.ex`:
 
@@ -1017,7 +1017,7 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
 end
 ```
 
-- [ ] **Step 2: Verify the task compiles and the dry run works**
+- [x] **Step 2: Verify the task compiles and the dry run works**
 
 ```bash
 mix compile --warnings-as-errors
@@ -1040,7 +1040,7 @@ EMOTHE0053  Hamlet
 If Task 1 imported the whole corpus, many more plays appear — that is expected; what matters is
 that those three are present and that no `AL####` code shows up under changes.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 mix format
@@ -1054,7 +1054,7 @@ git commit -m "feat: mix emothe.import.filemaker with a dry-run report"
 
 **Files:** none — this is the acceptance pass.
 
-- [ ] **Step 1: Snapshot the current state**
+- [x] **Step 1: Snapshot the current state**
 
 ```bash
 PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAF'|' \
@@ -1063,7 +1063,7 @@ PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAF'|' \
 wc -l /tmp/plays-before.txt
 ```
 
-- [ ] **Step 2: Apply**
+- [x] **Step 2: Apply**
 
 ```bash
 mix emothe.import.filemaker
@@ -1071,7 +1071,7 @@ mix emothe.import.filemaker
 
 Expected: `updated N, failed 0`.
 
-- [ ] **Step 3: Verify the three known corrections landed**
+- [x] **Step 3: Verify the three known corrections landed**
 
 ```bash
 PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAF'|' -c \
@@ -1087,7 +1087,7 @@ EMOTHE0038|en|-
 EMOTHE0053|es|traduccion
 ```
 
-- [ ] **Step 4: Verify the family links**
+- [x] **Step 4: Verify the family links**
 
 ```bash
 PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAF'|' -c \
@@ -1099,7 +1099,7 @@ Expected: the Hamlet family (`EMOTHE0050`, `EMOTHE0053`, `EMOTHE0059` → `EMOTH
 Antony family (`EMOTHE0052`, `EMOTHE0084`, `EMOTHE0139` → `EMOTHE0038`), plus whatever other
 complete families Task 1 imported.
 
-- [ ] **Step 5: Look at the app**
+- [x] **Step 5: Look at the app**
 
 ```bash
 mix phx.server
@@ -1113,7 +1113,7 @@ Check, without changing any UI code:
 - `/admin/plays/<id>/compare` — the comparison picker offers the family
   (`lib/emothe_web/live/play_comparison.ex:43`)
 
-- [ ] **Step 6: Run the whole suite**
+- [x] **Step 6: Run the whole suite**
 
 ```bash
 mix test
@@ -1123,7 +1123,7 @@ Expected: PASS. `test/emothe/roundtrip_test.exs` reads the fixture files directl
 touch `language` or `relationship_type`, so it should be unaffected; if it fails, read the failure
 before assuming this slice caused it.
 
-- [ ] **Step 7: Re-run the analysis page and commit**
+- [x] **Step 7: Re-run the analysis page and commit**
 
 ```bash
 python3 docs/build_import_analysis.py

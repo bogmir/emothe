@@ -1,0 +1,3477 @@
+<?xml version="1.0" ?>
+<TEI xml:lang="es" xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader><fileDesc> 
+<titleStmt> 
+	   <title type="traduccion">Auto de la barca del infierno</title>
+<title type="original">Auto da barca do inferno</title> 
+	   <title type="edicion">Auto de la barca del infierno / Gil Vicente: Tra. Lapenña, Alejandro 
+L.: codificación TEI para EMOTHE</title> 
+		 <title key="orden">Auto de la barca del infierno</title> 
+		 <title key="archivo">EMOTHE0759_AutoDeLaBarcaDelInfierno</title> 
+		  
+	   <editor role="translator"><persName>Lapeña, Alejandro L.
+L.</persName></editor>
+<author ana="fiable">Gil Vicente</author> 
+		 <author key="orden">Vicente, Gil</author> 
+		  
+	         <sponsor>  
+	           <orgName>Plan Nacional de Investigación Científica, Desarrollo e Innovación Tecnológica (Plan Nacional de I+D+i)</orgName>  
+	         </sponsor> 
+	         <funder> 
+              <orgName> Ministerio de Ciencia e Innovación – Agencia Estatal de Investigación -FEDER/ERDF:  "Teatro español y europeo de los siglos XVI y XVII: patrimonio y bases de datos" (EMOTHE) ref. PID2019-104045GB-C54 (2020-06-01 / 2023-05-31);  Ministerio de Ciencia, Innovación y Universidades, Ministerio de Economía y Competitividad – Agencia Estatal de Investigación -FEDER/ERDF:  "Teatro europeo de los siglos XVI y XVII: patrimonio y bases de datos" (EMOTHE) ref. FFI2016-80314-P (2016-12-30 /2019-12-31); Programa Estatal Redes de Excelencia, "Red del Patrimonio Teatral Clásico Español", ref. FFI2015-71441-REDC (2015-12-01 / 2017-11-30); Ministerio de Ciencia e Innovación, "Base de datos, argumentos y textos del teatro clásico español", ref. FFI2012-34347 (2013-02-01 / 2016-12-31); Ministerio de Ciencia e Innovación, "Patrimonio teatral clásico español: textos e instrumentos de investigación", ref. CSD 2009-00033 (2009-12-17 / 2014-12-13); Ministerio de Ciencia e Innovación, "ARTELOPE. Base de datos, argumentos y textos del teatro clásico español", ref. FFI2009-12730 (2010-01-01 / 2012-12-31)</orgName> 
+	        </funder> 
+	        <respStmt>  
+           <resp>Electronic edition: text adapted, edited for XML and encoded by</resp> 
+           <persName>Tronch Pérez, Jesús</persName> 
+	        </respStmt> 
+	        <principal>Joan Oleza Simó</principal> 
+	    </titleStmt> 
+ 
+		<extent ana="verso">846</extent> 
+	    <publicationStmt> 
+	        <publisher> 
+              <orgName> ARTELOPE/EMOTHE Universitat de València</orgName> 
+	        </publisher> 
+	        <authority>  
+	            <orgName>Universitat de València - Estudi General. http://www.uv.es</orgName>  
+	        </authority> 
+	        <idno type="EMOTHE">0759</idno> 
+	        <availability> 
+             <p>La Biblioteca Digital EMOTHE: The Classics of Early Modern European Theatre pertenece al proyecto EMOTHE del grupo de investigación ARTELOPE y ofrece en la web textos completos en acceso abierto, según la licencia que se indique. Se ruega citar la procedencia: "Oleza, Joan et al. EMOTHE: The Classics of Early Modern European Theatre. Valencia: ARTELOPE/EMOTHE Universitat de València, 2010-. https://emothe.uv.es/biblioteca/"</p> 
+              <licence target="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">Esta obra está bajo una Licencia Creative Commons Atribución-NoComercial-SinDerivadas 4.0 Internacional (CC BY-NC-ND 4.0)</licence>  
+	        </availability> 
+		<pubPlace>Valencia</pubPlace>	         
+		<date>2025</date> 
+	    </publicationStmt> 
+	     
+	    
+<sourceDesc>
+<bibl>
+<title>Auto de la barca del infierno</title>
+<author>Vicente, Gil</author>
+<editor role="traductor">Lapenña, Alejandro 
+L.</editor>
+<lang>Español</lang>
+<note>Vicente, Gil. <emph>Auto de la barca del infierno</emph>. Traducido por Alejandro L. Lapeña (2021). Valencia: EMOTHE Universitat de València, 2025.</note>
+</bibl>
+</sourceDesc> 
+	</fileDesc>  
+   <encodingDesc> 
+       <projectDesc> 
+           <p>La Biblioteca Digital EMOTHE (antes denominada Colección de Textos Clásicos Europeos (CTCE)) supone la creación de una base de datos de teatro clásico europeo en diferentes idiomas, versiones y refundiciones, todas ellas hipervinculadas.</p>   
+           <p>Carlos Muñoz Pons es responsable de (1) la programación de FileMaker para que genere archivos XML en formato TEI, a partir de los cuáles se generan estadísticas sobre aspectos de las obras; (2) el desarrollo del programa de generación de estas estadísticas; (3) el desarrollo de la hoja de transformación XSL para generar los archivos HMTL-PHP para su visualización en web; y (4) el desarrollo del programa para enlazar original y traducciones para su visualización en paralelo.</p> 
+       </projectDesc> 
+       <editorialDecl> 
+            <p>Las presentes ediciones digitales están basadas, en su mayor parte, en ediciones científicas de reconocido prestigio y se ha tratado, en la mayoría de ocasiones, de respetar sus criterios de edición. Solo en casos muy puntuales el editor digital ha introducido leves cambios de los que da cumplida cuenta en el apartado de "Notas".</p> 
+       </editorialDecl> 
+	      <classDecl> 
+            <taxonomy xml:id="CDU"> 
+                <bibl>Clasificación Decimal Universal</bibl> 
+            </taxonomy> 
+       </classDecl> 
+	      <appInfo> 
+            <application ident="FMPA" version="16"> 
+                <label>FileMaker Pro Advanced 16</label> 
+            </application> 
+            <application ident="FMSA" version="16"> 
+                <label>FileMaker Server 16</label> 
+            </application> 
+            <application ident="FMP" version="16"> 
+                <label>FileMaker Pro 16</label> 
+            </application> 
+            <application ident="Oxygen" version="20.1"> 
+                <label>Oxygen XML Editor 20.1</label> 
+            </application> 
+        </appInfo> 
+    </encodingDesc> 
+    <profileDesc> 
+	     <langUsage> 
+	       <language ident="es-ES">Español</language> 
+	     </langUsage> 
+      <textClass> 
+         <classCode scheme="#CDU">821.134.2-2</classCode> 
+      </textClass> 
+    </profileDesc> 
+    <revisionDesc>  
+        <change>   
+            <date></date>  
+         </change>   
+    </revisionDesc>
+</teiHeader>
+<text>
+<front><titlePage> 						
+<docTitle>
+<titlePart>
+<title>Auto de la barca del infierno</title>
+</titlePart>
+</docTitle> 						
+<docAuthor>Gil Vicente</docAuthor> 						
+</titlePage>
+<div type="introduccion_editor_digital">
+<head>Nota a esta edición digital</head>
+<p>Esta publicación es parte del proyecto I+D+i «EMOTHE: Second Phase of Early Modern Spanish and European Theatre: heritage and databases (ASODAT Third Phase)», referencia PID2022-136431NB-C65, financiado por MICIN/AEI/10.13039/501100011033 y por FEDER Una manera de hacer Europa.<lb/></p>
+</div>
+
+<div type="argumento">
+<head>[Argumento]</head>
+<p>Se representa en la obra siguiente una prefiguración sobre la rigurosa acusación que los enemigos hacen a todas las almas humanas en el punto en el que, por muerte de sus terrestres cuerpos, parten. Para tratar este tema, imagina el autor que, en ese momento, cuando acabamos de expirar, llegamos súbitamente a un profundo brazo de mar donde hay dos barcas: una de ellas lleva al paraíso y la otra al infierno. Se divide en tres partes: por cada embarcación, una escena. Esta primera es la del viaje al infierno.<lb/></p>
+</div>
+
+<div type="elenco">
+<head>El elenco es el siguiente</head>
+<p>Primera escena: barca del infierno, con su Barquero y sus Remeros, diablos. <lb/>Segunda escena: barca del paraíso, con su Barquero y sus Remeros, ángeles.<lb/>Pasajeros: Hidalgo, Usurero, Joane (Tonto), Zapatero, Fraile, Florencia, Alcahueta (Brísida), Judío, Corregidor, Procurador, Ahorcado, cuatro Caballeros.</p>
+<castList>
+<castItem ana="oculto"><role xml:id="remero">Remero</role></castItem>
+<castItem ana="oculto"><role xml:id="companero">Compañero</role></castItem>
+<castItem ana="oculto"><role xml:id="diablo">Diablo</role></castItem>
+<castItem ana="oculto"><role xml:id="hidalgo">Hidalgo</role></castItem>
+<castItem ana="oculto"><role xml:id="angel">Ángel</role></castItem>
+<castItem ana="oculto"><role xml:id="usurero">Usurero</role></castItem>
+<castItem ana="oculto"><role xml:id="tonto">Tonto</role></castItem>
+<castItem ana="oculto"><role xml:id="zapatero">Zapatero</role></castItem>
+<castItem ana="oculto"><role xml:id="fraile">Fraile</role></castItem>
+<castItem ana="oculto"><role xml:id="Brisida_alcahueta">Brísisda</role><roleDesc>alcahueta</roleDesc></castItem>
+<castItem ana="oculto"><role xml:id="judio">Judío</role></castItem>
+<castItem ana="oculto"><role xml:id="corregidor">Corregidor</role></castItem>
+<castItem ana="oculto"><role xml:id="procurador">Procurador</role></castItem>
+<castItem ana="oculto"><role xml:id="ahorcado">Ahorcado</role></castItem>
+<castItem ana="grupo oculto"><role xml:id="caballeros">Caballeros</role></castItem>
+<castItem ana="oculto"><role xml:id="caballero">Caballero</role></castItem>
+<castItem ana="oculto"><role xml:id="Caballero_otro">Otro caballero</role></castItem>
+</castList>
+</div>
+</front>
+<body>
+<div1 type="play" n="0">
+
+<sp xml:id="em0759-es-sp-0001" who="#remero">
+<speaker>REMERO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0001" n="1" rend="indent">A la barca, a la barca, ¡ulá!</l>
+
+<l xml:id="em0759-es-0002" n="2">Que tenemos buena marea</l>
+
+<l xml:id="em0759-es-0003" n="3">Traigan a popa la correa.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0002" who="#remero">
+<speaker>REMERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0004" n="4" part="I">¡Hecho, hecho!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0003" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0005" part="F">Bien está.</l>
+
+<l xml:id="em0759-es-0006" n="5">Vamos rápido, sin demora,</l>
+
+<l xml:id="em0759-es-0007" n="6">y aquella soga deja</l>
+
+<l xml:id="em0759-es-0008" n="7">y aquel banco despeja</l>
+
+<l xml:id="em0759-es-0009" n="8">para la gente que se incorpora.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0010" n="9" rend="indent">A la barca, a la barca, ¡uuuh!</l>
+
+<l xml:id="em0759-es-0011" n="10">Rápido, que se quiere ir.</l>
+
+<l xml:id="em0759-es-0012" n="11">¡Oh! Es hora de partir.</l>
+
+<l xml:id="em0759-es-0013" n="12">Loas a Belcebú.</l>
+
+<l xml:id="em0759-es-0014" n="13">Pero venga. Vas muy lento.</l>
+
+<l xml:id="em0759-es-0015" n="14">Despeja todo ese lecho.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0004" who="#remero">
+<speaker>REMERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0016" n="15">A buenas horas, ¡ya está hecho!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0005" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0017" n="16">Baja corriendo ese asiento.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0018" n="17" rend="indent">Pon este pujamen recto</l>
+
+<l xml:id="em0759-es-0019" n="18">y alivia aquella driza.</l>
+
+<l xml:id="em0759-es-0020" n="19">¡Oh, suelta! ¡Oh, iza! ¡Iza!</l>
+
+<l xml:id="em0759-es-0021" n="20">¡Oh, qué barco tan perfecto!</l>
+
+<l xml:id="em0759-es-0022" n="21">Pon banderas, que es fiesta.</l>
+
+<l xml:id="em0759-es-0023" n="22">¡Verga alta! ¡Ancla a pique!</l>
+
+<l xml:id="em0759-es-0024" n="23">¡Oh, preciado don Enrique!</l>
+
+<l xml:id="em0759-es-0025" n="24">¿Aquí venís vos? ¿Qué cosa es esta?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0006" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0026" n="25" rend="indent">¿Esta barca dónde va ahora</l>
+
+<l xml:id="em0759-es-0027" n="26">que está así preparada?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0007" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0028" n="27">Va a la isla extraviada</l>
+
+<l xml:id="em0759-es-0029" n="28">y ha de partir sin demora.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0008" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0030" n="29">¿Hacia allí va la señora?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0009" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0031" n="30">¡Señor! A su servicio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0010" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0032" n="31">Me parece mal compañera</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0011" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0033" n="32">Porque la veis desde fuera.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0012" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0034" n="33">Pero ¿a qué tierra pasáis?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0013" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0035" n="34">Al infierno, señor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0014" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0036" n="35">La tierra es buen sinsabor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0015" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0037" n="36">¿Qué? ¿Y también aquí os mofáis?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0016" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0038" n="37">¿Y pasajeros encontráis, caballero,</l>
+
+<l xml:id="em0759-es-0039" n="38">para tal habitación?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0017" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0040" n="39">Os veo en buena dirección</l>
+
+<l xml:id="em0759-es-0041" n="40">para ir a nuestro embarcadero...</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0018" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0042" n="41" rend="indent">¿Te parece a ti...?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0019" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0043" n="42">¿En qué esperas tener guarida?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0020" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0044" n="43">Yo dejo en la otra vida</l>
+
+<l xml:id="em0759-es-0045" n="44">a quien rece siempre por mí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0021" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0046" n="45">¿Quien rece siempre por ti?</l>
+
+<l xml:id="em0759-es-0047" n="46">Ji, ji, ji, ji, ji, ji...</l>
+
+<l xml:id="em0759-es-0048" n="47">¿Tú viviste a tu placer</l>
+
+<l xml:id="em0759-es-0049" n="48">buscando aquí el perdón aparecer</l>
+
+<l xml:id="em0759-es-0050" n="49">porque rezan allí por ti?</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0051" n="50" rend="indent">¡Embarca! Bueno... ¡Embarcad!</l>
+
+<l xml:id="em0759-es-0052" n="51">Que tenéis que ir al final.</l>
+
+<l xml:id="em0759-es-0053" n="52">Mandar poner una silla igual,</l>
+
+<l xml:id="em0759-es-0054" n="53">que así pasó vuestra paternidad.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0022" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0055" n="54">¿Qué? ¿Qué? ¿Qué? ¿Ya se va?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0023" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0056" n="55">Va o viene, pronto embarcad.</l>
+
+<l xml:id="em0759-es-0057" n="56">Según lo que elegisteis, la verdad,</l>
+
+<l xml:id="em0759-es-0058" n="57">así aquí os aparecerá.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0059" n="58" rend="indent">Como la muerte ya pasaste,</l>
+
+<l xml:id="em0759-es-0060" n="59">tendréis que pasar el río.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0024" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0061" n="60">¿No hay aquí otro navío?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0025" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0062" n="61">No, señor, que este fletaste</l>
+
+<l xml:id="em0759-es-0063" n="62">y, en cuanto expiraste,</l>
+
+<l xml:id="em0759-es-0064" n="63">me disteis la señal.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0026" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0065" n="64">¿Qué señal fue tal?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0027" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0066" n="65">De lo que vos os contentasteis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0028" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0067" n="66">A esta otra barca me iré.</l>
+
+<l xml:id="em0759-es-0068" n="67">¡Eh, la barca! ¿Adónde vais?</l>
+
+<l xml:id="em0759-es-0069" n="68">¡Eh, remeros! ¿Me escucháis?</l>
+
+<l xml:id="em0759-es-0070" n="69">¡Respondedme! ¡Eh! ¡Eh!</l>
+
+<l xml:id="em0759-es-0071" n="70">Por Dios, ¡aviado estoy!</l>
+
+<l xml:id="em0759-es-0072" n="71">Solo va a peor la situación.</l>
+
+<l xml:id="em0759-es-0073" n="72">¡Qué burros! Con perdón.</l>
+
+<l xml:id="em0759-es-0074" n="73">Se creen que un perdido soy.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0029" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0075" n="74" part="I">¿Qué mandáis?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0030" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0076" part="F">Que me digáis,</l>
+
+<l xml:id="em0759-es-0077" n="75">pues partí así sin aviso,</l>
+
+<l xml:id="em0759-es-0078" n="76">si la barca del paraíso</l>
+
+<l xml:id="em0759-es-0079" n="77">es esta en que navegáis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0031" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0080" n="78">Esta es, ¿qué demandáis?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0032" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0081" n="79">Que me dejéis embarcar, prevengo,</l>
+
+<l xml:id="em0759-es-0082" n="80">soy hidalgo de abolengo</l>
+
+<l xml:id="em0759-es-0083" n="81">y que bien me recojáis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0033" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0084" n="82" rend="indent">No se embarca tiranía</l>
+
+<l xml:id="em0759-es-0085" n="83">en este navío divino.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0034" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0086" n="84">No sé por qué mal destino</l>
+
+<l xml:id="em0759-es-0087" n="85">le dais a mi señoría.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0035" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0088" n="86">Para vuestra fantasía</l>
+
+<l xml:id="em0759-es-0089" n="87">muy pequeña es esta barca.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0036" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0090" n="88">Para señor de tal marca,</l>
+
+<l xml:id="em0759-es-0091" n="89">¿no hay aquí más cortesía?</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0092" n="90" rend="indent">¡Vengan planchas y atavíos!</l>
+
+<l xml:id="em0759-es-0093" n="91">¡Llevadme de esta ribera!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0037" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0094" n="92">No venís vos de manera</l>
+
+<l xml:id="em0759-es-0095" n="93">para entrar en este navío.</l>
+
+<l xml:id="em0759-es-0096" n="94">Ese otro va más vacío:</l>
+
+<l xml:id="em0759-es-0097" n="95">la silla entrará</l>
+
+<l xml:id="em0759-es-0098" n="96">y la cola cabrá</l>
+
+<l xml:id="em0759-es-0099" n="97">y todo vuestro señorío.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0100" n="98" rend="indent">Iréis allí más espacioso,</l>
+
+<l xml:id="em0759-es-0101" n="99">vos y vuestra señoría,</l>
+
+<l xml:id="em0759-es-0102" n="100">cuidando de vuestra tiranía,</l>
+
+<l xml:id="em0759-es-0103" n="101">aunque os hagáis silencioso.</l>
+
+<l xml:id="em0759-es-0104" n="102">Y porque, tan generoso,</l>
+
+<l xml:id="em0759-es-0105" n="103">despreciaste a los mendigos,</l>
+
+<l xml:id="em0759-es-0106" n="104">hallaréis aquí el castigo,</l>
+
+<l xml:id="em0759-es-0107" n="105">tanto antes fuisteis orgulloso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0038" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil">
+<l xml:id="em0759-es-0108" n="106" rend="indent">¡A la barca, a la barca, señores!</l>
+
+<l xml:id="em0759-es-0109" n="107">¡Oh! ¡Qué marea tan de plata!</l>
+
+<l xml:id="em0759-es-0110" n="108">¡Un vientecillo que mata</l>
+
+<l xml:id="em0759-es-0111" n="109">y valientes remadores!</l>
+
+<stage xml:id="em0759-es-st-0001">(cantando)</stage>
+
+<l xml:id="em0759-es-0112" n="110">Vosotros me vendréis a la mano,</l>
+
+<l xml:id="em0759-es-0113" n="111">a la mano me vendréis,</l>
+
+<l xml:id="em0759-es-0114" n="112">y vosotros veréis</l>
+
+<l xml:id="em0759-es-0115" n="113">un pez y veintiséis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0039" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="nil">
+<l xml:id="em0759-es-0116" n="114" rend="indent">¡Al infierno, madre mía!</l>
+
+<l xml:id="em0759-es-0117" n="115">¿Infierno hay para mí?</l>
+
+<l xml:id="em0759-es-0118" n="116">¡Oh, triste! Mientras viví</l>
+
+<l xml:id="em0759-es-0119" n="117">no cuidé lo que allí había.</l>
+
+<l xml:id="em0759-es-0120" n="118">Viví una fantasía,</l>
+
+<l xml:id="em0759-es-0121" n="119">me divertía ser adorado,</l>
+
+<l xml:id="em0759-es-0122" n="120">confié en mi estado</l>
+
+<l xml:id="em0759-es-0123" n="121">y no vi que me perdía.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0124" n="122" rend="indent">Venga esa plancha y veremos</l>
+
+<l xml:id="em0759-es-0125" n="123">esta barca de tristeza.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0040" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0126" n="124">Embarque, vuestra grandeza,</l>
+
+<l xml:id="em0759-es-0127" n="125">que aquí nos entenderemos.</l>
+
+<l xml:id="em0759-es-0128" n="126">Tomaréis un par de remos,</l>
+
+<l xml:id="em0759-es-0129" n="127">veremos cómo remáis, espero,</l>
+
+<l xml:id="em0759-es-0130" n="128">y, llegando a nuestro embarcadero,</l>
+
+<l xml:id="em0759-es-0131" n="129">nosotros os desembarcaremos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0041" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0132" n="130" rend="indent">Pero esperadme aquí:</l>
+
+<l xml:id="em0759-es-0133" n="131">volveré a la otra vida,</l>
+
+<l xml:id="em0759-es-0134" n="132">a ver a mi dama querida</l>
+
+<l xml:id="em0759-es-0135" n="133">que se quiere matar por mí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0042" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0136" n="134">¿Que se quiere matar por ti?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0043" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0137" n="135">Lo sé yo en buen estado.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0044" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0138" n="136">¡Oh, tonto enamorado,</l>
+
+<l xml:id="em0759-es-0139" n="137">el mayor que nunca vi!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0045" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0140" n="138" rend="indent">Era tanto su querer</l>
+
+<l xml:id="em0759-es-0141" n="139">que me escribió mil días.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0046" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0142" n="140">¡Cuántas mentiras leías!</l>
+
+<l xml:id="em0759-es-0143" n="141">Y tú, muerto de placer.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0047" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0144" n="142">¿Por qué te burlas de mí</l>
+
+<l xml:id="em0759-es-0145" n="143">en lugar de buscar mi bien?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0048" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0146" n="144">Así vivas tú, amén,</l>
+
+<l xml:id="em0759-es-0147" n="145">como te tuvo que querer a ti.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0049" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0148" n="146">Eso por lo que yo sabía.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0050" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0149" n="147">Pues, estando tú expirando</l>
+
+<l xml:id="em0759-es-0150" n="148">se estaba ella requebrando</l>
+
+<l xml:id="em0759-es-0151" n="149">con otro de menor valía.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0051" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0152" n="150">Dame permiso, te pido,</l>
+
+<l xml:id="em0759-es-0153" n="151">para ir a ver a mi mujer.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0052" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0154" n="152">Ella, para no tenerte que ver,</l>
+
+<l xml:id="em0759-es-0155" n="153">se despeñaría por un tendido.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0156" n="154" rend="indent">Además ella hoy rezó.</l>
+
+<l xml:id="em0759-es-0157" n="155">Entre sus gritos y gritas,</l>
+
+<l xml:id="em0759-es-0158" n="156">dio gracias infinitas</l>
+
+<l xml:id="em0759-es-0159" n="157">para quien la consoló.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0053" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0160" n="158">En cuanto a ella, bien lloró.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0054" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0161" n="159">¿No se llora también de alegría?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0055" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0162" n="160">¿Y las penas que decía?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0056" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0163" n="161">Su madre se las enseñó.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0164" n="162" rend="indent">Entrad, mi señor, ¡entrad!</l>
+
+<l xml:id="em0759-es-0165" n="163">¡Traed la pasarela! Poned los pies.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0057" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0166" n="164">Entremos, pues que así es...</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0058" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0167" n="165">Pero ahora descansad,</l>
+
+<l xml:id="em0759-es-0168" n="166">pasead y suspirad;</l>
+
+<l xml:id="em0759-es-0169" n="167">mientras vendrá más gente.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0059" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0170" n="168">¡Oh, barca! ¡Cómo eres de ardiente!</l>
+
+<l xml:id="em0759-es-0171" n="169">¡Maldito quien en ti va!</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0002">Le dice al Mozo de la silla.</stage>
+
+<sp xml:id="em0759-es-sp-0060" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil">
+<l xml:id="em0759-es-0172" n="170" rend="indent">Tú, su mozo, vete de ahí.</l>
+
+<l xml:id="em0759-es-0173" n="171">que la silla aquí sobra.</l>
+
+<l xml:id="em0759-es-0174" n="172">Cosa que en la iglesia obra</l>
+
+<l xml:id="em0759-es-0175" n="173">no se ha de embarcar aquí.</l>
+
+<l xml:id="em0759-es-0176" n="174">Aquí se la darán de marfil,</l>
+
+<l xml:id="em0759-es-0177" n="175">adornada con dolores,</l>
+
+<l xml:id="em0759-es-0178" n="176">con tales modos y labores</l>
+
+<l xml:id="em0759-es-0179" n="177">que estará aún más febril.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0180" n="178" rend="indent">A la barca, a la barca, buena gente,</l>
+
+<l xml:id="em0759-es-0181" n="179">que queremos arriar la vela.</l>
+
+<l xml:id="em0759-es-0182" n="180">¡Seguid la estela! ¡Seguid la estela!</l>
+
+<l xml:id="em0759-es-0183" n="181">¡Muchos y con buena mente!</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0003">Llega un Usurero.</stage>
+
+<sp xml:id="em0759-es-sp-0061" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0184" n="182">¡Oh! ¡Qué barca tan valiente!</l>
+
+<l xml:id="em0759-es-0185" n="183">¿Hacia dónde os dirigís?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0062" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0186" n="184">¡Oh!, en mal hora venís,</l>
+
+<l xml:id="em0759-es-0187" n="185">usurero, mi pariente.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0188" n="186" rend="indent">¿Cómo tardasteis vos tanto?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0063" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0189" n="187">Más quisiera yo tardar.</l>
+
+<l xml:id="em0759-es-0190" n="188">En la cosecha de tomar</l>
+
+<l xml:id="em0759-es-0191" n="189">me dio menudo quebranto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0064" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0192" n="190">Ahora muy mucho me espanto.</l>
+
+<l xml:id="em0759-es-0193" n="191">No os librará el dinero.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0065" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0194" n="192">Nadie sois para el barquero</l>
+
+<l xml:id="em0759-es-0195" n="193">y no me dejaran ni tanto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0066" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0196" n="194">Venga, entrad. ¡Entrad aquí!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0067" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0197" n="195">No he yo ahí embarcar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0068" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0198" n="196">¡Oh! ¡Qué gentil sospechar</l>
+
+<l xml:id="em0759-es-0199" n="197">y qué cosas para mí!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0069" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0200" n="198">Aunque ahora fallecí,</l>
+
+<l xml:id="em0759-es-0201" n="199">dejadme otro barco buscar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0070" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0202" n="200">¡De João Pimentel el pesar!</l>
+
+<l xml:id="em0759-es-0203" n="201">¿Por qué no irás aquí?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0071" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0204" n="202" rend="indent">¿Y adónde es el viaje?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0072" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0205" n="203">Para donde debes ir,</l>
+
+<l xml:id="em0759-es-0206" n="204">estamos para partir,</l>
+
+<l xml:id="em0759-es-0207" n="205">no gastes más tu lenguaje.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0073" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0208" n="206">Pero ¿adónde va el pasaje?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0074" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0209" n="207">Para la infernal comarca.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0075" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0210" n="208">Deje, no voy en tal barca.</l>
+
+<l xml:id="em0759-es-0211" n="209">Esta otra tiene mejor viaje.</l>
+</lg>
+
+<stage xml:id="em0759-es-st-0004">(Se va a la barca del Ángel.)</stage>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0212" n="210" rend="indent">¡Ey del barco! ¡Hola! ¡Ho!</l>
+
+<l xml:id="em0759-es-0213" n="211">¿Estáis a punto de partir?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0076" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0214" n="212">¿Y adónde quieres tú ir?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0077" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0215" n="213">Al paraíso voy.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0078" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0216" n="214">Con pocas ganas estoy</l>
+
+<l xml:id="em0759-es-0217" n="215">de llevarte para allá.</l>
+
+<l xml:id="em0759-es-0218" n="216">Esa otra te llevará.</l>
+
+<l xml:id="em0759-es-0219" n="217">¡Ve allí con quien te engañó!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0079" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0220" n="218" rend="indent" part="I">¿Por qué?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0080" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0221" part="F">Porque ese zurrón</l>
+
+<l xml:id="em0759-es-0222" n="219">ocupará todo el navío.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0081" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0223" n="220">¡Juro a Dios que va vacío!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0082" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0224" n="221">Pero no tu corazón.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0083" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0225" n="222">Allí me quedan alrededor</l>
+
+<l xml:id="em0759-es-0226" n="223">de veintiséis millones en un arca.</l>
+
+<l xml:id="em0759-es-0227" n="224">Ya que el interés tanto abarca,</l>
+
+<l xml:id="em0759-es-0228" n="225">¿no dais pasaje, señor?</l>
+</lg>
+
+<stage xml:id="em0759-es-st-0005">(Se vuelve al Diablo.)</stage>
+
+<lg type="nil">
+<l xml:id="em0759-es-0229" n="226" rend="indent">¡Oh, astuto barquero!</l>
+
+<l xml:id="em0759-es-0230" n="227">¿Sabéis vos en qué me hundo?</l>
+
+<l xml:id="em0759-es-0231" n="228">Quiero volver al mundo</l>
+
+<l xml:id="em0759-es-0232" n="229">y traerme mi dinero.</l>
+
+<l xml:id="em0759-es-0233" n="230">Que aquel otro marinero,</l>
+
+<l xml:id="em0759-es-0234" n="231">como me ve llegar sin dinero,</l>
+
+<l xml:id="em0759-es-0235" n="232">me suelta un sermón entero</l>
+
+<l xml:id="em0759-es-0236" n="233">cual patrón de los remeros.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0084" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0237" n="234" rend="indent">Entra, entra y remarás.</l>
+
+<l xml:id="em0759-es-0238" n="235">No perdamos más marea.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0085" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0239" n="236" part="I">Pero...</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0086" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0240" part="F">Por fuerza sea,</l>
+
+<l xml:id="em0759-es-0241" n="237">quieras o no, entrarás.</l>
+
+<l xml:id="em0759-es-0242" n="238">Irás a servir a Satanás,</l>
+
+<l xml:id="em0759-es-0243" n="239">que él siempre te ayudó.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0087" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0244" n="240">¡Oh! ¡Triste! ¿Quién me cegó?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0088" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0245" n="241">Cállate, que mucho llorarás.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0006">Al entrar en el barco, le dice al Hidalgo.</stage>
+
+<sp xml:id="em0759-es-sp-0089" who="#usurero">
+<speaker>USURERO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0246" n="242" rend="indent">¡Santa Joana de Valdês!</l>
+
+<l xml:id="em0759-es-0247" n="243">¿Aquí también su señoría?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0090" who="#hidalgo">
+<speaker>HIDALGO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0248" n="244">¡Un poco de cortesía!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0091" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0249" n="245">¿Oís? Sed cortés.</l>
+
+<l xml:id="em0759-es-0250" n="246">¿Vos, hidalgo, pensáis</l>
+
+<l xml:id="em0759-es-0251" n="247">que estáis en vuestra posada?</l>
+
+<l xml:id="em0759-es-0252" n="248">Os daré tal bofetada</l>
+
+<l xml:id="em0759-es-0253" n="249">con un remo, que sufriréis.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0007">Llega Joane, el Tonto.</stage>
+
+<sp xml:id="em0759-es-sp-0092" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0254" n="250" part="I">¡Ah, del barco!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0093" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0255" part="M">¿Quién es?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0094" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0256" part="F">Soy yo.</l>
+
+<l xml:id="em0759-es-0257" n="251">¿Es esta barcaza nuestra?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0095" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0258" n="252" part="I">¿De quién?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0096" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0259" part="M">De los tontos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0097" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0260" part="F">Vuestra,</l>
+
+<l xml:id="em0759-es-0261" n="253" part="I">entrad.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0098" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0262" part="F">¿Salto o no?</l>
+
+<l xml:id="em0759-es-0263" n="254">¡Oh! ¡Pesar de mi abuelo!</l>
+
+<l xml:id="em0759-es-0264" n="255">En resumen: me enfermé</l>
+
+<l xml:id="em0759-es-0265" n="256">y en mala hora obité</l>
+
+<l xml:id="em0759-es-0266" n="257">y eso que yo no suelo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0099" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0267" n="258" part="I">¿De qué moriste?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0100" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0268" part="F">¿De qué?</l>
+
+<l xml:id="em0759-es-0269" n="259">Quizá de cagalera.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0101" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0270" n="260" part="I">¿De qué?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0102" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0271" part="F">De cagar en gran manera,</l>
+
+<l xml:id="em0759-es-0272" n="261">¡mala sarna que te dé!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0103" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0273" n="262">Entra, pon aquí el pie.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0104" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0274" n="263">¡No! Que a lo mejor me desnuco.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0105" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0275" n="264">Entra, estúpido eunuco,</l>
+
+<l xml:id="em0759-es-0276" n="265">que se nos va a ir, como se ve.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0106" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0277" n="266" rend="indent">Esperad, esperad.</l>
+
+<l xml:id="em0759-es-0278" n="267">¿Y dónde nos vamos a meter?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0107" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0279" n="268">En el puerto de Lucifer.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0108" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0280" n="269" part="I">¿Qué?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0109" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0281" part="F">Al infierno, aquí entrad.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0110" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0282" n="270">¿Al infierno? De aquí me voy.</l>
+
+<l xml:id="em0759-es-0283" n="271">¡Fuera, fuera! Barca del cornudo.</l>
+
+<l xml:id="em0759-es-0284" n="272">Por el maldito peludo,</l>
+
+<l xml:id="em0759-es-0285" n="273">excavador de pantanos, maldito estoy.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0286" n="274" rend="indent">¡Zapatero de Candosa!</l>
+
+<l xml:id="em0759-es-0287" n="275">¡Costillar de asesinato!</l>
+
+<l xml:id="em0759-es-0288" n="276">¡Fuera! ¡Fuera! Piedra en el zapato,</l>
+
+<l xml:id="em0759-es-0289" n="277">hijo de la gran cosa.</l>
+
+<l xml:id="em0759-es-0290" n="278">Tu mujer es una tiñosa</l>
+
+<l xml:id="em0759-es-0291" n="279">y va a parir un sapo</l>
+
+<l xml:id="em0759-es-0292" n="280">sentada encima de un trapo.</l>
+
+<l xml:id="em0759-es-0293" n="281">Nieto de la asquerosa.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0294" n="282" rend="indent">Robacebollas. ¡Fuera! ¡Fuera!</l>
+
+<l xml:id="em0759-es-0295" n="283">Excomulgado en las iglesias,</l>
+
+<l xml:id="em0759-es-0296" n="284">burro con amnesia.</l>
+
+<l xml:id="em0759-es-0297" n="285">Toma el pan que te cayera</l>
+
+<l xml:id="em0759-es-0298" n="286">la mujer que de ti huyó</l>
+
+<l xml:id="em0759-es-0299" n="287">a la isla de Madeira.</l>
+
+<l xml:id="em0759-es-0300" n="288">¡Ratón de Giesteira,</l>
+
+<l xml:id="em0759-es-0301" n="289">el demonio que te parió!</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0302" n="290" rend="indent">¡Fuera! ¡Fuera! Te lanzo una pulla</l>
+
+<l xml:id="em0759-es-0303" n="291">de la pica aquella.</l>
+
+<l xml:id="em0759-es-0304" n="292">¡Fuera! ¡Fuera! Cágate en la vela,</l>
+
+<l xml:id="em0759-es-0305" n="293">don Cabeza de Botella.</l>
+
+<l xml:id="em0759-es-0306" n="294">Pata de cigarra vieja,</l>
+
+<l xml:id="em0759-es-0307" n="295">picota de las ovejas,</l>
+
+<l xml:id="em0759-es-0308" n="296">culo de mala doncella.</l>
+
+<stage xml:id="em0759-es-st-0008">( Llega a la barca de la gloria.)</stage>
+
+<l xml:id="em0759-es-0309" n="297" part="I">¡Ah, de la barca!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0111" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0310" part="F">¿Tú qué quieres?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0112" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0311" n="298">¿Quieres llevarme para allá?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0113" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0312" n="299" part="I">¿Quieres eres tú?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0114" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0313" part="F">Alguien, quizá.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0115" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0314" n="300">Tu pasarás, si quieres,</l>
+
+<l xml:id="em0759-es-0315" n="301">pues en todos tus quehaceres,</l>
+
+<l xml:id="em0759-es-0316" n="302">por malicia no erraste.</l>
+
+<l xml:id="em0759-es-0317" n="303">Con tu simpleza te contentaste</l>
+
+<l xml:id="em0759-es-0318" n="304">para gozar de los placeres.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0319" n="305" rend="indent">Espera mientras por ahí,</l>
+
+<l xml:id="em0759-es-0320" n="306">veremos si alguien viene</l>
+
+<l xml:id="em0759-es-0321" n="307">merecedor de lo que tiene</l>
+
+<l xml:id="em0759-es-0322" n="308">que deba entrar aquí.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0009">Llega un Zapatero cargado de hormas y le dice a la barca infernal.</stage>
+
+<sp xml:id="em0759-es-sp-0116" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0323" n="309" part="I">¡Ah, de la barca!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0117" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0324" part="F">¿Quién viene ahí?</l>
+
+<l xml:id="em0759-es-0325" n="310">Un zapatero santo y honrado.</l>
+
+<l xml:id="em0759-es-0326" n="311">¿Cómo vienes tan cargado?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0118" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0327" n="312">Me mandan venir así.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0328" n="313" rend="indent">Pero ¿adónde es el viaje?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0119" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0329" n="314">A la tierra de los condenados.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0120" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0330" n="315">¿Y los que mueren confesados</l>
+
+<l xml:id="em0759-es-0331" n="316">dónde tienen su pasaje?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0121" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0332" n="317">¡Para ya con este lenguaje!</l>
+
+<l xml:id="em0759-es-0333" n="318">Que esta es tu barca, esta.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0122" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0334" n="319">Renegaría yo de la fiesta</l>
+
+<l xml:id="em0759-es-0335" n="320">y de la barca y el embarque.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0336" n="321" rend="indent">¿Cómo podría eso ser</l>
+
+<l xml:id="em0759-es-0337" n="322">confesado y comulgado?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0123" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0338" n="323">Tú moriste excomulgado,</l>
+
+<l xml:id="em0759-es-0339" n="324">no como nos quisiste hacer creer.</l>
+
+<l xml:id="em0759-es-0340" n="325">Esperabas así vivir,</l>
+
+<l xml:id="em0759-es-0341" n="326">callaste diez mil engaños,</l>
+
+<l xml:id="em0759-es-0342" n="327">robaste mucho treinta años</l>
+
+<l xml:id="em0759-es-0343" n="328">al pueblo con tu menester.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0344" n="329" rend="indent">Embarca, hay sitio para ti,</l>
+
+<l xml:id="em0759-es-0345" n="330">que ya hace mucho que te espero.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0124" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0346" n="331">Te repito que yo no quiero.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0125" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0347" n="332">Digo y repito que sí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0126" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0348" n="333">¡Cuántas misas oí!</l>
+
+<l xml:id="em0759-es-0349" n="334">¿Con ellas lo puedo compensar?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0127" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0350" n="335">Oír misa y luego robar</l>
+
+<l xml:id="em0759-es-0351" n="336">es el camino para venir aquí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0128" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0352" n="337">¿Y las ofrendas que se dieron?</l>
+
+<l xml:id="em0759-es-0353" n="338">¿Y los óbolos de los finados?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0129" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0354" n="339">¿Y los dineros mal llevados</l>
+
+<l xml:id="em0759-es-0355" n="340">acaso satisfacción dieron?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0130" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0356" n="341">¡Oh! No quiera el cuero</l>
+
+<l xml:id="em0759-es-0357" n="342">ni la puta de la lana,</l>
+
+<l xml:id="em0759-es-0358" n="343">si es esta buena tartana</l>
+
+<l xml:id="em0759-es-0359" n="344">como se ve en el mundo entero.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0360" n="345" rend="indent">Juro a Dios que es gracia.</l>
+
+<stage xml:id="em0759-es-st-0010">(Se va a la barca del Ángel.)</stage>
+
+<l xml:id="em0759-es-0361" n="346">Ay, la santa carabela,</l>
+
+<l xml:id="em0759-es-0362" n="347">¿me podréis llevar con vuestra vela?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0131" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0363" n="348">Tu carga te desgracia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0132" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0364" n="349">¿No hay favor de Dios?</l>
+
+<l xml:id="em0759-es-0365" n="350">Esto en cualquier sitio irá.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0133" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0366" n="351">Esa barca que allí está</l>
+
+<l xml:id="em0759-es-0367" n="352">se lleva a quien roba por dos.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0368" n="353" rend="indent">¡Oh, almas avergonzadas!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0134" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0369" n="354">Pero a mí me maravilla</l>
+
+<l xml:id="em0759-es-0370" n="355">tener por gran pesadilla</l>
+
+<l xml:id="em0759-es-0371" n="356">cuatro hormas cagadas</l>
+
+<l xml:id="em0759-es-0372" n="357">que pueden ir bien sentadas</l>
+
+<l xml:id="em0759-es-0373" n="358">en el rincón para el trayecto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0135" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0374" n="359">De haber sido un hombre recto,</l>
+
+<l xml:id="em0759-es-0375" n="360">aquí serían excusadas.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0136" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0376" n="361">Así que determináis tal cual</l>
+
+<l xml:id="em0759-es-0377" n="362">quién se cocerá en el infierno.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0137" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0378" n="363">Escrito estás en el cuaderno</l>
+
+<l xml:id="em0759-es-0379" n="364">de la lista infernal.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0138" who="#zapatero">
+<speaker>ZAPATERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0380" n="365">Pues, diablos, ¿qué esperáis?</l>
+
+<l xml:id="em0759-es-0381" n="366">Vamos, no lo dejéis para luego</l>
+
+<l xml:id="em0759-es-0382" n="367">y llevadme ya a aquel fuego.</l>
+
+<l xml:id="em0759-es-0383" n="368">¿Para qué más aguardáis?</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0011">Viene un Fraile bailando con una Muchacha de la mano y tarareando una canción.</stage>
+
+<sp xml:id="em0759-es-sp-0139" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0384" n="369">¿Qué es eso, padre? ¿Qué le pasa?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0140" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0385" n="370"><emph>Deos gratias!</emph> Son un encanto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0141" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0386" n="371">¿Conoces también el canto?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0142" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0387" n="372">Y seguro que arrasa.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0143" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0388" n="373">¿Esa dama ha de entrar aquí?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0144" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0389" n="374">No sé dónde la embarcaré.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0145" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0390" n="375" part="I">¿Es la vuestra?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0146" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0391" part="F">No lo sé.</l>
+
+<l xml:id="em0759-es-0392" n="376">Por mía la traigo yo aquí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0147" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0393" n="377">¿Y no os dijeron ninguna cosa</l>
+
+<l xml:id="em0759-es-0394" n="378">en vuestro convento santo?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0148" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0395" n="379">Ellos hacen otro tanto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0149" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0396" n="380">¡Qué cosa tan preciosa!</l>
+
+<l xml:id="em0759-es-0397" n="381">Entrad, padre reverendo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0150" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0398" n="382">¿Hacia dónde lleváis a la gente?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0151" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0399" n="383">Para aquel fuego ardiente</l>
+
+<l xml:id="em0759-es-0400" n="384">que no temisteis viviendo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0152" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0401" n="385">¡Le juro a Dios que no te entiendo!</l>
+
+<l xml:id="em0759-es-0402" n="386">¿Y este hábito de cristiano?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0153" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0403" n="387">Gentil padre mundano,</l>
+
+<l xml:id="em0759-es-0404" n="388">a Belcebú os encomiendo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0154" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0405" n="389">¡Cuerpo de Dios consagrado!</l>
+
+<l xml:id="em0759-es-0406" n="390">Por la fe de Jesucristo,</l>
+
+<l xml:id="em0759-es-0407" n="391">que yo no entiendo a lo que asisto.</l>
+
+<l xml:id="em0759-es-0408" n="392">¿He yo de ser condenado?</l>
+
+<l xml:id="em0759-es-0409" n="393">Un fraile tan apasionado</l>
+
+<l xml:id="em0759-es-0410" n="394">y tan dado a la virtud.</l>
+
+<l xml:id="em0759-es-0411" n="395">Así Dios me dé salud</l>
+
+<l xml:id="em0759-es-0412" n="396">que yo estoy maravillado.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0155" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0413" n="397" rend="indent">No nos detengamos más.</l>
+
+<l xml:id="em0759-es-0414" n="398">Embarcad y partiremos.</l>
+
+<l xml:id="em0759-es-0415" n="399">Tomaréis un par de remos</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0156" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0416" n="400">No fue ese el acuerdo, además.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0157" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0417" n="401">Pues ya está dada la sentencia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0158" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0418" n="402">¡Por Dios! ¡Tenga cautela!</l>
+
+<l xml:id="em0759-es-0419" n="403">No va en tal carabela</l>
+
+<l xml:id="em0759-es-0420" n="404">mi señora, Florencia.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0421" n="405" rend="indent">¿Por estar enamorado</l>
+
+<l xml:id="em0759-es-0422" n="406">y gozar con una mujer</l>
+
+<l xml:id="em0759-es-0423" n="407">se ha un fraile perder</l>
+
+<l xml:id="em0759-es-0424" n="408">con tanto salmo rezado?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0159" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0425" n="409">¡Ahora estás bien aviado!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0160" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0426" n="410">Pero estás bien corregido.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0161" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0427" n="411">Devoto padre y marido,</l>
+
+<l xml:id="em0759-es-0428" n="412">deberéis ser aquí derrotado.</l>
+
+<l xml:id="em0759-es-0429" n="413">¡Mantenga Dios esta corona!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0162" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0430" n="414">¡Oh, padre, fray Batalla!</l>
+
+<l xml:id="em0759-es-0431" n="415">Vi que tenéis la malla.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0163" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0432" n="416">Sabed que fui gran persona.</l>
+
+<l xml:id="em0759-es-0433" n="417">Este espada es normal</l>
+
+<l xml:id="em0759-es-0434" n="418">y el escudo, misma situación.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0164" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0435" n="419">Dé vuestra reverencia lección</l>
+
+<l xml:id="em0759-es-0436" n="420">de esgrima, que es sin igual.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0012">( Esgrime.)</stage>
+
+<sp xml:id="em0759-es-sp-0165" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0437" n="421">¡Qué me gusta! Demos asalto.</l>
+
+<l xml:id="em0759-es-0438" n="422">Entonces uno en contra, así.</l>
+
+<l xml:id="em0759-es-0439" n="423">Otro golpe, así, así.</l>
+
+<l xml:id="em0759-es-0440" n="424">Este es el primer sobresalto.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0441" n="425" rend="indent">¡Levantad la espada!</l>
+
+<l xml:id="em0759-es-0442" n="426">Poned el diablo en la cruz</l>
+
+<l xml:id="em0759-es-0443" n="427">como yo ahora sin capuz.</l>
+
+<l xml:id="em0759-es-0444" n="428">Sal con la espada rasgada</l>
+
+<l xml:id="em0759-es-0445" n="429">y que quede resguardada.</l>
+
+<l xml:id="em0759-es-0446" n="430">Corte ancho, un revés,</l>
+
+<l xml:id="em0759-es-0447" n="431">y pronto coger los pies,</l>
+
+<l xml:id="em0759-es-0448" n="432">que todo lo demás no es nada.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0449" n="433" rend="indent">Cuando se recoge en vanguardia</l>
+
+<l xml:id="em0759-es-0450" n="434">herir no es prudente.</l>
+
+<l xml:id="em0759-es-0451" n="435">Venga, va, muy largamente,</l>
+
+<l xml:id="em0759-es-0452" n="436">cortad en la segunda guardia.</l>
+
+<l xml:id="em0759-es-0453" n="437">Guárdeme Dios de espingarda</l>
+
+<l xml:id="em0759-es-0454" n="438">o de varón osado,</l>
+
+<l xml:id="em0759-es-0455" n="439">pero aquí estoy yo guardado</l>
+
+<l xml:id="em0759-es-0456" n="440">con la paja en la albarda.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0457" n="441" rend="indent">Salgo con media espada</l>
+
+<l xml:id="em0759-es-0458" n="442">¡Eh! Guardar las quijadas.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0166" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0459" n="443">¡Oh! ¡Qué valientes llevadas!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0167" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0460" n="444">Que esto aún no es nada.</l>
+
+<l xml:id="em0759-es-0461" n="445">Demos otra vez asalto:</l>
+
+<l xml:id="em0759-es-0462" n="446">corta, ¡eh! Ahora un golpe fuerte.</l>
+
+<l xml:id="em0759-es-0463" n="447">Y, cortando con más suerte,</l>
+
+<l xml:id="em0759-es-0464" n="448">aquí está la sexta guardia, en alto.</l>
+
+<l xml:id="em0759-es-0465" n="449">De aquí se sale con una guía</l>
+
+<l xml:id="em0759-es-0466" n="450">y un revés de la primera.</l>
+
+<l xml:id="em0759-es-0467" n="451">Esta es la quinta verdadera.</l>
+
+<l xml:id="em0759-es-0468" n="452">¡Oh! ¡Cuántos aquí heriría!</l>
+
+<l xml:id="em0759-es-0469" n="453">Padre que eso aprendía,</l>
+
+<l xml:id="em0759-es-0470" n="454">¿en el infierno ha de ser pingo?</l>
+
+<l xml:id="em0759-es-0471" n="455">¡Ah! ¡Me guarde Santo Domingo</l>
+
+<l xml:id="em0759-es-0472" n="456">con tanta descortesía!</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0473" n="457" rend="indent">Prosigamos nuestra historia,</l>
+
+<l xml:id="em0759-es-0474" n="458">no tengamos más demora.</l>
+
+<l xml:id="em0759-es-0475" n="459">Dadme la mano, Florencia, señora,</l>
+
+<l xml:id="em0759-es-0476" n="460">vamos a la barca de la gloria.</l>
+
+<stage xml:id="em0759-es-st-0013">(Llega a la barca de la gloria.)</stage>
+
+<l xml:id="em0759-es-0477" n="461"><emph>Deo gratias!</emph> ¿Hay aquí lugar</l>
+
+<l xml:id="em0759-es-0478" n="462">para mi reverencia?</l>
+
+<l xml:id="em0759-es-0479" n="463">Y doña Florencia,</l>
+
+<l xml:id="em0759-es-0480" n="464">por lo menos ha de entrar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0168" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0481" n="465">En mala hora llegasteis.</l>
+
+<l xml:id="em0759-es-0482" n="466">¿Padre, robaste ese cuchillo?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0169" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0483" n="467">Señora, dame fuerza un poquillo</l>
+
+<l xml:id="em0759-es-0484" n="468">que la cosa mal está ahora.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0485" n="469" rend="indent">Vamos adonde nos van a mandar,</l>
+
+<l xml:id="em0759-es-0486" n="470">guárdenos Dios de esta ribera.</l>
+
+<l xml:id="em0759-es-0487" n="471">No veo aquí manera</l>
+
+<l xml:id="em0759-es-0488" n="472">sino, al final claudicar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0170" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0489" n="473">Padre, tenéis ya que venir.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0171" who="#fraile">
+<speaker>FRAILE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0490" n="474">Sí, llevadme allí, Florencia</l>
+
+<l xml:id="em0759-es-0491" n="475">y cumplamos la sentencia.</l>
+
+<l xml:id="em0759-es-0492" n="476">Es la orden de partir.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0014">Llega una alcahueta de nombre Brísida Vaz a la barca del infierno.</stage>
+
+<sp xml:id="em0759-es-sp-0172" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0493" n="477">¡Ulá de la barca, ulá!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0173" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0494" n="478" part="I">¿Quién llama?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0174" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0495" part="F">Brísida Vaz.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0175" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0496" n="479">¡Eh! ¡Espérame, rapaz!</l>
+
+<l xml:id="em0759-es-0497" n="480">¿Por qué no viene ella ya?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0176" who="#remero">
+<speaker>REMERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0498" n="481">Dice que no hay de venir acá</l>
+
+<l xml:id="em0759-es-0499" n="482">sin Joana de Valdês, como veis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0177" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0500" n="483">Entrad vos y remaréis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0178" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0501" n="484">No quiero yo entrar allá.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0179" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0502" n="485" rend="indent">¡Qué sabroso recelar!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0180" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0503" n="486">De esa barca yo me guardo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0181" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0504" n="487">¿Y traéis vos mucho fardo?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0182" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0505" n="488">El que me conviene llevar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0183" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0506" n="489">¿Qué es lo que tendréis que embarcar?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0184" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0507" n="490">Seiscientos virgos postizos</l>
+
+<l xml:id="em0759-es-0508" n="491">y tres arcas de hechizos</l>
+
+<l xml:id="em0759-es-0509" n="492">que no puedo aquí dejar.</l>
+
+<l xml:id="em0759-es-0510" n="493">Tres armarios de mentir,</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0511" n="494" rend="indent">y cinco cofres de veneno</l>
+
+<l xml:id="em0759-es-0512" n="495">y algunos robos ajenos</l>
+
+<l xml:id="em0759-es-0513" n="496">así en joyas de vestir,</l>
+
+<l xml:id="em0759-es-0514" n="497">vestuario de ocultar,</l>
+
+<l xml:id="em0759-es-0515" n="498">en fin, casa movediza,</l>
+
+<l xml:id="em0759-es-0516" n="499">un estrado bien macizo</l>
+
+<l xml:id="em0759-es-0517" n="500">con diez cojines de engañar.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0518" n="501" rend="indent">La mayor carga es</l>
+
+<l xml:id="em0759-es-0519" n="502">esas muchachas que vendía.</l>
+
+<l xml:id="em0759-es-0520" n="503">De aquella mercancía</l>
+
+<l xml:id="em0759-es-0521" n="504">traigo yo mucha, como ves.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0185" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0522" n="505">Ahora ponga aquí el pie.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0186" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0523" n="506">¡Fuera! Yo voy al paraíso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0187" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0524" n="507">¿Quién te dio tan compromiso?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0188" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0525" n="508">Ahí he de ir de buena fe.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0526" n="509" rend="indent">Yo soy una mártir tal,</l>
+
+<l xml:id="em0759-es-0527" n="510">azotes me he siempre llevado</l>
+
+<l xml:id="em0759-es-0528" n="511">y tormentos he soportado</l>
+
+<l xml:id="em0759-es-0529" n="512">como nadie ha hecho igual.</l>
+
+<l xml:id="em0759-es-0530" n="513">Si fuera al fuego infernal,</l>
+
+<l xml:id="em0759-es-0531" n="514">allí iría todo el mundo.</l>
+
+<l xml:id="em0759-es-0532" n="515">A esta otra barca en un segundo</l>
+
+<l xml:id="em0759-es-0533" n="516">me voy, que es más real.</l>
+
+<stage xml:id="em0759-es-st-0015">(Mientras llega a la barca de la gloria, le dice al Ángel.)</stage>
+
+<l xml:id="em0759-es-0534" n="517">Barquero, amigo, desde estas orillas,</l>
+
+<l xml:id="em0759-es-0535" n="518">para Brísida Vaz la tabla cae.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0189" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0536" n="519">No sé quién a ti te trae.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0190" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0537" n="520">Os lo pido de rodillas.</l>
+
+<l xml:id="em0759-es-0538" n="521">¿Pensáis que traigo piojos,</l>
+
+<l xml:id="em0759-es-0539" n="522">Ángel de Dios, mi rosa?</l>
+
+<l xml:id="em0759-es-0540" n="523">Soy Brísida, la preciosa,</l>
+
+<l xml:id="em0759-es-0541" n="524">que daba mujeres a manojos.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0542" n="525" rend="indent">Criaba a chicas de compañía</l>
+
+<l xml:id="em0759-es-0543" n="526">para los monjes de la catedral.</l>
+
+<l xml:id="em0759-es-0544" n="527">Pasadme, que es lo normal,</l>
+
+<l xml:id="em0759-es-0545" n="528">mi amor, alma mía,</l>
+
+<l xml:id="em0759-es-0546" n="529">ojos de perlitas finas.</l>
+
+<l xml:id="em0759-es-0547" n="530">Y yo estoy predicada,</l>
+
+<l xml:id="em0759-es-0548" n="531">angelada y amartillada,</l>
+
+<l xml:id="em0759-es-0549" n="532">e hice cosas muy divinas.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0550" n="533" rend="indent">Santa Úrsula no convirtió</l>
+
+<l xml:id="em0759-es-0551" n="534">como yo a tanta chica:</l>
+
+<l xml:id="em0759-es-0552" n="535">todas salvadas, me santifica,</l>
+
+<l xml:id="em0759-es-0553" n="536">que ninguna se perdió.</l>
+
+<l xml:id="em0759-es-0554" n="537">Y quiso él desde el cielo</l>
+
+<l xml:id="em0759-es-0555" n="538">que todas encontraran dueño.</l>
+
+<l xml:id="em0759-es-0556" n="539">¿Pensabais que todo era un sueño?</l>
+
+<l xml:id="em0759-es-0557" n="540">Ni una sola sin consuelo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0191" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0558" n="541">Allí vais a embarcar,</l>
+
+<l xml:id="em0759-es-0559" n="542">no me estéis importunando.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0192" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0560" n="543">Pero si os estoy alegando</l>
+
+<l xml:id="em0759-es-0561" n="544">por qué me tenéis que llevar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0193" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0562" n="545">No quiero oír tu importunar,</l>
+
+<l xml:id="em0759-es-0563" n="546">que no puedes venir aquí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0194" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0564" n="547">En qué mala hora yo serví,</l>
+
+<l xml:id="em0759-es-0565" n="548">pues no me puedo aprovechar.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0566" n="549" rend="indent">¡Oh, barqueros de mala hora!</l>
+
+<l xml:id="em0759-es-0567" n="550">Poned la tabla, que aquí me voy yo,</l>
+
+<l xml:id="em0759-es-0568" n="551">y tal hado me marcó,</l>
+
+<l xml:id="em0759-es-0569" n="552">que me siento mal aquí fuera.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0195" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0570" n="553">Entrad, mi señora,</l>
+
+<l xml:id="em0759-es-0571" n="554">y seréis bien recibida.</l>
+
+<l xml:id="em0759-es-0572" n="555">Si vivisteis santa vida,</l>
+
+<l xml:id="em0759-es-0573" n="556">lo sentiréis ahora.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0016">Llega un Judío con un chivo a la espalda.</stage>
+
+<sp xml:id="em0759-es-sp-0196" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0574" n="557">¿Qué ocurre, oh, marinero?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0197" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0575" n="558">¡En qué mala hora llegaste!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0198" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0576" n="559">¿Cuál es la barca que preparaste?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0199" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0577" n="560">Esta barca es del barquero.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0200" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0578" n="561">Pasadme, tengo dinero.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0201" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0579" n="562">¿Y el chivo también ha de venir?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0202" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0580" n="563">El chivo también debe ir.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0203" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0581" n="564">¡Oh! ¡Qué honroso pasajero!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0204" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0582" n="565">Sin chivo, ¿cómo iré allá?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0205" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0583" n="566">Pues yo no paso aquí carneros.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0206" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0584" n="567">Toma aquí unos dineros</l>
+
+<l xml:id="em0759-es-0585" n="568">y más se os pagará.</l>
+
+<l xml:id="em0759-es-0586" n="569">Por vida de Semifará,</l>
+
+<l xml:id="em0759-es-0587" n="570">que entre aquí el carnero.</l>
+
+<l xml:id="em0759-es-0588" n="571">¿Queréis que os dé más dineros?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0207" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0589" n="572">No, tú no has de venir acá.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0208" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0590" n="573">¿Por qué no irá el judío</l>
+
+<l xml:id="em0759-es-0591" n="574">donde Brísida Vaz lo hace?</l>
+
+<stage xml:id="em0759-es-st-0017">(Le dice al Hidalgo.)</stage>
+
+<l xml:id="em0759-es-0592" n="575">¿Al señor noble le place?</l>
+
+<l xml:id="em0759-es-0593" n="576">Señor noble, ¿me fío?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0209" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0594" n="577">¿Y al hidalgo quién le diera</l>
+
+<l xml:id="em0759-es-0595" n="578">el mando de este bajel?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0210" who="#judio">
+<speaker>JUDÍO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0596" n="579">Corregidor, coronel,</l>
+
+<l xml:id="em0759-es-0597" n="580">castigad a este cualquiera.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0598" n="581" rend="indent">Desgracia, piedra picuda,</l>
+
+<l xml:id="em0759-es-0599" n="582">lodo, llanto, leña, fuego,</l>
+
+<l xml:id="em0759-es-0600" n="583">cagadera que te dé luego,</l>
+
+<l xml:id="em0759-es-0601" n="584">mala diarrea te acuda.</l>
+
+<l xml:id="em0759-es-0602" n="585">Y por Dios, que te sacuda,</l>
+
+<l xml:id="em0759-es-0603" n="586">con la barca en los hocicos.</l>
+
+<l xml:id="em0759-es-0604" n="587">¿Haces burlas de los ricos?</l>
+
+<l xml:id="em0759-es-0605" n="588">Di, hijo de cornuda.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0211" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0606" n="589" rend="indent">¿Robaste la chiva, cabrón?</l>
+
+<l xml:id="em0759-es-0607" n="590">Me parecéis a mí</l>
+
+<l xml:id="em0759-es-0608" n="591">mal hombre de Alcoutim,</l>
+
+<l xml:id="em0759-es-0609" n="592">clavado cual camarón.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0212" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0610" n="593">Judío, allí te pasarán,</l>
+
+<l xml:id="em0759-es-0611" n="594">porque van más despejados.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0213" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0612" n="595">Si él se meó en los finados</l>
+
+<l xml:id="em0759-es-0613" n="596">en la iglesia de San Gião.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0614" n="597" rend="indent">Y la carne de la olla comía</l>
+
+<l xml:id="em0759-es-0615" n="598">en el día de Nuestro Señor</l>
+
+<l xml:id="em0759-es-0616" n="599">Pero él, con debido honor,</l>
+
+<l xml:id="em0759-es-0617" n="600">se mea en ella todos los días.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0214" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0618" n="601">Venga, va, démosle la vela.</l>
+
+<l xml:id="em0759-es-0619" n="602">Vos, judío, a remolque iréis,</l>
+
+<l xml:id="em0759-es-0620" n="603">porque mala persona parecéis.</l>
+
+<l xml:id="em0759-es-0621" n="604">Llevad el chivo en la tela.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0018">Llega un Corregidor a la barca del infierno.</stage>
+
+<sp xml:id="em0759-es-sp-0215" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0622" n="605" part="I">¡Ah, la barca!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0216" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0623" part="F">¿Qué queréis?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0217" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0624" n="606">Está aquí el señor juez.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0218" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0625" n="607">El amigo del ajedrez,</l>
+
+<l xml:id="em0759-es-0626" n="608">¡qué gran carga traéis!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0219" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0627" n="609">Por mi aspecto conoceréis</l>
+
+<l xml:id="em0759-es-0628" n="610">que no vienen por mal hecho.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0220" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0629" n="611">¿Qué tal va el Derecho?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0221" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0630" n="612">En estas actas lo veréis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0222" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0631" n="613" rend="indent">Pues bien, entrad, veremos</l>
+
+<l xml:id="em0759-es-0632" n="614">qué dice ese papel.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0223" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0633" n="615">¿Y adónde va el bajel?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0224" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0634" n="616">En el infierno os pondremos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0225" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0635" n="617">¿Cómo? ¿Que a esa tierra iremos?</l>
+
+<l xml:id="em0759-es-0636" n="618">¿Ahí ha de ir un corregidor?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0226" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0637" n="619">Santo descorregidor,</l>
+
+<l xml:id="em0759-es-0638" n="620">embarcad y remaremos.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0639" n="621" rend="indent">Venga, entrad, ya que habéis venido.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0227" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0640" n="622"><emph>Non est de regule juris,</emph> ¡no!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0228" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0641" n="623"><emph>Ita, ita!</emph> Dadme aquí la mano,</l>
+
+<l xml:id="em0759-es-0642" n="624">un remo como este os será ofrecido.</l>
+
+<l xml:id="em0759-es-0643" n="625">Fingid que nacisteis así</l>
+
+<l xml:id="em0759-es-0644" n="626">para nuestro compañero.</l>
+
+<l xml:id="em0759-es-0645" n="627">¿Qué haces, tú, aventurero?</l>
+
+<l xml:id="em0759-es-0646" n="628">Ponle la tabla ya aquí.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0229" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0647" n="629" rend="indent">¡Oh! Reniego del viaje</l>
+
+<l xml:id="em0759-es-0648" n="630">y de quien me ha de llevar.</l>
+
+<l xml:id="em0759-es-0649" n="631">¿Hay magistrado del mar?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0230" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0650" n="632">No hay aquí tal ultraje.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0231" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0651" n="633">No entiendo este barco,</l>
+
+<l xml:id="em0759-es-0652" n="634"><emph>nem hoc non potest esse.</emph></l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0232" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0653" n="635">Si ahora os pareciese</l>
+
+<l xml:id="em0759-es-0654" n="636">que solo me expreso en este marco...</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0655" n="637" rend="indent">Entrad, entrad, corregidor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0233" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0656" n="638">¡Oh! <emph>Videtis qui petatis!</emph></l>
+
+<l xml:id="em0759-es-0657" n="639"><emph>Super jure majestatis</emph></l>
+
+<l xml:id="em0759-es-0658" n="640">¿tiene vuestro mando vigor?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0234" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0659" n="641">¿Cuando erais oidor</l>
+
+<l xml:id="em0759-es-0660" n="642"><emph>nonne accepistis</emph> soborno?</l>
+
+<l xml:id="em0759-es-0661" n="643">Pues ahora iréis al horno</l>
+
+<l xml:id="em0759-es-0662" n="644">donde os esperan, señor.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0663" n="645" rend="indent">¡Oh! ¡Qué bueno es este papel</l>
+
+<l xml:id="em0759-es-0664" n="646">para un fuego que ahora es ley!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0235" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0665" n="647"><emph>Domine, memento mei!</emph></l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0236" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0666" n="648"><emph>Non es tempus,</emph> bachiller.</l>
+
+<l xml:id="em0759-es-0667" n="649"><emph>Imbarquemini in</emph> bajel</l>
+
+<l xml:id="em0759-es-0668" n="650"><emph>quia judicastis</emph> malicia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0237" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0669" n="651"><emph>Semper ego in justicia</emph></l>
+
+<l xml:id="em0759-es-0670" n="652"><emph>fecit</emph> y bien por nivel.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0238" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0671" n="653" rend="indent">¿Y los sobornos de los judíos</l>
+
+<l xml:id="em0759-es-0672" n="654">que vuestra mujer se llevaba?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0239" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0673" n="655">Eso a mí no me afectaba,</l>
+
+<l xml:id="em0759-es-0674" n="656">no eran provechos míos.</l>
+
+<l xml:id="em0759-es-0675" n="657"><emph>Non sunt peccatus meus,</emph></l>
+
+<l xml:id="em0759-es-0676" n="658"><emph>peccavit uxore mea.</emph></l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0240" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0677" n="659"><emph>Et vobis quoque cum ea</emph></l>
+
+<l xml:id="em0759-es-0678" n="660"><emph>nem timuistis Deus.</emph></l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0679" n="661" rend="indent"><emph>A largo modo adqueristis</emph></l>
+
+<l xml:id="em0759-es-0680" n="662"><emph>sanguinis laboratorum,</emph></l>
+
+<l xml:id="em0759-es-0681" n="663"><emph>ignorantes peccatorum.</emph></l>
+
+<l xml:id="em0759-es-0682" n="664"><emph>Ut quid eos non audistis?</emph></l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0241" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0683" n="665">¿Vos, barquero, <emph>nonne legistis</emph></l>
+
+<l xml:id="em0759-es-0684" n="666">castigar a los condenados?</l>
+
+<l xml:id="em0759-es-0685" n="667">Los derechos están parados</l>
+
+<l xml:id="em0759-es-0686" n="668"><emph>si aliquid tradidistis.</emph></l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0242" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0687" n="669" rend="indent">Venga, entrad en los negros hados.</l>
+
+<l xml:id="em0759-es-0688" n="670">Iréis al lago de los mundanos</l>
+
+<l xml:id="em0759-es-0689" n="671">y veréis a los escribanos</l>
+
+<l xml:id="em0759-es-0690" n="672">cómo están allí de prosperados.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0243" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0691" n="673">Y en la tierra de los condenados</l>
+
+<l xml:id="em0759-es-0692" n="674">¿están los evangelistas?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0244" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0693" n="675">Los maestros de las burlas vistas</l>
+
+<l xml:id="em0759-es-0694" n="676">allí está bien amargados.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0019">Llega un Procurador y dice el Corregidor cuando lo ve.</stage>
+
+<sp xml:id="em0759-es-sp-0245" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0695" n="677">¡Oh, señor procurador!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0246" who="#procurador">
+<speaker>PROCURADOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0696" n="678">Bésoos las manos, juez.</l>
+
+<l xml:id="em0759-es-0697" n="679">¿Qué dice el barquero esta vez?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0247" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0698" n="680">Que seréis buen remador.</l>
+
+<l xml:id="em0759-es-0699" n="681">Entrad, bachiller, doctor,</l>
+
+<l xml:id="em0759-es-0700" n="682">y le iréis dando al remo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0248" who="#procurador">
+<speaker>PROCURADOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0701" n="683">¿Y este barquero rastrero?</l>
+
+<l xml:id="em0759-es-0702" n="684">¿Os creéis el bromista mayor?</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0703" n="685" rend="indent">¿Esa gente que ahí está</l>
+
+<l xml:id="em0759-es-0704" n="686">la lleváis hacia dónde?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0249" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0705" n="687">Al infierno, donde corresponde.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0250" who="#procurador">
+<speaker>PROCURADOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0706" n="688">Pues yo no voy para allá.</l>
+
+<l xml:id="em0759-es-0707" n="689">Otro navío está aquí ahora</l>
+
+<l xml:id="em0759-es-0708" n="690">mucho mejor preparado.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0251" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0709" n="691">¡Pues estáis bien aviado!</l>
+
+<l xml:id="em0759-es-0710" n="692">Entrad, en mala hora.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0252" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0711" n="693">¿Os confesasteis, doctor?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0253" who="#procurador">
+<speaker>PROCURADOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0712" n="694">Bachiller soy... Pero por mi mal</l>
+
+<l xml:id="em0759-es-0713" n="695">no recordé que era mortal</l>
+
+<l xml:id="em0759-es-0714" n="696">ni la muerte ni el dolor.</l>
+
+<l xml:id="em0759-es-0715" n="697">¿Y vos, señor corregidor?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0254" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0716" n="698">Yo muy bien me confesé,</l>
+
+<l xml:id="em0759-es-0717" n="699">pero todo cuanto robé</l>
+
+<l xml:id="em0759-es-0718" n="700">se lo escondí al confesor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0255" who="#procurador">
+<speaker>PROCURADOR</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0719" n="701" rend="indent">Porque si no los untáis</l>
+
+<l xml:id="em0759-es-0720" n="702">no os quieren absolver</l>
+
+<l xml:id="em0759-es-0721" n="703">y es muy mal devolver</l>
+
+<l xml:id="em0759-es-0722" n="704">después de lo que tomáis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0256" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0723" n="705">¿Pues por qué no embarcáis?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0257" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0724" n="706"><emph>Quia esperamus in Deo</emph>.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0258" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0725" n="707"><emph>Imbarquemini in barco meo.</emph></l>
+
+<l xml:id="em0759-es-0726" n="708">¿Para qué<emph> esperatis</emph> más?</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0020">Se van ambos al barco de la gloria.</stage>
+
+<sp xml:id="em0759-es-sp-0259" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0727" n="709">¡Oh, capitán de los gloriosos,</l>
+
+<l xml:id="em0759-es-0728" n="710">pásanos en ese bajel!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0260" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0729" n="711">¡Oh, desgracias en el papel,</l>
+
+<l xml:id="em0759-es-0730" n="712">para las almas odiosas!</l>
+
+<l xml:id="em0759-es-0731" n="713">Os vanagloriasteis ante otros,</l>
+
+<l xml:id="em0759-es-0732" n="714">siendo hijos de la ciencia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0261" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0733" n="715">¡Oh! <emph>Habeatis</emph> clemencia</l>
+
+<l xml:id="em0759-es-0734" n="716">y pasadnos como vosotros.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0262" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0735" n="717" rend="indent">¡Oh, hombres de los breviarios</l>
+
+<l xml:id="em0759-es-0736" n="718"><emph>rapinastis conejorum</emph></l>
+
+<l xml:id="em0759-es-0737" n="719"><emph>et perdicis recibinorum</emph></l>
+
+<l xml:id="em0759-es-0738" n="720">y meáis en los campanarios.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0263" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0739" n="721">Ángeles, no seáis contrario,</l>
+
+<l xml:id="em0759-es-0740" n="722">pues no tenemos otro puente.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0264" who="#tonto">
+<speaker>TONTO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0741" n="723"><emph>Magistratis ubi sunte?</emph></l>
+
+<l xml:id="em0759-es-0742" n="724"><emph>Ego latinus macarronicarios.</emph></l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0265" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0743" n="725" rend="indent">La justicia divina</l>
+
+<l xml:id="em0759-es-0744" n="726">os manda venir cargados</l>
+
+<l xml:id="em0759-es-0745" n="727">porque iréis embarcados</l>
+
+<l xml:id="em0759-es-0746" n="728">en aquella barca vecina.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0266" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0747" n="729">¡Oh! Que nos guarde San Marcial</l>
+
+<l xml:id="em0759-es-0748" n="730">de la ribera y del río.</l>
+
+<l xml:id="em0759-es-0749" n="731">Parece que es desvarío</l>
+
+<l xml:id="em0759-es-0750" n="732">tener aquí tamaño mal.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0751" n="733" rend="indent">¡Traigan la negra tabla acá!</l>
+
+<l xml:id="em0759-es-0752" n="734">Vamos a ver este secreto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0267" who="#procurador">
+<speaker>PROCURADOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0753" n="735">Dice el destierro, el decreto...</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0268" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0754" n="736">Entrad, que aquí se dirá.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0021">Mientras entran en el barco de los condenados, le dice a Brísida Vaz.</stage>
+
+<sp xml:id="em0759-es-sp-0269" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0755" n="737">Mira quién aquí está:</l>
+
+<l xml:id="em0759-es-0756" n="738">¡doña Brísida Vaz!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0270" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0757" n="739">Ni siquiera aquí estoy en paz,</l>
+
+<l xml:id="em0759-es-0758" n="740">que no me dejabais allá.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0759" n="741" rend="indent">Todo el tiempo sentenciada:</l>
+
+<l xml:id="em0759-es-0760" n="742">«Justicia que manda hacer...».</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0271" who="#corregidor">
+<speaker>CORREGIDOR</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0761" n="743">Y vos vuelta a tejer</l>
+
+<l xml:id="em0759-es-0762" n="744">y a urdir otra jornada.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0272" who="#Brisida_alcahueta">
+<speaker>BRÍSIDA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0763" n="745">Dijiste, juez de alzada:</l>
+
+<l xml:id="em0759-es-0764" n="746">«¿Viene ahí pero de Lisboa?».</l>
+
+<l xml:id="em0759-es-0765" n="747">Llevémoslo a la proa</l>
+
+<l xml:id="em0759-es-0766" n="748">y otra persona más embarcada.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0022">Llega un Ahorcado.</stage>
+
+<sp xml:id="em0759-es-sp-0273" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0767" n="749">¡Ahora venís, ahorcado!</l>
+
+<l xml:id="em0759-es-0768" n="750">¿Garcia Moniz qué dice?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0274" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0769" n="751">Yo os diré lo que dice:</l>
+
+<l xml:id="em0759-es-0770" n="752">que fui bienaventurado,</l>
+
+<l xml:id="em0759-es-0771" n="753">que, por los hurtos que me estampa,</l>
+
+<l xml:id="em0759-es-0772" n="754">soy santo canonizado,</l>
+
+<l xml:id="em0759-es-0773" n="755">pues morí colgado</l>
+
+<l xml:id="em0759-es-0774" n="756">como el zorzal en la trampa.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0275" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0775" n="757">Entra aquí, remarás</l>
+
+<l xml:id="em0759-es-0776" n="758">hasta las puertas del infierno.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0276" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0777" n="759">No es esa la nao que yo gobierno.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0277" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0778" n="760">Entra, que aún cabrás.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0278" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0779" n="761">¡Pesar de San Barrabás!</l>
+
+<l xml:id="em0759-es-0780" n="762">Que Garcia Moniz dice</l>
+
+<l xml:id="em0759-es-0781" n="763">que los que murieran como yo hice</l>
+
+<l xml:id="em0759-es-0782" n="764">son libres de Satanás.</l>
+</lg>
+
+<lg type="nil">
+<l xml:id="em0759-es-0783" n="765" rend="indent">Y dijo que a Dios probara</l>
+
+<l xml:id="em0759-es-0784" n="766">que fuera él el ahorcado,</l>
+
+<l xml:id="em0759-es-0785" n="767">y que fuese Dios loado,</l>
+
+<l xml:id="em0759-es-0786" n="768">que en buena hora yo apareciera,</l>
+
+<l xml:id="em0759-es-0787" n="769">y que el Señor me escogiera,</l>
+
+<l xml:id="em0759-es-0788" n="770">y por mi bien vi alguaciles,</l>
+
+<l xml:id="em0759-es-0789" n="771">y mil latinos civiles,</l>
+
+<l xml:id="em0759-es-0790" n="772">como si yo latín supiera...</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0791" n="773" rend="indent">Y en el último paso</l>
+
+<l xml:id="em0759-es-0792" n="774">me dijo a los oídos</l>
+
+<l xml:id="em0759-es-0793" n="775">que el lugar de los elegidos</l>
+
+<l xml:id="em0759-es-0794" n="776">era la horca y el cadalso.</l>
+
+<l xml:id="em0759-es-0795" n="777">Ni guardianes de monasterio</l>
+
+<l xml:id="em0759-es-0796" n="778">tenían tan santa gente</l>
+
+<l xml:id="em0759-es-0797" n="779">como Afonso Valente,</l>
+
+<l xml:id="em0759-es-0798" n="780">el que ahora es carcelero.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0279" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0799" n="781">¿Dábate consolación</l>
+
+<l xml:id="em0759-es-0800" n="782">o algún refuerzo aquello?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0280" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0801" n="783">Con la soga en el cuello,</l>
+
+<l xml:id="em0759-es-0802" n="784">de poco vale la oración.</l>
+
+<l xml:id="em0759-es-0803" n="785">Lleva a la devoción,</l>
+
+<l xml:id="em0759-es-0804" n="786">que ha de quitar el donaire.</l>
+
+<l xml:id="em0759-es-0805" n="787">Pero a quien está en el aire</l>
+
+<l xml:id="em0759-es-0806" n="788">le aburre mucho el sermón.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0281" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0807" n="789" rend="indent">Entra, entra en el bajel,</l>
+
+<l xml:id="em0759-es-0808" n="790">que para el infierno has de ir.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0282" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0809" n="791">¿Y el Moniz me tuvo que mentir?</l>
+
+<l xml:id="em0759-es-0810" n="792">Me dijo: «Como san Miguel</l>
+
+<l xml:id="em0759-es-0811" n="793">irás a comer pan con fruto</l>
+
+<l xml:id="em0759-es-0812" n="794">porque fuiste ahorcado».</l>
+
+<l xml:id="em0759-es-0813" n="795">Pero, ya pasé mi hado</l>
+
+<l xml:id="em0759-es-0814" n="796">y ya se hizo el luto.</l>
+</lg>
+
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0815" n="797" rend="indent">Ahora no sé qué es eso.</l>
+
+<l xml:id="em0759-es-0816" n="798">No me habló de la ribera,</l>
+
+<l xml:id="em0759-es-0817" n="799">ni barquero ni barquera,</l>
+
+<l xml:id="em0759-es-0818" n="800">sino, después, el paraíso.</l>
+
+<l xml:id="em0759-es-0819" n="801">Y eso con su mucho seso,</l>
+
+<l xml:id="em0759-es-0820" n="802">y que era santa mi soga.</l>
+
+<l xml:id="em0759-es-0821" n="803">Pero después de que me ahoga</l>
+
+<l xml:id="em0759-es-0822" n="804">era mentira todo eso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0283" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0823" n="805">¿Te habló del purgatorio?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0284" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0824" n="806">Dice que es penal serio</l>
+
+<l xml:id="em0759-es-0825" n="807">y reza por él el salterio</l>
+
+<l xml:id="em0759-es-0826" n="808">y la oración del velatorio.</l>
+
+<l xml:id="em0759-es-0827" n="809">Y que era muy notorio</l>
+
+<l xml:id="em0759-es-0828" n="810">que los castigos disciplinados</l>
+
+<l xml:id="em0759-es-0829" n="811">eran rezos de los finados</l>
+
+<l xml:id="em0759-es-0830" n="812">y misa de San Gregorio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0285" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0831" n="813" rend="indent">Entra, pues, que has de entrar,</l>
+
+<l xml:id="em0759-es-0832" n="814">no esperes a tu padre.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0286" who="#ahorcado">
+<speaker>AHORCADO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0833" n="815">Entremos, pues, que no desmadre.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0287" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0834" n="816">Este fue fácil de embarcar.</l>
+
+<l xml:id="em0759-es-0835" n="817">¡Ea! Todos a remar</l>
+
+<l xml:id="em0759-es-0836" n="818">que está en seco el bajel.</l>
+
+<l xml:id="em0759-es-0837" n="819">Vos, doctor, bota el bajel.</l>
+
+<l xml:id="em0759-es-0838" n="820">Hidalgo, saltad al mar.</l>
+</lg>
+</sp>
+
+<stage xml:id="em0759-es-st-0023">Llegan cuatro caballeros de la Orden de Cristo que murieron en África y vienen cantando a cuatro voces la siguiente canción.</stage>
+
+<sp xml:id="em0759-es-sp-0288" who="#caballero #Caballero_otro">
+<speaker>CABALLEROS</speaker>
+<lg type="nil" part="I">
+<l xml:id="em0759-es-0839" n="821" rend="indent">A la barca, a la barca segura.</l>
+
+<l xml:id="em0759-es-0840" n="822">Guardad de la barca perdida.</l>
+
+<l xml:id="em0759-es-0841" n="823">A la barca, la barca de la vida.</l>
+
+<l xml:id="em0759-es-0842" n="824">Los que trabajáis, caballeros,</l>
+
+<l xml:id="em0759-es-0843" n="825">por la vida transitoria,</l>
+
+<l xml:id="em0759-es-0844" n="826">memoria, por Dios, memoria</l>
+
+<l xml:id="em0759-es-0845" n="827">de estos terribles embarcaderos.</l>
+
+<l xml:id="em0759-es-0846" n="828">A la barca, a la barca, mortales.</l>
+
+<l xml:id="em0759-es-0847" n="829">Pero en la vida perdida</l>
+
+<l xml:id="em0759-es-0848" n="830">se pierda la barca de la vida.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0289" who="#diablo">
+<speaker>DIABLO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0849" n="831">Caballeros, ¿vosotros pasáis</l>
+
+<l xml:id="em0759-es-0850" n="832">y adónde no me lo decís?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0290" who="#caballero">
+<speaker>CABALLERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0851" n="833">¿Y vos, Satán, presumís?</l>
+
+<l xml:id="em0759-es-0852" n="834">Mirad bien con quién habláis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0291" who="#Caballero_otro">
+<speaker>OTRO CABALLERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0759-es-0853" n="835">¿Y vos qué nos preguntáis?</l>
+
+<l xml:id="em0759-es-0854" n="836">Al menos conocednos bien:</l>
+
+<l xml:id="em0759-es-0855" n="837">morimos por él y amén</l>
+
+<l xml:id="em0759-es-0856" n="838">y más saber no queráis.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0759-es-sp-0292" who="#angel">
+<speaker>ÁNGEL</speaker>
+<lg type="free" part="F">
+<l xml:id="em0759-es-0857" n="839">¡Oh, de Dios caballeros,</l>
+
+<l xml:id="em0759-es-0858" n="840">a vos os estoy esperando,</l>
+
+<l xml:id="em0759-es-0859" n="841">que moristeis peleando</l>
+
+<l xml:id="em0759-es-0860" n="842">por Cristo, señor verdadero!</l>
+
+<l xml:id="em0759-es-0861" n="843">Estáis libres de todo mal,</l>
+
+<l xml:id="em0759-es-0862" n="844">mártires de nuestro Señor,</l>
+
+<l xml:id="em0759-es-0863" n="845">que quien muere con valor</l>
+
+<l xml:id="em0759-es-0864" n="846">merece la paz espiritual.</l>
+</lg>
+</sp>
+
+<trailer>Aquí acaba la primera escena.</trailer>
+</div1>
+</body><back></back>
+</text>
+</TEI>

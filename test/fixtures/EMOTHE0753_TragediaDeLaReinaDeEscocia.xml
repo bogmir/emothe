@@ -1,0 +1,4199 @@
+<?xml version="1.0" ?>
+<TEI xml:lang="es" xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader><fileDesc> 
+<titleStmt> 
+	   <title type="traduccion">Tragedia de la reina de Escocia</title>
+<title type="original">Tragédie de la Reine d’Écosse</title> 
+	   <title type="edicion">Tragedia de la reina de Escocia / Antoine de Montchrestien: Tra. García Peinado, Miguel Ángel; Aguilar Camacho, María del Carmen: codificación TEI para EMOTHE</title> 
+		 <title key="orden">reina de Escocia Tragedia de la</title> 
+		 <title key="archivo">EMOTHE0753_TragediaDeLaReinaDeEscocia</title> 
+		  
+	   <editor role="translator"><persName>García Peinado, Miguel Ángel; Aguilar Camacho, María del Carmen</persName></editor>
+<author ana="fiable">Antoine de Montchrestien</author> 
+		 <author key="orden">Montchrestien, Antoine de</author> 
+		  
+	         <sponsor>  
+	           <orgName>Plan Nacional de Investigación Científica, Desarrollo e Innovación Tecnológica (Plan Nacional de I+D+i)</orgName>  
+	         </sponsor> 
+	         <funder> 
+              <orgName> Ministerio de Ciencia e Innovación – Agencia Estatal de Investigación -FEDER/ERDF:  "Teatro español y europeo de los siglos XVI y XVII: patrimonio y bases de datos" (EMOTHE) ref. PID2019-104045GB-C54 (2020-06-01 / 2023-05-31);  Ministerio de Ciencia, Innovación y Universidades, Ministerio de Economía y Competitividad – Agencia Estatal de Investigación -FEDER/ERDF:  "Teatro europeo de los siglos XVI y XVII: patrimonio y bases de datos" (EMOTHE) ref. FFI2016-80314-P (2016-12-30 /2019-12-31); Programa Estatal Redes de Excelencia, "Red del Patrimonio Teatral Clásico Español", ref. FFI2015-71441-REDC (2015-12-01 / 2017-11-30); Ministerio de Ciencia e Innovación, "Base de datos, argumentos y textos del teatro clásico español", ref. FFI2012-34347 (2013-02-01 / 2016-12-31); Ministerio de Ciencia e Innovación, "Patrimonio teatral clásico español: textos e instrumentos de investigación", ref. CSD 2009-00033 (2009-12-17 / 2014-12-13); Ministerio de Ciencia e Innovación, "ARTELOPE. Base de datos, argumentos y textos del teatro clásico español", ref. FFI2009-12730 (2010-01-01 / 2012-12-31)</orgName> 
+	        </funder> 
+	        <respStmt>  
+           <resp>Electronic edition: text adapted, edited for XML and encoded by</resp> 
+           <persName>Carmen Cerdán, Rodrigo</persName> 
+	        </respStmt> 
+	        <principal>Joan Oleza Simó</principal> 
+	    </titleStmt> 
+ 
+		<extent ana="intervenciones">163</extent> 
+	    <publicationStmt> 
+	        <publisher> 
+              <orgName> ARTELOPE/EMOTHE Universitat de València</orgName> 
+	        </publisher> 
+	        <authority>  
+	            <orgName>Universitat de València - Estudi General. http://www.uv.es</orgName>  
+	        </authority> 
+	        <idno type="EMOTHE">0753</idno> 
+	        <availability> 
+             <p>La Biblioteca Digital EMOTHE: The Classics of Early Modern European Theatre pertenece al proyecto EMOTHE del grupo de investigación ARTELOPE y ofrece en la web textos completos en acceso abierto, según la licencia que se indique. Se ruega citar la procedencia: "Oleza, Joan et al. EMOTHE: The Classics of Early Modern European Theatre. Valencia: ARTELOPE/EMOTHE Universitat de València, 2010-. https://emothe.uv.es/biblioteca/"</p> 
+              <licence target="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">Esta obra está bajo una Licencia Creative Commons Atribución-NoComercial-SinDerivadas 4.0 Internacional (CC BY-NC-ND 4.0)</licence>  
+	        </availability> 
+		<pubPlace>Valencia</pubPlace>	         
+		<date>2024</date> 
+	    </publicationStmt> 
+	     
+	    
+<sourceDesc>
+<bibl>
+<title>La reina de Escocia</title>
+<author>Montchrestien, Antoine de</author>
+<editor role="traductor">García Peinado, Miguel Ángel; Aguilar Camacho, María del Carmen</editor>
+<note>Montchrestien, Antoine de. <emph>Tragedia de la reina de Escocia</emph>. Traducción versificada y notas de Miguel Ángel García Peinado y María del Carmen Aguilar Camacho para la Biblioteca Digital EMOTHE. Valencia: EMOTHE Universitat de València, 2024.</note>
+</bibl>
+</sourceDesc> 
+	</fileDesc>  
+   <encodingDesc> 
+       <projectDesc> 
+           <p>La Biblioteca Digital EMOTHE (antes denominada Colección de Textos Clásicos Europeos (CTCE)) supone la creación de una base de datos de teatro clásico europeo en diferentes idiomas, versiones y refundiciones, todas ellas hipervinculadas.</p>   
+           <p>Carlos Muñoz Pons es responsable de (1) la programación de FileMaker para que genere archivos XML en formato TEI, a partir de los cuáles se generan estadísticas sobre aspectos de las obras; (2) el desarrollo del programa de generación de estas estadísticas; (3) el desarrollo de la hoja de transformación XSL para generar los archivos HMTL-PHP para su visualización en web; y (4) el desarrollo del programa para enlazar original y traducciones para su visualización en paralelo.</p> 
+       </projectDesc> 
+       <editorialDecl> 
+            <p>Las presentes ediciones digitales están basadas, en su mayor parte, en ediciones científicas de reconocido prestigio y se ha tratado, en la mayoría de ocasiones, de respetar sus criterios de edición. Solo en casos muy puntuales el editor digital ha introducido leves cambios de los que da cumplida cuenta en el apartado de "Notas".</p> 
+       </editorialDecl> 
+	      <classDecl> 
+            <taxonomy xml:id="CDU"> 
+                <bibl>Clasificación Decimal Universal</bibl> 
+            </taxonomy> 
+       </classDecl> 
+	      <appInfo> 
+            <application ident="FMPA" version="16"> 
+                <label>FileMaker Pro Advanced 16</label> 
+            </application> 
+            <application ident="FMSA" version="16"> 
+                <label>FileMaker Server 16</label> 
+            </application> 
+            <application ident="FMP" version="16"> 
+                <label>FileMaker Pro 16</label> 
+            </application> 
+            <application ident="Oxygen" version="20.1"> 
+                <label>Oxygen XML Editor 20.1</label> 
+            </application> 
+        </appInfo> 
+    </encodingDesc> 
+    <profileDesc> 
+	     <langUsage> 
+	       <language ident="es-ES">Español</language> 
+	     </langUsage> 
+      <textClass> 
+         <classCode scheme="#CDU">821.134.2-2</classCode> 
+      </textClass> 
+    </profileDesc> 
+    <revisionDesc>  
+        <change>   
+            <date></date>  
+         </change>   
+    </revisionDesc>
+</teiHeader>
+<text>
+<front><titlePage> 						
+<docTitle>
+<titlePart>
+<title>Tragedia de la reina de Escocia</title>
+</titlePart>
+</docTitle> 						
+<docAuthor>Antoine de Antoine de Montchrestien</docAuthor> 						
+</titlePage>
+<div type="nota_edicion_digital">
+<head>Nota a esta edición digital</head>
+<p>Esta publicación es parte del proyecto I+D+i «EMOTHE: Segunda fase de teatro español y europeo de los siglos XVI y XVII: patrimonio y bases de datos», referencia PID2022-136431NB-C65 (acrónimo EMOTHE), financiado por MICIN/AEI/10.13039/501100011033 y por FEDER, UE.</p>
+</div>
+
+<div type="head_title">
+<p>Tragedia de la reina de Escocia de Antoine de Montchrestien. Traducción versificada y notas</p>
+</div>
+
+<div type="elenco">
+<head>Personajes</head>
+<castList>
+<castItem><role xml:id="REINA_ESCOCIA">Reina de Escocia</role></castItem>
+<castItem><role xml:id="REINA_INGLATERRA">Reina de Inglaterra</role></castItem>
+<castItem><role xml:id="CONSEJERO">Consejero</role></castItem>
+<castItem><role xml:id="DAVISON">D’Avison</role></castItem>
+<castItem><role xml:id="MAYORDOMO">Mayordomo</role></castItem>
+<castItem><role xml:id="MENSAJERO">Mensajero</role></castItem>
+<castItem><role xml:id="PAJE">Paje</role></castItem>
+<castItem><role xml:id="CORO_ESTADOS">Coro de los Estados</role></castItem>
+<castItem><role xml:id="CORO_DAMAS">Coro de las damas de compañía de la reina de Escocia</role></castItem>
+</castList>
+</div>
+</front>
+<body>
+<div1 type="act" n="1">
+<head>ACTO I</head>
+
+<stage xml:id="em0753-es-st-0001">REINA DE INGLATERRA, CONSEJERO, [CORO DE LOS ESTADOS]</stage>
+
+<sp xml:id="em0753-es-sp-0001" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0001" n="1">¿Hasta cuándo estará mi alma desolada</l>
+
+<l xml:id="em0753-es-0002">de espantosos temores que la sacudirán?</l>
+
+<l xml:id="em0753-es-0003">¿Viviré hasta cuando expuesta al peligro</l>
+
+<l xml:id="em0753-es-0004">del veneno doméstico y del gladio extranjero?</l>
+
+<l xml:id="em0753-es-0005">Un cuerpo bajo el Sol es sólo una sombra;</l>
+
+<l xml:id="em0753-es-0006">mas tantísimos males rebasan cualquier número,</l>
+
+<l xml:id="em0753-es-0007">acompañan al Cetro, por los hombres ansiado,</l>
+
+<l xml:id="em0753-es-0008">duro peso, no obstante, de la mente y las manos</l>
+
+<l xml:id="em0753-es-0009">que crece día a día, y al final abruma</l>
+
+<l xml:id="em0753-es-0010">a su orgulloso dueño, aunque miserable.</l>
+
+<l xml:id="em0753-es-0011">Aunque muchas personas me admiren con envidia,</l>
+
+<l xml:id="em0753-es-0012">me miren caminar con ojo y mente radiante:</l>
+
+<l xml:id="em0753-es-0013">aunque unas cien Naciones admiren mis riquezas</l>
+
+<l xml:id="em0753-es-0014">y me alcen por encima de las otras Princesas;</l>
+
+<l xml:id="em0753-es-0015">por mi parte yo estimo mi dicha infortunada,</l>
+
+<l xml:id="em0753-es-0016">que para seducirlos usa un disfraz de honor.</l>
+
+<l xml:id="em0753-es-0017">La espada de Damocles pende sobre mi testa,</l>
+
+<l xml:id="em0753-es-0018">con hundirla amenaza, si no se la detiene:</l>
+
+<l xml:id="em0753-es-0019">el español, no ufano con su último mundo</l>
+
+<l xml:id="em0753-es-0020">quiere sobre mi tumba plantar su fatuo trono;</l>
+
+<l xml:id="em0753-es-0021">do la fuerza no vale emplea el artificio,</l>
+
+<l xml:id="em0753-es-0022">para sí devastar mi Estado y mi vida:</l>
+
+<l xml:id="em0753-es-0023">este Pirro<note n="6221" type="traductor"><term>Pirro</term><p>Probablemente Pyrrhus, hijo de Aquiles asesinado por Orestes, En la mitología griega, Neoptólemo, también llamado Pirro (en griego antiguo ‘rojo, rubio’), era hijo del guerrero Aquiles y de la princesa Deidamía, hija del rey Licomedes de Esciro.</p></note> ambicioso, cuya red fin no tiene</l>
+
+<l xml:id="em0753-es-0024">con fe todo lo estrecha, anhela ganar todo,</l>
+
+<l xml:id="em0753-es-0025">del fin de un proyecto hace renacer otro:</l>
+
+<l xml:id="em0753-es-0026">como amo en los dos bordes del orbe es conocido:</l>
+
+<l xml:id="em0753-es-0027">¡y aun así saciar no puede su lujuria,</l>
+
+<l xml:id="em0753-es-0028">si no viene, injusticia<note n="6222" type="traductor"><term>injusticia</term><p>El original: “forfait”: subst. masc. Emploi intrans., littér., vieilli. Manquer gravement à ses devoirs; commettre une faute grave (CNRTL: Centre National de Ressources textuelles et Lexicales, version 2012. UMR ATILF (CNRS-Nancy Université). Site internet : http://www.cnrtl.fr/. http://www.atilf.fr/dmf).</p></note>!, a esta isla a extasiarme;</l>
+
+<l xml:id="em0753-es-0029">de no ser por el Cielo, que siempre me es propicio,</l>
+
+<l xml:id="em0753-es-0030">vería a la inocencia triunfar sobre malicia.</l>
+
+<l xml:id="em0753-es-0031">Mi Támesis, honor de nuestros más bellos ríos</l>
+
+<l xml:id="em0753-es-0032">sus afluentes haría rodar sólo por él;</l>
+
+<l xml:id="em0753-es-0033">y mi pueblo, en las armas indomable guerrero</l>
+
+<l xml:id="em0753-es-0034">gemiría bajo su insoportable yugo.</l>
+
+<l xml:id="em0753-es-0035">¿Pero qué me depara ahora el destino?</l>
+
+<l xml:id="em0753-es-0036">Cuanto menos lo intuyo más maquina mi muerte.</l>
+
+<l xml:id="em0753-es-0037">Una Reina exiliada, errante, fugitiva,</l>
+
+<l xml:id="em0753-es-0038">ya libre de los suyos, donde estaba cautiva,</l>
+
+<l xml:id="em0753-es-0039">llegó a nuestras costas contra su voluntad,</l>
+
+<l xml:id="em0753-es-0040">pues su infeliz viaje la guiaba a otro lugar.</l>
+
+<l xml:id="em0753-es-0041">Realmente la paré desde ese momento,</l>
+
+<l xml:id="em0753-es-0042">mas, salvo el albedrío, noblemente tratada;</l>
+
+<l xml:id="em0753-es-0043">y queriendo mil veces aflojar su cadena,</l>
+
+<l xml:id="em0753-es-0044">Dios sabe qué destino vino a impedírmelo.</l>
+
+<l xml:id="em0753-es-0045">Todos, por mi ejemplo, mirarán al futuro,</l>
+
+<l xml:id="em0753-es-0046">que una belleza real es difícil de guardar.</l>
+
+<l xml:id="em0753-es-0047">Aunque de su prisión el tedioso transcurso</l>
+
+<l xml:id="em0753-es-0048">pudiese excitar justa ira en su corazón;</l>
+
+<l xml:id="em0753-es-0049">por mi amable trato debía ella extinguirse,</l>
+
+<l xml:id="em0753-es-0050">quejándose en su mal de no poder quejarse:</l>
+
+<l xml:id="em0753-es-0051">pero me han referido, que en este último esfuerzo,</l>
+
+<l xml:id="em0753-es-0052">lucha ella por mi Cetro, y maquina mi muerte.</l>
+
+<l xml:id="em0753-es-0053">¿Será eso el amor, alma ingrata y ligera,</l>
+
+<l xml:id="em0753-es-0054">que sin fin me juraba tu boca embustera?</l>
+
+<l xml:id="em0753-es-0055">¡Tendré esta recompensa, no debida, ni ansiada,</l>
+
+<l xml:id="em0753-es-0056">de una a quien tanto bien por el mal he devuelto!</l>
+
+<l xml:id="em0753-es-0057">Mas ¿debo creer verdad una simple apariencia,</l>
+
+<l xml:id="em0753-es-0058">y sospechar de una determinada creencia?</l>
+
+<l xml:id="em0753-es-0059">Quien cree con ligereza pronto se decepciona:</l>
+
+<l xml:id="em0753-es-0060">igual quien no cree en nada obtiene un gran quebranto.</l>
+
+<l xml:id="em0753-es-0061">A quien lo lleva el viento se muestra muy voluble:</l>
+
+<l xml:id="em0753-es-0062">de ahí que la certeza nazca de la sospecha.</l>
+
+<l xml:id="em0753-es-0063">El que vive así, muere cien veces sin morir;</l>
+
+<l xml:id="em0753-es-0064">mejor temer un poco que exponerse a la muerte.</l>
+
+<l xml:id="em0753-es-0065">Así, para avalar mi Estado y mi vida,</l>
+
+<l xml:id="em0753-es-0066">la he, aun con pesar, sojuzgado algún tiempo,</l>
+
+<l xml:id="em0753-es-0067">no buscando su muerte, sino sólo esforzándose</l>
+
+<l xml:id="em0753-es-0068">en amansar la audacia y vivir bien segura,</l>
+
+<l xml:id="em0753-es-0069">¿hay que dejar llevarse por un furor tras otro,</l>
+
+<l xml:id="em0753-es-0070">exhortando a todos a venir tras de mí?</l>
+
+<l xml:id="em0753-es-0071">Que contra mí intenta animar a los míos,</l>
+
+<l xml:id="em0753-es-0072">que excita a mi pueblo y se esfuerza en armarlo,</l>
+
+<l xml:id="em0753-es-0073">en fin, por sus encantos muchos que me eran fieles</l>
+
+<l xml:id="em0753-es-0074">su deber olvidando se alinean con ella.</l>
+
+<l xml:id="em0753-es-0075">Corazón inhumano para beldad tan dulce,</l>
+
+<l xml:id="em0753-es-0076">ya que albergar tú puedes tanta deslealtad,</l>
+
+<l xml:id="em0753-es-0077">de envidia y de despecho, de audacia y de furor,</l>
+
+<l xml:id="em0753-es-0078">¿por qué tanta dulzura exhibes en tu rostro?</l>
+
+<l xml:id="em0753-es-0079">¿Tus ojos que encandilan a cualquier corazón,</l>
+
+<l xml:id="em0753-es-0080">quedarán impasibles viendo mi perdición?</l>
+
+<l xml:id="em0753-es-0081">Bellos Astros brillando en el cielo de tu rostro,</l>
+
+<l xml:id="em0753-es-0082">¿serán ellos presagio de mi funesta muerte?</l>
+
+<l xml:id="em0753-es-0083">¿No se conmoverá tu pecho de aflicción,</l>
+
+<l xml:id="em0753-es-0084">al ver a esta hermosa Isla en la desolación,</l>
+
+<l xml:id="em0753-es-0085">presa de la discordia de guerras que la abrasan,</l>
+
+<l xml:id="em0753-es-0086">al crimen de sus hijos por ellos animada?</l>
+
+<l xml:id="em0753-es-0087">¿Mirarás sin dolor a los airados soldados,</l>
+
+<l xml:id="em0753-es-0088">masacrar a sus pies a ancianos ultrajados,</l>
+
+<l xml:id="em0753-es-0089">degollar a los niños delante de sus padres,</l>
+
+<l xml:id="em0753-es-0090">niñas violadas en el regazo de sus madres,</l>
+
+<l xml:id="em0753-es-0091">y los ríos que incluso rebosan sus orillas</l>
+
+<l xml:id="em0753-es-0092">del llanto de los vivos y sangre de los muertos?</l>
+
+<l xml:id="em0753-es-0093">Si esta voluntad bárbaramente cruel</l>
+
+<l xml:id="em0753-es-0094">puede inclinar el ánimo de una Reina tan bella,</l>
+
+<l xml:id="em0753-es-0095">si el corazón de una mujer tan afligida,</l>
+
+<l xml:id="em0753-es-0096">osa aún concebir este airado proyecto;</l>
+
+<l xml:id="em0753-es-0097">creeré en adelante que los osos crueles</l>
+
+<l xml:id="em0753-es-0098">abandonan la furia que les es natural;</l>
+
+<l xml:id="em0753-es-0099">y que la hembra, nacida en la benignidad</l>
+
+<l xml:id="em0753-es-0100">rodea su corazón de una marga crueldad.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0002" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0101" n="2">Alzada está la máscara, la cosa es conocida:</l>
+
+<l xml:id="em0753-es-0102">si un ojo no la ve, es que lo vela una nube;</l>
+
+<l xml:id="em0753-es-0103">si no la cree la mente se desmiente a sí misma;</l>
+
+<l xml:id="em0753-es-0104">si el alma no la teme no tiene sentimientos;</l>
+
+<l xml:id="em0753-es-0105">se duerme miserable, y la tormenta arrecia</l>
+
+<l xml:id="em0753-es-0106">e, inesperadamente, cae sobre su cabeza.</l>
+
+<l xml:id="em0753-es-0107">No es preciso, Señora, permanecer aquí;</l>
+
+<l xml:id="em0753-es-0108">abarcad la inquietud de vos misma y la nuestra:</l>
+
+<l xml:id="em0753-es-0109">ya que, si el bien público vuestro deseo ha de ser,</l>
+
+<l xml:id="em0753-es-0110">por él también se debe preservar vuestra vida.</l>
+
+<l xml:id="em0753-es-0111">Así extinguir podréis más bien que hacer nacer</l>
+
+<l xml:id="em0753-es-0112">los bárbaros designios de estos fatuos morenos<note n="6223" type="traductor"><term>morenos</term><p>El original: “basanés”, aplicado a los españoles, significa <emph>de couleur brune</emph>; por analogía con la basane, piel de oveja curtida, que varía en tonalidad del dorado al pardo. El término se aplica generalmente a la complexión de la piel de una persona, y está documentado desde 1637, en el <emph>Abrégé du parallèle des langues françoise et latine repporté au plus près de leurs propriétez...</emph> par le P. Phillibert Monet, de la Compagnie de Jésus, Rouen: Romain de Beauvais, 1637.</p></note>;</l>
+
+<l xml:id="em0753-es-0113">así podréis brindar plena seguridad,</l>
+
+<l xml:id="em0753-es-0114">deterioro a Escocia, y el terror a Francia;</l>
+
+<l xml:id="em0753-es-0115">donde si fallecéis es deseo de los Reyes,</l>
+
+<l xml:id="em0753-es-0116">el fin de nuestra Fe, tumba de nuestras leyes.</l>
+
+<l xml:id="em0753-es-0117">Y como un rebaño desprovisto de su amo</l>
+
+<l xml:id="em0753-es-0118">que piensa estar seguro pastando en el prado</l>
+
+<l xml:id="em0753-es-0119">está expuesto a ser presa del furor de los lobos;</l>
+
+<l xml:id="em0753-es-0120">un similar peligro nos caería a nosotros,</l>
+
+<l xml:id="em0753-es-0121">si la cruel Parca<note n="6224" type="traductor"><term>Parca</term><p>Alusión a Átropos, en la mitología griega (a veces llamada Aisa) era una de las tres Parcas, la que cortaba el hilo de la vida de los mortales. Las otras eran Cloto, que hilaba la hebra, y Láquesis, que medía la longitud. Era ella quien elegía el mecanismo de la muerte y terminaba con la vida de cada mortal, cortando su hebra con sus aborrecibles tijeras. Las tres eran hijas de Zeus y Temis, diosa del orden, o de Nix "la Noche".</p></note> hubiera cortado nuestro hilo,</l>
+
+<l xml:id="em0753-es-0122">que por nuestro bien une vuestro cuerpo y vuestra alma:</l>
+
+<l xml:id="em0753-es-0123">cuando el Estado está dividido en facciones,</l>
+
+<l xml:id="em0753-es-0124">siempre el más malvado es el más autorizado;</l>
+
+<l xml:id="em0753-es-0125">tiene voz el desorden, y se oye al desenfreno</l>
+
+<l xml:id="em0753-es-0126">que abandona el alma a terribles pecados;</l>
+
+<l xml:id="em0753-es-0127">todo es indiferente, sea profano o sagrado,</l>
+
+<l xml:id="em0753-es-0128">el mal no se castiga, no se premia el buen acto.</l>
+
+<l xml:id="em0753-es-0129">Señora, os lo ruego que nunca olvidéis,</l>
+
+<l xml:id="em0753-es-0130">que los Reyes del mundo envidian vuestra gloria;</l>
+
+<l xml:id="em0753-es-0131">que todo el mundo os culpa, que el orgullo extranjero</l>
+
+<l xml:id="em0753-es-0132">contra vos sin cesar conspira nuevos riesgos,</l>
+
+<l xml:id="em0753-es-0133">busca todos los medios de quitaros la vida,</l>
+
+<l xml:id="em0753-es-0134">pues sólo vuestra muerte es el fin de su envidia.</l>
+
+<l xml:id="em0753-es-0135">Del español el brío, mil veces proyectado,</l>
+
+<l xml:id="em0753-es-0136">muestra muy claramente su infidelidad;</l>
+
+<l xml:id="em0753-es-0137">y si no ha satisfecho su valor traicionero,</l>
+
+<l xml:id="em0753-es-0138">es por falta de suerte, no por falta de rabia;</l>
+
+<l xml:id="em0753-es-0139">porque el benigno Cielo vela siempre por vos,</l>
+
+<l xml:id="em0753-es-0140">pues en vuestro bien yace la salvación de todos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0003" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0141" n="3">Sé bien, amigo mío, que ahora el destino</l>
+
+<l xml:id="em0753-es-0142">del pueblo inglés parece ir a la par del mío;</l>
+
+<l xml:id="em0753-es-0143">que muchos, olvidados del deber por mi muerte,</l>
+
+<l xml:id="em0753-es-0144">pronto habrían fraguado cien partidos monstruosos;</l>
+
+<l xml:id="em0753-es-0145">que igual que la víbora comida es por su fruto<note n="6225" type="traductor"><term>fruto</term><p>En la Antigüedad se creía que las crías de la víbora mataban a su madre al nacer.</p></note>,</l>
+
+<l xml:id="em0753-es-0146">Inglaterra sería comida por los suyos.</l>
+
+<l xml:id="em0753-es-0147">Pensando en tal desgracia padezco cien tormentos,</l>
+
+<l xml:id="em0753-es-0148">y de un solo temor soporto mil asombros;</l>
+
+<l xml:id="em0753-es-0149">pero este negro humor que posee mi alma,</l>
+
+<l xml:id="em0753-es-0150">no me permite nunca pensar en el remedio,</l>
+
+<l xml:id="em0753-es-0151">cual el paciente que sin morir languidece,</l>
+
+<l xml:id="em0753-es-0152">y no puede evitar su infeliz dolor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0004" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0153" n="4">Salid de este conflicto, no hay nada más sencillo.</l>
+
+<l xml:id="em0753-es-0154">Ahora que está el Cielo sereno y tranquilo,</l>
+
+<l xml:id="em0753-es-0155">el mar está en calma y el viento es favorable,</l>
+
+<l xml:id="em0753-es-0156">llevad la vela al mástil; mucho estuvo inactiva:</l>
+
+<l xml:id="em0753-es-0157">pues cuando el buen tiempo suceda a la tormenta,</l>
+
+<l xml:id="em0753-es-0158">arrancar será sólo buscar el hundimiento.</l>
+
+<l xml:id="em0753-es-0159">Puede en tiempos de paz ejercer la venganza</l>
+
+<l xml:id="em0753-es-0160">el que duerme tranquilo y no piensa en ella;</l>
+
+<l xml:id="em0753-es-0161">luego llega la guerra obligándolo a hacerlo,</l>
+
+<l xml:id="em0753-es-0162">aunque para salvarse, haga lo imprescindible.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0005" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0163" n="5">¿Cómo resolveré todo este desconcierto?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0006" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0164" n="6">Cortad sólo una testa de la Hidra de los bandos<note n="6226" type="traductor"><term>bandos</term><p>Alusión a La Hidra de Lerna, que en la mitología griega era una serpiente acuática de enorme tamaño, aliento venenoso y múltiples cabezas que moraba en las profundidades del lago homónimo, cerca de Nauplia, en el golfo de la Argólida. Bajo sus aguas había una entrada al Inframundo vigilado por la Hidra.</p></note>.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0007" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0165" n="7">Para dar este golpe se necesita a un Hércules<note n="6227" type="traductor"><term>Hércules</term><p>La Hidra de Lerna fue aniquilada por Hércules durante uno de sus doce trabajos. Su guarida era el lago homónimo, situado en la Argílida. Aunque se especuló que tal sitio habría existido en la Antigüedad Clásica, la moderna arqueología ha desmentido el mito de que este sitio sagrado fuera incluso más antiguo que la ciudad de Mecenas, en Argos.</p></note>.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0008" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0166" n="8">Se puede, sin peligro, perpetrar un delito.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0009" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0167" n="9">Aunque tal fuera, está fuera de nuestras leyes:</l>
+
+<l xml:id="em0753-es-0168">las Reinas y los Reyes sólo dan cuenta a Dios.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0010" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0169" n="10">Es altruismo matar a una mujer malvada</l>
+
+<l xml:id="em0753-es-0170">así como a un tirano: de los dos nos jactamos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0011" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0171" n="11">Consideradla bien; es la madre de un Rey,</l>
+
+<l xml:id="em0753-es-0172">la esposa de dos Reyes, y como yo una Reina</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0012" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0173" n="12">Consideradla bien; es una desleal</l>
+
+<l xml:id="em0753-es-0174">que niega con sus hábitos la majestad Real.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0013" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0175" n="13">Mi interés privado me impide el juzgarla.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0014" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0176" n="14">Y ese mismo interés os invita a pensarlo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0015" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0177" n="15">Veo más peligro en ello cuanto más yo lo pienso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0016" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0178" n="16">Podréis atenuarlo vengando vuestra ofensa.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0017" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0179" n="17">Esta justa venganza está en manos de Dios.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0018" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0180" n="18">Y Dios os la devuelve, pues a vos pertenece.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0019" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0181" n="19">Si el Cielo me apoya, la Tierra está en mi contra.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0020" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0182" n="20">Si el Cielo os apoya nada os puede ir mal.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0021" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0183" n="21">Sus secretos son hondos, y la razón humana</l>
+
+<l xml:id="em0753-es-0184">proponiendo de un modo, dispone luego de otro.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0022" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0185" n="22">Puesto que el Cielo es justo, no puede disgustarle,</l>
+
+<l xml:id="em0753-es-0186">el que la ley pague su salario a los malos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0023" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0187" n="23">No, no, algún vengador saldría de su tumba,</l>
+
+<l xml:id="em0753-es-0188">hurtaría mi vida y a vos vuestro descanso.</l>
+
+<l xml:id="em0753-es-0189">Los Reyes que ordenan dar muerte a sus rivales,</l>
+
+<l xml:id="em0753-es-0190">pensando en reducirlos, no hacen sino aumentarlos,</l>
+
+<l xml:id="em0753-es-0191">los padres, los vecinos, los hijos, los amigos,</l>
+
+<l xml:id="em0753-es-0192">resucitan a causa de aquellos que mataron:</l>
+
+<l xml:id="em0753-es-0193">así el árbol rechaza muchas jóvenes ramas</l>
+
+<l xml:id="em0753-es-0194">en lugar de las viejas ramas que el hierro corta.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0024" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0195" n="24">Pero en esa estación puede cortarse el árbol</l>
+
+<l xml:id="em0753-es-0196">que hasta las raíces vemos como se seca.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0025" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0197" n="25">Es peor este remedio que la propia epidemia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0026" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0198" n="26">Pero en males extremos, hay que ser siempre extremo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0027" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0199" n="27">Soportar una injuria a veces es mejor</l>
+
+<l xml:id="em0753-es-0200">que buscar la venganza y encontrar la desgracia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0028" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0201" n="28">No obstante, es mejor siempre vengarse de un agravio,</l>
+
+<l xml:id="em0753-es-0202">que atraer muchos otros por haberlo aguantado.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0029" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0203" n="29">Siempre entre dos peligros se elige el menor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0030" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0204" n="30">Mas juzgar es preciso sin ninguna pasión.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0031" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0205" n="31">Si la ajusticiamos, irritamos a Francia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0032" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0206" n="32">¿Dejándola vivir que confianza os aporta?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0033" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0207" n="33">Podemos acusarla, pero no castigarla.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0034" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0208" n="34">Si está en vuestras manos, ¿quién puede impedíroslo?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0035" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0209" n="35">Varios pueblos tras ello invadirían mi Isla.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0036" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0210" n="36">Paz a quien nos respete. Guerra a quien nos provoque.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0037" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0211" n="37">La llorarán los Reyes, yo sola erraré.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0038" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0212" n="38">Al menos no podrán reír por vuestra muerte.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0039" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0213" n="39">Por la injuria común se armarán en la diestra.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0040" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0214" n="40">Causa más miedo el trueno que luego el propio daño.</l>
+
+<l xml:id="em0753-es-0215">El castigo de un grande provoca mucho ruido.</l>
+
+<l xml:id="em0753-es-0216">Una vez dado el golpe, el efecto es escaso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0041" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0217" n="41">La sacra sangre Real debe ser inviolable.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0042" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0218" n="42">Debió ella de la vuestra pensar de modo igual.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0043" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0219" n="43">¡Nadie creerá que ella ha enredado en mi vida!</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0044" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0220" n="44">Más vale que sea así que luego sorprenderse.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0045" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0221" n="45">Las Ligas siempre son muy poco conocidas,</l>
+
+<l xml:id="em0753-es-0222">hasta que se ha logrado el efecto sangriento.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0046" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0223" n="46">Mas tal conocimiento llega siempre muy tarde,</l>
+
+<l xml:id="em0753-es-0224">pues somos demasiado propensos al azar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0047" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0225" n="47">Creo que mejor sería renunciar a la vida,</l>
+
+<l xml:id="em0753-es-0226">si para conservarla nos atraemos la envidia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0048" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0227" n="48">Poco ardor tiene un Príncipe si soportar no puede</l>
+
+<l xml:id="em0753-es-0228">a los que sólo saben hablar y murmurar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0049" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0229" n="49">Gana en esto Clemencia, conviene que lo intente</l>
+
+<l xml:id="em0753-es-0230">si con dulce envoltura puedo explorar la herida;</l>
+
+<l xml:id="em0753-es-0231">probar quiero otra vez este procedimiento;</l>
+
+<l xml:id="em0753-es-0232">pues pudiendo perderla al intentar salvarla,</l>
+
+<l xml:id="em0753-es-0233">demostrará al menos que tengo un alma buena</l>
+
+<l xml:id="em0753-es-0234">que salvar quiere a todos y no perder a nadie.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0050" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0235" n="50">Evitad protegiéndola el perdernos a todos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0051" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0236" n="51">Poco me cuido yo, mas lo haré de vosotros.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0052" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0237" n="52">No basta con decirlo, hay que demostrarlo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0053" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0238" n="53">Queriendo excluir el mal, cuidemos de aumentarlo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0054" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0239" n="54">Sin emplear el hierro, no se puede curar.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0055" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0240" n="55">Mas, no debe usarse para hacerla morir.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0056" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0241" n="56">¡Cómo! ¿Vuestra alma cede vilmente al perdón?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0057" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0242" n="57">Si la bondad nos sirve, la juzgo buena cosa.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0058" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0243" n="58">El blando con los crueles es brutal con los buenos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0059" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0244" n="59">A veces los malvados con el perdón se vencen:</l>
+
+<l xml:id="em0753-es-0245">mas quien cimentar quiere con sangre su fortuna,</l>
+
+<l xml:id="em0753-es-0246">al final muere siempre de muerte poco usual.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0060" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0247" n="60">A la que no se teme o se perdona todo</l>
+
+<l xml:id="em0753-es-0248">completa su viaje antes de llegar al final.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0061" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0249" n="61">Miedo que sólo manda en un alma cobarde</l>
+
+<l xml:id="em0753-es-0250">es una débil guarda de Reinos poderosos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0062" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0251" n="62">La impunidad del vicio muchas veces causó</l>
+
+<l xml:id="em0753-es-0252">la ruina y la muerte del Reino y de los Reyes.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0063" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0253" n="63">El rigor excesivo nunca está libre de odio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0064" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0254" n="64">Y nos lleva a menudo hacia el desprecio fácil.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0065" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0255" n="65">Me esforcé con vosotros para que bien me amarais.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0066" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0256" n="66">También necesitabais que os tuvieran miedo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0067" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0257" n="67">El amor de los súbditos que engendra la clemencia,</l>
+
+<l xml:id="em0753-es-0258">cien veces más confianza transmite que su miedo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0068" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0259" n="68">El amor de los súbditos os debe conducir</l>
+
+<l xml:id="em0753-es-0260">a cerrar ojo a todo, salvo a vuestro deber.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0069" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0261" n="69">Yo también quiero hacerlo, pero sin ser cruel:</l>
+
+<l xml:id="em0753-es-0262">la bondad en la hembra es virtud natural.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0070" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0263" n="70">No es crueldad alguna el ordenar la muerte</l>
+
+<l xml:id="em0753-es-0264">de aquella que trataba de injustamente dárosla.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0071" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0265" n="71">Es un honor muy grande el perdonar la ofensa,</l>
+
+<l xml:id="em0753-es-0266">cuando el poder tenemos para poder vengarnos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0072" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0267" n="72">Si penetrar el ojo puede en el pensamiento,</l>
+
+<l xml:id="em0753-es-0268">castigar bien debiera a quien piensa ofender.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0073" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0269" n="73">Quien perdona al prójimo por amor a sí mismo,</l>
+
+<l xml:id="em0753-es-0270">sabiendo que cae en falta merece un gran elogio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0074" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0271" n="74">Mas a veces se entrega en mano extranjeras,</l>
+
+<l xml:id="em0753-es-0272">cuando no se atreve a vengarse de sus súbditos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0075" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0273" n="75">Entre abejas que el Rey lleva en su república</l>
+
+<l xml:id="em0753-es-0274">hay un duro aguijón, pero que nunca pica<note n="6228" type="traductor"><term>pica</term><p>Sobre la interesante vida de las abejas, véase entre otros: François Tavoillot y Pierre-Henri Tavoillot: <emph>El filósofo y la abeja</emph>, trad. Carlo A. Caranci, Barcelona: Espasa, 2017.</p></note>.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0076" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0275" n="76">Así contra los buenos no llevéis ninguno,</l>
+
+<l xml:id="em0753-es-0276">sino con los malvados que su deber, no cumplen.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0077" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0277" n="77">Un Príncipe severo tachado es de injusticia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0078" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0278" n="78">Un Príncipe benigno estimula el vicio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0079" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0279" n="79">Pecar por ser clemente es siempre lo mejor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0080" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0280" n="80">Tanto uno como otro son causa de desgracia.</l>
+
+<l xml:id="em0753-es-0281">Lleva exceso y defecto a errores notables</l>
+
+<l xml:id="em0753-es-0282">en asuntos de Estado muy poco reparables.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0081" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0283" n="81">Quiero en esta ocasión elegir lo sensato,</l>
+
+<l xml:id="em0753-es-0284">útil para mis súbditos y propio a mi deseo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0082" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0285" n="82">Decidid bien, Señora, pensando en no desviaros,</l>
+
+<l xml:id="em0753-es-0286">cuidad que al andar vais por el buen camino,</l>
+
+<l xml:id="em0753-es-0287">que a menudo se tuerce quien cree ir derecho.</l>
+
+<l xml:id="em0753-es-0288">En la senda que lleva de un modo escurridizo,</l>
+
+<l xml:id="em0753-es-0289">veréis (o buen Dios, aleja estos presagios)</l>
+
+<l xml:id="em0753-es-0290">destruir los castillos, saquear las aldeas,</l>
+
+<l xml:id="em0753-es-0291">arrasar las ciudades, hacer hundir las flotas,</l>
+
+<l xml:id="em0753-es-0292">y la sangre a torrentes filtrarse en el mar;</l>
+
+<l xml:id="em0753-es-0293">¿Qué digo que veréis? Viable es que vuestra vista</l>
+
+<l xml:id="em0753-es-0294">oculte su blancura con desnudez mortal,</l>
+
+<l xml:id="em0753-es-0295">y entre tantos males os quedará el bien</l>
+
+<l xml:id="em0753-es-0296">de no poderlos ver ni sentir nada de ellos.</l>
+
+<l xml:id="em0753-es-0297">Feliz aquel que duerma en tumba polvorienta,</l>
+
+<l xml:id="em0753-es-0298">no languidezca preso en una gruta umbría,</l>
+
+<l xml:id="em0753-es-0299">donde todo enterrado igual que en una tumba,</l>
+
+<l xml:id="em0753-es-0300">en vano por él Febo se saldría del agua.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0083" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0301" n="83">Pues bien, para evitar que una tormenta así</l>
+
+<l xml:id="em0753-es-0302">no cubra con vosotros mi inocente cabeza,</l>
+
+<l xml:id="em0753-es-0303">es preciso encerrarla en prisión más estrecha;</l>
+
+<l xml:id="em0753-es-0304">por obligación lo hago, nadie puede culparme.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0084" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0305" n="84">Para bien liberaros de esta prisionera,</l>
+
+<l xml:id="em0753-es-0306">intentaréis en vano la senda habitual:</l>
+
+<l xml:id="em0753-es-0307">cargaréis con cien hierros sus piernas y sus manos,</l>
+
+<l xml:id="em0753-es-0308">la seguiréis haciendo más dura en sus proyectos,</l>
+
+<l xml:id="em0753-es-0309">y si alguna vez puede soltarse la cadena,</l>
+
+<l xml:id="em0753-es-0310">disfrutará actuando de forma inhumana,</l>
+
+<l xml:id="em0753-es-0311">provocará mil males, suscitará mil muertes;</l>
+
+<l xml:id="em0753-es-0312">recordar las cadenas aumentará su rabia,</l>
+
+<l xml:id="em0753-es-0313">y su propio furor la hará más desleal.</l>
+
+<l xml:id="em0753-es-0314">Pasa igual con el tigre o la leona pelirroja</l>
+
+<l xml:id="em0753-es-0315">cuando están encerrados por un tiempo en la jaula:</l>
+
+<l xml:id="em0753-es-0316">si viven en el campo son mucho más osados,</l>
+
+<l xml:id="em0753-es-0317">provocan más destrozos, crímenes y matanzas,</l>
+
+<l xml:id="em0753-es-0318">que aquellos que se crían en desiertos salvajes.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0085" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0319" n="85">Podemos ablandarla de todo exonerándola,</l>
+
+<l xml:id="em0753-es-0320">aunque su corazón fuese el de una roca</l>
+
+<l xml:id="em0753-es-0321">endurecida cuyo origen fuese el Cáucaso:</l>
+
+<l xml:id="em0753-es-0322">sería así tan sólo gracias a mi clemencia</l>
+
+<l xml:id="em0753-es-0323">que ella conseguiría vivir en libertad,</l>
+
+<l xml:id="em0753-es-0324">la que había perdido por su culpa y deméritos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0086" who="#CONSEJERO">
+<speaker>CONSEJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0325" n="86">Su valor traicionero tan fiero es de carácter</l>
+
+<l xml:id="em0753-es-0326">que estos raros favores fueran para ella agravio.</l>
+
+<l xml:id="em0753-es-0327">Conozco su talante. De un ingrato en deuda</l>
+
+<l xml:id="em0753-es-0328">¿Qué se puede esperar sino ser ultrajado?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0087" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="F">
+<l xml:id="em0753-es-0329" n="87">Feliz el siglo de oro en el que no había envidia.</l>
+
+<l xml:id="em0753-es-0330">Para alzarse al honor,</l>
+
+<l xml:id="em0753-es-0331">veía el hombre pasar los días de su vida</l>
+
+<l xml:id="em0753-es-0332">en una dicha igual.</l>
+
+<l xml:id="em0753-es-0333">No estaba afligido por miedo o esperanza</l>
+
+<l xml:id="em0753-es-0334">ni de ambición movido;</l>
+
+<l xml:id="em0753-es-0335">su cuerpo, vigoroso, de dolor libre estaba,</l>
+
+<l xml:id="em0753-es-0336">su pecho sin pasión.</l>
+
+<l xml:id="em0753-es-0337">No deseaba ver que juzgarán su vida</l>
+
+<l xml:id="em0753-es-0338">a costa de su esfuerzo;</l>
+
+<l xml:id="em0753-es-0339">ni por algo de gloria, humo satisfactorio,</l>
+
+<l xml:id="em0753-es-0340">soportaba mil males.</l>
+
+<l xml:id="em0753-es-0341">Se nutría de frutos que la benigna tierra</l>
+
+<l xml:id="em0753-es-0342">por sí misma aportaba;</l>
+
+<l xml:id="em0753-es-0343">y todo desplegado sobre agua cristalina</l>
+
+<l xml:id="em0753-es-0344">que saciaba su sed.</l>
+
+<l xml:id="em0753-es-0345">Libre se paseaba por verdecidos bosques</l>
+
+<l xml:id="em0753-es-0346">por su placer guiado.</l>
+
+<l xml:id="em0753-es-0347">Y aún no vivía en ruidosos lugares</l>
+
+<l xml:id="em0753-es-0348">de popular bullicio.</l>
+
+<l xml:id="em0753-es-0349">Descansaba en verano bajo una fresca sombra</l>
+
+<l xml:id="em0753-es-0350">si se hallaba cansado,</l>
+
+<l xml:id="em0753-es-0351">dormía por la noche en guarida salvaje</l>
+
+<l xml:id="em0753-es-0352">tapizada de musgo.</l>
+
+<l xml:id="em0753-es-0353">Allí, ignorando vanas inquietudes humanas</l>
+
+<l xml:id="em0753-es-0354">dormía a sus anchas:</l>
+
+<l xml:id="em0753-es-0355">ni en dolor ni en envidia fértiles en mil males</l>
+
+<l xml:id="em0753-es-0356">se afligía su alma.</l>
+
+<l xml:id="em0753-es-0357">¿Quién no preferiría el gozo de la ducha</l>
+
+<l xml:id="em0753-es-0358">a la pompa de Reyes?</l>
+
+<l xml:id="em0753-es-0359">¿Quién no desearía cortar así las rosas</l>
+
+<l xml:id="em0753-es-0360">sin pincharse los dedos?</l>
+
+<l xml:id="em0753-es-0361">La ardiente ambición que mueve a los Príncipes</l>
+
+<l xml:id="em0753-es-0362">les perturba el juicio;</l>
+
+<l xml:id="em0753-es-0363">la gloria les provoca mucho más mal que bien;</l>
+
+<l xml:id="em0753-es-0364">un tormento es su júbilo.</l>
+
+<l xml:id="em0753-es-0365">Su descanso se instala en medio del dolor;</l>
+
+<l xml:id="em0753-es-0366">su día troca en noche:</l>
+
+<l xml:id="em0753-es-0367">su grandeza mayor no es más que un vano ídolo,</l>
+
+<l xml:id="em0753-es-0368">que seduce al pueblo.</l>
+
+<l xml:id="em0753-es-0369">Su Estado no es seguro salvo en su incertidumbre;</l>
+
+<l xml:id="em0753-es-0370">en menos de un instante</l>
+
+<l xml:id="em0753-es-0371">vemos su libertad caer en la servidumbre,</l>
+
+<l xml:id="em0753-es-0372">y su gloria en desdén.</l>
+
+<l xml:id="em0753-es-0373">Aunque todos los honran y todos los aceptan,</l>
+
+<l xml:id="em0753-es-0374">no están ni así contentos:</l>
+
+<l xml:id="em0753-es-0375">el continuo recelo los devora en silencio</l>
+
+<l xml:id="em0753-es-0376">entre sus pasatiempos.</l>
+
+<l xml:id="em0753-es-0377">Juzgo que es dichoso aquel que su edad pasa</l>
+
+<l xml:id="em0753-es-0378">de sí libre y de miedo,</l>
+
+<l xml:id="em0753-es-0379">con todos sus deseos a su aldea limitados,</l>
+
+<l xml:id="em0753-es-0380">sin aspirar a más.</l>
+</lg>
+</sp>
+</div1>
+
+<div1 type="act" n="2">
+<head>ACTO II</head>
+
+<stage xml:id="em0753-es-st-0002">CORO DE LOS ESTADOS, REINA DE INGLATERRA</stage>
+
+<sp xml:id="em0753-es-sp-0088" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0381" n="88">Soberano honor de Damas soberanas</l>
+
+<l xml:id="em0753-es-0382">que loarás desde ahora el yugo de las Reinas,</l>
+
+<l xml:id="em0753-es-0383">haz descender tus ojos rodeados de relámpagos</l>
+
+<l xml:id="em0753-es-0384">en tus humildes súbditos ante ti prosternados,</l>
+
+<l xml:id="em0753-es-0385">que vienen, por mi voz, a cumplir tu promesa,</l>
+
+<l xml:id="em0753-es-0386">seguros en su alma de que tú, gran Princesa</l>
+
+<l xml:id="em0753-es-0387">que incluso a los que mientes y a su palabra faltan,</l>
+
+<l xml:id="em0753-es-0388">nunca serás desleal con tus leales súbditos,</l>
+
+<l xml:id="em0753-es-0389">sino que aceptarás que la justa sentencia</l>
+
+<l xml:id="em0753-es-0390">leída en pleno Consejo en tu santa presencia</l>
+
+<l xml:id="em0753-es-0391">contra esta Princesa permitan rienda suelta,</l>
+
+<l xml:id="em0753-es-0392">puesto que las facciones renacen cada día.</l>
+
+<l xml:id="em0753-es-0393">Es el deseo de todos. Es el bien de la patria</l>
+
+<l xml:id="em0753-es-0394">que buscar solo tú debes, a ello te llaman;</l>
+
+<l xml:id="em0753-es-0395">tus Estados reunidos están resueltos a ello,</l>
+
+<l xml:id="em0753-es-0396">y tu devoto pueblo no desea otra cosa.</l>
+
+<l xml:id="em0753-es-0397">No es momento de que tu bondad ose el perdón,</l>
+
+<l xml:id="em0753-es-0398">mantén tu Majestad que nos proteja a todos;</l>
+
+<l xml:id="em0753-es-0399">lo que tú hacer no puedes queriendo que las leyes</l>
+
+<l xml:id="em0753-es-0400">perdonen ésta para llegar a nuestros Reyes.</l>
+
+<l xml:id="em0753-es-0401">Consiente que Inglaterra jure en nuestra palabra,</l>
+
+<l xml:id="em0753-es-0402">que sólo con tu muerte soporta ella más pérdidas</l>
+
+<l xml:id="em0753-es-0403">que las que tuviera con los bravos paladines</l>
+
+<l xml:id="em0753-es-0404">que en el campo de lirios plantaron sus laureles.</l>
+
+<l xml:id="em0753-es-0405">Murieron tras luchar en una guerra frívola,</l>
+
+<l xml:id="em0753-es-0406">Y tú, que más piadosa hacia tu propio pueblo</l>
+
+<l xml:id="em0753-es-0407">podrás ampararlo de todo esfuerzo dañino</l>
+
+<l xml:id="em0753-es-0408">si alguna vez burlas a las trampas de la muerte.</l>
+
+<l xml:id="em0753-es-0409">Pero al abandonarlo a esta feroz tormenta,</l>
+
+<l xml:id="em0753-es-0410">su Estado se expone a un penoso naufragio</l>
+
+<l xml:id="em0753-es-0411">del que nadie podrá recoger los despojos,</l>
+
+<l xml:id="em0753-es-0412">su gloria y su honor caerán en el desprecio:</l>
+
+<l xml:id="em0753-es-0413">ella, que una vez fue tan apreciada en armas,</l>
+
+<l xml:id="em0753-es-0414">será el hazmerreír de los que conquistó;</l>
+
+<l xml:id="em0753-es-0415">los que se amedrentaban al ver sus estandartes,</l>
+
+<l xml:id="em0753-es-0416">correrán a atacarla cubiertos con bandanas.</l>
+
+<l xml:id="em0753-es-0417">Con la frente pintada de un pálido color,</l>
+
+<l xml:id="em0753-es-0418">y más por ti temiendo, que temes por sí mismo,</l>
+
+<l xml:id="em0753-es-0419">imagínate verla, y decirte estas palabras</l>
+
+<l xml:id="em0753-es-0420">cortadas por suspiros y por tristes sollozos:</l>
+
+<l xml:id="em0753-es-0421">hija que yo engendré para hacerme de madre,</l>
+
+<l xml:id="em0753-es-0422">Reina cara a mi pecho, y a mi bien necesaria,</l>
+
+<l xml:id="em0753-es-0423">cuida de tu albedrío, y si por ti no lo haces,</l>
+
+<l xml:id="em0753-es-0424">que lo hagas por los tuyos, los míos y por mí:</l>
+
+<l xml:id="em0753-es-0425">si morir por nosotros nunca fue tu deseo,</l>
+
+<l xml:id="em0753-es-0426">conserva por nosotros el resto de tu vida.</l>
+
+<l xml:id="em0753-es-0427">Bendita sea la Dama a quien el Cielo amigo</l>
+
+<l xml:id="em0753-es-0428">gracias a un gran favor tanto bien permitió,</l>
+
+<l xml:id="em0753-es-0429">que viva una vida provechosa al público,</l>
+
+<l xml:id="em0753-es-0430">a todos agradable, y honorable a sí misma.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0089" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0431" n="89">¡Qué desafortunada es la grandeza humana,</l>
+
+<l xml:id="em0753-es-0432">aunque brille en los ojos con un bello esplendor,</l>
+
+<l xml:id="em0753-es-0433">si hasta de rufianes debe ella protegerse!</l>
+
+<l xml:id="em0753-es-0434">¿Qué no puede la mano que sin miedo se arriesga?</l>
+
+<l xml:id="em0753-es-0435">Quien predice tormenta al puerto va a guardarse;</l>
+
+<l xml:id="em0753-es-0436">quien presagia el peligro debe estar preparado;</l>
+
+<l xml:id="em0753-es-0437">de ahí que afianzar quiera mi Estado y mi vida</l>
+
+<l xml:id="em0753-es-0438">cual el público bien y el mío me invita a hacerlo.</l>
+
+<l xml:id="em0753-es-0439">Yo querría perderme y así poder salvaros,</l>
+
+<l xml:id="em0753-es-0440">mas, para no perderos bien debo conservarme.</l>
+
+<l xml:id="em0753-es-0441">La causa es razonable y prudente el temor</l>
+
+<l xml:id="em0753-es-0442">de este peligro próximo, logro del que dudáis:</l>
+
+<l xml:id="em0753-es-0443">pues parece que casi en mi sola se encierra</l>
+
+<l xml:id="em0753-es-0444">toda fe en el descanso que nutre vuestras mentes.</l>
+
+<l xml:id="em0753-es-0445">Pero no ignoráis que esta bella Reina,</l>
+
+<l xml:id="em0753-es-0446">en quien ofendemos la grandeza soberana,</l>
+
+<l xml:id="em0753-es-0447">en prisión manteniéndola de un modo injusto,</l>
+
+<l xml:id="em0753-es-0448">de todo punto es lógico que pretenda ser libre;</l>
+
+<l xml:id="em0753-es-0449">aunque quizá a nosotros pueda perjudicarnos</l>
+
+<l xml:id="em0753-es-0450">encumbrar a una Dama de admirable belleza,</l>
+
+<l xml:id="em0753-es-0451">fértil en artificios y elocuente en el habla,</l>
+
+<l xml:id="em0753-es-0452">y que sirve de Sol a Astros de dos Cortes.</l>
+
+<l xml:id="em0753-es-0453">No deseo informarme ni indagar aquí más</l>
+
+<l xml:id="em0753-es-0454">si ella quiere dañarme; su valor bien conozco.</l>
+
+<l xml:id="em0753-es-0455">En realidad, su vida le importa a nuestro Estado,</l>
+
+<l xml:id="em0753-es-0456">pero ordenar matarla es un gran atentado.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0090" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0457" n="90">Varios días pasaron desde que allí la enviamos,</l>
+
+<l xml:id="em0753-es-0458">si todavía estuviera urdiendo nuevas tramas…</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0091" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0459" n="91">El tiempo sirve a veces de juicio a sabia mente,</l>
+
+<l xml:id="em0753-es-0460">la voluntad se tuerce junto con la estación,</l>
+
+<l xml:id="em0753-es-0461">y tan sólo es digno de alabanza el piloto,</l>
+
+<l xml:id="em0753-es-0462">que puede izar la vela cuando el viento cambia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0092" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0463" n="92">Cuando se idea un plan no se debe cambiar,</l>
+
+<l xml:id="em0753-es-0464">si al no ejecutarlo te pones en peligro.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0093" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0465" n="93">Bien convencida estando, es penada injustamente.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0094" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0466" n="94">Se condena el pecado, no se condena el rango.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0095" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0467" n="95">Aún quiero aplazar esta ejecución.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0096" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0468" n="96">Guardaos de adelantar nuestra perdición.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0097" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0469" n="97">¿Qué más hacer puede una mujer encadenada?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0098" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0470" n="98">¿Qué no puede hacer mal una mujer rendida?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0099" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0471" n="99">Tras su muerte, ya tarde, vendrá la contrición.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0100" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0472" n="100">Muy libre, en pocos días la podréis percibir.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0101" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0473" n="101">Para su propio daño su rostro airea sus planes.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0102" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0474" n="102">El marinero aún boga tras sufrir el naufragio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0103" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0475" n="103">Si se atreve a hacerlo, habrá que castigarla.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0104" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0476" n="104">Estáis ya en un punto que no se vuelve atrás.</l>
+
+<l xml:id="em0753-es-0477">ved el fulgor brillante de los petos franceses,</l>
+
+<l xml:id="em0753-es-0478">oíd los tambores de las bandas escocesas,</l>
+
+<l xml:id="em0753-es-0479">y de España los pífanos, que hoy es su peligro</l>
+
+<l xml:id="em0753-es-0480">a todo el mundo excitan, y para despejarlo</l>
+
+<l xml:id="em0753-es-0481">cubriremos el mar con velas y con remos,</l>
+
+<l xml:id="em0753-es-0482">llenando nuestros ricos puertos de hierro y llamas.</l>
+
+<l xml:id="em0753-es-0483">No obstante, entre nosotros esta tea que consume</l>
+
+<l xml:id="em0753-es-0484">irá por todas partes encendiendo las Ligas,</l>
+
+<l xml:id="em0753-es-0485">y la plaga mortal cercando nuestros tuétanos</l>
+
+<l xml:id="em0753-es-0486">causará más daño que las guerras crueles:</l>
+
+<l xml:id="em0753-es-0487">donde queriendo sólo consentir en su muerte,</l>
+
+<l xml:id="em0753-es-0488">podéis desde el linaje sofocar este esfuerzo;</l>
+
+<l xml:id="em0753-es-0489">y con muy poca sangre apagar el incendio,</l>
+
+<l xml:id="em0753-es-0490">que, a medida que avanza, es mucho más temible.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0105" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0491" n="105">Pues bien, amigos míos, haced lo que queráis,</l>
+
+<l xml:id="em0753-es-0492">vuestras metas, por mí, no se retrasarán;</l>
+
+<l xml:id="em0753-es-0493">encuentro en ambas partes el mismo raciocinio</l>
+
+<l xml:id="em0753-es-0494">como el mismo peligro; y no apruebo ninguno,</l>
+
+<l xml:id="em0753-es-0495">ni nada desapruebo; mas ya estáis advertidos</l>
+
+<l xml:id="em0753-es-0496">que informar bien debéis al mejor de los partidos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0106" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0497" n="106">Que el Cielo bendiga nuestra elevada empresa;</l>
+
+<l xml:id="em0753-es-0498">que a esta notable meta la Tierra favorezca;</l>
+
+<l xml:id="em0753-es-0499">ya sea el genio inglés de otros vencedor,</l>
+
+<l xml:id="em0753-es-0500">tanto por nuestras manos o por el corazón.</l>
+
+<l xml:id="em0753-es-0501">Dios quiera en tu cabeza afirmar la corona,</l>
+
+<l xml:id="em0753-es-0502">el Cetro en tu mano, y que la ira traidora</l>
+
+<l xml:id="em0753-es-0503">de pueblos conjurados para así abatirlo,</l>
+
+<l xml:id="em0753-es-0504">ceda finalmente a la dicha de su virtud</l>
+
+<l xml:id="em0753-es-0505">para que en el futuro la imagen de su gloria</l>
+
+<l xml:id="em0753-es-0506">vuele sobre el altar del templo de memoria.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0107" who="#REINA_INGLATERRA">
+<speaker>REINA DE INGLATERRA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0507" n="107">¡Cómo! ¿Por contentar a este tenaz Consejo,</l>
+
+<l xml:id="em0753-es-0508">llevamos a esta Reina a un suplicio prescrito?</l>
+
+<l xml:id="em0753-es-0509">¿Lo deseo realmente? ¿Tengo que permitirlo?</l>
+
+<l xml:id="em0753-es-0510">¿Hay algo en que la audacia no pueda involucrarse?</l>
+
+<l xml:id="em0753-es-0511">¿Teñir la horca con sangre sagrada de los Reyes?</l>
+
+<l xml:id="em0753-es-0512">Podría incluso a veces verter allí la mía:</l>
+
+<l xml:id="em0753-es-0513">pues quien fuerza el derecho del Pueblo y de Natura,</l>
+
+<l xml:id="em0753-es-0514">lo que hace a cualquier otro en sí mismo lo sufre.</l>
+
+<l xml:id="em0753-es-0515">Es preciso impedir que mi ilustre nombre</l>
+
+<l xml:id="em0753-es-0516">sea por siempre injuriado por un acto tan bárbaro,</l>
+
+<l xml:id="em0753-es-0517">podré mejor de hecho ensalzar mi memoria</l>
+
+<l xml:id="em0753-es-0518">que con una historia tan desgraciada y trágica:</l>
+
+<l xml:id="em0753-es-0519">sólo para el vulgo se alzará el cadalso,</l>
+
+<l xml:id="em0753-es-0520">no para los que Dios sube a un grado tan alto.</l>
+
+<l xml:id="em0753-es-0521">Pues ¿Qué de mí dirían los países extranjeros?</l>
+
+<l xml:id="em0753-es-0522">¿Podrían sin despecho oír mis alabanzas</l>
+
+<l xml:id="em0753-es-0523">que la voz de la fama publica en todas partes?</l>
+
+<l xml:id="em0753-es-0524">¿Quiero en esta Princesa ultrajar a los Reyes?</l>
+
+<l xml:id="em0753-es-0525">¿Que vuelquen contra mí su furor y coraje?</l>
+
+<l xml:id="em0753-es-0526">¿La blasfemia en el alma? ¿En la boca el ultraje?</l>
+
+<l xml:id="em0753-es-0527">¿Quién desde ahora podría nombrarme sin horror?</l>
+
+<l xml:id="em0753-es-0528">Se diría que hubiera nacido ella en el mar;</l>
+
+<l xml:id="em0753-es-0529">la crio en la cuna la ubre de una leona</l>
+
+<l xml:id="em0753-es-0530">que más que dulce leche le dio rabia felona;</l>
+
+<l xml:id="em0753-es-0531">en resumen, tiene ella de carne el estómago,</l>
+
+<l xml:id="em0753-es-0532">pero oculta un pecho de mármol o de roca.</l>
+
+<l xml:id="em0753-es-0533">Mi sexo, que obtiene de mí tantas ventajas,</l>
+
+<l xml:id="em0753-es-0534">recibir no podría más que vergüenza y daño;</l>
+
+<l xml:id="em0753-es-0535">se lo describiría como cruel, vengativo,</l>
+
+<l xml:id="em0753-es-0536">cruel y de dos caras, moro, artero y miedoso,</l>
+
+<l xml:id="em0753-es-0537">sanguinario, impostor, hacedor de mentiras,</l>
+
+<l xml:id="em0753-es-0538">inventor de malicias, y urdidor de sueños,</l>
+
+<l xml:id="em0753-es-0539">camaleón que se adapta al carácter del que llega</l>
+
+<l xml:id="em0753-es-0540">en todas sus certezas, salvo en la tolerancia.</l>
+
+<l xml:id="em0753-es-0541">Las mujeres que han puesto bajo mi mando el Cetro</l>
+
+<l xml:id="em0753-es-0542">nunca se privarían de decir en mi ausencia:</l>
+
+<l xml:id="em0753-es-0543">¡oh cruel deshonor de nuestro sexo humano!</l>
+
+<l xml:id="em0753-es-0544">Sostener no debieras en tu mano sangrienta</l>
+
+<l xml:id="em0753-es-0545">el sagrado timón de esta Isla famosa</l>
+
+<l xml:id="em0753-es-0546">que el gran mar espumoso rodea por todos lados.</l>
+
+<l xml:id="em0753-es-0547">Si viniste a la tierra con ascendente tal,</l>
+
+<l xml:id="em0753-es-0548">para que así tu vida transcurriera en el mando,</l>
+
+<l xml:id="em0753-es-0549">¿por qué no estableciste tu fatua tiranía</l>
+
+<l xml:id="em0753-es-0550">sobre los leones de África y los tigres de Hircania,</l>
+
+<l xml:id="em0753-es-0551">ya que estos animales cuanto más ira sienten,</l>
+
+<l xml:id="em0753-es-0552">afín a tu crueldad, tienen gentil valor?</l>
+
+<l xml:id="em0753-es-0553">Así, para evitar que con tan grandes críticas</l>
+
+<l xml:id="em0753-es-0554">su charla no difame a las Damas extranjeras,</l>
+
+<l xml:id="em0753-es-0555">las Damas a sus hijos, y estos a sus sobrinos</l>
+
+<l xml:id="em0753-es-0556">e incluso estos sobrinos a toda su progenie,</l>
+
+<l xml:id="em0753-es-0557">esta vez es preciso liberar a esta Reina</l>
+
+<l xml:id="em0753-es-0558">cuya prisión y pena a todos simpatiza,</l>
+
+<l xml:id="em0753-es-0559">considerando suyos sus hierros, libre de ellos,</l>
+
+<l xml:id="em0753-es-0560">puede que ella olvide la angustia que ha sufrido</l>
+
+<l xml:id="em0753-es-0561">y el dulce recuerdo de tanta indulgencia</l>
+
+<l xml:id="em0753-es-0562">nunca abandonará mi recuerdo y memoria.</l>
+
+<l xml:id="em0753-es-0563">Así, por algún bien debemos complacer</l>
+
+<l xml:id="em0753-es-0564">a los que cambiar pueden el mal que han recibido;</l>
+
+<l xml:id="em0753-es-0565">el hombre que es prudente, siempre que es posible,</l>
+
+<l xml:id="em0753-es-0566">vence por cortesía a un potente adversario.</l>
+
+<l xml:id="em0753-es-0567">Tantas dificultades llegarán a surgir</l>
+
+<l xml:id="em0753-es-0568">cuando deba cumplirse la sentencia de muerte,</l>
+
+<l xml:id="em0753-es-0569">que para valorarlas habrá que condonar;</l>
+
+<l xml:id="em0753-es-0570">anularé, no obstante, la pena del proyecto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0108" who="#CORO_ESTADOS">
+<speaker>CORO DE LOS ESTADOS</speaker>
+<lg type="free" part="F">
+<l xml:id="em0753-es-0571" n="108">¿Qué es, oh Dios, el hombre? Una flor pasajera,</l>
+
+<l xml:id="em0753-es-0572">que el calor marchita o el viento caer deja<note n="6229" type="traductor"><term>deja</term><p>El original “faire choir” (“faire tomber”): Expression formée sur le verbe intransitif choir, archaïsme ayant la même signification que tomber, et issu du latin classique cadere. Bien que vieillie, cette expression est encore en usage de nos jours, souvent par ironie ou par volonté d'employer un langage littéraire, et est à rapprocher de l'expression laisser choir.</p></note>;</l>
+
+<l xml:id="em0753-es-0573">una vana neblina, una sombra ligera</l>
+
+<l xml:id="em0753-es-0574">que holga por la mañana y pasa por la tarde;</l>
+
+<l xml:id="em0753-es-0575">un Astro de la Tierra de claridad muy límpido,</l>
+
+<l xml:id="em0753-es-0576">pero al que mil nieblas ocultan sin cesar,</l>
+
+<l xml:id="em0753-es-0577">que se alza en la cuna para caer en el féretro,</l>
+
+<l xml:id="em0753-es-0578">que desde su Oriente se inclina hacia su ocaso:</l>
+
+<l xml:id="em0753-es-0579">una pompa ventosa sobre la ola fatua,</l>
+
+<l xml:id="em0753-es-0580">pero, que en un momento se funde en su agua;</l>
+
+<l xml:id="em0753-es-0581">una chispa que muere en cuanto que se apaga,</l>
+
+<l xml:id="em0753-es-0582">pero que nunca más puede ser reavivada.</l>
+
+<l xml:id="em0753-es-0583">La vida es aire cálido que de la nariz sale,</l>
+
+<l xml:id="em0753-es-0584">que una semilla de uva puede ahogar de repente;</l>
+
+<l xml:id="em0753-es-0585">un vivo torrente de sangre que riega el pecho,</l>
+
+<l xml:id="em0753-es-0586">que helado por la muerte no puede calentarse.</l>
+
+<l xml:id="em0753-es-0587">La Luna tiene un Sol para arreglar su pérdida</l>
+
+<l xml:id="em0753-es-0588">y llenar su creciente una vez cada mes;</l>
+
+<l xml:id="em0753-es-0589">mas, desde que la vida cubierta está de muerte,</l>
+
+<l xml:id="em0753-es-0590">ya tan sólo renace una vez en mil años.</l>
+
+<l xml:id="em0753-es-0591">Si los árboles pierden las hojas en invierno,</l>
+
+<l xml:id="em0753-es-0592">primavera los cubre de un follaje más bello;</l>
+
+<l xml:id="em0753-es-0593">y el hombre, al perder su agradable verdor,</l>
+
+<l xml:id="em0753-es-0594">no debe esperar un segundo esplendor.</l>
+
+<l xml:id="em0753-es-0595">Las flores no recobran su tez primaveral</l>
+
+<l xml:id="em0753-es-0596">una vez que han sentido el calor del verano:</l>
+
+<l xml:id="em0753-es-0597">una vez que la muerte marchita nuestros párpados,</l>
+
+<l xml:id="em0753-es-0598">ojos, podéis decir: adiós, dulce fulgor.</l>
+
+<l xml:id="em0753-es-0599">La vida no se para, y tan corto es su final</l>
+
+<l xml:id="em0753-es-0600">que a un rápido aleteo<note n="6230" type="traductor"><term>aleteo</term><p>ALETEO. m. Acción de aletear. 2. fig. Acción de palpitar acelerada y violentamente el corazón. <emph>Diccionario histórico de la lengua española</emph> (1933-1936). Trabajo que supone la confluencia entre la tradición del <emph>Diccionario de autoridades</emph> y el sistema de trabajo de la lexicografía histórica que se practicaba en Europa desde el siglo XIX.<lb/>En pocos años, a pesar de la escasez de materiales y de la dudosa fiabilidad de algunos de ellos, se publicaron los dos tomos de este diccionario (de la <emph>A</emph> a la <emph>Ce</emph>). Los ejemplos que se contienen en estos volúmenes fueron decisivos para la confección de otras obras y facilitaron el paso adelante que supuso el <emph>Diccionario histórico de la lengua española</emph> de 1960-1996.</p></note> no se lo ve llegar;</l>
+
+<l xml:id="em0753-es-0601">allí, tan pronto llega, permanece ya firme,</l>
+
+<l xml:id="em0753-es-0602">el nacer y el morir es la misma cuestión.</l>
+
+<l xml:id="em0753-es-0603">La muerte es segura, el momento se ignora.</l>
+
+<l xml:id="em0753-es-0604">¿Quién sabe en la mañana cómo termina el día?</l>
+
+<l xml:id="em0753-es-0605">Quieren decapitar a una Diosa en belleza,</l>
+
+<l xml:id="em0753-es-0606">hija de la virtud y madre del amor.</l>
+</lg>
+</sp>
+</div1>
+
+<div1 type="act" n="3">
+<head>ACTO III</head>
+
+<stage xml:id="em0753-es-st-0003">DAVISON, REINA DE ESCOCIA, CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</stage>
+
+<sp xml:id="em0753-es-sp-0109" who="#DAVISON">
+<speaker>DAVISON<note n="6231" type="traductor"><term>DAVISON</term><p>La Reina Isabel I tenía un Consejo Privado, un grupo de 19 poderosos nobles designados por ella que la aconsejaban. Durante su reinado, el Consejo se reunió inicialmente tres veces por semana y, a medida que su influencia crecía se reunieron todos los días, asesorando sobre cuestiones nacionales e internacionales, relaciones con embajadores extranjeros y supervisión de la aplicación de la ley.<lb/>Los principales Consejeros de la Reina fueron:<lb/>1. William Cecil (1520-1598): nombrado como Secretario de Estado en 1558. Fue su ministro más importante y la guio sabiamente durante 40 años. En 1571 recibió el título de Lord Burghley.<lb/>2. Robert Dudley (1532-1588): conde de Leicester y consejero de confianza hasta su muerte en 1588. Él y Elizabeth eran muy cercanos, lo que propició que hubiera rumores de que fueran amantes.<lb/>3. Sir Francis Walsingham (1532-1590): estaba a cargo del servicio secreto de Isabel y la asesoraba sobre asuntos exteriores; en 1586, descubrió el complot que condujo a la ejecución de María, reina de Escocia.<lb/>Tras ellos destaca la importancia de William Davison (1541-1608) secretario de la Reina Isabel I, que desempeñó un papel clave y diplomático en la ejecución en 1587 de María, Reina de Escocia, y se convirtió en el chivo expiatorio de este evento en la historia británica. Como secretario de cierta influencia, participó activamente en la creación de alianzas con los amigos protestantes de Inglaterra en Holanda y Escocia para evitar la guerra con Francia.<lb/>Davison fue miembro de la comisión designada para juzgar a María, reina de Escocia, aunque no participó en sus procedimientos. Cuando se dictó sentencia contra María, se confió la orden de ejecución a Davison quien, tras un tiempo, obtuvo la firma de la Reina. Isabel sugirió que María debería ser ejecutada de una manera más secreta, y su conversación proporcionó amplias pruebas de que no le gustaba la idea de asumir cualquier responsabilidad por la muerte de su rival. Los jueces se reunieron el 11 de octubre y los procedimientos comenzaron el 14. Se prorrogó cuatro días después, solo para reunirse nuevamente el día 25 en la <emph>Star Chamber</emph> en Westminster; el 29, el Parlamento solicitó que se llevara a cabo la ejecución. María fue decapitada el 8 de febrero de 1587.</p></note></speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0607" n="109">Quien quiera en la grandeza mostrar un gran coraje</l>
+
+<l xml:id="em0753-es-0608">debe exponer su cuerpo y su alma al ultraje</l>
+
+<l xml:id="em0753-es-0609">de un amo ofensivo cuya autoridad</l>
+
+<l xml:id="em0753-es-0610">precede a la vergüenza o a la sepultura.</l>
+
+<l xml:id="em0753-es-0611">¡Oh hombre poseído por manía extrema</l>
+
+<l xml:id="em0753-es-0612">que se entrega al Señor y renuncia a sí mismo!</l>
+
+<l xml:id="em0753-es-0613">Que debido a un favor variable es como el viento</l>
+
+<l xml:id="em0753-es-0614">a menudo se priva de honor y de reposo.</l>
+
+<l xml:id="em0753-es-0615">La carga que me imponen realmente es enojosa,</l>
+
+<l xml:id="em0753-es-0616">pero temo que sea aún más peligrosa:</l>
+
+<l xml:id="em0753-es-0617">voy a dar un golpe, mas lo veo de repente,</l>
+
+<l xml:id="em0753-es-0618">lo veo, infeliz, sobre mí caer de nuevo.</l>
+
+<l xml:id="em0753-es-0619">¡Qué resurjan rencillas de un cuerpo magullado!</l>
+
+<l xml:id="em0753-es-0620">¡Cuántas penas eternas causará una muerte!</l>
+
+<l xml:id="em0753-es-0621">¡Cuánta sangre inocente habrá de derramarse</l>
+
+<l xml:id="em0753-es-0622">antes de que esta herida la suya haya saciado!</l>
+
+<l xml:id="em0753-es-0623">Esta Hidra procreará con los golpes de espada.</l>
+
+<l xml:id="em0753-es-0624">Crecerán cien cabezas por cada una cortada;</l>
+
+<l xml:id="em0753-es-0625">sin embargo, yo, débil, lánguido, desterrado,</l>
+
+<l xml:id="em0753-es-0626">en vano anhelaré que me llegue la muerte,</l>
+
+<l xml:id="em0753-es-0627">y para mi tormento se alargará mi vida.</l>
+
+<l xml:id="em0753-es-0628">De hecho, perseguido por el rencor, la envidia:</l>
+
+<l xml:id="em0753-es-0629">y por haber resuelto este crimen tan pronto,</l>
+
+<l xml:id="em0753-es-0630">por todos yo seré repudiado igualmente.</l>
+
+<l xml:id="em0753-es-0631">Recuerdo de continuo la muerte de Pompeyo</l>
+
+<l xml:id="em0753-es-0632">y que de sus verdugos la creencia fue falseada.</l>
+
+<l xml:id="em0753-es-0633">el mastín, alterado por la rabia y la ira,</l>
+
+<l xml:id="em0753-es-0634">si un transeúnte lo ahuyenta tirándole pedradas,</l>
+
+<l xml:id="em0753-es-0635">no mira hacia el brazo que sobre él las lanza,</l>
+
+<l xml:id="em0753-es-0636">sino su amarga furia se consuma en la piedra:</l>
+
+<l xml:id="em0753-es-0637">no obstante, en adelante, contra mí querrán sólo</l>
+
+<l xml:id="em0753-es-0638">desquitarse de ella, y no podré evitarlo:</l>
+
+<l xml:id="em0753-es-0639">donde estén los autores del mal de esta Reina,</l>
+
+<l xml:id="em0753-es-0640">en medio de mis lágrimas se reirán de mi pena.</l>
+
+<l xml:id="em0753-es-0641">¡Cruel destino es el que me da la ley!</l>
+
+<l xml:id="em0753-es-0642">Yo no quiero hacerlo, pero debo hacerlo:</l>
+
+<l xml:id="em0753-es-0643">necesario es quererlo, ya que es fuerza obligada;</l>
+
+<l xml:id="em0753-es-0644">temblando, me resigno. Oh triste pensamiento,</l>
+
+<l xml:id="em0753-es-0645">mantén lejos de ti lo que pueda asustarte:</l>
+
+<l xml:id="em0753-es-0646">cuando se promete algo, es preciso pagarlo.</l>
+
+<l xml:id="em0753-es-0647">No seamos indolentes, y no nos demoremos.</l>
+
+<l xml:id="em0753-es-0648">Así, seré el causante de mi propio perjuicio.</l>
+
+<l xml:id="em0753-es-0649">Me considerarán, por mi temeridad,</l>
+
+<l xml:id="em0753-es-0650">el fiel ejecutor de una infidelidad.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0110" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0651" n="110">¡Qué trabajo le cuesta al alma hacer el mal!</l>
+
+<l xml:id="em0753-es-0652">Sufre diez mil batallas</l>
+
+<l xml:id="em0753-es-0653">que la empujan arriba y abajo</l>
+
+<l xml:id="em0753-es-0654">por muchos y muchos discursos opuestos:</l>
+
+<l xml:id="em0753-es-0655">mas, cansada de considerarlo todo,</l>
+
+<l xml:id="em0753-es-0656">es tan propensa al vicio,</l>
+
+<l xml:id="em0753-es-0657">que no obstante se arriesga</l>
+
+<l xml:id="em0753-es-0658">por malicia o por sino.</l>
+
+<l xml:id="em0753-es-0659">¿De qué sirve a los mortales la razón</l>
+
+<l xml:id="em0753-es-0660">si la pasión es tan fuerte</l>
+
+<l xml:id="em0753-es-0661">que la mísera debe salir</l>
+
+<l xml:id="em0753-es-0662">para alojarla en su morada?</l>
+
+<l xml:id="em0753-es-0663">En vano ciertamente al nombrarla</l>
+
+<l xml:id="em0753-es-0664">la llamamos reina de los hombres,</l>
+
+<l xml:id="em0753-es-0665">ya que por fuerza o artimaña</l>
+
+<l xml:id="em0753-es-0666">sus ilustres derechos le son arrebatados.</l>
+
+<l xml:id="em0753-es-0667">Cesad, pobres almas humanas,</l>
+
+<l xml:id="em0753-es-0668">de jactaros de vuestras cualidades,</l>
+
+<l xml:id="em0753-es-0669">con aires de honor os halagáis,</l>
+
+<l xml:id="em0753-es-0670">pero no sentís menos el dolor:</l>
+
+<l xml:id="em0753-es-0671">y si, por lo bueno y lo malo</l>
+
+<l xml:id="em0753-es-0672">se evaluara lo bueno del Ser,</l>
+
+<l xml:id="em0753-es-0673">los animales más estúpidos</l>
+
+<l xml:id="em0753-es-0674">serían reconocidos como los más felices.</l>
+
+<l xml:id="em0753-es-0675">Un sólo punto os propicia ventaja</l>
+
+<l xml:id="em0753-es-0676">que no es común a la bestia,</l>
+
+<l xml:id="em0753-es-0677">y ocurre cuando la virtud os circunscribe</l>
+
+<l xml:id="em0753-es-0678">a los límites del deber</l>
+
+<l xml:id="em0753-es-0679">sin que el ciego apetito</l>
+
+<l xml:id="em0753-es-0680">tirano de vuestra fantasía</l>
+
+<l xml:id="em0753-es-0681">por un impulso lleno de frenesí</l>
+
+<l xml:id="em0753-es-0682">os lleve a una velocidad vertiginosa.</l>
+
+<l xml:id="em0753-es-0683">Mas, quién puede prometer tanto</l>
+
+<l xml:id="em0753-es-0684">si no es por el favor de arriba:</l>
+
+<l xml:id="em0753-es-0685">sin él falta la fuerza,</l>
+
+<l xml:id="em0753-es-0686">cuando el vicio quiere someternos,</l>
+
+<l xml:id="em0753-es-0687">mas no hay nada más humano,</l>
+
+<l xml:id="em0753-es-0688">que el Cielo nos dé gracia</l>
+
+<l xml:id="em0753-es-0689">nos estimule a la virtud,</l>
+
+<l xml:id="em0753-es-0690">y a poner freno al vicio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0111" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0691" n="111">¡De quién debo quejarme! ¡Oh cielo, oh mar, oh tierra!</l>
+
+<l xml:id="em0753-es-0692">¿Cuál de vosotros tres me libra una cruel guerra?</l>
+
+<l xml:id="em0753-es-0693">Desde que encendió el Sol su gran candela</l>
+
+<l xml:id="em0753-es-0694">para adornar al mundo, nuevo aún, con su luz</l>
+
+<l xml:id="em0753-es-0695">el hado en su ira no vertió tanto dolor</l>
+
+<l xml:id="em0753-es-0696">en un mortal y aún menos en una Reina</l>
+
+<l xml:id="em0753-es-0697">como en mí, abatida y llena de dolor;</l>
+
+<l xml:id="em0753-es-0698">solo yo soy el blanco de todas las desgracias</l>
+
+<l xml:id="em0753-es-0699">desde el fatal momento de aquella primera hora</l>
+
+<l xml:id="em0753-es-0700">que llorando me vio saludar a la luz,</l>
+
+<l xml:id="em0753-es-0701">hasta el día de hoy, triste y sin esperanza</l>
+
+<l xml:id="em0753-es-0702">sin tregua, sin ayuda siempre lo he soportado;</l>
+
+<l xml:id="em0753-es-0703">y si he sentido a veces la sombra de un consuelo</l>
+
+<l xml:id="em0753-es-0704">era para empeorar aún más mi dolor.</l>
+
+<l xml:id="em0753-es-0705">Mi cuerpo endeble y débil yacía en la cuna,</l>
+
+<l xml:id="em0753-es-0706">y anunciaban sus lágrimas los males que he sufrido,</l>
+
+<l xml:id="em0753-es-0707">cuando mi país natal dividido en facciones,</l>
+
+<l xml:id="em0753-es-0708">cual, si se complaciera de su propio perjuicio,</l>
+
+<l xml:id="em0753-es-0709">alejó de su mente toda fidelidad,</l>
+
+<l xml:id="em0753-es-0710">para sustituirla por la deslealtad.</l>
+
+<l xml:id="em0753-es-0711">De nuestro antiguo trono expulsó a mi madre,</l>
+
+<l xml:id="em0753-es-0712">que por sitios secretos vagaba solitaria,</l>
+
+<l xml:id="em0753-es-0713">transportaba mi cuna siempre bañada en lágrimas,</l>
+
+<l xml:id="em0753-es-0714">en vez de estar sembrada de rosas y de flores,</l>
+
+<l xml:id="em0753-es-0715">como si desde entonces la fortuna inhumana</l>
+
+<l xml:id="em0753-es-0716">quisiera amamantarme con tristeza y dolor.</l>
+
+<l xml:id="em0753-es-0717">a esta gran Princesa, de su tiempo ornamento,</l>
+
+<l xml:id="em0753-es-0718">a veces sosteniéndome en sus lánguidos brazos,</l>
+
+<l xml:id="em0753-es-0719">por nuestra usual desgracia conmovida por su ánimo,</l>
+
+<l xml:id="em0753-es-0720">del río de sus ojos se bañaba mi rostro;</l>
+
+<l xml:id="em0753-es-0721">y alzando hacia el Cielo el pecho y entrecejo,</l>
+
+<l xml:id="em0753-es-0722">tiernamente gemía mientras así me hablaba:</l>
+
+<l xml:id="em0753-es-0723">parte de mí querida, débil naturaleza,</l>
+
+<l xml:id="em0753-es-0724">yo no sé si una buena o mala aventura</l>
+
+<l xml:id="em0753-es-0725">te depara el destino, pues ni el ojo más sabio</l>
+
+<l xml:id="em0753-es-0726">puede introducirse tanto en sus secretos.</l>
+
+<l xml:id="em0753-es-0727">Bueno, tan sólo sé que si tu pobre vida</l>
+
+<l xml:id="em0753-es-0728">por el hilo que la abre es siempre perseguida,</l>
+
+<l xml:id="em0753-es-0729">el Cielo, por mostrar cuanto puede su augurio,</l>
+
+<l xml:id="em0753-es-0730">nacer te hizo en la Tierra, y vivir con dolor.</l>
+
+<l xml:id="em0753-es-0731">Mas, di, Cielo inhumano, ¿qué daño o qué agravio</l>
+
+<l xml:id="em0753-es-0732">pudo hacerte mi pobre descendencia en la cuna,</l>
+
+<l xml:id="em0753-es-0733">que parece, a fuerza de llorar cada día,</l>
+
+<l xml:id="em0753-es-0734">implorar tu afligida gracia a nuestros males?</l>
+
+<l xml:id="em0753-es-0735">Si es por los pecados de la doliente madre,</l>
+
+<l xml:id="em0753-es-0736">por lo que la castigas, ella es inocente:</l>
+
+<l xml:id="em0753-es-0737">perdónala, cruel, y más bien sobre mí,</l>
+
+<l xml:id="em0753-es-0738">sobre mí, miserable, extiende esas angustias.</l>
+
+<l xml:id="em0753-es-0739">Mi madre, así expresándose, alzó su ruego al Cielo;</l>
+
+<l xml:id="em0753-es-0740">pero en Él provocó una furia mayor,</l>
+
+<l xml:id="em0753-es-0741">no había llegado a la mitad de su ruta,</l>
+
+<l xml:id="em0753-es-0742">cuando una noche eterna oscureció sus días,</l>
+
+<l xml:id="em0753-es-0743">sobre mí que quedaba huérfana redoblando</l>
+
+<l xml:id="em0753-es-0744">los golpes de su ira indomable y maligna.</l>
+
+<l xml:id="em0753-es-0745">Había visto apenas nevar en siete inviernos,</l>
+
+<l xml:id="em0753-es-0746">y siete primaveras con sus verdes ropajes,</l>
+
+<l xml:id="em0753-es-0747">cuando abandoné mi terruño natal,</l>
+
+<l xml:id="em0753-es-0748">que ya no era mi madre, sino madrastra infiel,</l>
+
+<l xml:id="em0753-es-0749">y atravesando el mar me vine hacia Francia</l>
+
+<l xml:id="em0753-es-0750">bajo distinto Cielo, a buscar otros destinos.</l>
+
+<l xml:id="em0753-es-0751">Me desposó allí el Rey, pero esta alta unión</l>
+
+<l xml:id="em0753-es-0752">fue seguida de cerca por una viudez fúnebre;</l>
+
+<l xml:id="em0753-es-0753">murió este buen Príncipe, y el severo destino</l>
+
+<l xml:id="em0753-es-0754">no hizo sino mostrarlo a los infaustos galos.</l>
+
+<l xml:id="em0753-es-0755">¡Oh voluble fortuna, así es como tu rueda</l>
+
+<l xml:id="em0753-es-0756">juega incesantemente con Reyes y con Reinas!</l>
+
+<l xml:id="em0753-es-0757">Reconociendo luego que en esta bella Corte</l>
+
+<l xml:id="em0753-es-0758">yo había ensombrecido a la luz de mi día,</l>
+
+<l xml:id="em0753-es-0759">Francia, la bella Francia, para todos afable</l>
+
+<l xml:id="em0753-es-0760">no era ya a mis ojos sino un desierto hórrido</l>
+
+<l xml:id="em0753-es-0761">volví a ver mi tierra do sin cesar pensaba</l>
+
+<l xml:id="em0753-es-0762">llorando tristemente por mi infausto destino;</l>
+
+<l xml:id="em0753-es-0763">mas no estoy allí mucho, en medio de mis quejas,</l>
+
+<l xml:id="em0753-es-0764">siento cada vez más sus fatales ataques,</l>
+
+<l xml:id="em0753-es-0765">y no veo como uno de mis males se agrava,</l>
+
+<l xml:id="em0753-es-0766">cuando otro más cruel vuelve a asaltarme:</l>
+
+<l xml:id="em0753-es-0767">¡En el triste momento en que llegué al mundo,</l>
+
+<l xml:id="em0753-es-0768">me condenaba el Cielo a soportarlo todo!</l>
+
+<l xml:id="em0753-es-0769">Pero si hacia mí se mostró riguroso,</l>
+
+<l xml:id="em0753-es-0770">no se mostró más dulce mi infeliz país;</l>
+
+<l xml:id="em0753-es-0771">al permitir filtrarse entre la fantasía</l>
+
+<l xml:id="em0753-es-0772">la loca opinión de una rancia herejía<note n="6232" type="traductor"><term>herejía</term><p>El 19 de agosto de 1561, María volvía a su tierra natal desembarcando en el puerto de Leith (Edimburgo), tras unos 13 años de ausencia. A su regreso, la reina escocesa se encontraría con una nación dividida por la religión a causa de la Reforma Protestante, ya en un estado avanzado. El partido protestante, liderado por el famoso John Knox, había tomado mucha importancia. Tras una charla con su hermanastro Jacobo, que relevó a su madre como regente, María le comunicó que iba a tolerar esta nueva religión para evitar derramamiento de sangre siempre y cuando ella pudiera practicar el catolicismo.</p></note>;</l>
+
+<l xml:id="em0753-es-0773">habiendo, por error, la novedad alterado<note n="6233" type="traductor"><term>alterado</term><p>La aceptación de otra religión en su país fue algo muy avanzado para la época, más aún cuando María era muy católica.</p></note>,</l>
+
+<l xml:id="em0753-es-0774">y embriagada mi mente por la deslealtad;</l>
+
+<l xml:id="em0753-es-0775">se agitaron furiosas contiendas ciudadanas,</l>
+
+<l xml:id="em0753-es-0776">rebelión en los campos, levantamiento en urbes,</l>
+
+<l xml:id="em0753-es-0777">se buscó mi vergüenza, sin razón persiguiéndome,</l>
+
+<l xml:id="em0753-es-0778">creyéndome urdidora en la muerte de mi cónyuge<note n="6234" type="traductor"><term>cónyuge</term><p>Durante unos años, María recorrería Escocia para visitar a sus fieles católicos, que le pidieron que continuara con la línea sucesoria de los Estuardo, debiendo para ello tener un hijo. El elegido sería Enrique Estuardo, más conocido como Lord Darnley, un primo suyo inglés del que, tras cuidarlo de sarampión, se acabaría enamorando y con quien se casó, en 1565. Celoso de David Riccio, asistente, confidente y mejor amigo de María Estuardo, Lord Darnley firmó un pacto con otros nobles para asesinar a Riccio y conseguir poderes reales. Riccio fue asesinado con unas 60 puñaladas, momento en el que María estaba embarazada de 6 meses, dando a luz al poco tiempo a Jacobo, el futuro heredero del trono escocés. Seis meses más tarde, Lord Darnley moriría en una explosión, aunque las investigaciones descubrirían que había sido estrangulado previamente.</p></note>.</l>
+
+<l xml:id="em0753-es-0779">¿Puedes, querido esposo, que ahora reposas</l>
+
+<l xml:id="em0753-es-0780">en la feliz morada escuchar tales cosas?</l>
+
+<l xml:id="em0753-es-0781">¿Puedes ver difamar a tu mitad adorada</l>
+
+<l xml:id="em0753-es-0782">que incluso tras tu muerte vive en tu amistad?</l>
+
+<l xml:id="em0753-es-0783">Alberga en tu cuerpo a esta alma generosa,</l>
+
+<l xml:id="em0753-es-0784">y de antemano sal de la tumba arenosa,</l>
+
+<l xml:id="em0753-es-0785">para así defenderme de la acusación</l>
+
+<l xml:id="em0753-es-0786">que mi propia Nación presenta contra mí.</l>
+
+<l xml:id="em0753-es-0787">Sin embargo, me escapo pues sé que la inocencia</l>
+
+<l xml:id="em0753-es-0788">con respecto a los malos no es segura defensa,</l>
+
+<l xml:id="em0753-es-0789">y en el mar embarcándome maldigo yo mil veces</l>
+
+<l xml:id="em0753-es-0790">al destino enemigo, a mi reino y sus leyes.</l>
+
+<l xml:id="em0753-es-0791">Pero como si el mar tuviera connivencia</l>
+
+<l xml:id="em0753-es-0792">con la ingrata tierra en la que yo nací,</l>
+
+<l xml:id="em0753-es-0793">apenas hube entrado en su manso regazo,</l>
+
+<l xml:id="em0753-es-0794">bajo mi nave inquieto del golpear de los remos,</l>
+
+<l xml:id="em0753-es-0795">cuando enseguida vi las llanuras de espuma</l>
+
+<l xml:id="em0753-es-0796">blanqueando el azul de las orgullosas olas,</l>
+
+<l xml:id="em0753-es-0797">que, con su gran rugido en la orilla amagaban</l>
+
+<l xml:id="em0753-es-0798">con hacer naufragar mi quejumbrosa nave.</l>
+
+<l xml:id="em0753-es-0799">No obstante, navegué, temiendo a la tormenta</l>
+
+<l xml:id="em0753-es-0800">menos que a mi pueblo que pedía mi cabeza;</l>
+
+<l xml:id="em0753-es-0801">así pues, bien deduje encontrar más descanso</l>
+
+<l xml:id="em0753-es-0802">en lo alto del ciclón, en medio de las olas,</l>
+
+<l xml:id="em0753-es-0803">que entre un pueblo agitado por felonía e ira</l>
+
+<l xml:id="em0753-es-0804">que desea injustamente la muerte de su Reina.</l>
+
+<l xml:id="em0753-es-0805">No permitió el Cielo lo que yo deseaba,</l>
+
+<l xml:id="em0753-es-0806">que fondear pudiera en la orilla francesa,</l>
+
+<l xml:id="em0753-es-0807">donde esperaba hallar una tierra extranjera</l>
+
+<l xml:id="em0753-es-0808">más infiel que la mía a mis leves cenizas:</l>
+
+<l xml:id="em0753-es-0809">mas cuando, ¡ay! Huyo de este país que me rehúye</l>
+
+<l xml:id="em0753-es-0810">el tormento aumenta, el día se hace noche,</l>
+
+<l xml:id="em0753-es-0811">los llameantes relámpagos que emite la tormenta,</l>
+
+<l xml:id="em0753-es-0812">como líneas rojizas cortan la nube en sombras:</l>
+
+<l xml:id="em0753-es-0813">el horror, ruido, espanto lamentos y chillidos</l>
+
+<l xml:id="em0753-es-0814">el oído ensordece y enturbian las mentes;</l>
+
+<l xml:id="em0753-es-0815">todos a Dios se vuelven en la bronca tormenta</l>
+
+<l xml:id="em0753-es-0816">y sus oídos no oyen las ansias de su súplica;</l>
+
+<l xml:id="em0753-es-0817">desata el aire su ira, y más fuerte que antes</l>
+
+<l xml:id="em0753-es-0818">cobran vida las luchas de las olas y el viento.</l>
+
+<l xml:id="em0753-es-0819">A veces nuestra nave se hunde en los abismos;</l>
+
+<l xml:id="em0753-es-0820">otras se alza, impulsada, llegando a las estrellas;</l>
+
+<l xml:id="em0753-es-0821">luego a veces volteada en igual contrapeso</l>
+
+<l xml:id="em0753-es-0822">extrae la sal flotando en las rajas de madera:</l>
+
+<l xml:id="em0753-es-0823">en resumen, corriendo casi su última suerte,</l>
+
+<l xml:id="em0753-es-0824">una fiera borrasca nuestros deseos frustrando</l>
+
+<l xml:id="em0753-es-0825">la lanza en las orillas de los rudos ingleses,</l>
+
+<l xml:id="em0753-es-0826">pueblo taimado y cruel cuyas leyes supremas</l>
+
+<l xml:id="em0753-es-0827">son esas de la fuerza y de la tiranía,</l>
+
+<l xml:id="em0753-es-0828">cuyo pecho está lleno de ira y felonía,</l>
+
+<l xml:id="em0753-es-0829">y el ojo del delito se nutre y se complace</l>
+
+<l xml:id="em0753-es-0830">viendo la sangre humana derramada en la tierra.</l>
+
+<l xml:id="em0753-es-0831">Mas me hubiera valido ser arrojada lejos</l>
+
+<l xml:id="em0753-es-0832">en la ignota orilla de una isla despoblada,</l>
+
+<l xml:id="em0753-es-0833">o apagar mi antorcha en la ola espumosa,</l>
+
+<l xml:id="em0753-es-0834">al menos el océano mi tumba habría sido.</l>
+
+<l xml:id="em0753-es-0835">Fui hecha prisionera; un gran número de años</l>
+
+<l xml:id="em0753-es-0836">en su redondo círculo desde entonces rodaron,</l>
+
+<l xml:id="em0753-es-0837">y sin embargo nadie me ha restituido</l>
+
+<l xml:id="em0753-es-0838">la dicha de ser libre con gran dolor perdida.</l>
+
+<l xml:id="em0753-es-0839">¡Querida libertad, vanamente deseada!</l>
+
+<l xml:id="em0753-es-0840">Te alejaste de mí y ya fue para siempre.</l>
+
+<l xml:id="em0753-es-0841">Por fin un día tuve la esperanza de verte;</l>
+
+<l xml:id="em0753-es-0842">no sirvió para nada, salvo para fallarme;</l>
+
+<l xml:id="em0753-es-0843">ya no debo salir de una prisión tan férrea,</l>
+
+<l xml:id="em0753-es-0844">o si debo salir, la puerta es la muerte.</l>
+
+<l xml:id="em0753-es-0845">Quieren darme el gran golpe que yo parar no pueda;</l>
+
+<l xml:id="em0753-es-0846">pues bien, así es la vida, debo estar preparada.</l>
+
+<l xml:id="em0753-es-0847">El mal que se impacienta se irrita aún más;</l>
+
+<l xml:id="em0753-es-0848">no hay nada más humano ni grande que el valor.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0112" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0849" n="112">Pues, digan lo que digan no llegarán a eso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0113" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0850" n="113">Estoy, en cualquier caso, convencida de ello.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0114" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0851" n="114">Tratar a una Princesa como una criminal.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0115" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0852" n="115">A quien busca venganza sobra cualquier respeto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0116" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0853" n="116">Lo hacen a propósito para así asustaros.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0117" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0854" n="117">El corazón me engaña, o es para ejecutarme.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0118" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0855" n="118">Temen mucho ofender en Francia a los Príncipes.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0119" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0856" n="119">Temen menos mi muerte que mi liberación.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0120" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0857" n="120">La Reina, vuestra hermana, jamás lo deseará.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0121" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0858" n="121">De mi prisión injusta ella se acordará.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0122" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0859" n="122">También es demasiado sin atreverse a más.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0123" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0860" n="123">Los grandes miden todo sólo por la ventaja.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0124" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0861" n="124">¿Y qué dirían de ella en todas las naciones?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0125" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0862" n="125">La inquietud por la fama se pierde en las pasiones.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0126" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0863" n="126">Quien no tiene virtud desea al menos la sombra.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0127" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0864" n="127">Quien no tiene virtud aspira a cualquier crimen.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0128" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0865" n="128">Con pretexto engañoso intenta ocultarlo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0129" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0866" n="129">Está tan afligido que no quiere encubrirlo.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0130" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0867" n="130">La austera entereza teme a la vergüenza.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0131" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0868" n="131">La valentía insolente no incita a habladurías.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0132" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0869" n="132">Así rezar debemos, como último recurso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0133" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0870" n="133">Los talantes furiosos sordos son a plegarias.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0134" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0871" n="134">Siempre vuelvo al punto en que se inicia la trama,</l>
+
+<l xml:id="em0753-es-0872">para apagar el fuego nutrido en vuestra alma</l>
+
+<l xml:id="em0753-es-0873">del recuerdo viviente de mil indignidades,</l>
+
+<l xml:id="em0753-es-0874">que vuestro proceder no había merecido.</l>
+
+<l xml:id="em0753-es-0875">Pues, cuando en la angustia se te ofrece la gracia,</l>
+
+<l xml:id="em0753-es-0876">en las almas más duras el mal deseo se esfuma.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0135" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0877" n="135">Un alma desolada fácilmente se frustra</l>
+
+<l xml:id="em0753-es-0878">al creer intrascendente el bien que ella proyecta.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0136" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0879" n="136">Un alma desgraciada es siempre desconfiada,</l>
+
+<l xml:id="em0753-es-0880">y del bien de su prójimo recula su creencia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0137" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0881" n="137">Cuando el pensar del alma vibra por la esperanza,</l>
+
+<l xml:id="em0753-es-0882">vive incesantemente lleno de desconcierto.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0138" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0883" n="138">Feliz en sus desgracias quien se nutre de creencia,</l>
+
+<l xml:id="em0753-es-0884">en los males más densos se promete el alivio.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0139" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0885" n="139">Mas, más bien el aciago, el hombre agobiado,</l>
+
+<l xml:id="em0753-es-0886">al que una vana fe de bien hace infeliz.</l>
+
+<l xml:id="em0753-es-0887">No me habléis nunca de eso; no es con la palabra,</l>
+
+<l xml:id="em0753-es-0888">sino el propio dolor lo que a mí me consuela,</l>
+
+<l xml:id="em0753-es-0889">y ahuyentando de mí cualquier dulce pensar,</l>
+
+<l xml:id="em0753-es-0890">abrazo solamente lo que puede ofenderme:</l>
+
+<l xml:id="em0753-es-0891">así que en mucho tiempo he estado en servidumbre,</l>
+
+<l xml:id="em0753-es-0892">por haber adquirido del mal un fuerte hábito.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0140" who="#PAJE">
+<speaker>PAJE</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0893" n="140">Aquí hay gente, Señora, muy bien atendida,</l>
+
+<l xml:id="em0753-es-0894">que bajaron allí y fueron detenidos:</l>
+
+<l xml:id="em0753-es-0895">no he podido saber qué asunto los trae,</l>
+
+<l xml:id="em0753-es-0896">pero están realmente de parte de la Reina.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0141" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0897" n="141">Bueno, si a Nos vienen habrá que recibirlos;</l>
+
+<l xml:id="em0753-es-0898">ni placer ni disgusto tengo yo que mostrarles;</l>
+
+<l xml:id="em0753-es-0899">pues lista está mi alma para cualquier percance;</l>
+
+<l xml:id="em0753-es-0900">yo misma de mí misma me he fortalecido.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0142" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0901" n="142">Hermanas mías, oremos con una voz y un alma</l>
+
+<l xml:id="em0753-es-0902">al Dios del Cielo, dueño del corazón de Reyes,</l>
+
+<l xml:id="em0753-es-0903">que salve de la pena a</l>
+
+<l xml:id="em0753-es-0904">nuestra inocente Reina.</l>
+
+<l xml:id="em0753-es-0905">Oremos al que tiene poder sobre los hombres,</l>
+
+<l xml:id="em0753-es-0906">y de quienes exige la obediencia debida,</l>
+
+<l xml:id="em0753-es-0907">que tenga compasión</l>
+
+<l xml:id="em0753-es-0908">de nuestra aflicción.</l>
+
+<l xml:id="em0753-es-0909">Roguemos a aquel que pliega a sus propósitos</l>
+
+<l xml:id="em0753-es-0910">los impulsos de los corazones más duros,</l>
+
+<l xml:id="em0753-es-0911">que nos haga propicia</l>
+
+<l xml:id="em0753-es-0912">la gracia o la justicia.</l>
+
+<l xml:id="em0753-es-0913">Oremos a aquel, cuya sólida diestra</l>
+
+<l xml:id="em0753-es-0914">la puerta de la cárcel la abre y la cierra,</l>
+
+<l xml:id="em0753-es-0915">que nos saque de aquí</l>
+
+<l xml:id="em0753-es-0916">por su dulce encanto.</l>
+
+<l xml:id="em0753-es-0917">Oremos a aquel que es recurso único</l>
+
+<l xml:id="em0753-es-0918">para los afligidos, y ayuda de los buenos,</l>
+
+<l xml:id="em0753-es-0919">que quite la tristeza</l>
+
+<l xml:id="em0753-es-0920">a nuestra gran Princesa.</l>
+
+<l xml:id="em0753-es-0921">Oremos a aquel que promete alivio</l>
+
+<l xml:id="em0753-es-0922">al corazón tenaz en su duro dolor</l>
+
+<l xml:id="em0753-es-0923">que se acabe hoy</l>
+
+<l xml:id="em0753-es-0924">su mal y nuestro hastío.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0143" who="#DAVISON">
+<speaker>DAVISON</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0925" n="143">A vos Reina de Escocia en prisión retenida</l>
+
+<l xml:id="em0753-es-0926">desde que a nuestras costas vos fuisteis transportada,</l>
+
+<l xml:id="em0753-es-0927">unidos los Estados de Inglaterra en acuerdo,</l>
+
+<l xml:id="em0753-es-0928">deseosos de vengar tus crímenes y errores</l>
+
+<l xml:id="em0753-es-0929">por mi voz te hace oír un justo fallo de muerte.</l>
+
+<l xml:id="em0753-es-0930">Por hacer que los Reyes se enfrenten a nosotros,</l>
+
+<l xml:id="em0753-es-0931">la discordia avivado, urdido la traición,</l>
+
+<l xml:id="em0753-es-0932">a nuestra buena Reina queriendo envenenar,</l>
+
+<l xml:id="em0753-es-0933">reavivando disputas civiles por doquier,</l>
+
+<l xml:id="em0753-es-0934">alimentando clanes y aversiones mortales,</l>
+
+<l xml:id="em0753-es-0935">resucitando ardores de batallas pasadas,</l>
+
+<l xml:id="em0753-es-0936">oponiendo al Estado gran número de bandos;</l>
+
+<l xml:id="em0753-es-0937">el Consejo pronuncia contra Vos la sentencia</l>
+
+<l xml:id="em0753-es-0938">pago bien merecido por vuestro grave crimen.</l>
+
+<l xml:id="em0753-es-0939">Sobre un negro cadalso vuestra testa tapada,</l>
+
+<l xml:id="em0753-es-0940">por mano del verdugo caerá amputada.</l>
+
+<l xml:id="em0753-es-0941">¡Que ascienda el alma al Cielo! Con esta esperanza</l>
+
+<l xml:id="em0753-es-0942">preparaos, Señora, para la vida eterna.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0144" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0943" n="144">Por fin llega el momento largamente esperado</l>
+
+<l xml:id="em0753-es-0944">¿Quién me devolverá ese dulce reposo?</l>
+
+<l xml:id="em0753-es-0945">¡Oh día venturoso! Lograrás que una Reina</l>
+
+<l xml:id="em0753-es-0946">saliendo de dos cárceles salga de su condena,</l>
+
+<l xml:id="em0753-es-0947">para entrar en los Cielos de los que no se vuelve,</l>
+
+<l xml:id="em0753-es-0948">donde nunca se acerca el horror de la muerte.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0145" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0949" n="145">¡Día más bien aciago y noche tenebrosa,</l>
+
+<l xml:id="em0753-es-0950">que nuestra luz conduces a la sombría tumba!</l>
+
+<l xml:id="em0753-es-0951">¿Nos dejáis aquí sin bienes ni sustento?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0146" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0952" n="146">No está carente de algo aquel a quien Dios cuida.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0147" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0953" n="147">Nos dejáis, Señora, y nuestros húmedos párpados</l>
+
+<l xml:id="em0753-es-0954">a fuerza de llorar apagarán sus luces,</l>
+
+<l xml:id="em0753-es-0955">para vernos envueltos en miles de peligros</l>
+
+<l xml:id="em0753-es-0956">entre estos enemigos e infieles extranjeros.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0148" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-0957" n="148">Me dejáis vosotras, no soy yo quien os deja;</l>
+
+<l xml:id="em0753-es-0958">abandono la Tierra y me dirijo al Cielo.</l>
+
+<l xml:id="em0753-es-0959">Es una ley cierta para los de la Tierra,</l>
+
+<l xml:id="em0753-es-0960">que siempre el nacimiento trae consigo la muerte.</l>
+
+<l xml:id="em0753-es-0961">Que cada día, cada hora y momento que pasa</l>
+
+<l xml:id="em0753-es-0962">acorta el espacio de la vida mortal.</l>
+
+<l xml:id="em0753-es-0963">Pero, aunque la muerte sea un mal para los ruines</l>
+
+<l xml:id="em0753-es-0964">bien es para los buenos, que al pasar los años</l>
+
+<l xml:id="em0753-es-0965">traídos son a este puerto cuya incómoda entrada</l>
+
+<l xml:id="em0753-es-0966">mete a los elegidos en la ciudad divina,</l>
+
+<l xml:id="em0753-es-0967">antes vivos que muertos, mejor que viejos, jóvenes,</l>
+
+<l xml:id="em0753-es-0968">peregrinos errantes, ya vecinos del Cielo.</l>
+
+<l xml:id="em0753-es-0969">Desde que el corredor comienza el trayecto,</l>
+
+<l xml:id="em0753-es-0970">aspira a ganar al final de la carrera;</l>
+
+<l xml:id="em0753-es-0971">el barquero, aburrido de bogar en el agua</l>
+
+<l xml:id="em0753-es-0972">desea amarrar su barco dentro de la ensenada;</l>
+
+<l xml:id="em0753-es-0973">el viajero cansado siente reír su valor</l>
+
+<l xml:id="em0753-es-0974">cuando ve el campanario de su propio poblado:</l>
+
+<l xml:id="em0753-es-0975">yo, que ya he llenado el curso de mis años,</l>
+
+<l xml:id="em0753-es-0976">sufriendo de continuo las tormentas dañinas,</l>
+
+<l xml:id="em0753-es-0977">mientras que agitaba las tormentas del mundo,</l>
+
+<l xml:id="em0753-es-0978">quiero anclar en el puerto donde afluye el descanso,</l>
+
+<l xml:id="em0753-es-0979">termino mi viaje en muy dura estación,</l>
+
+<l xml:id="em0753-es-0980">pero mucho más grata hallaré la morada,</l>
+
+<l xml:id="em0753-es-0981">donde hasta debo ver a este padre piadoso,</l>
+
+<l xml:id="em0753-es-0982">que hace de la discordia una armonía afable,</l>
+
+<l xml:id="em0753-es-0983">que gobierna incesante los flujos de los Cielos,</l>
+
+<l xml:id="em0753-es-0984">que hace bailar en círculos a los Astros radiantes,</l>
+
+<l xml:id="em0753-es-0985">y sostiene este ancho orbe preso en su fuerte mano;</l>
+
+<l xml:id="em0753-es-0986">por quien todo está en todos<note n="6235" type="traductor"><term>todos</term><p>Es decir: todas las cosas son de la misma especie en todos.</p></note> de diversa manera,</l>
+
+<l xml:id="em0753-es-0987">y tenemos el ser, en quien sólo vivimos,</l>
+
+<l xml:id="em0753-es-0988">en quien sólo sentimos, respiramos y andamos.</l>
+
+<l xml:id="em0753-es-0989">Veloz, ligero el fuego alza el vuelo en el Cielo;</l>
+
+<l xml:id="em0753-es-0990">el agua hacia abajo desciende por su peso,</l>
+
+<l xml:id="em0753-es-0991">más aun cuando todo aspira al mismo sitio</l>
+
+<l xml:id="em0753-es-0992">que era como un centro que Dios le asignó:</l>
+
+<l xml:id="em0753-es-0993">mi ánima es del Cielo, y por Él es atraída,</l>
+
+<l xml:id="em0753-es-0994">y con ardor sediento suspira sin cesar</l>
+
+<l xml:id="em0753-es-0995">tras el omnipotente, bueno, santo y fuerte,</l>
+
+<l xml:id="em0753-es-0996">pues ver es una vida, y no ver una muerte.</l>
+
+<l xml:id="em0753-es-0997">Aunque la tempestad agrupe muchas nubes</l>
+
+<l xml:id="em0753-es-0998">que quieran impedirme llegar al Paraíso,</l>
+
+<l xml:id="em0753-es-0999">y halle en el camino dificultades miles</l>
+
+<l xml:id="em0753-es-1000">bajo mis pasos vienen por doquier a ofrecerse;</l>
+
+<l xml:id="em0753-es-1001">que el frío y el calor, el viento y la tormenta</l>
+
+<l xml:id="em0753-es-1002">intenten desviarme en este feliz viaje,</l>
+
+<l xml:id="em0753-es-1003">sin embargo, no pueden; allí debo arribar:</l>
+
+<l xml:id="em0753-es-1004">veo para honrarme levantarse a las vírgenes;</l>
+
+<l xml:id="em0753-es-1005">a Príncipes y Reyes por mi llegada alegres,</l>
+
+<l xml:id="em0753-es-1006">asignarme un lugar elegido en sus filas;</l>
+
+<l xml:id="em0753-es-1007">y al mismo Dios en medio de los gloriosos Ángeles,</l>
+
+<l xml:id="em0753-es-1008">recibirme en su casa con cordial bienvenida,</l>
+
+<l xml:id="em0753-es-1009">dedicarme mil muestras de honores y atenciones,</l>
+
+<l xml:id="em0753-es-1010">y echarme en la espalda el manto alegre teñido</l>
+
+<l xml:id="em0753-es-1011">con la preciosa sangre del Cordero inocente,</l>
+
+<l xml:id="em0753-es-1012">que quiso inmolarse por salvar su rebaño;</l>
+
+<l xml:id="em0753-es-1013">que de libre fue siervo, y que de Dios se hizo hombre,</l>
+
+<l xml:id="em0753-es-1014">llevó en su cruz la culpa de todos nuestros yerros.</l>
+
+<l xml:id="em0753-es-1015">Cielo, único consuelo de nuestra dura faena,</l>
+
+<l xml:id="em0753-es-1016">puerto en nuestra tormenta, reposo en nuestros males,</l>
+
+<l xml:id="em0753-es-1017">recibe, pues, mi alma que, salvada del naufragio</l>
+
+<l xml:id="em0753-es-1018">desciende a tu orilla de la muerte eterna.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0149" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0753-es-1019" n="149">No sufras por la muerte,</l>
+
+<l xml:id="em0753-es-1020">es algo muy común:</l>
+
+<l xml:id="em0753-es-1021">que el débil y el más fuerte</l>
+
+<l xml:id="em0753-es-1022">igual suerte al fin corren.</l>
+
+<l xml:id="em0753-es-1023">Todos igual acaban,</l>
+
+<l xml:id="em0753-es-1024">mas no todos por igual.</l>
+
+<l xml:id="em0753-es-1025">Mortal, deja de pensar</l>
+
+<l xml:id="em0753-es-1026">cómo al hado doblegar;</l>
+
+<l xml:id="em0753-es-1027">si adelantarla no puedes,</l>
+
+<l xml:id="em0753-es-1028">de nada elle se desvía;</l>
+
+<l xml:id="em0753-es-1029">suspiros, lágrimas, quejas, discursos</l>
+
+<l xml:id="em0753-es-1030">son vanos obstáculos a su curso.</l>
+
+<l xml:id="em0753-es-1031">Una fuerte necesidad</l>
+
+<l xml:id="em0753-es-1032">lleva todo a su punto,</l>
+
+<l xml:id="em0753-es-1033">que corre con paso imparable</l>
+
+<l xml:id="em0753-es-1034">mientras en su final descanse:</l>
+
+<l xml:id="em0753-es-1035">sin sentir que el barco se mueve,</l>
+
+<l xml:id="em0753-es-1036">llegamos al otro lado del agua.</l>
+
+<l xml:id="em0753-es-1037">Hace ya mucho tiempo nuestros primeros padres</l>
+
+<l xml:id="em0753-es-1038">rastrearon esta senda negra,</l>
+
+<l xml:id="em0753-es-1039">donde a mil animales diferentes</l>
+
+<l xml:id="em0753-es-1040">la Parca protege noche y día,</l>
+
+<l xml:id="em0753-es-1041">si uno deja hoy el mundo</l>
+
+<l xml:id="em0753-es-1042">otro lo sigue mañana.</l>
+
+<l xml:id="em0753-es-1043">Cuando el hombre ha llegado al último período</l>
+
+<l xml:id="em0753-es-1044">así como a su origen,</l>
+
+<l xml:id="em0753-es-1045">por el destino humano está privado</l>
+
+<l xml:id="em0753-es-1046">de disputar otra carrera;</l>
+
+<l xml:id="em0753-es-1047">al igual que un río se une al mar,</l>
+
+<l xml:id="em0753-es-1048">del que luego no vuelve a salir.</l>
+
+<l xml:id="em0753-es-1049">¿Se puede hallar un camino</l>
+
+<l xml:id="em0753-es-1050">en el que al final haya una salida?</l>
+
+<l xml:id="em0753-es-1051">Tú ves el Sol cuando sale,</l>
+
+<l xml:id="em0753-es-1052">luego ocultarse de tu vista;</l>
+
+<l xml:id="em0753-es-1053">de ahí comienza a decirse</l>
+
+<l xml:id="em0753-es-1054">que el mortal sólo nace para luego morir.</l>
+
+<l xml:id="em0753-es-1055">Aquel que se sorprendiera</l>
+
+<l xml:id="em0753-es-1056">de no haber tenido vida,</l>
+
+<l xml:id="em0753-es-1057">se confesaría loco:</l>
+
+<l xml:id="em0753-es-1058">pues es un loco deseo</l>
+
+<l xml:id="em0753-es-1059">querer diferir la muerte</l>
+
+<l xml:id="em0753-es-1060">contra el fallo de la suerte.</l>
+
+<l xml:id="em0753-es-1061">El hombre, temeroso de su firme destino,</l>
+
+<l xml:id="em0753-es-1062">no se decidirá a aplazar su muerte:</l>
+
+<l xml:id="em0753-es-1063">la Parca enseguida vendrá a por él</l>
+
+<l xml:id="em0753-es-1064">horrible y desfigurada</l>
+
+<l xml:id="em0753-es-1065">tanto para que tema la hora de la muerte,</l>
+
+<l xml:id="em0753-es-1066">o para no temerla.</l>
+
+<l xml:id="em0753-es-1067">Quien quiera en todo instante verla,</l>
+
+<l xml:id="em0753-es-1068">que se arme de valor el corazón:</l>
+
+<l xml:id="em0753-es-1069">que se prepare a recibirla</l>
+
+<l xml:id="em0753-es-1070">como si fuera un bien, no como un ultraje.</l>
+
+<l xml:id="em0753-es-1071">Quien graba su imagen en el corazón</l>
+
+<l xml:id="em0753-es-1072">no debe nunca tener miedo.</l>
+
+<l xml:id="em0753-es-1073">El hombre que se conoce bien</l>
+
+<l xml:id="em0753-es-1074">sabe que en cualquier estación que muera,</l>
+
+<l xml:id="em0753-es-1075">no se pierde nada de su tiempo,</l>
+
+<l xml:id="em0753-es-1076">pero que en los demás permanece;</l>
+
+<l xml:id="em0753-es-1077">al ser viejo termina su trayecto</l>
+
+<l xml:id="em0753-es-1078">en la flor de sus días más hermosos.</l>
+
+<l xml:id="em0753-es-1079">Ve que la Parca lo siega todo</l>
+
+<l xml:id="em0753-es-1080">sin respetar la grandeza o la edad,</l>
+
+<l xml:id="em0753-es-1081">ve que de un extremo a otro</l>
+
+<l xml:id="em0753-es-1082">el mundo es su prebenda;</l>
+
+<l xml:id="em0753-es-1083">y que no hay estación,</l>
+
+<l xml:id="em0753-es-1084">que no le traiga su cosecha.</l>
+
+<l xml:id="em0753-es-1085">Él espía el vuelo del tiempo</l>
+
+<l xml:id="em0753-es-1086">que, no obstante, apenas importa</l>
+
+<l xml:id="em0753-es-1087">a aquellos cuyas mentes contentas</l>
+
+<l xml:id="em0753-es-1088">son tan prósperos en sus fortunas</l>
+
+<l xml:id="em0753-es-1089">que no pueden esperar nada</l>
+
+<l xml:id="em0753-es-1090">sino perder para más desear.</l>
+
+<l xml:id="em0753-es-1091">Observa a grandes y pequeños</l>
+
+<l xml:id="em0753-es-1092">siguiéndose a poca distancia</l>
+
+<l xml:id="em0753-es-1093">hasta el lugar que los devora,</l>
+
+<l xml:id="em0753-es-1094">y que en su pálida morada</l>
+
+<l xml:id="em0753-es-1095">todo hombre es apremiado por el sueño</l>
+
+<l xml:id="em0753-es-1096">hasta el gran día de su despertar.</l>
+
+<l xml:id="em0753-es-1097">Observa que al quejarse</l>
+
+<l xml:id="em0753-es-1098">por una bella criatura</l>
+
+<l xml:id="em0753-es-1099">cuando la muerte va apagándolo,</l>
+
+<l xml:id="em0753-es-1100">acusa erróneamente a la Natura,</l>
+
+<l xml:id="em0753-es-1101">de recibir de alguien superior a él</l>
+
+<l xml:id="em0753-es-1102">la imposición de esta ley.</l>
+
+<l xml:id="em0753-es-1103">Sabe que un movimiento repentino</l>
+
+<l xml:id="em0753-es-1104">entre tantas veleidades humanas,</l>
+
+<l xml:id="em0753-es-1105">la muerte sigue siendo cierta</l>
+
+<l xml:id="em0753-es-1106">entre sus caminos inciertos,</l>
+
+<l xml:id="em0753-es-1107">pero no podemos sobre la marcha</l>
+
+<l xml:id="em0753-es-1108">sostener ningún juicio verdadero.</l>
+
+<l xml:id="em0753-es-1109">Aquel que así medita,</l>
+
+<l xml:id="em0753-es-1110">la espera siempre a pie firme;</l>
+
+<l xml:id="em0753-es-1111">quien no está aterrado de miedo</l>
+
+<l xml:id="em0753-es-1112">cuando ve avanzar su final,</l>
+
+<l xml:id="em0753-es-1113">pero lo sigue creyendo cumplido,</l>
+
+<l xml:id="em0753-es-1114">sólo está lleno de sabiduría.</l>
+</lg>
+</sp>
+</div1>
+
+<div1 type="act" n="4">
+<head>ACTO IV</head>
+
+<stage xml:id="em0753-es-st-0004">REINA DE ESCOCIA, CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</stage>
+
+<sp xml:id="em0753-es-sp-0150" who="#REINA_ESCOCIA">
+<speaker>REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1115" n="150">Esta es la última hora de mi deseado anhelo,</l>
+
+<l xml:id="em0753-es-1116">para la que de siempre me he estado preparando;</l>
+
+<l xml:id="em0753-es-1117">sin pesar abandono este cieno vicioso</l>
+
+<l xml:id="em0753-es-1118">yendo donde el ánima se une a su tallo eterno,</l>
+
+<l xml:id="em0753-es-1119">brillando clara y pura en la claridad del Cielo,</l>
+
+<l xml:id="em0753-es-1120">floreciendo de nuevo con vida inmortal.</l>
+
+<l xml:id="em0753-es-1121">Ábrete, Paraíso, y admite en este sitio</l>
+
+<l xml:id="em0753-es-1122">a mi espíritu ardiente por querer ver a Dios;</l>
+
+<l xml:id="em0753-es-1123">vosotros, protectores Ángeles de los fieles,</l>
+
+<l xml:id="em0753-es-1124">extended al viento los aros de vuestras alas,</l>
+
+<l xml:id="em0753-es-1125">para así recibir a mi alma en vuestros brazos</l>
+
+<l xml:id="em0753-es-1126">cuando ella y este líder real vuelen de mi cuerpo,</l>
+
+<l xml:id="em0753-es-1127">que por vos sea llevada al seno de Abraham</l>
+
+<l xml:id="em0753-es-1128">donde de Dios la gloria nos es manifestada.</l>
+
+<l xml:id="em0753-es-1129">Por la fe anticipo esta dulce alegría,</l>
+
+<l xml:id="em0753-es-1130">que de esperanza cierta me llena totalmente,</l>
+
+<l xml:id="em0753-es-1131">que todo lo que mi alma representa en mi pecho</l>
+
+<l xml:id="em0753-es-1132">me hace vivir arriba, aunque ausente de cuerpo.</l>
+
+<l xml:id="em0753-es-1133">Pero ¿cuál será el precio si, ya llegado al Cielo,</l>
+
+<l xml:id="em0753-es-1134">puedo ver con mi ánima lo que no ven los ojos?</l>
+
+<l xml:id="em0753-es-1135">¿Lo que no es oído? Lo que no puede, en suma,</l>
+
+<l xml:id="em0753-es-1136">estar en modo alguno bajo la mente humana,</l>
+
+<l xml:id="em0753-es-1137">¿si eximido del cuerpo no todo en él es alma,</l>
+
+<l xml:id="em0753-es-1138">para entender el bien que no entendió en la tierra?</l>
+
+<l xml:id="em0753-es-1139">Pero, para gozar del fruto de mi espera,</l>
+
+<l xml:id="em0753-es-1140">humilde y devota de Dios, yo me presento</l>
+
+<l xml:id="em0753-es-1141">en nombre de su amado hijo, en la Cruz clavado</l>
+
+<l xml:id="em0753-es-1142">por mí amansó el Infierno, la muerte y el pecado;</l>
+
+<l xml:id="em0753-es-1143">tomó de un mortal siervo la sensible figura,</l>
+
+<l xml:id="em0753-es-1144">para restituirnos la inmortal Natura;</l>
+
+<l xml:id="em0753-es-1145">y se dignó a bajar del Cielo a la Tierra,</l>
+
+<l xml:id="em0753-es-1146">para que así el Cielo pudiera encumbrarla:</l>
+
+<l xml:id="em0753-es-1147">en el nombre del Hijo, dirijo a ti, Padre,</l>
+
+<l xml:id="em0753-es-1148">los devotos acentos de mi humilde plegaria;</l>
+
+<l xml:id="em0753-es-1149">te ruego que la aceptes, tan sólo en su nombre,</l>
+
+<l xml:id="em0753-es-1150">porque mi salvador se declaró con su muerte,</l>
+
+<l xml:id="em0753-es-1151">recordando los males que me hacen criminal</l>
+
+<l xml:id="em0753-es-1152">Tú, a la muerte eterna, me puedes condenar,</l>
+
+<l xml:id="em0753-es-1153">al orco del sufrir donde dentro resuenan</l>
+
+<l xml:id="em0753-es-1154">quejas, llantos, sollozos y un crujir de dientes:</l>
+
+<l xml:id="em0753-es-1155">mas cubierta con manto de completa inocencia</l>
+
+<l xml:id="em0753-es-1156">con el que tu hijo único nuestra ofensa ha cubierto,</l>
+
+<l xml:id="em0753-es-1157">te ruego, oh Señor, que le des a mi fe</l>
+
+<l xml:id="em0753-es-1158">lo que contra mí pueda alegar tu justicia.</l>
+
+<l xml:id="em0753-es-1159">Padre dulce y benigno, no vengas a juzgar</l>
+
+<l xml:id="em0753-es-1160">contra tu criatura. ¡Ay Dios mío! no te afanes</l>
+
+<l xml:id="em0753-es-1161">contra mí tu cautiva, no vengas a mostrarme</l>
+
+<l xml:id="em0753-es-1162">todo mortal pecado que hallar puedas en mí.</l>
+
+<l xml:id="em0753-es-1163">Todos, Señor, pecaron ante tu santa faz:</l>
+
+<l xml:id="em0753-es-1164">¿si es que por esto fuimos de tu gracia exilados,</l>
+
+<l xml:id="em0753-es-1165">a quién se otorgaría tu salvación entonces?</l>
+
+<l xml:id="em0753-es-1166">¿Qué hacer con el estrado<note n="6236" type="traductor"><term>estrado</term><p>El término “bois” debe aludir al dispositivo de la guillotina: un marco de madera alto y vertical provisto de una pesada hoja de acero con un filo oblicuo, suspendida en la parte superior; la traducción por “estrado”, en su acepción de Sala de los tribunales donde suben los testigos o los acusados para declarar, une a la vez el juicio y la ejecución.</p></note> de la sangre lavada?</l>
+
+<l xml:id="em0753-es-1167">La tierra de los vivos quedaría desierta,</l>
+
+<l xml:id="em0753-es-1168">si el error de los hombres implicara su ruina.</l>
+
+<l xml:id="em0753-es-1169">Tu nos has redimido de la caída de Adam,</l>
+
+<l xml:id="em0753-es-1170">y nuestro bien sacaste de nuestra expiación.</l>
+
+<l xml:id="em0753-es-1171">luego, abriendo un tesoro de gracias liberales,</l>
+
+<l xml:id="em0753-es-1172">con tu vida pagaste nuestras deudas desleales:</l>
+
+<l xml:id="em0753-es-1173">y donde más habían fluido los pecados</l>
+
+<l xml:id="em0753-es-1174">se desbordó tu sangre para destruirlos todos.</l>
+
+<l xml:id="em0753-es-1175">Cual cuando en la mañana el aire, lleno de nubes,</l>
+
+<l xml:id="em0753-es-1176">lanzando el Sol sus finas y furtivas miradas</l>
+
+<l xml:id="em0753-es-1177">de pronto hace borrarse las nieblas esparcidas</l>
+
+<l xml:id="em0753-es-1178">entre la Tierra y Él cual un velo tendido;</l>
+
+<l xml:id="em0753-es-1179">así haces disipar, claro Sol de justicia,</l>
+
+<l xml:id="em0753-es-1180">alzando en nosotros la suma de nuestro vicio,</l>
+
+<l xml:id="em0753-es-1181">que, sin las cariñosas miradas de tus ojos,</l>
+
+<l xml:id="em0753-es-1182">alzarían un muro entre Nos y los Cielos.</l>
+
+<l xml:id="em0753-es-1183">Por favor, fija un poco sobre mí tu mirada,</l>
+
+<l xml:id="em0753-es-1184">los rayos de tu gracia brillarán en mi pecho,</l>
+
+<l xml:id="em0753-es-1185">y lo acrisolarán de infames pecados</l>
+
+<l xml:id="em0753-es-1186">con los que mi alma y cuerpo uno a otro están manchados.</l>
+
+<l xml:id="em0753-es-1187">Oh Dios, haz que mi alma, por faltas empañada,</l>
+
+<l xml:id="em0753-es-1188">reciba la imagen de tu gloria infinita</l>
+
+<l xml:id="em0753-es-1189">limpiada por tu mano, para que pueda verse,</l>
+
+<l xml:id="em0753-es-1190">igual que el sucio espejo que se limpia al frotarlo.</l>
+
+<l xml:id="em0753-es-1191">Libérame, Señor, de este mortal servicio</l>
+
+<l xml:id="em0753-es-1192">cuya cadena eterna es la prenda más segura,</l>
+
+<l xml:id="em0753-es-1193">y permite que mi alma al irse de este cuerpo</l>
+
+<l xml:id="em0753-es-1194">que entre sus fuertes lazos la estrechó tanto tiempo,</l>
+
+<l xml:id="em0753-es-1195">no quede retenida por su elevado peso,</l>
+
+<l xml:id="em0753-es-1196">sino que pronto y rápida ella agriete las nubes,</l>
+
+<l xml:id="em0753-es-1197">para ser admitida en la morada eterna,</l>
+
+<l xml:id="em0753-es-1198">y posea en sí misma tu amor paternal,</l>
+
+<l xml:id="em0753-es-1199">que mayor se concibe por el ser de tu rostro</l>
+
+<l xml:id="em0753-es-1200">en la desvelada ánima de su fangosa masa.</l>
+
+<l xml:id="em0753-es-1201">Al partir de este sitio no me queda hacer nada,</l>
+
+<l xml:id="em0753-es-1202">salvo expresarle a todos, un eterno adiós.</l>
+
+<l xml:id="em0753-es-1203">Adiós, Escocia mía, adiós tierra natal,</l>
+
+<l xml:id="em0753-es-1204">Mas, más bien tierra ingrata fatal para sus Príncipes,</l>
+
+<l xml:id="em0753-es-1205">donde las disensiones y la discordia reinan,</l>
+
+<l xml:id="em0753-es-1206">donde los corazones se dividen en clanes,</l>
+
+<l xml:id="em0753-es-1207">y bruscos en la guerra tanto como en el dogma,</l>
+
+<l xml:id="em0753-es-1208">sus primeras maniobras no denotan pujanza.</l>
+
+<l xml:id="em0753-es-1209">Quiera el Cielo aplacar este ardor visceral</l>
+
+<l xml:id="em0753-es-1210">que agitan en tu pecho las tormentas rebeldes</l>
+
+<l xml:id="em0753-es-1211">de un montón de facciosos, que con guerras civiles</l>
+
+<l xml:id="em0753-es-1212">desgarran la armonía y paz de las ciudades.</l>
+
+<l xml:id="em0753-es-1213">Que tu joven Rey pueda, mi hijo bien amado,</l>
+
+<l xml:id="em0753-es-1214">regirte largo tiempo, amado por los suyos,</l>
+
+<l xml:id="em0753-es-1215">lo quieran los vecinos, lo teman los extraños,</l>
+
+<l xml:id="em0753-es-1216">y el Cielo lo conozca por las loas recibidas.</l>
+
+<l xml:id="em0753-es-1217">Tú, esperanza del pueblo, dulce inquietud de mi alma,</l>
+
+<l xml:id="em0753-es-1218">aunque me traten mal, con ardid y rigor</l>
+
+<l xml:id="em0753-es-1219">viable en un asunto inusual por doquier,</l>
+
+<l xml:id="em0753-es-1220">no obstante, no permitas que tu alma se hastíe;</l>
+
+<l xml:id="em0753-es-1221">pero por el bien público soporta con paciencia</l>
+
+<l xml:id="em0753-es-1222">lo que no deberías soportar de otro modo.</l>
+
+<l xml:id="em0753-es-1223">En ocasión así, callarse ante el ultraje</l>
+
+<l xml:id="em0753-es-1224">no es una cobardía, sino un gran coraje.</l>
+
+<l xml:id="em0753-es-1225">Adiós, viviendo aquí es preciso que reines,</l>
+
+<l xml:id="em0753-es-1226">igual que cuando muera yo reinaré arriba.</l>
+
+<l xml:id="em0753-es-1227">Que a medida que crezcas lo hagas también en gracia,</l>
+
+<l xml:id="em0753-es-1228">y tras los otros Reyes, supérate a ti mismo.</l>
+
+<l xml:id="em0753-es-1229">Adiós, Francia, antaño morada de mi gozo,</l>
+
+<l xml:id="em0753-es-1230">donde mil y mil veces me llevó el deseo</l>
+
+<l xml:id="em0753-es-1231">desde que abandoné tu agradable hogar,</l>
+
+<l xml:id="em0753-es-1232">por ti yo fui feliz, y por ti miserable:</l>
+
+<l xml:id="em0753-es-1233">si mis huesos pudieran descansar en tu tierra,</l>
+
+<l xml:id="em0753-es-1234">la muerte serviría de gracia y de reposo:</l>
+
+<l xml:id="em0753-es-1235">pero como el Eterno dispone otra cosa</l>
+
+<l xml:id="em0753-es-1236">en su justo deseo mi alma bien reposa.</l>
+
+<l xml:id="em0753-es-1237">A ti adiós, gran Enrique<note n="6237" type="traductor"><term>Enrique</term><p>Enrique II, hijo de Francisco i y de Claude de Francia; fue el suegro de la reina de Escocia, al casarse esta con uno de sus hijos, Francisco II, rey de Francia de 1559 a 1560, quien también sería rey consorte de Escocia, desde 1558 hasta su muerte en 1560.</p></note>, Monarca glorioso,</l>
+
+<l xml:id="em0753-es-1238">delicia de la Tierra y dulce inquietud del Cielo,</l>
+
+<l xml:id="em0753-es-1239">de ojos amorosos y grandeza en el rostro,</l>
+
+<l xml:id="em0753-es-1240">elocuencia en la boca y Marte en el arrojo.</l>
+
+<l xml:id="em0753-es-1241">Reyes de sangre, honor del universo adiós,</l>
+
+<l xml:id="em0753-es-1242">y a los loreneses, que de laurel cubiertos</l>
+
+<l xml:id="em0753-es-1243">hacéis que vuestra raza sea loada en todas partes,</l>
+
+<l xml:id="em0753-es-1244">aún con razón alaba las palmas de Idumea<note n="6238" type="traductor"><term>Idumea</term><p>Región de Asia situada al sur de Judea y del mar Muerto, habitada tradicionalmente por el pueblo semita de los edomitas o idumeos.</p></note>.</l>
+
+<l xml:id="em0753-es-1245">Adiós soberbio Louvre, jactancia de los Nobles;</l>
+
+<l xml:id="em0753-es-1246">adiós ricas ciudades, castillos placenteros,</l>
+
+<l xml:id="em0753-es-1247">adiós pueblo cortés, adiós bella Nobleza,</l>
+
+<l xml:id="em0753-es-1248">que tanto me quisisteis siendo vuestra Princesa,</l>
+
+<l xml:id="em0753-es-1249">cuando un François segundo, de los Valois claro Astro,</l>
+
+<l xml:id="em0753-es-1250">que en Galia ejercía las leyes paternales<note n="6239" type="traductor"><term>paternales</term><p>Francisco I (1494-1547) reinó desde 1515 hasta su muerte. Hijo de Charles d'Orléans y de Louise de Savoie, pertenecía a la rama de los Valois-Angoulême de la dinastía de los capetos.<lb/>Francisco I es considerado el rey emblemático del Renacimiento francés. Bajo su reinado se produjo un desarrollo importante de las artes y de las letras en Francia.</p></note>.</l>
+
+<l xml:id="em0753-es-1251">Adiós, finalmente, castas y bellas Damas,</l>
+
+<l xml:id="em0753-es-1252">ansia de corazones, ardor de bellas almas,</l>
+
+<l xml:id="em0753-es-1253">que en el cielo francés brilláis con más fuerza,</l>
+
+<l xml:id="em0753-es-1254">que brilla en la noche la luz del Firmamento,</l>
+
+<l xml:id="em0753-es-1255">y superáis en número a todas las Estrellas,</l>
+
+<l xml:id="em0753-es-1256">que al brillar en invierno lo hacen ya sin velos.</l>
+
+<l xml:id="em0753-es-1257">Ahora, ¿qué palabras podría utilizar,</l>
+
+<l xml:id="em0753-es-1258">bellas y amadas almas, qué adioses usar</l>
+
+<l xml:id="em0753-es-1259">cuando os dejo para ir a ver a los Ángeles?</l>
+
+<l xml:id="em0753-es-1260">Siento desasosiegos más extraños que nunca,</l>
+
+<l xml:id="em0753-es-1261">cuando veo vuestros ojos anegados en lágrimas,</l>
+
+<l xml:id="em0753-es-1262">por no poder mis pasos acompañar al Cielo;</l>
+
+<l xml:id="em0753-es-1263">al son de estos suspiros que abren vuestras bocas,</l>
+
+<l xml:id="em0753-es-1264">un intenso dolor me conmueve al momento</l>
+
+<l xml:id="em0753-es-1265">angustiando mi alma, y contra mi voluntad,</l>
+
+<l xml:id="em0753-es-1266">me siento forzado a gemir y lamentarme.</l>
+
+<l xml:id="em0753-es-1267">Mas calmemos la mente, serenemos el rostro</l>
+
+<l xml:id="em0753-es-1268">ya que esta tempestad nos trae la bonanza.</l>
+
+<l xml:id="em0753-es-1269">Poca cosa es morir si se vive eternamente</l>
+
+<l xml:id="em0753-es-1270">en la morada eterna en una eterna paz.</l>
+
+<l xml:id="em0753-es-1271">En la última partida dadme un beso, Doncellas,</l>
+
+<l xml:id="em0753-es-1272">y a Dios rogad por mí; vuestras fieles plegarias</l>
+
+<l xml:id="em0753-es-1273">servirán de ajorcas a mi liviano espíritu,</l>
+
+<l xml:id="em0753-es-1274">para ir de un pleno vuelo a alojarme en los Astros.</l>
+
+<l xml:id="em0753-es-1275">Pero os rogaré (es el último encargo</l>
+
+<l xml:id="em0753-es-1276">que os pido a vosotras como pleno servicio)</l>
+
+<l xml:id="em0753-es-1277">que del sayón las manos no profanen mi cuerpo;</l>
+
+<l xml:id="em0753-es-1278">el preciado honor debe subsistir a los muertos.</l>
+
+<l xml:id="em0753-es-1279">Cerrad con vuestros dedos mis apagados párpados,</l>
+
+<l xml:id="em0753-es-1280">inhumadme, tendedme dentro del ataúd:</l>
+
+<l xml:id="em0753-es-1281">si mis helados miembros nada sienten ni notan,</l>
+
+<l xml:id="em0753-es-1282">mi alma percibirá alguna complacencia.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0151" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0753-es-1283" n="151">No debe un hombre creerse feliz hasta morir,</l>
+
+<l xml:id="em0753-es-1284">pues la felicidad no habita aquí abajo;</l>
+
+<l xml:id="em0753-es-1285">vive lejos del mundo y nadie ve su gloria,</l>
+
+<l xml:id="em0753-es-1286">salvo que se abandone y regrese al Cielo.</l>
+
+<l xml:id="em0753-es-1287">Feliz es la mente que conoce esta Belleza</l>
+
+<l xml:id="em0753-es-1288">y puede a su gusto abrazarla y besarla;</l>
+
+<l xml:id="em0753-es-1289">satisfecha está el alma en la gloria inmortal</l>
+
+<l xml:id="em0753-es-1290">de usar sus placeres que agotar no se pueden.</l>
+
+<l xml:id="em0753-es-1291">Cuán dulce delicia es saborear la ambrosía</l>
+
+<l xml:id="em0753-es-1292">que ofrece su tierna mano a sus cortesanos,</l>
+
+<l xml:id="em0753-es-1293">y el beber su néctar, que de la fantasía</l>
+
+<l xml:id="em0753-es-1294">aleja la tristeza e inquietudes penosas.</l>
+
+<l xml:id="em0753-es-1295">Aquel que ella recibe a la honra de su mesa,</l>
+
+<l xml:id="em0753-es-1296">lo hace sentar ella en el banco de los eternos,</l>
+
+<l xml:id="em0753-es-1297">llevando en el Cielo una vida agradable,</l>
+
+<l xml:id="em0753-es-1298">y comenzar un día que jamás tendrá noche.</l>
+
+<l xml:id="em0753-es-1299">Su testa, por su mano coronada de gloria,</l>
+
+<l xml:id="em0753-es-1300">su cuerpo revestido de inmortalidad;</l>
+
+<l xml:id="em0753-es-1301">celebra en este punto el divino Himeneo,</l>
+
+<l xml:id="em0753-es-1302">que lo une para siempre con la eternidad.</l>
+
+<l xml:id="em0753-es-1303">Los Ángeles que asisten a la sagrada boda</l>
+
+<l xml:id="em0753-es-1304">hacen que el nupcial canto resuene en los Cielos,</l>
+
+<l xml:id="em0753-es-1305">un extremo placer su valor estimula,</l>
+
+<l xml:id="em0753-es-1306">por el sumo placer de los gloriosos amantes.</l>
+
+<l xml:id="em0753-es-1307">Eternos poseedores de las gracias eternas,</l>
+
+<l xml:id="em0753-es-1308">vivid tranquilamente en la casa de la paz:</l>
+
+<l xml:id="em0753-es-1309">el tiempo siempre hará nuevo vuestro contento;</l>
+
+<l xml:id="em0753-es-1310">la flor de vuestro gozo nunca se agostará.</l>
+
+<l xml:id="em0753-es-1311">Vivís en puerto donde no llega la tormenta</l>
+
+<l xml:id="em0753-es-1312">do la calma del mundo turbar puede al momento:</l>
+
+<l xml:id="em0753-es-1313">se salva allí la mente, naufragando el cuerpo,</l>
+
+<l xml:id="em0753-es-1314">y las furiosas olas ya no lo hacen temblar.</l>
+
+<l xml:id="em0753-es-1315">Ya no teméis miradas ni acechos de un corsario,</l>
+
+<l xml:id="em0753-es-1316">a quien el mar aterra y morir hace al piloto:</l>
+
+<l xml:id="em0753-es-1317">ya no le tenéis miedo a un bandido sanguinario,</l>
+
+<l xml:id="em0753-es-1318">que corre espada al puño para el paso impediros.</l>
+
+<l xml:id="em0753-es-1319">Ya el avaro usurero que devora a los vivos,</l>
+
+<l xml:id="em0753-es-1320">no envía a nuestra puerta a un severo alguacil:</l>
+
+<l xml:id="em0753-es-1321">el hombre os despreció, incluso Dios os honra,</l>
+
+<l xml:id="em0753-es-1322">y por vuestra desgracia sois afortunada.</l>
+
+<l xml:id="em0753-es-1323">Un Príncipe ambicioso dejó ya de insultaros,</l>
+
+<l xml:id="em0753-es-1324">por hacer suyo a un pueblo a su total criterio;</l>
+
+<l xml:id="em0753-es-1325">y vos ya no teméis el rostro de un tirano,</l>
+
+<l xml:id="em0753-es-1326">que su pasión seguía por toda directriz.</l>
+
+<l xml:id="em0753-es-1327">La trompeta despierta, de golpe, vuestras almas;</l>
+
+<l xml:id="em0753-es-1328">no veis nuestros campos cubiertos de escuadrones;</l>
+
+<l xml:id="em0753-es-1329">la música del Cielo alegra vuestro oído,</l>
+
+<l xml:id="em0753-es-1330">y para ver el baile vuestros ojos se abren.</l>
+
+<l xml:id="em0753-es-1331">En adelante nada os distrae del reposo,</l>
+
+<l xml:id="em0753-es-1332">y vuestros corazones ebrios están de gozo;</l>
+
+<l xml:id="em0753-es-1333">lo que menos nos gusta no podrá disgustaros,</l>
+
+<l xml:id="em0753-es-1334">y vuestras alegrías vuestros deseos superan.</l>
+
+<l xml:id="em0753-es-1335">En suma, tenéis tantas gracias inigualables,</l>
+
+<l xml:id="em0753-es-1336">que viéndolo y oyéndolo uno no lo creería,</l>
+
+<l xml:id="em0753-es-1337">mas se sospecharía de ojos y de oídos,</l>
+
+<l xml:id="em0753-es-1338">al carear vuestros gozos con los de aquí abajo.</l>
+</lg>
+</sp>
+</div1>
+
+<div1 type="act" n="5">
+<head>ACTO V</head>
+
+<stage xml:id="em0753-es-st-0005">MAYORDOMO, (MENSAJERO, CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA)</stage>
+
+<sp xml:id="em0753-es-sp-0152" who="#MAYORDOMO">
+<speaker>MAYORDOMO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1339" n="152">¡Oh tres y cuatro veces sirviente miserable!</l>
+
+<l xml:id="em0753-es-1340">Aún vives, y ves esta triste desgracia,</l>
+
+<l xml:id="em0753-es-1341">mas aun sin verla, y sintiendo un gran pesar,</l>
+
+<l xml:id="em0753-es-1342">en tu privacidad sigues siendo indiscreto.</l>
+
+<l xml:id="em0753-es-1343">¡Reina, ornamento único de las Damas de ahora,</l>
+
+<l xml:id="em0753-es-1344">cómo aflige mi ánimo tu infausto destino!</l>
+
+<l xml:id="em0753-es-1345">Bello cuerpo, de quien la muerte obra espíritus</l>
+
+<l xml:id="em0753-es-1346">cuya dicha mayor fue asentada en tus ojos,</l>
+
+<l xml:id="em0753-es-1347">no pude ni debí esta tarea haceros,</l>
+
+<l xml:id="em0753-es-1348">aunque hubiera nacido para a vos serviros.</l>
+
+<l xml:id="em0753-es-1349">¿Tras haberos servido en un grado tan alto,</l>
+
+<l xml:id="em0753-es-1350">debí yo conduciros al abyecto cadalso?</l>
+
+<l xml:id="em0753-es-1351">No habría sido dar un testimonio cierto</l>
+
+<l xml:id="em0753-es-1352">de cuánto abominaba un ultraje tan cruel.</l>
+
+<l xml:id="em0753-es-1353">Había visto antes vuestra augusta grandeza</l>
+
+<l xml:id="em0753-es-1354">sobrepasar al Sol en su vivo esplendor,</l>
+
+<l xml:id="em0753-es-1355">y pensé que las nubes en derredor reunidas,</l>
+
+<l xml:id="em0753-es-1356">serían por tu dicha algún día ahuyentadas;</l>
+
+<l xml:id="em0753-es-1357">mas erré tanto que, en vez de volver a verte</l>
+
+<l xml:id="em0753-es-1358">en un trono Real ejercer tu poder,</l>
+
+<l xml:id="em0753-es-1359">me veo obligado a contemplar vuestra alma</l>
+
+<l xml:id="em0753-es-1360">expuesta al verdugo en un teatro infame.</l>
+
+<l xml:id="em0753-es-1361">Sin duda habría muerto en medio de mis pasos,</l>
+
+<l xml:id="em0753-es-1362">si te hubiera guiado a esta indigna muerte,</l>
+
+<l xml:id="em0753-es-1363">indigna no por vos, sino por esta bárbara,</l>
+
+<l xml:id="em0753-es-1364">a la que sólo el rostro de su aridez separa<note n="6240" type="traductor"><term>separa</term><p>La única explicación lógica para estos dos versos es la de una alusión a la causante de su muerte, su prima la reina Isabel de Inglaterra, de la que el autor pone de relieve su carácter insociable.</p></note>.</l>
+
+<l xml:id="em0753-es-1365">De hecho, es realmente la misma crueldad</l>
+
+<l xml:id="em0753-es-1366">permitir maltratar a sin igual belleza,</l>
+
+<l xml:id="em0753-es-1367">que sólo por los Reyes merece ser tocada,</l>
+
+<l xml:id="em0753-es-1368">no por la de un verdugo de mortandad manchada,</l>
+
+<l xml:id="em0753-es-1369">para morir en ella sin miedo ni vergüenza</l>
+
+<l xml:id="em0753-es-1370">la gracia de la gracia y la prez del honor.</l>
+
+<l xml:id="em0753-es-1371">Tú que lo consentiste, pueblo altivo y salvaje,</l>
+
+<l xml:id="em0753-es-1372">que vuestra propia sangre empape vuestra orilla;</l>
+
+<l xml:id="em0753-es-1373">la Muerte se pasea aún por vuestras urbes,</l>
+
+<l xml:id="em0753-es-1374">llevando por delante el odio y la discordia;</l>
+
+<l xml:id="em0753-es-1375">nublado sigue el Cielo de tormenta y ventisca,</l>
+
+<l xml:id="em0753-es-1376">y mil agudos rayos caen sobre tu cabeza.</l>
+
+<l xml:id="em0753-es-1377">El mar, aún crecido en su exterior ruidoso</l>
+
+<l xml:id="em0753-es-1378">corre sobre tu orilla sin brida ni mordaza.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0153" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1379" n="153">Vivimos en un siglo en el que la modestia,</l>
+
+<l xml:id="em0753-es-1380">la honra y la decencia han desaparecido;</l>
+
+<l xml:id="em0753-es-1381">estamos en un tiempo donde todo se mezcla,</l>
+
+<l xml:id="em0753-es-1382">donde el suplicio injusto se aplica con razón,</l>
+
+<l xml:id="em0753-es-1383">el deseo de los grandes se considera lícito,</l>
+
+<l xml:id="em0753-es-1384">do la razón se mide tanto como es posible.</l>
+
+<l xml:id="em0753-es-1385">No se presta atención a la Real sangre sacra</l>
+
+<l xml:id="em0753-es-1386">perforándola el hacha, y el brazo desleal</l>
+
+<l xml:id="em0753-es-1387">la trata de igual modo que a la mercenaria;</l>
+
+<l xml:id="em0753-es-1388">se da a las majestades el suplicio común,</l>
+
+<l xml:id="em0753-es-1389">y lo que siempre había sido algo inviolable</l>
+
+<l xml:id="em0753-es-1390">se ve en el futuro profanado y manchado.</l>
+
+<l xml:id="em0753-es-1391">Tanto más cuan de cerca se contempla el suplicio,</l>
+
+<l xml:id="em0753-es-1392">es juzgado execrable y de muy mal ejemplo:</l>
+
+<l xml:id="em0753-es-1393">porque jamás el Sol al girar en el Cielo</l>
+
+<l xml:id="em0753-es-1394">oteó aquí abajo con su flameante ojo</l>
+
+<l xml:id="em0753-es-1395">una injuria tan pérfida y tan abominable;</l>
+
+<l xml:id="em0753-es-1396">¡Oh Dios, tú lo sabes y no envías a tus rayos!</l>
+
+<l xml:id="em0753-es-1397">Pero ¿no hay alguien que viene hacia nosotros?</l>
+
+<l xml:id="em0753-es-1398">Vamos pronto a su encuentro, hermanas mías, moveos.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0154" who="#MENSAJERO">
+<speaker>MENSAJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1399" n="154">Habéis llegado a tiempo, afligidas Doncellas,</l>
+
+<l xml:id="em0753-es-1400">para oír por mi boca noticias lastimosas.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0155" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1401" n="155">Ya nos las esperábamos; pero habla, Mensajero,</l>
+
+<l xml:id="em0753-es-1402">además, nuestras almas buscan entristecerse.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0156" who="#MENSAJERO">
+<speaker>MENSAJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1403" n="156">Esta Dama Real, con valor y espíritu,</l>
+
+<l xml:id="em0753-es-1404">en quien el alto Cielo su obra admiraba,</l>
+
+<l xml:id="em0753-es-1405">ahora está muerta; su ardiente sangre humeante</l>
+
+<l xml:id="em0753-es-1406">flamea intensamente sobre el negro cadalso.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0157" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1407" n="157">¡Crimen inusitado! ¡Suplicio abominable!</l>
+
+<l xml:id="em0753-es-1408">¡Crueldad berberisca! ¡Agresión execrable!</l>
+
+<l xml:id="em0753-es-1409">¿De un rostro tan hermoso las rosas y los lirios</l>
+
+<l xml:id="em0753-es-1410">por dedos de la muerte han sido extraídos?</l>
+
+<l xml:id="em0753-es-1411">¿Esta boca otras veces tan llena de elocuencia</l>
+
+<l xml:id="em0753-es-1412">se cerró para siempre en un silencio eterno?</l>
+
+<l xml:id="em0753-es-1413">Y este divino espíritu huésped de un cuerpo humano</l>
+
+<l xml:id="em0753-es-1414">de él es expulsado por la verduga mano.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0158" who="#MENSAJERO">
+<speaker>MENSAJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1415" n="158">No os compadezcáis del sino de esta Dama,</l>
+
+<l xml:id="em0753-es-1416">y escuchad su final para aliviar vuestra alma.</l>
+
+<l xml:id="em0753-es-1417">Una muerte inmutable dicha al alma juiciosa,</l>
+
+<l xml:id="em0753-es-1418">mezcla algún placer unido a su tristeza.</l>
+
+<l xml:id="em0753-es-1419">Un gran salón estaba lúgubremente ornado,</l>
+
+<l xml:id="em0753-es-1420">y antorchas encendidas alto y bajo alumbrando,</l>
+
+<l xml:id="em0753-es-1421">brillaba el pavimento con un negro color,</l>
+
+<l xml:id="em0753-es-1422">parecía el cadalso de una gran altura.</l>
+
+<l xml:id="em0753-es-1423">Hubo allí un encuentro de los pueblos vecinos,</l>
+
+<l xml:id="em0753-es-1424">muy perturbados todos por el acaecimiento,</l>
+
+<l xml:id="em0753-es-1425">y la Reina mostrando un rostro muy firme,</l>
+
+<l xml:id="em0753-es-1426">llegó poco después do esperaba el verdugo.</l>
+
+<l xml:id="em0753-es-1427">Paulet su salvaguardia le servía de guía,</l>
+
+<l xml:id="em0753-es-1428">y sus damas llorando caminaban tras él.</l>
+
+<l xml:id="em0753-es-1429">Ella que lentamente volaba hacia la muerte,</l>
+
+<l xml:id="em0753-es-1430">con sus dulces palabras calmaba el dolor de ellas:</l>
+
+<l xml:id="em0753-es-1431">“Os ruego que a mi muerte no vayáis a seguir</l>
+
+<l xml:id="em0753-es-1432">llorando y sollozando; debéis envidiarme,</l>
+
+<l xml:id="em0753-es-1433">si por perder el cuerpo adquiero un bien tal,</l>
+
+<l xml:id="em0753-es-1434">que es inigualable a lo que hay en el mundo.</l>
+
+<l xml:id="em0753-es-1435">Ya que morir debemos, ¿no soy afortunada</l>
+
+<l xml:id="em0753-es-1436">de ir a vivir al Cielo por esta muerte abyecta?</l>
+
+<l xml:id="em0753-es-1437">Si la flor de mis días se aja en este tiempo,</l>
+
+<l xml:id="em0753-es-1438">florecerá de nuevo en la eterna primavera,</l>
+
+<l xml:id="em0753-es-1439">y la gracia de Dios como un alma<note n="6241" type="traductor"><term>alma</term><p>ALMO, MA. (Del lat. <emph>almus</emph>, de <emph>alere</emph>, alimentar.) adj. poét. Criador, alimentador, vivificador; «Los hielos de olvido \ que la <emph>alma</emph> fuente del sentir cegaron.» L. Moratín, <emph>Poesías</emph>, ed. Rív., t. 2, p. 586.; «Así Pomona \ tiende su manto, y pródiga derrama \ del <emph>almo</emph> cuerno el celestial tesoro.» M. Quintana, <emph>Obr.</emph> ed. Rtv. t.19, p. 30, col. 2.; «Abre en tendido sulco el almo suelo \ a la fecunda tierra.» Lista, <emph>Poesías</emph>, ed. Riv. t. 67, p. 308., «Si tanto anhelo \ la voluntad saber del <emph>almo</emph> joven. \ no a ello me incita el criminal deseo \ de sondear los íntimos arcanos \ que esconde al mundo.» M. de la Rosa, <emph>Obr.</emph>, ed, 1827, t. 4, p. 295.; «Revela su hermosura el firmamento \ ..., \ el almo sol su brillo soberano.» Zorrilla. <emph>Obr.</emph>, ed. Baudry. t. 3, p. 147. <emph>Diccionario histórico de la lengua española</emph> (1933-1936), p. 467.</p></note> abonada,</l>
+
+<l xml:id="em0753-es-1440">destilará en ella su favor más preciado,</l>
+
+<l xml:id="em0753-es-1441">para que ella transmita un aire refinado,</l>
+
+<l xml:id="em0753-es-1442">que perfume los santos recintos de los Cielos.</l>
+
+<l xml:id="em0753-es-1443">Las almas beatíficas son Rosas celestiales</l>
+
+<l xml:id="em0753-es-1444">que sin cesar florecen en el Sol de Justicia;</l>
+
+<l xml:id="em0753-es-1445">las de jardines duran menos de una mañana,</l>
+
+<l xml:id="em0753-es-1446">mas las flores del Cielo nunca tienen final”.</l>
+
+<l xml:id="em0753-es-1447">Ya estas palabras dichas a sus tristes doncellas,</l>
+
+<l xml:id="em0753-es-1448">por su cruel partida, más difuntas que vivas,</l>
+
+<l xml:id="em0753-es-1449">en sus inquietos pechos crecieron los lamentos,</l>
+
+<l xml:id="em0753-es-1450">las quejas en sus bocas, lágrimas en los ojos.</l>
+
+<l xml:id="em0753-es-1451">Mientras iba llegando al centro de la sala,</l>
+
+<l xml:id="em0753-es-1452">su rostro era hermoso, aunque estuviera pálido,</l>
+
+<l xml:id="em0753-es-1453">no por la pronta muerte en su joven estación,</l>
+
+<l xml:id="em0753-es-1454">mas del tedio sufrido en tan larga prisión.</l>
+
+<l xml:id="em0753-es-1455">Entonces los presentes de valor conmovidos,</l>
+
+<l xml:id="em0753-es-1456">y el alma hechizada, observan su semblante,</l>
+
+<l xml:id="em0753-es-1457">leen en su bella frente el desprecio a la muerte,</l>
+
+<l xml:id="em0753-es-1458">se emboban con sus ojos, consideran su porte;</l>
+
+<l xml:id="em0753-es-1459">pero el asombro en ellos deja paso al miedo,</l>
+
+<l xml:id="em0753-es-1460">ya está su alma afectada del golpe mortal próximo,</l>
+
+<l xml:id="em0753-es-1461">cuando sin verter lágrimas te obliga ella a llorar,</l>
+
+<l xml:id="em0753-es-1462">cuando no suspirando, te hace suspirar.</l>
+
+<l xml:id="em0753-es-1463">Mientras todos tenían la vista fija en ella</l>
+
+<l xml:id="em0753-es-1464">que mostraba un semblante de amor hasta en la muerte,</l>
+
+<l xml:id="em0753-es-1465">con pie tan soberano cual alto el corazón,</l>
+
+<l xml:id="em0753-es-1466">sube ella hasta lo alto del fúnebre patíbulo,</l>
+
+<l xml:id="em0753-es-1467">luego, sonriendo un poco con boca y ojos, dijo:</l>
+
+<l xml:id="em0753-es-1468">“No pensaba morir en este bello lecho;</l>
+
+<l xml:id="em0753-es-1469">mas como a Dios le agrada disponer de mí así,</l>
+
+<l xml:id="em0753-es-1470">moriré por su gloria defendiendo mi fe.</l>
+
+<l xml:id="em0753-es-1471">Me gano una corona en este vil suplicio,</l>
+
+<l xml:id="em0753-es-1472">en la que sacrifico a su nombre mi vida,</l>
+
+<l xml:id="em0753-es-1473">lo que se ensalzará en multitud de lenguas;</l>
+
+<l xml:id="em0753-es-1474">una sola corona en la Tierra yo pierdo,</l>
+
+<l xml:id="em0753-es-1475">para poseer dos en el Imperio eterno,</l>
+
+<l xml:id="em0753-es-1476">la corona de vida, y la tiara del martirio”.</l>
+
+<l xml:id="em0753-es-1477">con llantos estos términos los enviaba al Cielo,</l>
+
+<l xml:id="em0753-es-1478">que se veía afligido al ver correr sus lágrimas;</l>
+
+<l xml:id="em0753-es-1479">mas, de pronto expresando una gran alegría,</l>
+
+<l xml:id="em0753-es-1480">en voz alta pidió un padre confesor;</l>
+
+<l xml:id="em0753-es-1481">se acerca uno al momento queriendo consolarla.</l>
+
+<l xml:id="em0753-es-1482">Ella al reconocer por el tono de su voz</l>
+
+<l xml:id="em0753-es-1483">que él no es lo que quiere, se queda algo confusa.</l>
+
+<l xml:id="em0753-es-1484">“¿Un favor tan pequeño, dice, me lo rechazan?</l>
+
+<l xml:id="em0753-es-1485">Es mucha crueldad el no autorizarme</l>
+
+<l xml:id="em0753-es-1486">que un padre católico me asista en la muerte:</l>
+
+<l xml:id="em0753-es-1487">pero hagáis lo que hagáis, yo moriré del modo</l>
+
+<l xml:id="em0753-es-1488">que mi educación y creencias comportan”.</l>
+
+<l xml:id="em0753-es-1489">Dicho esto, en el cadalso doblando las rodillas,</l>
+
+<l xml:id="em0753-es-1490">se confiesa a sí misma, y tres golpes de pecho</l>
+
+<l xml:id="em0753-es-1491">da en su afligido seno, bañando sus fulgores<note n="6242" type="traductor"><term>fulgores</term><p>El poeta cordobés Marcos Rafael Blanco Belmonte (1871-1936) utiliza la misma imagen en el primer verso de su poema “Sembrando”:</p><p>De aquel rincón bañado por los fulgores<lb/>del sol que nuestro cielo triunfante llena;<lb/>de la florida tierra donde entre flores<lb/>se deslizó mi infancia dulce y serena;<lb/>envuelto en los recuerdos de mi pasado,<lb/>borroso cual lo lejos del horizonte,<lb/>guardo el extraño ejemplo, nunca olvidado,<lb/>del sembrador más raro que hubo en el monte.</p></note></l>
+
+<l xml:id="em0753-es-1492">con lágrimas devotas siguiendo a sus plegarias,</l>
+
+<l xml:id="em0753-es-1493">y mantiene a sus ánimas al Cielo adheridas</l>
+
+<l xml:id="em0753-es-1494">recibiendo el perdón por todos sus pecados.</l>
+
+<l xml:id="em0753-es-1495">Su oración acabada se le ilumina el rostro,</l>
+
+<l xml:id="em0753-es-1496">con dulce y sereno aire de una gracia risueña,</l>
+
+<l xml:id="em0753-es-1497">mostrando ella sus ojos más dulces que hace poco,</l>
+
+<l xml:id="em0753-es-1498">aplanada su frente como una ola sin viento;</l>
+
+<l xml:id="em0753-es-1499">habló luego, de nuevo, pronunciando esta frase:</l>
+
+<l xml:id="em0753-es-1500">“Muero por ti, Señor, ese es mi consuelo.</l>
+
+<l xml:id="em0753-es-1501">A tu santo favor, mi Salvador y Dios,</l>
+
+<l xml:id="em0753-es-1502">encomiendo mi alma al salir de este sitio”.</l>
+
+<l xml:id="em0753-es-1503">Luego, vuelve al verdugo su rostro glorioso:</l>
+
+<l xml:id="em0753-es-1504">“arma cuando tú quieras tu mano injuriosa,</l>
+
+<l xml:id="em0753-es-1505">asesta el mortal golpe, y con brazo furioso</l>
+
+<l xml:id="em0753-es-1506">haz que caiga la testa y vuele mi alma al Cielo”.</l>
+
+<l xml:id="em0753-es-1507">Oyendo estas palabras, el corre a usar el hacha;</l>
+
+<l xml:id="em0753-es-1508">de uno a cuatro golpes sobre su cuello asesta;</l>
+
+<l xml:id="em0753-es-1509">pues el hierro afilado, menos cruel que su brazo</l>
+
+<l xml:id="em0753-es-1510">quiso aplazar la muerte de un cuerpo tan bello.</l>
+
+<l xml:id="em0753-es-1511">El tronco al final cae, y su faz moribunda</l>
+
+<l xml:id="em0753-es-1512">por tres o cuatro veces saltó sobre la plaza.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0159" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1513" n="159">¡Oh, qué frío dolor nos ahoga el corazón!</l>
+
+<l xml:id="em0753-es-1514">Para que nuestro sino conozca su rigor:</l>
+
+<l xml:id="em0753-es-1515">transformaos, ojos nuestros, en fuentes abundantes,</l>
+
+<l xml:id="em0753-es-1516">a fuerza de llorar cegad vuestras pupilas;</l>
+
+<l xml:id="em0753-es-1517">y tú, corazón triste, rómpete en sollozos,</l>
+
+<l xml:id="em0753-es-1518">que resuenen tan alto cual la tormenta en la ola.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0160" who="#MENSAJERO">
+<speaker>MENSAJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1519" n="160">Dejad, dejad a un lado las quejas miserables.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0161" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1520" n="161">¿Quién puede asaz llorar males tan deplorables?</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0162" who="#MENSAJERO">
+<speaker>MENSAJERO</speaker>
+<lg type="free" part="M">
+<l xml:id="em0753-es-1521" n="162">Lamentarnos debemos tan sólo por los muertos</l>
+
+<l xml:id="em0753-es-1522">de quienes la esperanza murió junto a sus cuerpos,</l>
+
+<l xml:id="em0753-es-1523">de la otra vida ajenos, y creyendo que el hombre</l>
+
+<l xml:id="em0753-es-1524">es llevado a la tumba a dormir un breve sueño,</l>
+
+<l xml:id="em0753-es-1525">y que a la voz del Ángel él resucitará.</l>
+
+<l xml:id="em0753-es-1526">La muerte no es un mal; y cuando el bueno muere,</l>
+
+<l xml:id="em0753-es-1527">el insulto no puede extenderse hasta el punto</l>
+
+<l xml:id="em0753-es-1528">de que cambie su estado y hacerlo desgraciado:</l>
+
+<l xml:id="em0753-es-1529">pues, aunque el mismo fin tuviera el inocente</l>
+
+<l xml:id="em0753-es-1530">que el hombre vicioso que culpable se siente,</l>
+
+<l xml:id="em0753-es-1531">el hombre cuya vida ha sido siempre buena,</l>
+
+<l xml:id="em0753-es-1532">muere bien, sin que importe la muerte que le aguarde.</l>
+
+<l xml:id="em0753-es-1533">Si el tipo de muerte nos hiciera infelices,</l>
+
+<l xml:id="em0753-es-1534">sería el Cielo duro y firme con los buenos:</l>
+
+<l xml:id="em0753-es-1535">pues el habría hecho blandos y miserables</l>
+
+<l xml:id="em0753-es-1536">a tantos santos Mártires y a Padres Venerables,</l>
+
+<l xml:id="em0753-es-1537">y a santos Confesores que firmes en su fe,</l>
+
+<l xml:id="em0753-es-1538">murieron ruinmente en honor de su Rey.</l>
+</lg>
+</sp>
+
+<sp xml:id="em0753-es-sp-0163" who="#CORO_DAMAS">
+<speaker>CORO DE LAS DAMAS DE COMPAÑÍA DE LA REINA DE ESCOCIA</speaker>
+<lg type="free" part="F">
+<l xml:id="em0753-es-1539" n="163">Vuestro consejo es bueno. No lloremos por ella</l>
+
+<l xml:id="em0753-es-1540">que ahora está gozando de la gloria eterna,</l>
+
+<l xml:id="em0753-es-1541">sintamos nuestra pérdida, y tan sólo lloremos</l>
+
+<l xml:id="em0753-es-1542">para buscar algún alivio a nuestros males.</l>
+
+<l xml:id="em0753-es-1543">La amargura del llanto suaviza la tristeza.</l>
+
+<l xml:id="em0753-es-1544">Escucha estos lamentos, venturosa Princesa.</l>
+
+<l xml:id="em0753-es-1545">Princesa, único objeto de Príncipes y Reyes,</l>
+
+<l xml:id="em0753-es-1546">por quien el amor dio conocer sus leyes,</l>
+
+<l xml:id="em0753-es-1547">sólo en ti alcanzando el triunfo sobre todos,</l>
+
+<l xml:id="em0753-es-1548">veíase la belleza cuando vivías aquí,</l>
+
+<l xml:id="em0753-es-1549">mas cuando falleciste ella murió también,</l>
+
+<l xml:id="em0753-es-1550">y el pesar, ya sin más, queda en la memoria.</l>
+
+<l xml:id="em0753-es-1551">Si sostenía tu mano un cetro prestigioso,</l>
+
+<l xml:id="em0753-es-1552">acabas de cambiarlo por el Reino del Cielo:</l>
+
+<l xml:id="em0753-es-1553">pero se nos cegó al tu luz ocultarnos;</l>
+
+<l xml:id="em0753-es-1554">pues, aunque brille el Sol encima de los ojos,</l>
+
+<l xml:id="em0753-es-1555">nuestra alma al perderte ha perdido su Sol,</l>
+
+<l xml:id="em0753-es-1556">cuya luz por si sola abría nuestros párpados.</l>
+
+<l xml:id="em0753-es-1557">Belleza que mandaba en todos los corazones,</l>
+
+<l xml:id="em0753-es-1558">e inundaba de encantos de tu acritud los rasgos,</l>
+
+<l xml:id="em0753-es-1559">por los que se moría de dolor o deseo;</l>
+
+<l xml:id="em0753-es-1560">si debías morir, no debiste nacer,</l>
+
+<l xml:id="em0753-es-1561">o si nada inmortal vivir puede en la tierra,</l>
+
+<l xml:id="em0753-es-1562">debiste haber estado encantada en el Cielo.</l>
+
+<l xml:id="em0753-es-1563">Ornamento inmortal de bellezas mortales</l>
+
+<l xml:id="em0753-es-1564">con quien la vista humana se abatía encantada,</l>
+
+<l xml:id="em0753-es-1565">el propio Amor estaba prendado de tu gracia,</l>
+
+<l xml:id="em0753-es-1566">y la castidad en ella brilló siempre en tu frente,</l>
+
+<l xml:id="em0753-es-1567">la dulzura en tus ojos acabó jubilándose,</l>
+
+<l xml:id="em0753-es-1568">y el pudor sembró sus rosas en tu rostro.</l>
+
+<l xml:id="em0753-es-1569">Bello cuerpo que aislaba la virtud en su seno,</l>
+
+<l xml:id="em0753-es-1570">como el único espíritu que te infundía vida,</l>
+
+<l xml:id="em0753-es-1571">para, a ojos de todos, ser tú la más perfecta;</l>
+
+<l xml:id="em0753-es-1572">cuando te hicieron ir de la vida a la muerte,</l>
+
+<l xml:id="em0753-es-1573">contigo a los Cielos, se fue de aquí la vida,</l>
+
+<l xml:id="em0753-es-1574">igual que de los Cielos había a ti venido.</l>
+
+<l xml:id="em0753-es-1575">Testa do afables juegos anidaban cual pájaros,</l>
+
+<l xml:id="em0753-es-1576">dulces lazos que ataban corazones de Príncipes,</l>
+
+<l xml:id="em0753-es-1577">quedando encantados en la gloria de su oficio,</l>
+
+<l xml:id="em0753-es-1578">cansada ya no alumbras, oh amada cabellera,</l>
+
+<l xml:id="em0753-es-1579">o lo haces en el Cielo, transformada en estrellas,</l>
+
+<l xml:id="em0753-es-1580">como antaño ocurriera con la de Berenice<note n="6243" type="traductor"><term>Berenice</term><p>Berenice era la esposa de Ptolomeo, Rey de Egipto, quien en su primera misión como rey debió ir a la guerra para luchar contra el rey Seleuco II y vengar el asesinato de su hermano. Berenice, que tenía una larga y hermosa cabellera rubia, languidecía por los peligros que corría su esposo en la guerra, en el templo de Afrodita prometió entregarle su cabello si su marido regresaba sano y salvo, depositando la cabellera en el altar de la diosa. Pero por la noche alguien llegó hasta el templo y robó la cabellera. Desesperada Berenice y furioso su esposo porque su esposa hubiera hecho un sacrificio a una deidad griega, fueron aliviados en su dolor por el astrónomo Conón de Samos, gran amigo de Arquímedes de Siracusa. Conón mostró a los reyes una agrupación de estrellas, y les contó que esa agrupación acababa de aparecer en el firmamento y que sin duda se trataba de la cabellera de Berenice, que había sido transportada allí por la diosa Afrodita, a quien se le había ofrecido.</p></note>.</l>
+
+<l xml:id="em0753-es-1581">Bella frente, hielo ígneo do los ojos se paran</l>
+
+<l xml:id="em0753-es-1582">caga día admiraban a cien nuevas bellezas,</l>
+
+<l xml:id="em0753-es-1583">sede de majestad toda alzada de gloria;</l>
+
+<l xml:id="em0753-es-1584">Amor, el gran demonio que sabe ordenar Reyes,</l>
+
+<l xml:id="em0753-es-1585">con el cetro en la mano te confirió sus leyes,</l>
+
+<l xml:id="em0753-es-1586">sentado con su pompa en un trono de marfil.</l>
+
+<l xml:id="em0753-es-1587">Bellos ojos del bello Cielo en luz sin par,</l>
+
+<l xml:id="em0753-es-1588">bellos Astros, o bien dos Soles radiantes,</l>
+
+<l xml:id="em0753-es-1589">cegando a todo juntos y quemando con sus llamas,</l>
+
+<l xml:id="em0753-es-1590">antes vuestras miradas suavemente iracundas,</l>
+
+<l xml:id="em0753-es-1591">fueron tantas saetas duramente lanzadas,</l>
+
+<l xml:id="em0753-es-1592">para hacer en sus ansias caer la fe de las almas.</l>
+
+<l xml:id="em0753-es-1593">Boca llena de bálsamo y de fluidos encantos</l>
+
+<l xml:id="em0753-es-1594">que los pechos más fríos hacer arder podrían,</l>
+
+<l xml:id="em0753-es-1595">más fértil en su labia que en sus dulces encantos:</l>
+
+<l xml:id="em0753-es-1596">de amor vivo oráculo, tu siempre impregnabas,</l>
+
+<l xml:id="em0753-es-1597">con gran verbosidad y fluidez cuando hablabas,</l>
+
+<l xml:id="em0753-es-1598">para hechizar al mundo con asombro y temor.</l>
+
+<l xml:id="em0753-es-1599">¡Ay, ya no estás, cabello más hermoso que el oro,</l>
+
+<l xml:id="em0753-es-1600">o si aún estás, estás ensangrentado!</l>
+
+<l xml:id="em0753-es-1601">Frente que ya no tienes tu natural blancura;</l>
+
+<l xml:id="em0753-es-1602">ojos que tanta luz en derredor sembrabais,</l>
+
+<l xml:id="em0753-es-1603">la muerte os ha velado a pesar del amor;</l>
+
+<l xml:id="em0753-es-1604">el silencio te cierra, oh boca santa y hermosa.</l>
+
+<l xml:id="em0753-es-1605">Ya que tantas desgracias habéis visto segar,</l>
+
+<l xml:id="em0753-es-1606">Dejad, pobres mortales, de asombraros más</l>
+
+<l xml:id="em0753-es-1607">si no encontráis nada constante y duradero:</l>
+
+<l xml:id="em0753-es-1608">de un momento a otro vemos que todo cambia;</l>
+
+<l xml:id="em0753-es-1609">la vida es como un viento ligero o una sombra,</l>
+
+<l xml:id="em0753-es-1610">su curso sólo es comparable a la nada.</l>
+</lg>
+</sp>
+
+<trailer  xml:id="em0753-es-tr-0001" >FIN</trailer>
+</div1>
+</body><back></back>
+</text>
+</TEI>

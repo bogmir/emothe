@@ -16,6 +16,7 @@ defmodule Emothe.Catalogue.PlaySource do
     field :pub_date, :string
     field :language, :string
     field :position, :integer, default: 0
+    field :origin, :string, default: "manual"
 
     belongs_to :play, Emothe.Catalogue.Play
 
@@ -35,7 +36,9 @@ defmodule Emothe.Catalogue.PlaySource do
       :pub_date,
       :language,
       :position,
-      :play_id
+      :play_id,
+      :origin
     ])
+    |> validate_inclusion(:origin, Emothe.Catalogue.origins())
   end
 end

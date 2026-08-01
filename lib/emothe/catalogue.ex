@@ -11,9 +11,20 @@ defmodule Emothe.Catalogue do
 
   @per_page 25
 
+  @origins ~w(tei manual filemaker)
+
+  @doc """
+  Where a play's editors, sources and editorial notes came from.
+
+  A TEI re-import replaces only the rows it created itself (`"tei"`); anything a
+  researcher typed or a FileMaker slice wrote survives untouched.
+  """
+  def origins, do: @origins
+
   def list_plays(opts \\ []) do
     query =
       Play
+      |> scope(opts)
       |> apply_complete(opts[:complete])
       |> apply_search(opts[:search])
       |> apply_sort(opts[:sort] || :title_sort)
@@ -35,24 +46,29 @@ defmodule Emothe.Catalogue do
 
   def count_plays(opts \\ []) do
     Play
+    |> scope(opts)
     |> apply_search(opts[:search])
     |> Repo.aggregate(:count, :id)
   end
 
-  def count_complete_plays do
+  def count_complete_plays(opts \\ []) do
     Play
+    |> scope(opts)
     |> where([p], p.is_complete == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  def get_play!(id), do: Repo.get!(Play, id)
-
-  def get_play_by_code!(code) do
-    Repo.get_by!(Play, code: code)
+  def get_play!(id, opts \\ []) do
+    Play |> scope(opts) |> Repo.get!(id)
   end
 
-  def get_play_with_all!(id) do
+  def get_play_by_code!(code, opts \\ []) do
+    Play |> scope(opts) |> Repo.get_by!(code: code)
+  end
+
+  def get_play_with_all!(id, opts \\ []) do
     Play
+    |> scope(opts)
     |> Repo.get!(id)
     |> Repo.preload([
       :statistic,
@@ -64,8 +80,9 @@ defmodule Emothe.Catalogue do
     ])
   end
 
-  def get_play_by_code_with_all!(code) do
+  def get_play_by_code_with_all!(code, opts \\ []) do
     Play
+    |> scope(opts)
     |> Repo.get_by!(code: code)
     |> Repo.preload([
       :statistic,
@@ -89,9 +106,23 @@ defmodule Emothe.Catalogue do
     |> Repo.update()
   end
 
+  @doc """
+  Archives a play. The row, its content and its history stay; every read hides it
+  unless asked for with `include_deleted: true`, and its code stays reserved so a
+  re-import updates this row instead of creating a second one.
+  """
   def delete_play(%Play{} = play) do
-    Repo.delete(play)
+    play
+    |> Ecto.Changeset.change(deleted_at: DateTime.utc_now() |> DateTime.truncate(:second))
+    |> Repo.update()
   end
+
+  def restore_play(%Play{} = play) do
+    play |> Ecto.Changeset.change(deleted_at: nil) |> Repo.update()
+  end
+
+  @doc "Destroys a play and every row that hangs off it. There is no undo."
+  def purge_play(%Play{} = play), do: Repo.delete(play)
 
   @doc "Recomputes and updates play.verse_count from the actual verse_line elements."
   def update_verse_count(play_id) do
@@ -250,6 +281,7 @@ defmodule Emothe.Catalogue do
   def list_plays_grouped(opts \\ []) do
     query =
       Play
+      |> scope(opts)
       |> where([p], is_nil(p.parent_play_id))
       |> where([p], p.is_complete == true)
       |> apply_search_grouped(opts[:search])
@@ -273,6 +305,7 @@ defmodule Emothe.Catalogue do
     Repo.preload(plays,
       derived_plays:
         from(d in Play,
+          where: is_nil(d.deleted_at),
           where: d.is_complete == true,
           order_by: [asc: d.title_sort, asc: d.title]
         )
@@ -281,6 +314,7 @@ defmodule Emothe.Catalogue do
 
   def count_plays_grouped(opts \\ []) do
     Play
+    |> scope(opts)
     |> where([p], is_nil(p.parent_play_id))
     |> where([p], p.is_complete == true)
     |> apply_search_grouped(opts[:search])
@@ -295,6 +329,7 @@ defmodule Emothe.Catalogue do
 
     derived_match =
       from(d in Play,
+        where: is_nil(d.deleted_at),
         where: not is_nil(d.parent_play_id),
         where: d.is_complete == true,
         where:
@@ -314,6 +349,7 @@ defmodule Emothe.Catalogue do
 
   def list_plays_for_select do
     Play
+    |> scope([])
     |> order_by([p], asc: p.title_sort, asc: p.title)
     |> select([p], {p.title, p.code, p.id})
     |> Repo.all()
@@ -321,6 +357,16 @@ defmodule Emothe.Catalogue do
   end
 
   # --- Private ---
+
+  # Archived plays are invisible everywhere unless a caller explicitly asks for them:
+  # `archived: true` for the archive listing, `include_deleted: true` for both at once.
+  defp scope(query, opts) do
+    cond do
+      opts[:archived] -> where(query, [p], not is_nil(p.deleted_at))
+      opts[:include_deleted] -> query
+      true -> where(query, [p], is_nil(p.deleted_at))
+    end
+  end
 
   defp apply_complete(query, true), do: where(query, [p], p.is_complete == true)
   defp apply_complete(query, _), do: query

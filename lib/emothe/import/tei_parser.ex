@@ -6,12 +6,21 @@ defmodule Emothe.Import.TeiParser do
   them to UTF-8 before parsing with Saxy.
   """
 
+  import Ecto.Query
+
   alias Emothe.Repo
   alias Emothe.Catalogue
-  alias Emothe.Catalogue.Play
+  alias Emothe.Catalogue.{Play, PlayEditor, PlaySource, PlayEditorialNote}
   alias Emothe.PlayContent
+  alias Emothe.PlayContent.{Character, Division, Element}
 
   require Logger
+
+  # Columns the platform owns, not the TEI file. `language` in particular: every EMOTHE
+  # file carries xml:lang="es" for the editorial platform, so a re-import would undo the
+  # FileMaker sync (docs/superpowers/plans/2026-08-01-s1-work-families-and-language.md).
+  # New research columns added by later slices belong on this list.
+  @platform_owned [:language, :relationship_type, :parent_play_id, :is_complete]
 
   @title_small_words MapSet.new([
                        "a",
@@ -52,15 +61,104 @@ defmodule Emothe.Import.TeiParser do
   def import_file(path) do
     Logger.info("Importing TEI file: #{path}")
 
+    case read_tree(path) do
+      {:ok, tree} ->
+        Repo.transaction(fn -> import_tree(tree) end)
+
+      {:error, reason} ->
+        Logger.error("Import failed for #{path}: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
+  @doc """
+  Reports what importing `path` would do, without writing anything.
+
+  A re-import replaces the play's whole text and the editors, sources and notes the
+  importer created itself; everything a researcher typed is kept, as are the columns
+  the platform owns. This is what the admin import page and `--dry-run` print so that
+  nobody discovers the replacement afterwards.
+  """
+  def preview_import(path) do
+    with {:ok, {_name, _attrs, children}} <- read_tree(path),
+         header when not is_nil(header) <- find_child(children, "teiHeader") do
+      {:ok, preview_for(header)}
+    else
+      nil -> {:error, :missing_tei_header}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp preview_for({_name, _attrs, children}) do
+    attrs =
+      extract_play_attrs(
+        find_child(children, "fileDesc"),
+        find_child(children, "encodingDesc"),
+        find_child(children, "profileDesc")
+      )
+
+    existing = Repo.get_by(Play, code: attrs.code)
+
+    %{
+      code: attrs.code,
+      title: attrs.title,
+      existing: existing,
+      archived: not is_nil(existing) and not is_nil(existing.deleted_at),
+      replaces: replaced_counts(existing),
+      preserves: preserved_counts(existing),
+      preserves_fields: preserved_fields(existing)
+    }
+  end
+
+  defp replaced_counts(nil),
+    do: %{divisions: 0, elements: 0, characters: 0, editors: 0, sources: 0, notes: 0}
+
+  defp replaced_counts(%Play{id: id}) do
+    %{
+      divisions: count_rows(Division, id),
+      elements: count_rows(Element, id),
+      characters: count_rows(Character, id),
+      editors: count_rows(PlayEditor, id, "tei"),
+      sources: count_rows(PlaySource, id, "tei"),
+      notes: count_rows(PlayEditorialNote, id, "tei")
+    }
+  end
+
+  defp preserved_counts(nil), do: %{editors: 0, sources: 0, notes: 0}
+
+  defp preserved_counts(%Play{id: id}) do
+    %{
+      editors: count_rows(PlayEditor, id) - count_rows(PlayEditor, id, "tei"),
+      sources: count_rows(PlaySource, id) - count_rows(PlaySource, id, "tei"),
+      notes: count_rows(PlayEditorialNote, id) - count_rows(PlayEditorialNote, id, "tei")
+    }
+  end
+
+  defp preserved_fields(nil), do: []
+
+  defp preserved_fields(%Play{} = play) do
+    Enum.filter(@platform_owned, fn field -> Map.get(play, field) not in [nil, false] end)
+  end
+
+  defp count_rows(schema, play_id) do
+    Repo.aggregate(from(r in schema, where: r.play_id == ^play_id), :count, :id)
+  end
+
+  defp count_rows(schema, play_id, origin) do
+    Repo.aggregate(
+      from(r in schema, where: r.play_id == ^play_id and r.origin == ^origin),
+      :count,
+      :id
+    )
+  end
+
+  defp read_tree(path) do
     with {:ok, raw} <- File.read(path),
          xml when is_binary(xml) <- normalize_encoding(raw),
          {:ok, tree} <- parse_xml(xml) do
-      Repo.transaction(fn ->
-        import_tree(tree)
-      end)
+      {:ok, tree}
     else
       {:error, reason} ->
-        Logger.error("Import failed for #{path}: #{inspect(reason)}")
         {:error, reason}
 
       {:incomplete, _, _} = err ->
@@ -68,7 +166,7 @@ defmodule Emothe.Import.TeiParser do
         {:error, :encoding_error}
 
       other ->
-        Logger.error("Unexpected error importing #{path}: #{inspect(other)}")
+        Logger.error("Unexpected error reading #{path}: #{inspect(other)}")
         {:error, other}
     end
   end
@@ -136,6 +234,29 @@ defmodule Emothe.Import.TeiParser do
 
   # --- Header ---
 
+  # A re-import replaces the text wholesale, but only the editors, sources and notes the
+  # importer created itself. Anything a researcher typed — and every table later slices
+  # add — stays. Deleting elements first lets the element_characters FK cascade handle
+  # the join rows.
+  defp reset_tei_content(%Play{id: id}) do
+    for schema <- [Element, Division, Character] do
+      Repo.delete_all(from(r in schema, where: r.play_id == ^id))
+    end
+
+    for schema <- [PlayEditor, PlaySource, PlayEditorialNote] do
+      Repo.delete_all(from(r in schema, where: r.play_id == ^id and r.origin == "tei"))
+    end
+  end
+
+  # Every editor, source and note the importer creates is stamped `origin: "tei"`, so a
+  # re-import can replace its own rows and leave hand-entered ones alone. Rows created
+  # anywhere else default to "manual".
+  defp create_editor(attrs), do: Catalogue.create_play_editor(Map.put(attrs, :origin, "tei"))
+  defp create_source(attrs), do: Catalogue.create_play_source(Map.put(attrs, :origin, "tei"))
+
+  defp create_note(attrs),
+    do: Catalogue.create_play_editorial_note(Map.put(attrs, :origin, "tei"))
+
   defp import_header({_name, _attrs, children}) do
     file_desc = find_child(children, "fileDesc")
     encoding_desc = find_child(children, "encodingDesc")
@@ -146,7 +267,17 @@ defmodule Emothe.Import.TeiParser do
     play =
       case Repo.get_by(Play, code: play_attrs.code) do
         %Play{} = existing_play ->
-          Repo.rollback({:play_already_exists, existing_play.code})
+          reset_tei_content(existing_play)
+
+          case Catalogue.update_play(existing_play, Map.drop(play_attrs, @platform_owned)) do
+            {:ok, play} ->
+              # An import of an archived play brings it back — the file is the reason it
+              # is wanted again.
+              play |> Ecto.Changeset.change(deleted_at: nil) |> Repo.update!()
+
+            {:error, changeset} ->
+              Repo.rollback(changeset)
+          end
 
         nil ->
           case Catalogue.create_play(play_attrs) do
@@ -388,7 +519,7 @@ defmodule Emothe.Import.TeiParser do
       principal = find_child(title_stmt_children, "principal")
 
       if principal do
-        Catalogue.create_play_editor(%{
+        create_editor(%{
           play_id: play.id,
           person_name: text_content(principal),
           role: "principal",
@@ -419,7 +550,7 @@ defmodule Emothe.Import.TeiParser do
               el -> text_content(el)
             end
 
-          Catalogue.create_play_editor(%{
+          create_editor(%{
             play_id: play.id,
             person_name: person_name,
             role: normalized_role,
@@ -452,7 +583,7 @@ defmodule Emothe.Import.TeiParser do
           end
 
         if person do
-          Catalogue.create_play_editor(%{
+          create_editor(%{
             play_id: play.id,
             person_name: text_content(person),
             role: role,
@@ -488,7 +619,7 @@ defmodule Emothe.Import.TeiParser do
           end
 
         if person do
-          Catalogue.create_play_editor(%{
+          create_editor(%{
             play_id: play.id,
             person_name: text_content(person),
             role: role,
@@ -524,7 +655,7 @@ defmodule Emothe.Import.TeiParser do
             _ -> nil
           end
 
-        Catalogue.create_play_source(%{
+        create_source(%{
           play_id: play.id,
           title: safe_text(find_child(children, "title")),
           author: safe_text(find_child(children, "author")),
@@ -624,7 +755,7 @@ defmodule Emothe.Import.TeiParser do
           _ -> "nota"
         end
 
-      Catalogue.create_play_editorial_note(%{
+      create_note(%{
         play_id: play.id,
         section_type: section_type,
         heading: heading,

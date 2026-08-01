@@ -33,6 +33,10 @@ defmodule Emothe.Catalogue.Play do
     field :edition_title, :string
     field :is_complete, :boolean, default: false
 
+    # Set only through Catalogue.delete_play/1 and restore_play/1 — deliberately absent
+    # from every cast list so no form can archive a play.
+    field :deleted_at, :utc_datetime
+
     belongs_to :parent_play, Emothe.Catalogue.Play, define_field: false
     has_many :derived_plays, Emothe.Catalogue.Play, foreign_key: :parent_play_id
 

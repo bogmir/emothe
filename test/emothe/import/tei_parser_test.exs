@@ -77,14 +77,17 @@ defmodule Emothe.Import.TeiParserTest do
     assert {:error, {:xml_parse_error, _}} = TeiParser.import_file(path)
   end
 
-  test "import_file/1 returns error when play code already exists" do
+  test "import_file/1 updates the existing play when the code is already present" do
     code = "DUP01"
     path = write_tei(minimal_tei(title: "Duplicate", code: code))
 
     assert {:ok, play} = TeiParser.import_file(path)
     assert play.code == code
 
-    assert {:error, {:play_already_exists, ^code}} = TeiParser.import_file(path)
+    # Re-importing is an update of the same row, not a failure — see
+    # docs/superpowers/plans/2026-08-01-soft-delete-and-reimport.md
+    assert {:ok, reimported} = TeiParser.import_file(path)
+    assert reimported.id == play.id
   end
 
   test "import_file/1 returns error for valid XML without teiHeader" do

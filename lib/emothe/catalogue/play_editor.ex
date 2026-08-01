@@ -10,6 +10,7 @@ defmodule Emothe.Catalogue.PlayEditor do
     field :role, :string
     field :organization, :string
     field :position, :integer, default: 0
+    field :origin, :string, default: "manual"
 
     belongs_to :play, Emothe.Catalogue.Play
 
@@ -18,11 +19,12 @@ defmodule Emothe.Catalogue.PlayEditor do
 
   def changeset(editor, attrs) do
     editor
-    |> cast(attrs, [:person_name, :role, :organization, :position, :play_id])
+    |> cast(attrs, [:person_name, :role, :organization, :position, :play_id, :origin])
     |> validate_required([:person_name, :role])
     |> validate_inclusion(
       :role,
       ~w(editor digital_editor reviewer principal translator researcher)
     )
+    |> validate_inclusion(:origin, Emothe.Catalogue.origins())
   end
 end

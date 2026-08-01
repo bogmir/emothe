@@ -11,6 +11,8 @@ defmodule Emothe.Import.FilemakerSync do
 
   import Ecto.Query
 
+  alias Emothe.ActivityLog
+  alias Emothe.Catalogue
   alias Emothe.Catalogue.Play
   alias Emothe.Repo
 
@@ -49,6 +51,39 @@ defmodule Emothe.Import.FilemakerSync do
       end
     end)
     |> Map.new(fn {key, list} -> {key, Enum.reverse(list)} end)
+  end
+
+  @doc """
+  Writes every change in the plan and logs it. Returns one result per change.
+  """
+  def apply_plan(plan, opts \\ []) do
+    user_id = Keyword.get(opts, :user_id)
+
+    Enum.map(plan.changes, fn change ->
+      play = Catalogue.get_play!(change.play_id)
+
+      case Catalogue.update_play(play, change.sets) do
+        {:ok, updated} ->
+          ActivityLog.log!(%{
+            user_id: user_id,
+            play_id: updated.id,
+            action: "update",
+            resource_type: "play",
+            resource_id: updated.id,
+            changes: stringify(change.sets),
+            metadata: %{"source" => "filemaker_index"}
+          })
+
+          {:ok, change.code}
+
+        {:error, changeset} ->
+          {:error, change.code, changeset}
+      end
+    end)
+  end
+
+  defp stringify(sets) do
+    Map.new(sets, fn {key, value} -> {Atom.to_string(key), value} end)
   end
 
   defp changes_for(play, version, by_code) do

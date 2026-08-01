@@ -105,4 +105,40 @@ defmodule Emothe.Import.FilemakerSyncTest do
     assert plan.changes == []
     assert Enum.sort(plan.unchanged) == ["EMOTHE0038", "EMOTHE0052"]
   end
+
+  describe "apply_plan/2" do
+    test "writes the changes and logs one activity entry per play" do
+      original = play("EMOTHE0038_AntonyAndCleopatra")
+      translation = play("EMOTHE0052_AntonioYCleopatra")
+
+      results =
+        index()
+        |> FilemakerSync.plan([original, translation])
+        |> FilemakerSync.apply_plan()
+
+      assert Enum.sort(results) == [{:ok, "EMOTHE0038"}, {:ok, "EMOTHE0052"}]
+
+      assert Emothe.Catalogue.get_play!(original.id).language == "en"
+
+      reloaded = Emothe.Catalogue.get_play!(translation.id)
+      assert reloaded.relationship_type == "traduccion"
+      assert reloaded.parent_play_id == original.id
+
+      entries = Emothe.ActivityLog.list_entries(play_id: translation.id)
+      assert [entry] = entries
+      assert entry.action == "update"
+      assert entry.metadata["source"] == "filemaker_index"
+      assert entry.changes["relationship_type"] == "traduccion"
+    end
+
+    test "applying twice is a no-op the second time" do
+      original = play("EMOTHE0038_AntonyAndCleopatra")
+      index = index()
+
+      index |> FilemakerSync.plan([original]) |> FilemakerSync.apply_plan()
+
+      second = FilemakerSync.plan(index, [Emothe.Catalogue.get_play!(original.id)])
+      assert second.changes == []
+    end
+  end
 end

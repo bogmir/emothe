@@ -67,5 +67,27 @@ defmodule EmotheWeb.Admin.PlayListLiveTest do
 
       refute render(view) =~ "Delete Me"
     end
+
+    test "an archived play is listed under the archived filter and can be restored", %{conn: conn} do
+      conn = log_in_admin(conn)
+      play = TestFixtures.play_fixture(%{"title" => "Archive Me"})
+
+      {:ok, view, _html} = live(conn, ~p"/admin/plays")
+
+      view |> element("button[phx-click=delete][phx-value-id='#{play.id}']") |> render_click()
+      refute render(view) =~ "Archive Me"
+
+      {:ok, archived_view, html} = live(conn, ~p"/admin/plays?archived=1")
+      assert html =~ "Archive Me"
+
+      archived_view
+      |> element("button[phx-click=restore][phx-value-id='#{play.id}']")
+      |> render_click()
+
+      refute render(archived_view) =~ "Archive Me"
+
+      {:ok, _view, html} = live(conn, ~p"/admin/plays")
+      assert html =~ "Archive Me"
+    end
   end
 end

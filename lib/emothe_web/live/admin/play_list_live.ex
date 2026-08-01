@@ -26,12 +26,19 @@ defmodule EmotheWeb.Admin.PlayListLive do
   def handle_params(params, _url, socket) do
     search = params["search"] || ""
     page = parse_page(params["page"])
+    archived = params["archived"] == "1"
 
-    total = Catalogue.count_plays(search: search)
+    total = Catalogue.count_plays(search: search, archived: archived)
     total_pages = max(1, ceil(total / @per_page))
     page = min(page, total_pages)
 
-    plays = Catalogue.list_plays(search: search, page: page, per_page: @per_page)
+    plays =
+      Catalogue.list_plays(
+        search: search,
+        page: page,
+        per_page: @per_page,
+        archived: archived
+      )
 
     if connected?(socket) do
       for play <- plays, do: PlayContent.subscribe(play.id)
@@ -42,7 +49,9 @@ defmodule EmotheWeb.Admin.PlayListLive do
      |> assign(:plays, plays)
      |> assign(:search, search)
      |> assign(:page, page)
-     |> assign(:total_pages, total_pages)}
+     |> assign(:total_pages, total_pages)
+     |> assign(:archived, archived)
+     |> assign(:archived_count, Catalogue.count_plays(archived: true))}
   end
 
   @impl true
@@ -56,32 +65,54 @@ defmodule EmotheWeb.Admin.PlayListLive do
 
     ActivityLog.log!(%{
       user_id: socket.assigns.current_user.id,
+      play_id: play.id,
       action: "delete",
       resource_type: "play",
       resource_id: play.id,
-      metadata: %{title: play.title, code: play.code}
+      metadata: %{title: play.title, code: play.code, archived: true}
     })
 
     {:ok, _} = Catalogue.delete_play(play)
 
-    total = Catalogue.count_plays(search: socket.assigns.search)
+    {:noreply, reload(socket)}
+  end
+
+  def handle_event("restore", %{"id" => id}, socket) do
+    play = Catalogue.get_play!(id, include_deleted: true)
+
+    {:ok, _} = Catalogue.restore_play(play)
+
+    ActivityLog.log!(%{
+      user_id: socket.assigns.current_user.id,
+      play_id: play.id,
+      action: "update",
+      resource_type: "play",
+      resource_id: play.id,
+      metadata: %{title: play.title, code: play.code, restored: true}
+    })
+
+    {:noreply, reload(socket)}
+  end
+
+  defp reload(socket) do
+    opts = [search: socket.assigns.search, archived: socket.assigns.archived]
+
+    total = Catalogue.count_plays(opts)
     total_pages = max(1, ceil(total / @per_page))
     page = min(socket.assigns.page, total_pages)
-    plays = Catalogue.list_plays(search: socket.assigns.search, page: page, per_page: @per_page)
+    plays = Catalogue.list_plays(opts ++ [page: page, per_page: @per_page])
 
-    {:noreply, assign(socket, plays: plays, page: page, total_pages: total_pages)}
+    assign(socket,
+      plays: plays,
+      page: page,
+      total_pages: total_pages,
+      archived_count: Catalogue.count_plays(archived: true)
+    )
   end
 
   @impl true
   def handle_info({:play_content_changed, _play_id}, socket) do
-    plays =
-      Catalogue.list_plays(
-        search: socket.assigns.search,
-        page: socket.assigns.page,
-        per_page: @per_page
-      )
-
-    {:noreply, assign(socket, plays: plays)}
+    {:noreply, reload(socket)}
   end
 
   defp parse_page(nil), do: 1
@@ -125,16 +156,28 @@ defmodule EmotheWeb.Admin.PlayListLive do
         </div>
       </div>
 
-      <form phx-change="search" phx-submit="search" class="mb-5">
-        <input
-          type="text"
-          name="search"
-          value={@search}
-          placeholder={gettext("Search plays...")}
-          phx-debounce="300"
-          class="input input-bordered w-full md:max-w-md"
-        />
-      </form>
+      <div class="mb-5 flex flex-wrap items-center gap-3">
+        <form phx-change="search" phx-submit="search" class="flex-1 md:max-w-md">
+          <input
+            type="text"
+            name="search"
+            value={@search}
+            placeholder={gettext("Search plays...")}
+            phx-debounce="300"
+            class="input input-bordered w-full"
+          />
+        </form>
+
+        <.link
+          :if={@archived_count > 0 or @archived}
+          patch={if @archived, do: ~p"/admin/plays", else: ~p"/admin/plays?archived=1"}
+          class={["btn btn-sm", @archived && "btn-active"]}
+        >
+          <.icon name="hero-archive-box-mini" class="size-4" />
+          {gettext("Archived plays")}
+          <span class="badge badge-sm">{@archived_count}</span>
+        </.link>
+      </div>
 
       <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100 shadow-sm">
         <table class="table table-zebra">
@@ -163,6 +206,9 @@ defmodule EmotheWeb.Admin.PlayListLive do
                 >
                   {play.title}
                 </.link>
+                <span :if={play.deleted_at} class="badge badge-ghost badge-sm ml-2">
+                  {gettext("Archived")}
+                </span>
                 <p :if={play.author_name} class="text-xs text-base-content/60 mt-0.5">
                   {play.author_name}
                 </p>
@@ -188,17 +234,27 @@ defmodule EmotheWeb.Admin.PlayListLive do
                     <.icon name="hero-arrow-top-right-on-square-mini" class="size-4" />
                   </.link>
                   <button
+                    :if={play.deleted_at}
+                    phx-click="restore"
+                    phx-value-id={play.id}
+                    class="btn btn-ghost btn-xs text-success tooltip tooltip-left"
+                    data-tip={gettext("Restore")}
+                  >
+                    <.icon name="hero-arrow-uturn-left-mini" class="size-4" />
+                  </button>
+                  <button
+                    :if={is_nil(play.deleted_at)}
                     phx-click="delete"
                     phx-value-id={play.id}
                     data-confirm={
-                      gettext("Delete «%{title}» and all its content? This cannot be undone.",
+                      gettext("Archive «%{title}»? It is hidden from the site and can be restored.",
                         title: play.title
                       )
                     }
                     class="btn btn-ghost btn-xs text-error tooltip tooltip-left"
-                    data-tip={gettext("Delete")}
+                    data-tip={gettext("Archive")}
                   >
-                    <.icon name="hero-trash-mini" class="size-4" />
+                    <.icon name="hero-archive-box-mini" class="size-4" />
                   </button>
                 </div>
               </td>

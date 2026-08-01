@@ -15,6 +15,8 @@ defmodule EmotheWeb.Admin.ImportLive do
      |> assign(:importing, false)
      |> assign(:import_total, 0)
      |> assign(:import_done, 0)
+     |> assign(:pending, [])
+     |> assign(:previews, [])
      |> assign(:breadcrumbs, [
        %{label: gettext("Admin"), to: ~p"/admin/plays"},
        %{label: gettext("Plays"), to: ~p"/admin/plays"},
@@ -47,15 +49,19 @@ defmodule EmotheWeb.Admin.ImportLive do
         {:ok, {dest, entry.client_name}}
       end)
 
-    send(self(), {:import_next, pending_files})
+    {:noreply, start_or_confirm(socket, pending_files)}
+  end
 
-    {:noreply,
-     socket
-     |> assign(:importing, true)
-     |> assign(:successes, [])
-     |> assign(:errors, [])
-     |> assign(:import_total, length(pending_files))
-     |> assign(:import_done, 0)}
+  def handle_event("confirm_import", _params, socket) do
+    {:noreply, start_import(socket, socket.assigns.pending)}
+  end
+
+  def handle_event("cancel_import", _params, socket) do
+    Enum.each(socket.assigns.pending, fn {path, _filename} ->
+      if String.starts_with?(path, System.tmp_dir!()), do: File.rm(path)
+    end)
+
+    {:noreply, socket |> assign(:pending, []) |> assign(:previews, [])}
   end
 
   def handle_event("import_directory", %{"directory" => dir}, socket) do
@@ -77,15 +83,7 @@ defmodule EmotheWeb.Admin.ImportLive do
               {Path.join(dir, file), file}
             end)
 
-          send(self(), {:import_next, pending})
-
-          {:noreply,
-           socket
-           |> assign(:importing, true)
-           |> assign(:successes, [])
-           |> assign(:errors, [])
-           |> assign(:import_total, length(pending))
-           |> assign(:import_done, 0)}
+          {:noreply, start_or_confirm(socket, pending)}
         end
 
       {:error, reason} ->
@@ -96,6 +94,39 @@ defmodule EmotheWeb.Admin.ImportLive do
            "#{gettext("Cannot read directory")}: #{format_error(reason)}"
          )}
     end
+  end
+
+  # An import that lands on a play we already hold replaces its whole text. Say so and
+  # wait for a click; a batch of entirely new plays goes straight through.
+  defp start_or_confirm(socket, pending) do
+    previews =
+      for {path, filename} <- pending,
+          {:ok, preview} <- [TeiParser.preview_import(path)],
+          preview.existing,
+          do: Map.put(preview, :filename, filename)
+
+    if previews == [] do
+      start_import(socket, pending)
+    else
+      socket
+      |> assign(:pending, pending)
+      |> assign(:previews, previews)
+      |> assign(:successes, [])
+      |> assign(:errors, [])
+    end
+  end
+
+  defp start_import(socket, pending) do
+    send(self(), {:import_next, pending})
+
+    socket
+    |> assign(:importing, true)
+    |> assign(:pending, [])
+    |> assign(:previews, [])
+    |> assign(:successes, [])
+    |> assign(:errors, [])
+    |> assign(:import_total, length(pending))
+    |> assign(:import_done, 0)
   end
 
   @impl true
@@ -248,6 +279,61 @@ defmodule EmotheWeb.Admin.ImportLive do
         </div>
       </div>
 
+      <%!-- Replacement confirmation --%>
+      <div :if={@previews != []} class="card mb-6 border border-warning bg-base-100 shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title text-warning">
+            <.icon name="hero-exclamation-triangle" class="size-5" />
+            {gettext("%{count} of these plays already exist", count: length(@previews))}
+          </h2>
+          <p class="text-sm text-base-content/70">
+            {gettext(
+              "Importing replaces the text and the records that came from TEI. Anything entered by hand is kept."
+            )}
+          </p>
+
+          <ul class="mt-3 space-y-3">
+            <li :for={p <- @previews} class="rounded-box bg-base-200 px-3 py-2">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-primary badge-sm">{p.code}</span>
+                <span class="font-medium">{p.existing.title}</span>
+                <span :if={p.archived} class="badge badge-ghost badge-sm">
+                  {gettext("archived — will be restored")}
+                </span>
+              </div>
+              <div class="mt-1 text-xs text-base-content/70">
+                {gettext(
+                  "Replaces %{divisions} division(s), %{elements} element(s), %{characters} character(s) and %{tei} record(s) imported from TEI.",
+                  divisions: p.replaces.divisions,
+                  elements: p.replaces.elements,
+                  characters: p.replaces.characters,
+                  tei: p.replaces.editors + p.replaces.sources + p.replaces.notes
+                )}
+              </div>
+              <div :if={preserved_total(p) > 0} class="mt-1 text-xs font-medium text-success">
+                {gettext("Keeps %{count} record(s) you entered by hand.",
+                  count: preserved_total(p)
+                )}
+              </div>
+              <div :if={p.preserves_fields != []} class="mt-1 text-xs text-base-content/70">
+                {gettext("Keeps: %{fields}",
+                  fields: Enum.map_join(p.preserves_fields, ", ", &field_label/1)
+                )}
+              </div>
+            </li>
+          </ul>
+
+          <div class="card-actions mt-4">
+            <button phx-click="confirm_import" class="btn btn-warning btn-sm">
+              {gettext("Replace and import")}
+            </button>
+            <button phx-click="cancel_import" class="btn btn-ghost btn-sm">
+              {gettext("Cancel")}
+            </button>
+          </div>
+        </div>
+      </div>
+
       <%!-- Import progress --%>
       <div :if={@importing} class="card mb-6 border border-base-300 bg-base-100 shadow-sm">
         <div class="card-body">
@@ -345,6 +431,15 @@ defmodule EmotheWeb.Admin.ImportLive do
     </div>
     """
   end
+
+  defp preserved_total(preview) do
+    preview.preserves.editors + preview.preserves.sources + preview.preserves.notes
+  end
+
+  defp field_label(:language), do: gettext("language")
+  defp field_label(:relationship_type), do: gettext("relationship")
+  defp field_label(:parent_play_id), do: gettext("parent play")
+  defp field_label(:is_complete), do: gettext("completeness")
 
   defp upload_error_to_string(:too_large), do: gettext("File is too large (max 20MB)")
   defp upload_error_to_string(:not_accepted), do: gettext("Only .xml files are accepted")

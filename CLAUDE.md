@@ -2,6 +2,27 @@
 
 Web application for managing, cataloguing, and presenting digitized early modern European theatre plays (16th-17th century). Allows humanities researchers to input play data, export to TEI-XML/PDF/HTML, and provides public presentation pages with statistics. Based on the existing EMOTHE project at https://emothe.uv.es.
 
+## How To Work In This Repo
+
+**Test-driven development is required.** Every feature and every bugfix follows the same loop, in this order:
+
+1. **Write the failing test first.** Before touching implementation code, write a test that expresses the behaviour you want.
+2. **Run it and watch it fail.** Paste-worthy proof that the test exercises the thing you are about to build. A test that passes before the implementation exists is testing nothing.
+3. **Write the smallest implementation that passes.**
+4. **Run the test again.** It must pass.
+5. **Run `mix test`** — the whole suite, not just the new file — before claiming anything works.
+
+Rules that follow from this:
+
+- **Never claim "done", "fixed" or "working" without the command output that proves it.** Evidence first, assertion second.
+- **A failing test is information, not an obstacle.** If a test fails, read the failure before changing anything. If the failure means the *test's* expectation was wrong, fix the test and say so — but check the implementation first.
+- **An existing test that contradicts a deliberate behaviour change gets updated, with a comment saying why.** See `test/emothe/import/tei_parser_test.exs` — "returns error when play code already exists" became "updates the existing play" when re-imports became non-destructive.
+- **Bugfixes get a regression test** that fails before the fix.
+- **`mix format` after every task.** The repo is formatted; a noisy diff hides the real change.
+- **`mix compile --warnings-as-errors` before committing.**
+
+Where the tests live: `test/emothe/` for contexts, importers and exporters; `test/emothe_web/live/` for LiveViews; `test/support/fixtures.ex` for `play_fixture/1` and friends; `test/fixtures/` for TEI and FileMaker sample files.
+
 ## Tech Stack
 
 - Elixir 1.19.5 / Erlang/OTP 28.1 (via asdf, see `.tool-versions`)
@@ -99,6 +120,13 @@ All tables use UUID primary keys. Key relationships:
 
 Element types: `speech`, `stage_direction`, `verse_line`, `prose`, `line_group`
 Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco`, `front`
+
+### Archiving and provenance
+
+- `plays.deleted_at` — archiving, not deletion. `Catalogue.delete_play/1` sets it, `restore_play/1` clears it, `purge_play/1` is the destructive path (wired to no button). Every Catalogue read hides archived plays; pass `include_deleted: true` for both or `archived: true` for only the archived ones. The unique index on `plays.code` is deliberately global, so an archived play keeps its code reserved.
+- `play_editors.origin`, `play_sources.origin`, `play_editorial_notes.origin` — `"tei" | "manual" | "filemaker"`, default `"manual"`. A TEI re-import deletes only its own `"tei"` rows, so hand-entered records survive.
+- **Re-importing a TEI file whose code exists updates that play in place** (same `id`, same history, un-archived). It does *not* write `language`, `relationship_type`, `parent_play_id` or `is_complete` — those are `@platform_owned` in `lib/emothe/import/tei_parser.ex`. Any new curated column must be added to that list, or the next re-import erases it.
+- `TeiParser.preview_import/1` reports what an import would replace and keep, without writing. Used by the admin import page and `mix emothe.import.tei --dry-run`.
 
 ## Routes
 
@@ -232,6 +260,16 @@ mix test
 mix phx.server
 ```
 
+Load the corpus (82 TEI files under `test/fixtures/`):
+
+```bash
+mix emothe.import.tei             # skip codes already imported
+mix emothe.import.tei --dry-run   # report what would happen, write nothing
+mix emothe.import.tei --force     # re-import every file, updating in place
+```
+
+`mix gettext.extract --merge` works in this repo; note that it fuzzy-matches new strings onto unrelated existing translations. Check every entry it marks fuzzy before trusting it.
+
 Then visit:
 - http://localhost:4000/admin/plays/import to import TEI files
 - http://localhost:4000/plays to browse the catalogue
@@ -312,6 +350,8 @@ Then visit:
 
 ### Low Priority / Future
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
+- [x] **Soft delete & re-importable plays (S0b)** — `plays.deleted_at`, `origin` on the three mixed-ownership child tables, re-import updates in place, import preview + `--dry-run`, admin archive filter and restore. Plan: `docs/superpowers/plans/2026-08-01-soft-delete-and-reimport.md`
+- [ ] **FileMaker import (S1-S8)** — work families and language, version metadata, witnesses, bibliography, historical performances, credits, genre. Roadmap: `docs/superpowers/plans/2026-08-01-filemaker-import-slices.md`; S1 has a full plan. Governing rule: the export is a bootstrap, not a dependency — every field it carries gets a permanent column *and* an admin form
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
 - [x] **Activity log** - `activity_logs` table tracks all admin actions (create/update/delete/import/export/role_change) with user, play, resource type, changes, and metadata; admin UI at `/admin/activity-log` with filters (action, resource, user, date range) and pagination

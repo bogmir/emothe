@@ -48,4 +48,41 @@ defmodule Emothe.Import.FilemakerTest do
   test "returns an error for a missing file" do
     assert {:error, :enoent} = Filemaker.load_index("test/fixtures/filemaker/nope.ndjson")
   end
+
+  describe "load_versions/1" do
+    @versions "test/fixtures/filemaker/versions_sample.ndjson"
+
+    setup do
+      {:ok, versions} = Filemaker.load_versions(@versions)
+      %{versions: versions}
+    end
+
+    test "keys every version by the code in its web-edition link", %{versions: versions} do
+      assert Map.keys(versions) |> Enum.sort() == ["EMOTHE0038", "EMOTHE0211", "HIE0393"]
+    end
+
+    test "decodes the historical time code into a slug", %{versions: versions} do
+      assert versions["EMOTHE0038"].historical_time == "antiguedad_clasica"
+      assert versions["EMOTHE0211"].historical_time == "siglo_xvii"
+    end
+
+    test "reads the note out of the rendered label", %{versions: versions} do
+      assert versions["EMOTHE0038"].historical_time_note ==
+               "First century BC. The play dramatizes events taking place between 40 and 30 BC."
+    end
+
+    test "a code with no rendered label still yields a slug and no note", %{versions: versions} do
+      assert versions["EMOTHE0211"].historical_time == "siglo_xvii"
+      assert versions["EMOTHE0211"].historical_time_note == nil
+    end
+
+    test "takes the first of several periods", %{versions: versions} do
+      assert versions["HIE0393"].historical_time == "siglo_xvi"
+      assert versions["HIE0393"].historical_time_note == "After the Battle of Pavia (1525)."
+    end
+
+    test "returns an error for a missing file" do
+      assert {:error, :enoent} = Filemaker.load_versions("test/fixtures/filemaker/nope.ndjson")
+    end
+  end
 end

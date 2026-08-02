@@ -17,6 +17,27 @@ defmodule Emothe.Import.Filemaker do
 
   @languages %{"ES" => "es", "EN" => "en", "FR" => "fr", "IT" => "it", "PT" => "pt"}
 
+  @versions_layout "T01_tituloEM"
+
+  # bus_tiemHistorico. Codes 3 and 4 do not occur anywhere in the export.
+  @historical_times %{
+    "1" => "tiempo_indeterminado",
+    "2" => "antiguo_testamento",
+    "5" => "edad_media",
+    "6" => "siglo_xv",
+    "7" => "siglo_xvi",
+    "8" => "siglo_xvii",
+    "9" => "tiempo_maravilloso",
+    "10" => "antiguedad_clasica",
+    "11" => "tiempo_alegorico"
+  }
+
+  # <a href='../biblioteca/textosEMOTHE/EMOTHE0038_AntonyAndCleopatra.php' …>
+  @web_edition ~r|textosEMOTHE/([A-Za-z0-9]+)_|
+
+  # <li>Antigüedad clásica<br/>Note: First century BC.…</li>
+  @first_item ~r|<li>(.*?)</li>|s
+
   def default_path, do: @default_path
 
   @doc """
@@ -31,6 +52,78 @@ defmodule Emothe.Import.Filemaker do
         |> elem(1)
 
       {:ok, index}
+    end
+  end
+
+  @doc """
+  Returns `{:ok, %{code => version}}` for every version record in the export.
+
+  The version records carry the research metadata that has no home in TEI. Only the
+  fields S2a needs are read; later slices add to the map this returns.
+  """
+  def load_versions(path \\ @default_path) do
+    with {:ok, body} <- File.read(path) do
+      versions =
+        body
+        |> String.split("\n", trim: true)
+        |> Enum.reduce({nil, %{}}, &read_version_line/2)
+        |> elem(1)
+
+      {:ok, versions}
+    end
+  end
+
+  defp read_version_line(line, {layout, versions}) do
+    case Jason.decode(line) do
+      {:ok, %{"_meta" => meta}} ->
+        {meta["layout"], versions}
+
+      {:ok, %{"fields" => fields}} when layout == @versions_layout ->
+        version = build_version(fields)
+        {layout, Map.put(versions, version.code, version)}
+
+      _ ->
+        {layout, versions}
+    end
+  end
+
+  defp build_version(fields) do
+    %{
+      code: version_code(fields),
+      historical_time: historical_time(fields),
+      historical_time_note: historical_time_note(fields)
+    }
+  end
+
+  # The href is the only place the HIE#### codes appear; the numeric id is the fallback.
+  defp version_code(fields) do
+    case Regex.run(@web_edition, field(fields, "pub_edicionWeb")) do
+      [_all, code] ->
+        code
+
+      _ ->
+        id = fields |> field("_IdTituloEmothe") |> String.to_integer()
+        "EMOTHE" <> String.pad_leading(Integer.to_string(id), 4, "0")
+    end
+  end
+
+  defp historical_time(fields) do
+    fields
+    |> field("bus_tiemHistorico")
+    |> String.split("\n", trim: true)
+    |> List.first()
+    |> then(&Map.get(@historical_times, &1))
+  end
+
+  defp historical_time_note(fields) do
+    with [_all, item] <- Regex.run(@first_item, field(fields, "pub_TiemHistorico")),
+         [_label, note] <- String.split(item, ~r|<br\s*/?>\s*Note:|, parts: 2) do
+      case strip_tags(note) do
+        "" -> nil
+        text -> text
+      end
+    else
+      _ -> nil
     end
   end
 

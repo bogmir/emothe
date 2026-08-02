@@ -143,6 +143,11 @@ metadata a curator is expected to edit, so the export is a bootstrap and must no
 | set, different | has a value | `conflicts` — reported, **not** written |
 | anything | blank | `unchanged` — never blanks a set column |
 
+The two sources are independent of each other. A play absent from the published index is still
+reported under `missing`, but it can still have a `T01` research record and must still be filled —
+`EMOTHE0341` is exactly that case: research metadata, never published. So `missing` and `changes`
+are not mutually exclusive.
+
 `plan/2`'s return map gains a fourth key:
 
 ```elixir

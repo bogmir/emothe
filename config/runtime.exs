@@ -23,6 +23,13 @@ end
 config :emothe, EmotheWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+config :emothe,
+  env: config_env(),
+  admin_emails:
+    System.get_env("ADMIN_EMAILS", "")
+    |> String.split(",", trim: true)
+    |> Enum.map(&String.trim/1)
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

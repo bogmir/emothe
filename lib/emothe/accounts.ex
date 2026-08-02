@@ -380,6 +380,18 @@ defmodule Emothe.Accounts do
   def admin?(_), do: false
 
   @doc """
+  True when this user's email is listed in `ADMIN_EMAILS`.
+
+  Protected admins cannot be demoted, deactivated or deleted from the UI.
+  Enforce this here, not by hiding a button.
+  """
+  def protected_admin?(%User{email: email}) do
+    String.downcase(email) in Emothe.Accounts.AdminBootstrap.configured_emails()
+  end
+
+  def protected_admin?(_), do: false
+
+  @doc """
   Returns true if the user has confirmed their email address.
   """
   def confirmed?(%User{confirmed_at: confirmed_at}), do: not is_nil(confirmed_at)

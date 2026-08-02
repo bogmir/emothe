@@ -48,3 +48,6 @@ config :phoenix_live_view,
 # Sort query params output of verified routes for robust url comparisons
 config :phoenix,
   sort_verified_routes_query_params: true
+
+# Pin ADMIN_EMAILS empty so a stray environment variable cannot alter tests
+config :emothe, admin_emails: []

@@ -18,6 +18,7 @@ defmodule Emothe.Application do
     children = [
       EmotheWeb.Telemetry,
       Emothe.Repo,
+      Emothe.Accounts.AdminBootstrap,
       {DNSCluster, query: Application.get_env(:emothe, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Emothe.PubSub},
       # Start a worker by calling: Emothe.Worker.start_link(arg)

@@ -343,8 +343,8 @@ Then visit:
 ## What Still Needs To Be Done
 
 ### High Priority
-- [ ] **Create initial admin user** - promote a registered user to admin via IEx: `Emothe.Accounts.get_user_by_email("...") |> Emothe.Accounts.User.role_changeset(%{role: "admin"}) |> Emothe.Repo.update()`
-- [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs)
+- [x] **Create initial admin user** - set `ADMIN_EMAILS` (comma-separated); `Emothe.Accounts.AdminBootstrap` reconciles it at boot and mails each address an invitation. Break-glass with SMTP down: `mix emothe.invite EMAIL --admin --print-url`
+- [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs). Required secrets: `DATABASE_URL`, `SECRET_KEY_BASE`, `ADMIN_EMAILS` (**unset means zero admins**), `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`
 - [x] **Email delivery** - SMTP adapter via `gen_smtp`; configure `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` (+ optional `SMTP_PORT`, `MAIL_FROM`) as Fly.io secrets
 - [x] **Email confirmation enforced** - unconfirmed users redirected to `/users/confirm` by `require_authenticated_user` plug and `ensure_authenticated`/`ensure_admin` LiveView hooks
 - [x] **Login rate limiting** - 20 attempts per minute per IP via ETS-backed `EmotheWeb.RateLimit`; applied in `UserSessionController.create/2`

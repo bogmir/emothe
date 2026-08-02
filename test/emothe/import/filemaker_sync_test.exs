@@ -37,6 +37,16 @@ defmodule Emothe.Import.FilemakerSyncTest do
     play_fixture(Map.merge(%{"code" => code, "language" => "es"}, attrs))
   end
 
+  defp versions do
+    %{
+      "EMOTHE0038" => %{
+        code: "EMOTHE0038",
+        historical_time: "antiguedad_clasica",
+        historical_time_note: "First century BC."
+      }
+    }
+  end
+
   test "corrects the language of an original stored as Spanish" do
     original = play("EMOTHE0038_AntonyAndCleopatra")
 
@@ -139,6 +149,93 @@ defmodule Emothe.Import.FilemakerSyncTest do
 
       second = FilemakerSync.plan(index, [Emothe.Catalogue.get_play!(original.id)])
       assert second.changes == []
+    end
+  end
+
+  describe "curated fields are fill-only" do
+    test "fills a blank historical time" do
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+
+      assert [%{code: "EMOTHE0038", sets: sets}] = plan.changes
+      assert sets.historical_time == "antiguedad_clasica"
+      assert sets.historical_time_note == "First century BC."
+      assert plan.conflicts == []
+    end
+
+    test "leaves an equal value alone" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "historical_time" => "antiguedad_clasica",
+          "historical_time_note" => "First century BC."
+        })
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+
+      assert plan.changes == []
+      assert plan.conflicts == []
+      assert plan.unchanged == ["EMOTHE0038"]
+    end
+
+    test "reports a curated value that disagrees, and does not write it" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "historical_time" => "edad_media"
+        })
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+
+      assert [%{field: :historical_time, current: "edad_media", indexed: "antiguedad_clasica"}] =
+               Enum.filter(plan.conflicts, &(&1.field == :historical_time))
+
+      # the note was blank, so it still gets filled
+      assert [%{sets: sets}] = plan.changes
+      assert Map.keys(sets) == [:historical_time_note]
+    end
+
+    test "never blanks a curated column the export has nothing for" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "historical_time" => "edad_media"
+        })
+
+      plan = FilemakerSync.plan(index(), [original], %{})
+
+      assert plan.changes == []
+      assert plan.conflicts == []
+    end
+
+    test "the S1 fields still overwrite unconditionally" do
+      # language is derived, not curated: the index is authoritative and wins.
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "es"})
+
+      plan = FilemakerSync.plan(index(), [original], %{})
+
+      assert [%{sets: %{language: "en"}}] = plan.changes
+      assert plan.conflicts == []
+    end
+
+    test "fills a play that has a version record but no index entry" do
+      # EMOTHE0341 is real: it has a T01 research record and was never published,
+      # so it is absent from T00. A curated fill must not depend on the index.
+      orphan = play("EMOTHE0341_LaEstrellaDeSevilla")
+
+      curated = %{
+        "EMOTHE0341" => %{
+          code: "EMOTHE0341",
+          historical_time: "siglo_xvii",
+          historical_time_note: nil
+        }
+      }
+
+      plan = FilemakerSync.plan(index(), [orphan], curated)
+
+      assert [%{code: "EMOTHE0341", sets: %{historical_time: "siglo_xvii"}}] = plan.changes
+      assert plan.missing == ["EMOTHE0341"]
     end
   end
 end

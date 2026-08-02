@@ -1,9 +1,19 @@
 defmodule Emothe.Import.FilemakerSync do
   @moduledoc """
-  Applies the FileMaker published index to the plays we already have.
+  Applies the FileMaker export to the plays we already have.
 
-  `plan/2` is pure: it produces the list of changes without writing anything, so the
+  `plan/3` is pure: it produces the list of changes without writing anything, so the
   mix task can print it for review. `apply_plan/2` performs the writes.
+
+  Two write policies, deliberately:
+
+    * **Derived fields** — `language`, `relationship_type`, `parent_play_id`. The
+      published index is authoritative, so a difference is an error in our data and
+      gets overwritten.
+    * **Curated fields** — `historical_time`, `historical_time_note`. A researcher is
+      expected to edit these in the admin form, so the export is a bootstrap: a blank
+      column is filled, a disagreement is reported under `:conflicts` and left alone,
+      and only `force: true` overwrites it.
 
   Nothing here ever creates a play. Codes with no index entry — every Artelope play,
   and anything the project never published — come back under `:missing`.
@@ -18,6 +28,7 @@ defmodule Emothe.Import.FilemakerSync do
 
   @keep :keep
   @languages ~w(es en fr it pt)
+  @curated [:historical_time, :historical_time_note]
 
   @doc "The FileMaker code hiding at the front of a play code."
   def base_code(code), do: code |> String.split("_") |> List.first()
@@ -27,27 +38,38 @@ defmodule Emothe.Import.FilemakerSync do
     Play |> order_by([p], p.code) |> Repo.all()
   end
 
-  @doc "Diffs the index against the given plays. Writes nothing."
-  def plan(index, plays) do
+  @doc "Diffs the export against the given plays. Writes nothing."
+  def plan(index, plays, versions \\ %{}) do
     by_code = Map.new(plays, &{base_code(&1.code), &1})
+    empty = %{changes: [], unchanged: [], missing: [], conflicts: []}
 
     plays
-    |> Enum.reduce(%{changes: [], unchanged: [], missing: []}, fn play, acc ->
+    |> Enum.reduce(empty, fn play, acc ->
       code = base_code(play.code)
+      curated = Map.get(versions, code, %{})
 
-      case Map.fetch(index, code) do
-        :error ->
-          %{acc | missing: [code | acc.missing]}
+      # The two sources are independent. A play absent from the published index is
+      # still reported as missing, but it can have a T01 research record — EMOTHE0341
+      # does — and that fill must not be skipped.
+      {derived, acc} =
+        case Map.fetch(index, code) do
+          :error -> {%{}, %{acc | missing: [code | acc.missing]}}
+          {:ok, version} -> {changes_for(play, version, by_code), acc}
+        end
 
-        {:ok, version} ->
-          case changes_for(play, version, by_code) do
-            empty when map_size(empty) == 0 ->
-              %{acc | unchanged: [code | acc.unchanged]}
+      sets = Map.merge(derived, fills_for(play, curated))
+      acc = %{acc | conflicts: conflicts_for(play, curated, code) ++ acc.conflicts}
 
-            sets ->
-              change = %{play_id: play.id, code: code, title: play.title, sets: sets}
-              %{acc | changes: [change | acc.changes]}
-          end
+      cond do
+        map_size(sets) > 0 ->
+          change = %{play_id: play.id, code: code, title: play.title, sets: sets}
+          %{acc | changes: [change | acc.changes]}
+
+        Map.has_key?(index, code) ->
+          %{acc | unchanged: [code | acc.unchanged]}
+
+        true ->
+          acc
       end
     end)
     |> Map.new(fn {key, list} -> {key, Enum.reverse(list)} end)
@@ -96,6 +118,35 @@ defmodule Emothe.Import.FilemakerSync do
     |> Enum.reject(fn {key, value} -> Map.get(play, key) == value end)
     |> Map.new()
   end
+
+  # Curated fields are filled only when the column is blank. See the moduledoc.
+  defp fills_for(play, curated) do
+    @curated
+    |> Enum.filter(fn key -> blank?(Map.get(play, key)) and not blank?(Map.get(curated, key)) end)
+    |> Map.new(fn key -> {key, Map.get(curated, key)} end)
+  end
+
+  defp conflicts_for(play, curated, code) do
+    for key <- @curated,
+        current = Map.get(play, key),
+        indexed = Map.get(curated, key),
+        not blank?(current),
+        not blank?(indexed),
+        current != indexed do
+      %{
+        play_id: play.id,
+        code: code,
+        title: play.title,
+        field: key,
+        current: current,
+        indexed: indexed
+      }
+    end
+  end
+
+  defp blank?(nil), do: true
+  defp blank?(""), do: true
+  defp blank?(_value), do: false
 
   defp language_for(%{lang: lang}) when lang in @languages, do: lang
   defp language_for(_version), do: @keep

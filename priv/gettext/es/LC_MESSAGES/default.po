@@ -68,6 +68,8 @@ msgstr "Añadir acotación"
 msgid "Add Verse Line"
 msgstr "Añadir verso"
 
+#: lib/emothe_web/components/layouts/app.html.heex:21
+#: lib/emothe_web/components/layouts/app.html.heex:34
 #: lib/emothe_web/live/admin/activity_log_live.ex:25
 #: lib/emothe_web/live/admin/export_site_live.ex:36
 #: lib/emothe_web/live/admin/import_live.ex:21
@@ -171,9 +173,8 @@ msgstr "No se puede leer el directorio"
 msgid "Catalan"
 msgstr "Catalán"
 
-#: lib/emothe_web/components/layouts/admin.html.heex:12
 #: lib/emothe_web/components/layouts/app.html.heex:19
-#: lib/emothe_web/components/layouts/app.html.heex:29
+#: lib/emothe_web/components/layouts/app.html.heex:28
 #: lib/emothe_web/live/play_compare_live.ex:23
 #: lib/emothe_web/live/play_show_live.ex:39
 #, elixir-autogen, elixir-format
@@ -263,8 +264,6 @@ msgid "Current password"
 msgstr "Contraseña actual"
 
 #: lib/emothe_web/components/layouts.ex:300
-#: lib/emothe_web/components/layouts/admin.html.heex:25
-#: lib/emothe_web/components/layouts/app.html.heex:43
 #, elixir-autogen, elixir-format
 msgid "Dashboard"
 msgstr "Panel de control"
@@ -490,9 +489,6 @@ msgid "If your email is in our system, you will receive instructions to reset yo
 msgstr "Si su correo está en nuestro sistema, recibirá instrucciones para restablecer su contraseña en breve."
 
 #: lib/emothe_web/components/layouts.ex:270
-#: lib/emothe_web/components/layouts/admin.html.heex:14
-#: lib/emothe_web/components/layouts/app.html.heex:22
-#: lib/emothe_web/components/layouts/app.html.heex:32
 #: lib/emothe_web/live/admin/play_detail_live.ex:291
 #, elixir-autogen, elixir-format
 msgid "Import"
@@ -593,7 +589,6 @@ msgid "Line numbers"
 msgstr "Números de verso"
 
 #: lib/emothe_web/components/layouts.ex:205
-#: lib/emothe_web/components/layouts/app.html.heex:66
 #: lib/emothe_web/live/user_forgot_password_live.ex:23
 #: lib/emothe_web/live/user_login_live.ex:26
 #: lib/emothe_web/live/user_reset_password_live.ex:36
@@ -607,8 +602,6 @@ msgid "Log in to EMOTHE"
 msgstr "Iniciar sesión en EMOTHE"
 
 #: lib/emothe_web/components/layouts.ex:201
-#: lib/emothe_web/components/layouts/admin.html.heex:42
-#: lib/emothe_web/components/layouts/app.html.heex:61
 #, elixir-autogen, elixir-format
 msgid "Log out"
 msgstr "Cerrar sesión"
@@ -787,9 +780,6 @@ msgid "Play with code %{code} already exists"
 msgstr "Ya existe una obra con el código %{code}"
 
 #: lib/emothe_web/components/layouts.ex:264
-#: lib/emothe_web/components/layouts/admin.html.heex:13
-#: lib/emothe_web/components/layouts/app.html.heex:21
-#: lib/emothe_web/components/layouts/app.html.heex:31
 #: lib/emothe_web/components/statistics_panel.ex:189
 #: lib/emothe_web/live/admin/export_site_live.ex:295
 #: lib/emothe_web/live/admin/export_site_live.ex:382
@@ -953,8 +943,6 @@ msgid "Sending..."
 msgstr "Enviando..."
 
 #: lib/emothe_web/components/layouts.ex:200
-#: lib/emothe_web/components/layouts/admin.html.heex:40
-#: lib/emothe_web/components/layouts/app.html.heex:59
 #, elixir-autogen, elixir-format
 msgid "Settings"
 msgstr "Configuración"
@@ -2473,7 +2461,6 @@ msgstr "ninguno"
 msgid "Action"
 msgstr "Acciones"
 
-#: lib/emothe_web/components/layouts/admin.html.heex:15
 #: lib/emothe_web/live/admin/activity_log_live.ex:18
 #: lib/emothe_web/live/admin/activity_log_live.ex:26
 #: lib/emothe_web/live/admin/activity_log_live.ex:200
@@ -2718,11 +2705,6 @@ msgstr "Error al generar EPUB: %{reason}"
 #, elixir-autogen, elixir-format
 msgid "Export EPUB"
 msgstr "Exportar EPUB"
-
-#: lib/emothe_web/components/layouts/admin.html.heex:16
-#, elixir-autogen, elixir-format, fuzzy
-msgid "Export Site"
-msgstr "Exportar"
 
 #: lib/emothe_web/live/admin/export_site_live.ex:18
 #: lib/emothe_web/live/admin/export_site_live.ex:37
@@ -3126,11 +3108,6 @@ msgstr "No tiene acceso a esa página."
 msgid "Activity"
 msgstr "Actividad"
 
-#: lib/emothe_web/controllers/demo_ui_html/admin_shell.html.heex:3
-#, elixir-autogen, elixir-format
-msgid "Admin shell preview"
-msgstr "Vista previa del panel de administración"
-
 #: lib/emothe_web/components/layouts.ex:276
 #, elixir-autogen, elixir-format
 msgid "Site"
@@ -3145,3 +3122,8 @@ msgstr "Sistema"
 #, elixir-autogen, elixir-format
 msgid "View public site"
 msgstr "Ver el sitio público"
+
+#: lib/emothe_web/components/layouts/admin.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "Toggle sidebar"
+msgstr "Mostrar u ocultar el panel lateral"

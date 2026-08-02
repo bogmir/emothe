@@ -1,66 +1,53 @@
-<header class="navbar bg-base-100 border-b border-base-300 px-4 sm:px-6 lg:px-8 min-h-0 py-2 sticky top-0 z-30">
-  <div class="flex-1 gap-3">
-    <a
-      href="/"
-      class="flex items-center gap-2 text-base-content hover:opacity-80 transition-opacity"
-    >
-      <img src={~p"/images/logo.svg"} width="28" />
-      <span class="text-sm font-bold tracking-tight">EMOTHE</span>
-    </a>
-    <span class="text-base-content/30 hidden sm:inline">|</span>
-    <nav class="hidden sm:flex items-center gap-1">
-      <a href="/plays" class="btn btn-ghost btn-xs">{gettext("Catalogue")}</a>
-      <a href="/admin/plays" class="btn btn-ghost btn-xs">{gettext("Plays")}</a>
-      <a href="/admin/plays/import" class="btn btn-ghost btn-xs">{gettext("Import")}</a>
-      <a href="/admin/activity-log" class="btn btn-ghost btn-xs">{gettext("Activity Log")}</a>
-      <a href="/admin/export" class="btn btn-ghost btn-xs">{gettext("Export Site")}</a>
-    </nav>
+<div class="flex min-h-screen">
+  <%!-- Checked means collapsed. CSS-only: the sidebar is a sibling of the
+        checkbox, so peer-checked removes it from the layout entirely rather
+        than dimming it behind an overlay. Play pages start collapsed so the
+        text gets the full width. --%>
+  <input
+    id="admin-sidebar"
+    type="checkbox"
+    class="peer sr-only"
+    checked={not is_nil(assigns[:play_context])}
+  />
+
+  <div class="peer-checked:hidden sticky top-0 h-screen overflow-y-auto">
+    <.admin_sidebar
+      current_user={assigns[:current_user]}
+      current_path={assigns[:current_path] || ""}
+    />
   </div>
-  <div class="flex-none flex items-center gap-2">
-    <.locale_toggle locale={assigns[:locale] || "es"} />
-    <.theme_toggle />
-    <a
-      href="/admin/dashboard"
-      class="btn btn-ghost btn-xs btn-square text-base-content/70"
-      title={gettext("Dashboard")}
-    >
-      <.icon name="hero-chart-bar-micro" class="size-3.5" />
-    </a>
-    <%= if assigns[:current_user] do %>
-      <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-xs gap-1">
-          <.icon name="hero-user-circle-micro" class="size-4" />
-          <span class="max-w-[8rem] truncate text-xs">{@current_user.email}</span>
-          <.icon name="hero-chevron-down-micro" class="size-3" />
-        </label>
-        <ul
-          tabindex="0"
-          class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-48 border border-base-300"
+
+  <div class="flex-1 min-w-0 flex flex-col">
+    <header class="navbar bg-base-100 border-b border-base-300 px-4 min-h-0 py-2 sticky top-0 z-30">
+      <div class="flex-1 gap-3">
+        <label
+          for="admin-sidebar"
+          class="btn btn-ghost btn-xs btn-square"
+          aria-label={gettext("Toggle sidebar")}
         >
-          <li><a href="/users/settings">{gettext("Settings")}</a></li>
-          <li>
-            <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
-          </li>
-        </ul>
+          <.icon name="hero-bars-3-micro" class="size-4" />
+        </label>
+        <.link
+          navigate={~p"/"}
+          class="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
+          <img src={~p"/images/logo.svg"} width="28" />
+          <span class="text-sm font-bold tracking-tight">EMOTHE</span>
+        </.link>
       </div>
-    <% end %>
+      <.user_menu current_user={assigns[:current_user]} locale={assigns[:locale] || "es"} />
+    </header>
+
+    <.play_context_bar
+      :if={assigns[:play_context]}
+      play={@play_context.play}
+      active_tab={@play_context.active_tab}
+    />
+
+    <main class="flex-1">
+      {@inner_content}
+    </main>
   </div>
-</header>
-
-<%= if assigns[:breadcrumbs] && @breadcrumbs != [] do %>
-  <div class="bg-base-200/50 border-b border-base-300 px-4 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-7xl">
-      <.breadcrumbs items={@breadcrumbs} />
-    </div>
-  </div>
-<% end %>
-
-<%= if assigns[:play_context] do %>
-  <.play_context_bar play={@play_context.play} active_tab={@play_context.active_tab} />
-<% end %>
-
-<main class="flex-1">
-  {@inner_content}
-</main>
+</div>
 
 <.flash_group flash={@flash} />

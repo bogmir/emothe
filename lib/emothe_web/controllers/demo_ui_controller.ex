@@ -42,36 +42,6 @@ defmodule EmotheWeb.DemoUIController do
     )
   end
 
-  # Temporary: the shell mockup for visual approval. Deleted once the real
-  # admin layout adopts admin_sidebar/1.
-  def admin_shell(conn, _params) do
-    now = DateTime.utc_now(:second)
-
-    admin = %Emothe.Accounts.User{
-      email: "ana@uv.es",
-      role: :admin,
-      confirmed_at: now
-    }
-
-    researcher = %Emothe.Accounts.User{
-      email: "investigador@uv.es",
-      role: :researcher,
-      confirmed_at: now
-    }
-
-    conn
-    |> put_layout(html: {EmotheWeb.Layouts, :demo_root})
-    |> render(:admin_shell,
-      page_title: "Admin Shell (Demo)",
-      play: UIDemoData.play(),
-      variants: [
-        {"Admin — on /admin/plays/import", admin, "/admin/plays/import", false},
-        {"Researcher — on /admin/plays", researcher, "/admin/plays", false},
-        {"Admin in play mode — sidebar hidden by default", admin, "/admin/plays/x/content", true}
-      ]
-    )
-  end
-
   def admin_import(conn, params) do
     conn =
       case params["flash"] do

@@ -121,6 +121,7 @@ defmodule EmotheWeb.Router do
       layout: {EmotheWeb.Layouts, :admin},
       on_mount: [
         EmotheWeb.SetLocaleHook,
+        EmotheWeb.CurrentPathHook,
         {EmotheWeb.UserAuth, {:ensure_can, :view_admin}}
       ] do
       live "/plays", PlayListLive, :index
@@ -175,7 +176,6 @@ defmodule EmotheWeb.Router do
       get "/", DemoUIController, :index
       get "/public/catalogue", DemoUIController, :public_catalogue
       get "/public/play", DemoUIController, :public_play
-      get "/admin/shell", DemoUIController, :admin_shell
       get "/admin/plays", DemoUIController, :admin_plays
       get "/admin/play", DemoUIController, :admin_play
       get "/admin/import", DemoUIController, :admin_import

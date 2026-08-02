@@ -16,56 +16,26 @@
         tabindex="0"
         class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-44 border border-base-300"
       >
-        <li><a href="/plays">{gettext("Catalogue")}</a></li>
-        <%= if Emothe.Authz.can?(assigns[:current_user], :view_admin) do %>
-          <li><a href="/admin/plays">{gettext("Plays")}</a></li>
-          <li><a href="/admin/plays/import">{gettext("Import")}</a></li>
-        <% end %>
+        <li><.link navigate={~p"/plays"}>{gettext("Catalogue")}</.link></li>
+        <li :if={Emothe.Authz.can?(assigns[:current_user], :view_admin)}>
+          <.link navigate={~p"/admin/plays"}>{gettext("Admin")}</.link>
+        </li>
       </ul>
     </div>
     <%!-- Desktop navigation --%>
     <span class="text-base-content/30 hidden sm:inline">|</span>
     <nav class="hidden sm:flex items-center gap-1">
-      <a href="/plays" class="btn btn-ghost btn-xs">{gettext("Catalogue")}</a>
-      <%= if Emothe.Authz.can?(assigns[:current_user], :view_admin) do %>
-        <a href="/admin/plays" class="btn btn-ghost btn-xs">{gettext("Plays")}</a>
-        <a href="/admin/plays/import" class="btn btn-ghost btn-xs">{gettext("Import")}</a>
-      <% end %>
+      <.link navigate={~p"/plays"} class="btn btn-ghost btn-xs">{gettext("Catalogue")}</.link>
+      <.link
+        :if={Emothe.Authz.can?(assigns[:current_user], :view_admin)}
+        navigate={~p"/admin/plays"}
+        class="btn btn-ghost btn-xs"
+      >
+        {gettext("Admin")}
+      </.link>
     </nav>
   </div>
-  <div class="flex-none flex items-center gap-2">
-    <.locale_toggle locale={assigns[:locale] || "es"} />
-    <.theme_toggle />
-    <%= if Emothe.Authz.can?(assigns[:current_user], :view_dashboard) do %>
-      <a
-        href="/admin/dashboard"
-        class="btn btn-ghost btn-xs btn-square text-base-content/70"
-        title={gettext("Dashboard")}
-      >
-        <.icon name="hero-chart-bar-micro" class="size-3.5" />
-      </a>
-    <% end %>
-    <%= if assigns[:current_user] do %>
-      <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-xs gap-1">
-          <.icon name="hero-user-circle-micro" class="size-4" />
-          <span class="max-w-[8rem] truncate text-xs">{@current_user.email}</span>
-          <.icon name="hero-chevron-down-micro" class="size-3" />
-        </label>
-        <ul
-          tabindex="0"
-          class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-48 border border-base-300"
-        >
-          <li><a href="/users/settings">{gettext("Settings")}</a></li>
-          <li>
-            <.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link>
-          </li>
-        </ul>
-      </div>
-    <% else %>
-      <a href="/users/log-in" class="btn btn-primary btn-xs">{gettext("Log in")}</a>
-    <% end %>
-  </div>
+  <.user_menu current_user={assigns[:current_user]} locale={assigns[:locale] || "es"} />
 </header>
 
 <%= if assigns[:breadcrumbs] && @breadcrumbs != [] do %>

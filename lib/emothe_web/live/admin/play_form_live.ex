@@ -39,11 +39,6 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:parent_play_search, "")
     |> assign(:parent_play_suggestions, [])
     |> assign(:attribution_mode, :select)
-    |> assign(:breadcrumbs, [
-      %{label: gettext("Admin"), to: ~p"/admin/plays"},
-      %{label: gettext("Plays"), to: ~p"/admin/plays"},
-      %{label: gettext("New Play")}
-    ])
     |> assign(:play_context, nil)
   end
 
@@ -75,12 +70,6 @@ defmodule EmotheWeb.Admin.PlayFormLive do
     |> assign(:parent_play_search, "")
     |> assign(:parent_play_suggestions, [])
     |> assign(:attribution_mode, attribution_mode)
-    |> assign(:breadcrumbs, [
-      %{label: gettext("Admin"), to: ~p"/admin/plays"},
-      %{label: gettext("Plays"), to: ~p"/admin/plays"},
-      %{label: play.title, to: ~p"/admin/plays/#{play.id}"},
-      %{label: gettext("Edit Metadata")}
-    ])
     |> assign(:play_context, %{play: play, active_tab: :metadata})
   end
 

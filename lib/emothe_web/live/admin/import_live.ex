@@ -17,11 +17,6 @@ defmodule EmotheWeb.Admin.ImportLive do
      |> assign(:import_done, 0)
      |> assign(:pending, [])
      |> assign(:previews, [])
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Plays"), to: ~p"/admin/plays"},
-       %{label: gettext("Import TEI-XML")}
-     ])
      |> allow_upload(:tei_files,
        accept: ~w(.xml),
        max_entries: 20,

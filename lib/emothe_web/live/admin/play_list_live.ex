@@ -15,11 +15,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
      |> assign(:plays, [])
      |> assign(:search, "")
      |> assign(:page, 1)
-     |> assign(:total_pages, 1)
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Plays")}
-     ])}
+     |> assign(:total_pages, 1)}
   end
 
   @impl true

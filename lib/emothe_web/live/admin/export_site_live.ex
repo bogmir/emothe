@@ -31,11 +31,7 @@ defmodule EmotheWeb.Admin.ExportSiteLive do
      |> assign(:gen_detail, "")
      |> assign(:gen_result, nil)
      |> assign(:deploy_status, nil)
-     |> assign(:deploy_url, nil)
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Export Static Site")}
-     ])}
+     |> assign(:deploy_url, nil)}
   end
 
   @impl true

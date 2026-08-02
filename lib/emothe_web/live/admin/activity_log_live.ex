@@ -20,11 +20,7 @@ defmodule EmotheWeb.Admin.ActivityLogLive do
      |> assign(:users, users)
      |> assign(:page, 1)
      |> assign(:total_pages, 1)
-     |> assign(:filters, %{})
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Activity Log")}
-     ])}
+     |> assign(:filters, %{})}
   end
 
   @impl true

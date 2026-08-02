@@ -59,11 +59,6 @@ defmodule EmotheWeb.DemoUIController do
     |> with_admin_layout()
     |> render(:admin_import,
       page_title: "Import TEI-XML (Demo)",
-      breadcrumbs: [
-        %{label: "Admin", to: "/demo/ui/admin/plays"},
-        %{label: "Plays", to: "/demo/ui/admin/plays"},
-        %{label: "Import TEI-XML"}
-      ],
       successes: [{"example.xml", "La Dama Boba", "DAMA01"}]
     )
   end
@@ -73,7 +68,6 @@ defmodule EmotheWeb.DemoUIController do
     |> with_admin_layout()
     |> render(:admin_plays,
       page_title: "Admin - Plays (Demo)",
-      breadcrumbs: [%{label: "Admin", to: "/demo/ui/admin/plays"}, %{label: "Plays"}],
       plays: UIDemoData.plays_list(),
       search: ""
     )
@@ -86,11 +80,6 @@ defmodule EmotheWeb.DemoUIController do
     |> with_admin_layout()
     |> render(:admin_play,
       page_title: "Admin: #{play.title} (Demo)",
-      breadcrumbs: [
-        %{label: "Admin", to: "/demo/ui/admin/plays"},
-        %{label: "Plays", to: "/demo/ui/admin/plays"},
-        %{label: play.title}
-      ],
       play: play,
       characters: UIDemoData.characters(),
       divisions: [

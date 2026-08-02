@@ -57,11 +57,13 @@ lib/
 │   │   └── diff.ex                   # Changeset diff extractor
 │   ├── statistics/
 │   │   └── play_statistic.ex         # Cached JSONB statistics per play
-│   ├── accounts.ex                   # User registration, login, session context
+│   ├── accounts.ex                   # Invitations, login, sessions, deactivation
 │   ├── accounts/
-│   │   ├── user.ex                   # User schema (email, hashed_password, role)
-│   │   ├── user_token.ex             # Session and email tokens
+│   │   ├── user.ex                   # User schema (email, hashed_password, role, deactivated_at)
+│   │   ├── user_token.ex             # Session and email tokens (session, invite, reset, change)
+│   │   ├── admin_bootstrap.ex        # Reconciles ADMIN_EMAILS at boot
 │   │   └── user_notifier.ex          # Email notification templates
+│   ├── authz.ex                      # The only place that answers "may this user do that?"
 │   ├── import/
 │   │   └── tei_parser.ex             # TEI-XML importer (handles UTF-16 files)
 │   └── export/
@@ -76,18 +78,17 @@ lib/
 │           └── deployer.ex           # GitHub Pages deployment
 └── emothe_web/
     ├── router.ex
-    ├── user_auth.ex                  # Auth plugs & LiveView on_mount hooks
+    ├── user_auth.ex                  # Auth plugs & LiveView on_mount hooks (delegates to Authz)
     ├── play_labels.ex                # Translated play metadata vocabularies (historical_time, …)
     ├── live/
     │   ├── play_catalogue_live.ex    # Public: /plays - searchable catalogue
     │   ├── play_show_live.ex         # Public: /plays/:code - play text, characters, stats
-    │   ├── user_registration_live.ex # /users/register
+    │   ├── current_path_hook.ex      # Assigns :current_path for sidebar highlighting
+    │   ├── user_accept_invite_live.ex # /users/accept-invite/:token
     │   ├── user_login_live.ex        # /users/log-in
-    │   ├── user_settings_live.ex     # /users/settings (email & password)
+    │   ├── user_settings_live.ex     # /users/settings (email, password, active sessions)
     │   ├── user_forgot_password_live.ex
     │   ├── user_reset_password_live.ex
-    │   ├── user_confirmation_live.ex
-    │   ├── user_confirmation_instructions_live.ex
     │   └── admin/
     │       ├── play_list_live.ex     # Admin: /admin/plays - manage plays
     │       ├── play_form_live.ex     # Admin: /admin/plays/new|:id/edit
@@ -110,8 +111,8 @@ lib/
 
 All tables use UUID primary keys. Key relationships:
 
-- `users` - email/password auth with role (`:admin`, `:researcher`), confirmation, tokens
-- `users_tokens` - session tokens, email confirmation/reset tokens
+- `users` - email/password auth with role (`:admin`, `:researcher`), `confirmed_at`, `deactivated_at`; `hashed_password` is nullable because an invited account has no password yet
+- `users_tokens` - session tokens (with `ip_address`/`user_agent`), invite/reset/change-email tokens
 - `plays` has_many `play_editors`, `play_sources`, `play_editorial_notes`, `characters`, `play_divisions`, `play_elements`
 - `play_divisions` self-references via `parent_id` (acts contain scenes)
 - `play_elements` self-references via `parent_id` (speeches contain line_groups contain verse_lines)
@@ -129,6 +130,37 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 - **Re-importing a TEI file whose code exists updates that play in place** (same `id`, same history, un-archived). It does *not* write `language`, `relationship_type`, `parent_play_id`, `is_complete`, `historical_time` or `historical_time_note` — those are `@platform_owned` in `lib/emothe/import/tei_parser.ex`. Any new curated column must be added to that list: for a column the TEI parser emits, the list is what stops the re-import overwriting it; for one it does not emit, the list is what makes the import preview report it as preserved.
 - `TeiParser.preview_import/1` reports what an import would replace and keep, without writing. Used by the admin import page and `mix emothe.import.tei --dry-run`.
 
+### Access control
+
+- **Accounts are invite-only.** There is no registration page. `Accounts.invite_user/3`
+  creates a password-less row plus a 7-day `"invite"` token; accepting sets the password
+  and `confirmed_at` in one transaction, because clicking the emailed link already proves
+  the mailbox. Re-inviting invalidates the previous link.
+- **`ADMIN_EMAILS`** is the source of truth for who is an admin. `Emothe.Accounts.AdminBootstrap`
+  reconciles it at boot: unknown addresses get an invited admin plus mail, non-admins get
+  promoted, deactivated ones get reactivated. Those accounts cannot be demoted, deactivated
+  or deleted from `/admin/users` — `Accounts.protected_admin?/1` refuses in the handler.
+  **Unset in production means zero admins.** Break-glass: `mix emothe.invite EMAIL --admin --print-url`,
+  or `Emothe.Release.invite_url/1` from `fly ssh console`, both of which bypass SMTP.
+- **`Emothe.Authz.can?(user, action, resource \\ nil)` is the only authorization predicate.**
+  The router, the LiveView mount hooks and the admin sidebar all call it, which is what keeps
+  the nav and the routes from drifting — `/admin/users` was previously reachable but unlinked.
+  Never write `role == :admin` outside that module for an access decision. Because
+  `pipe_through` cannot pass options to a plug, each permission gets a one-line pipeline
+  (`:require_admin_area`, `:require_deploy`, `:require_dashboard`) wrapping
+  `UserAuth.require_permission/2`.
+- **Researchers** get every content action (plays, content, editors, sources, import, export
+  download, archive). **Admins** additionally get purge, user management, activity log, site
+  deploy and the dashboard.
+- **Per-play scoping is a planned extension**, not a rewrite: `can?/3` already takes the
+  resource, so restricting researchers to assigned plays is one new clause plus a
+  `play_assignments` table. See the `@moduledoc` in `lib/emothe/authz.ex`.
+- **Accounts are deactivated, never deleted** — `activity_logs.user_id` references them.
+  Deactivating destroys every token and disconnects open LiveViews.
+- Sessions last 30 days and are listed and revocable at `/users/settings`; admins can force
+  logout from `/admin/users`. Login throttling has two ETS keys: 20/minute per IP and
+  10/15 minutes per email address, and a successful login clears the email counter.
+
 ## Routes
 
 ### Public
@@ -137,26 +169,25 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 - `GET /plays/:code` - Public play presentation (text, characters, statistics tabs)
 
 ### Authentication
-- `GET /users/register` - Registration (redirects if already logged in)
+- `GET /users/accept-invite/:token` - Set a password on an invited account, then log in
 - `GET /users/log-in` - Login (redirects if already logged in)
 - `POST /users/log-in` - Create session
 - `DELETE /users/log-out` - Destroy session
-- `GET /users/settings` - Email & password settings (requires auth)
+- `GET /users/settings` - Email, password and active sessions (requires an active account)
 - `GET /users/reset-password` - Forgot password
 - `GET /users/reset-password/:token` - Reset password form
-- `GET /users/confirm` - Resend confirmation instructions
-- `GET /users/confirm/:token` - Confirm account
 
-### Admin (requires admin role)
+### Admin (requires `:view_admin`, i.e. any active researcher or admin)
 - `GET /admin/plays` - Play management list
 - `GET /admin/plays/new` - Create play
 - `GET /admin/plays/:id/edit` - Edit play metadata
 - `GET /admin/plays/:id` - Play detail (structure, stats, export buttons)
 - `GET /admin/plays/import` - Import TEI-XML files (upload, server path, or directory)
-- `GET /admin/activity-log` - Activity audit log with filters
-- `GET /admin/users` - User management (roles, confirmation)
-- `GET /admin/export` - Static site generation UI
-- `GET /admin/export/download-zip` - Download generated static site as .zip
+- `GET /admin/activity-log` - Activity audit log with filters (`:view_activity_log`)
+- `GET /admin/users` - Invite, deactivate, reactivate, force logout, change role (`:manage_users`)
+- `GET /admin/export` - Static site generation UI (`:deploy_site`)
+- `GET /admin/export/download-zip` - Download generated static site as .zip (`:deploy_site`)
+- `GET /admin/dashboard` - LiveDashboard (`:view_dashboard`)
 - `GET /admin/plays/compare/export/html` - Comparison HTML export
 - `GET /admin/plays/:id/export/tei` - Download TEI-XML
 - `GET /admin/plays/:id/export/html` - Download HTML
@@ -320,16 +351,19 @@ Then visit:
 - [x] Admin play detail page with structure overview and export buttons
 - [x] Admin TEI import page (file upload)
 - [x] Export controller (TEI-XML, HTML, PDF download endpoints)
-- [x] Authentication with bcrypt (registration, login, password reset, email confirmation)
-- [x] Role-based access control (`:admin`, `:researcher` roles)
-- [x] Admin route protection (requires admin role via plug + LiveView on_mount)
+- [x] Authentication with bcrypt (invite-only accounts, login, password reset). Public registration and the account-confirmation flow are deleted; accepting an invitation is what sets `confirmed_at`
+- [x] `Emothe.Authz.can?/3` - single authorization predicate consulted by the router, the LiveView mount hooks and the admin sidebar
+- [x] Account state enforced - the three auth gates require `confirmed_at` set and `deactivated_at` nil. This is the claim that was previously false in this file
+- [x] `ADMIN_EMAILS` reconciled at boot by `Emothe.Accounts.AdminBootstrap`; those admins are protected from UI demotion/deactivation
+- [x] Visible, revocable sessions - `/users/settings` lists IP and browser per session, revokes one or all others; 30-day tokens; admins force logout from `/admin/users`
+- [x] Admin sidebar shell - three permission-filtered groups, collapsible at every breakpoint, hidden by default on play pages; breadcrumbs removed from the admin layout
 - [x] Compile & fix errors (all modules compile cleanly)
 - [x] TEI parser test suite - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding, split verse parts, line_id, rend, source fields, principal/respStmt editors, author_attribution, edition_title, is_verse, lg part, prose asides, multiple bibl sources, listBibl wrapper
 - [x] TEI XML export test suite - full roundtrip coverage: split verses, xml:id, rend, source bibl fields, pub_place/publication_date, availability_note, principal, respStmt roles, author_attribution, edition_title, hidden characters, division heads, lg part, prose asides, multiple sources, extent
 - [x] Real-fixture roundtrip test (`RoundtripTest`) - imports 22+ real TEI files, exports, and verifies: 12 structural count fields (acts, scenes, characters, speeches, verses, line_groups, stage_dirs, asides, split_parts, verse_type_attrs, hidden_chars, heads), ordering preservation (characters, sources, verse line attrs), metadata fidelity (title, author, code, original_title, pub_place, publication_date, licence_url, edition_title, author_attribution, editors, principals, sponsor, funder, sources), derived fields (verse_count, is_verse, extent), and warn-only speaker_refs (multi-character `who` limitation)
 - [x] Duplicate character xml_id handling in TEI importer (`create_character_unless_exists`)
 - [x] Manual play content editor at `/admin/plays/:id/content` - characters, divisions, elements with modal forms
-- [x] Navigation overhaul: two layouts (public app + admin), breadcrumbs, play context bar for admin play pages
+- [x] Navigation overhaul: two layouts (public app + admin sidebar shell), play context bar for admin play pages; breadcrumbs remain on public pages only
 - [x] Collapsible sidebar with scroll spy (IntersectionObserver) on public play page
 - [x] Theme toggle (system/light/dark) in navbar
 - [x] EMOTHE home page with catalogue CTA
@@ -346,9 +380,9 @@ Then visit:
 - [x] **Create initial admin user** - set `ADMIN_EMAILS` (comma-separated); `Emothe.Accounts.AdminBootstrap` reconciles it at boot and mails each address an invitation. Break-glass with SMTP down: `mix emothe.invite EMAIL --admin --print-url`
 - [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs). Required secrets: `DATABASE_URL`, `SECRET_KEY_BASE`, `ADMIN_EMAILS` (**unset means zero admins**), `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`
 - [x] **Email delivery** - SMTP adapter via `gen_smtp`; configure `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` (+ optional `SMTP_PORT`, `MAIL_FROM`) as Fly.io secrets
-- [x] **Email confirmation enforced** - unconfirmed users redirected to `/users/confirm` by `require_authenticated_user` plug and `ensure_authenticated`/`ensure_admin` LiveView hooks
-- [x] **Login rate limiting** - 20 attempts per minute per IP via ETS-backed `EmotheWeb.RateLimit`; applied in `UserSessionController.create/2`
-- [x] **User management admin UI** - `/admin/users` lists users with role badges, confirmed status; promote/demote role, resend confirmation email
+- [x] **Account state enforced** - `require_authenticated_user`, `require_permission` and the `{:ensure_can, action}` LiveView hook all require `Accounts.active?/1` (confirmed and not deactivated); an inactive session is destroyed with an explanatory flash rather than looping
+- [x] **Login rate limiting** - 20/minute per IP plus 10/15 minutes per email address via ETS-backed `EmotheWeb.RateLimit`; a successful login calls `RateLimit.reset/1` so only failures consume the email budget
+- [x] **User management admin UI** - `/admin/users` invites by email with a role, resends invitations, deactivates, reactivates, forces logout and changes roles; state badges are Protected/Deactivated/Invited/Active
 
 ### Medium Priority
 - [x] **Aside detection** in TEI importer (detects `<stage type="delivery">[Aparte.]</stage>` and `<seg type="aside">` patterns)
@@ -395,5 +429,6 @@ Then visit:
 - **UUID primary keys**: All tables use `binary_id` for eventual distributed deployment
 - **JSONB statistics**: Cached stats stored as a JSON blob, recomputed on demand
 - **Self-referencing trees**: Both divisions and elements use `parent_id` for hierarchy
-- **bcrypt authentication**: Standard Phoenix auth pattern with session tokens, email confirmation, password reset
-- **Role-based access**: Two roles (`:admin`, `:researcher`); admin routes protected via plug + LiveView `on_mount`
+- **bcrypt authentication**: Standard Phoenix auth pattern with session tokens and password reset; accounts arrive by invitation, so accepting the invite replaces a separate confirmation step
+- **One authorization seam**: two roles (`:admin`, `:researcher`) but every access decision goes through `Emothe.Authz.can?/3`, which already takes the resource — per-play scoping becomes one extra clause instead of a rewrite
+- **Admin identity in config, not the UI**: `ADMIN_EMAILS` is reconciled at boot, so a compromised admin session cannot strip its co-admins or lock the owner out

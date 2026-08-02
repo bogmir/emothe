@@ -24,11 +24,6 @@ defmodule EmotheWeb.Admin.PlayDetailLive do
      |> assign(:characters, characters)
      |> assign(:divisions, divisions)
      |> assign(:statistic, statistic)
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Plays"), to: ~p"/admin/plays"},
-       %{label: play.title}
-     ])
      |> assign(:play_context, %{play: play, active_tab: :overview})
      |> assign(:validation_result, nil)
      |> assign(:validating, false)

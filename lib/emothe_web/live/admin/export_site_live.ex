@@ -1,6 +1,8 @@
 defmodule EmotheWeb.Admin.ExportSiteLive do
   use EmotheWeb, :live_view
 
+  on_mount {EmotheWeb.UserAuth, {:ensure_can, :deploy_site}}
+
   alias Emothe.Export.StaticSite
   alias Emothe.Export.StaticSite.Deployer
 

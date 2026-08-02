@@ -1,6 +1,10 @@
 defmodule EmotheWeb.Admin.UserListLive do
   use EmotheWeb, :live_view
 
+  # Stricter than the live_session's :view_admin, declared here so admin
+  # sections still navigate without a full page reload.
+  on_mount {EmotheWeb.UserAuth, {:ensure_can, :manage_users}}
+
   alias Emothe.Accounts
   alias Emothe.ActivityLog
 
@@ -141,6 +145,8 @@ defmodule EmotheWeb.Admin.UserListLive do
                 </span>
               </td>
               <td>
+                <%!-- Renders the listed user's role. Not an access decision:
+                      those all go through Emothe.Authz.can?/3. --%>
                 <span class={[
                   "badge badge-sm",
                   if(user.role == :admin, do: "badge-primary", else: "badge-ghost")

@@ -21,7 +21,9 @@ defmodule EmotheWeb.UserAcceptInviteLiveTest do
     render_submit(form)
     conn = follow_trigger_action(form, conn)
 
-    assert redirected_to(conn) == ~p"/"
+    # Researchers hold :view_admin since the Authz task, so signed_in_path
+    # sends them to the admin play list rather than the public home page.
+    assert redirected_to(conn) == ~p"/admin/plays"
     assert Accounts.active?(Emothe.Repo.reload!(user))
   end
 

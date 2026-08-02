@@ -29,6 +29,20 @@ defmodule EmotheWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # pipe_through cannot pass options to a plug, so each named permission gets
+  # its own pipeline. Every one of them asks Emothe.Authz.can?/3.
+  pipeline :require_admin_area do
+    plug :require_permission, :view_admin
+  end
+
+  pipeline :require_deploy do
+    plug :require_permission, :deploy_site
+  end
+
+  pipeline :require_dashboard do
+    plug :require_permission, :view_dashboard
+  end
+
   # Public API
   scope "/api/v1", EmotheWeb.API do
     pipe_through :api
@@ -99,13 +113,16 @@ defmodule EmotheWeb.Router do
     delete "/users/log-out", UserSessionController, :delete
   end
 
-  # Admin routes - requires admin role
+  # Admin routes - requires the :view_admin permission
   scope "/admin", EmotheWeb.Admin do
-    pipe_through [:browser, :require_authenticated_user, :require_admin_user]
+    pipe_through [:browser, :require_authenticated_user, :require_admin_area]
 
     live_session :admin,
       layout: {EmotheWeb.Layouts, :admin},
-      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :ensure_admin}] do
+      on_mount: [
+        EmotheWeb.SetLocaleHook,
+        {EmotheWeb.UserAuth, {:ensure_can, :view_admin}}
+      ] do
       live "/plays", PlayListLive, :index
       live "/plays/new", PlayFormLive, :new
       live "/plays/:id/edit", PlayFormLive, :edit
@@ -121,7 +138,6 @@ defmodule EmotheWeb.Router do
     end
 
     # Export endpoints
-    get "/export/download-zip", ExportController, :download_zip
     get "/plays/compare/export/html", ExportController, :compare_html
     get "/plays/:id/export/tei", ExportController, :tei
     get "/plays/:id/export/html", ExportController, :html
@@ -129,11 +145,18 @@ defmodule EmotheWeb.Router do
     get "/plays/:id/export/epub", ExportController, :epub
   end
 
-  # LiveDashboard for admin users (all environments)
+  # Site deployment download sits behind :deploy_site, not :view_admin
+  scope "/admin", EmotheWeb.Admin do
+    pipe_through [:browser, :require_authenticated_user, :require_deploy]
+
+    get "/export/download-zip", ExportController, :download_zip
+  end
+
+  # LiveDashboard, behind :view_dashboard (all environments)
   import Phoenix.LiveDashboard.Router
 
   scope "/admin" do
-    pipe_through [:browser, :require_authenticated_user, :require_admin_user]
+    pipe_through [:browser, :require_authenticated_user, :require_dashboard]
 
     live_dashboard "/dashboard", metrics: EmotheWeb.Telemetry
   end

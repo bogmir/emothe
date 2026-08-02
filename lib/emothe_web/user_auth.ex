@@ -10,6 +10,7 @@ defmodule EmotheWeb.UserAuth do
   use Gettext, backend: EmotheWeb.Gettext
 
   alias Emothe.Accounts
+  alias Emothe.Authz
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -130,8 +131,8 @@ defmodule EmotheWeb.UserAuth do
       on user_token.
       Redirects to login page if there's no logged user.
 
-    * `:ensure_admin` - Same as `:ensure_authenticated` but also
-      checks the user has the admin role.
+    * `{:ensure_can, action}` - Same as `:ensure_authenticated` but also
+      checks `Emothe.Authz.can?/3` for `action`.
 
     * `:redirect_if_user_is_authenticated` - Authenticates the user from the session.
       Redirects to signed_in_path if there's a logged user.
@@ -168,7 +169,7 @@ defmodule EmotheWeb.UserAuth do
     end
   end
 
-  def on_mount(:ensure_admin, _params, session, socket) do
+  def on_mount({:ensure_can, action}, _params, session, socket) do
     socket = mount_current_user(socket, session)
     user = socket.assigns.current_user
 
@@ -176,19 +177,16 @@ defmodule EmotheWeb.UserAuth do
       not Accounts.active?(user) ->
         {:halt, redirect_to_login(socket)}
 
-      not Accounts.admin?(user) ->
+      Authz.can?(user, action) ->
+        {:cont, socket}
+
+      true ->
         socket =
           socket
-          |> Phoenix.LiveView.put_flash(
-            :error,
-            gettext("You must be an admin to access this page.")
-          )
+          |> Phoenix.LiveView.put_flash(:error, gettext("You do not have access to that page."))
           |> Phoenix.LiveView.redirect(to: ~p"/")
 
         {:halt, socket}
-
-      true ->
-        {:cont, socket}
     end
   end
 
@@ -270,23 +268,25 @@ defmodule EmotheWeb.UserAuth do
   end
 
   @doc """
-  Used for routes that require an active admin.
+  Plug requiring a named permission. Takes the action as its option:
+
+      plug :require_permission, :view_admin
   """
-  def require_admin_user(conn, _opts) do
+  def require_permission(conn, action) do
     user = conn.assigns[:current_user]
 
     cond do
       is_nil(user) or not Accounts.active?(user) ->
         require_authenticated_user(conn, [])
 
-      not Accounts.admin?(user) ->
+      Authz.can?(user, action) ->
         conn
-        |> put_flash(:error, gettext("You must be an admin to access this page."))
-        |> redirect(to: ~p"/")
-        |> halt()
 
       true ->
         conn
+        |> put_flash(:error, gettext("You do not have access to that page."))
+        |> redirect(to: ~p"/")
+        |> halt()
     end
   end
 
@@ -309,10 +309,6 @@ defmodule EmotheWeb.UserAuth do
         |> Map.get(:assigns, %{})
         |> Map.get(:current_user)
 
-    if Accounts.admin?(current_user) do
-      ~p"/admin/plays"
-    else
-      ~p"/"
-    end
+    if Authz.can?(current_user, :view_admin), do: ~p"/admin/plays", else: ~p"/"
   end
 end

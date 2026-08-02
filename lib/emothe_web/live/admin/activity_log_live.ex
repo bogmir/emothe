@@ -1,6 +1,8 @@
 defmodule EmotheWeb.Admin.ActivityLogLive do
   use EmotheWeb, :live_view
 
+  on_mount {EmotheWeb.UserAuth, {:ensure_can, :view_activity_log}}
+
   alias Emothe.ActivityLog
   alias Emothe.ActivityLog.Entry
   alias Emothe.Accounts

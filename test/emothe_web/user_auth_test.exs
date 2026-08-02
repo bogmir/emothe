@@ -60,6 +60,26 @@ defmodule EmotheWeb.UserAuthTest do
     end
   end
 
+  describe "researcher access" do
+    test "given a researcher then the admin play list is reachable", %{conn: conn} do
+      conn =
+        conn
+        |> log_in_user(Emothe.TestFixtures.user_fixture(role: :researcher))
+        |> get(~p"/admin/plays")
+
+      assert html_response(conn, 200)
+    end
+
+    test "given a researcher then user management is refused", %{conn: conn} do
+      conn =
+        conn
+        |> log_in_user(Emothe.TestFixtures.user_fixture(role: :researcher))
+        |> get(~p"/admin/users")
+
+      assert redirected_to(conn) == ~p"/"
+    end
+  end
+
   describe "public registration" do
     # The plan expected Phoenix.Router.NoRouteError, but the endpoint's
     # render_errors turns an unmatched route into a plain 404 in test.

@@ -23,7 +23,7 @@ msgstr ""
 
 #: lib/emothe_web/components/core_components.ex:449
 #: lib/emothe_web/live/admin/play_list_live.ex:189
-#: lib/emothe_web/live/admin/user_list_live.ex:133
+#: lib/emothe_web/live/admin/user_list_live.ex:246
 #, elixir-autogen, elixir-format
 msgid "Actions"
 msgstr ""
@@ -81,7 +81,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_form_live.ex:79
 #: lib/emothe_web/live/admin/play_list_live.ex:20
 #: lib/emothe_web/live/admin/play_sources_live.ex:21
-#: lib/emothe_web/live/admin/user_list_live.ex:23
+#: lib/emothe_web/live/admin/user_list_live.ex:221
 #, elixir-autogen, elixir-format
 msgid "Admin"
 msgstr ""
@@ -391,7 +391,7 @@ msgstr ""
 msgid "Element saved."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:129
+#: lib/emothe_web/live/admin/user_list_live.ex:242
 #: lib/emothe_web/live/user_forgot_password_live.ex:15
 #: lib/emothe_web/live/user_login_live.ex:15
 #: lib/emothe_web/live/user_settings_live.ex:21
@@ -656,7 +656,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/activity_log_live.ex:338
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1774
 #: lib/emothe_web/live/admin/play_list_live.ex:290
-#: lib/emothe_web/live/admin/user_list_live.ex:227
+#: lib/emothe_web/live/admin/user_list_live.ex:372
 #: lib/emothe_web/live/play_catalogue_live.ex:151
 #, elixir-autogen, elixir-format
 msgid "Next"
@@ -804,7 +804,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/activity_log_live.ex:328
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1765
 #: lib/emothe_web/live/admin/play_list_live.ex:280
-#: lib/emothe_web/live/admin/user_list_live.ex:217
+#: lib/emothe_web/live/admin/user_list_live.ex:362
 #: lib/emothe_web/live/play_catalogue_live.ex:141
 #, elixir-autogen, elixir-format
 msgid "Previous"
@@ -1452,6 +1452,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_detail_live.ex:141
 #: lib/emothe_web/live/admin/play_editors_live.ex:158
 #: lib/emothe_web/live/admin/play_editors_live.ex:167
+#: lib/emothe_web/live/admin/user_list_live.ex:221
 #: lib/emothe_web/live/play_show_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "Researcher"
@@ -1817,7 +1818,7 @@ msgstr ""
 
 #: lib/emothe_web/live/admin/activity_log_live.ex:331
 #: lib/emothe_web/live/admin/play_list_live.ex:283
-#: lib/emothe_web/live/admin/user_list_live.ex:220
+#: lib/emothe_web/live/admin/user_list_live.ex:365
 #: lib/emothe_web/live/play_catalogue_live.ex:144
 #, elixir-autogen, elixir-format
 msgid "Page %{page} of %{total}"
@@ -1851,7 +1852,8 @@ msgid "Reworking"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_editors_live.ex:218
-#: lib/emothe_web/live/admin/user_list_live.ex:130
+#: lib/emothe_web/live/admin/user_list_live.ex:220
+#: lib/emothe_web/live/admin/user_list_live.ex:243
 #, elixir-autogen, elixir-format
 msgid "Role"
 msgstr ""
@@ -2050,83 +2052,62 @@ msgstr ""
 msgid "Admin - Users"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:131
-#, elixir-autogen, elixir-format
-msgid "Confirmed"
-msgstr ""
-
-#: lib/emothe_web/live/admin/user_list_live.ex:178
+#: lib/emothe_web/live/admin/user_list_live.ex:284
 #, elixir-autogen, elixir-format
 msgid "Demote %{email} to researcher?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:180
+#: lib/emothe_web/live/admin/user_list_live.ex:286
 #, elixir-autogen, elixir-format
 msgid "Demote to researcher"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:82
+#: lib/emothe_web/live/admin/user_list_live.ex:86
 #, elixir-autogen, elixir-format
 msgid "Failed to update role."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:109
+#: lib/emothe_web/live/admin/user_list_live.ex:196
 #, elixir-autogen, elixir-format
 msgid "Manage user roles and email confirmations."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:208
+#: lib/emothe_web/live/admin/user_list_live.ex:353
 #, elixir-autogen, elixir-format
 msgid "No users found."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:189
+#: lib/emothe_web/live/admin/user_list_live.ex:295
 #, elixir-autogen, elixir-format
 msgid "Promote %{email} to admin?"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:191
+#: lib/emothe_web/live/admin/user_list_live.ex:297
 #, elixir-autogen, elixir-format
 msgid "Promote to admin"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:132
-#, elixir-autogen, elixir-format, fuzzy
-msgid "Registered"
-msgstr ""
-
-#: lib/emothe_web/live/admin/user_list_live.ex:119
+#: lib/emothe_web/live/admin/user_list_live.ex:232
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Search by email..."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:106
+#: lib/emothe_web/live/admin/user_list_live.ex:193
 #, elixir-autogen, elixir-format
 msgid "User Management"
 msgstr ""
 
 #: lib/emothe_web/components/layouts.ex:294
-#: lib/emothe_web/live/admin/user_list_live.ex:24
 #, elixir-autogen, elixir-format
 msgid "Users"
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:57
+#: lib/emothe_web/live/admin/user_list_live.ex:67
 #, elixir-autogen, elixir-format
 msgid "You cannot change your own role."
 msgstr ""
 
-#: lib/emothe_web/live/admin/user_list_live.ex:163
-#, elixir-autogen, elixir-format
-msgid "confirmed"
-msgstr ""
-
-#: lib/emothe_web/live/admin/user_list_live.ex:164
-#, elixir-autogen, elixir-format
-msgid "unconfirmed"
-msgstr ""
-
-#: lib/emothe_web/live/admin/user_list_live.ex:144
+#: lib/emothe_web/live/admin/user_list_live.ex:257
 #, elixir-autogen, elixir-format
 msgid "you"
 msgstr ""
@@ -3122,4 +3103,119 @@ msgstr ""
 #: lib/emothe_web/components/layouts/admin.html.heex:26
 #, elixir-autogen, elixir-format
 msgid "Toggle sidebar"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:132
+#, elixir-autogen, elixir-format
+msgid "Account deactivated."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:139
+#, elixir-autogen, elixir-format
+msgid "Account reactivated."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:181
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Active"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:145
+#, elixir-autogen, elixir-format
+msgid "All sessions ended."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:120
+#, elixir-autogen, elixir-format
+msgid "Could not resend that invitation."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:245
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Created"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:325
+#, elixir-autogen, elixir-format
+msgid "Deactivate"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:172
+#, elixir-autogen, elixir-format
+msgid "Deactivated"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:338
+#, elixir-autogen, elixir-format
+msgid "Defined in ADMIN_EMAILS"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:317
+#, elixir-autogen, elixir-format
+msgid "Force logout"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:117
+#, elixir-autogen, elixir-format
+msgid "Invitation resent."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:100
+#, elixir-autogen, elixir-format
+msgid "Invitation sent to %{email}."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:211
+#, elixir-autogen, elixir-format
+msgid "Invite by email"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:178
+#, elixir-autogen, elixir-format
+msgid "Invited"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:224
+#, elixir-autogen, elixir-format
+msgid "Inviting..."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:169
+#, elixir-autogen, elixir-format
+msgid "Protected"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:333
+#, elixir-autogen, elixir-format
+msgid "Reactivate"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:309
+#, elixir-autogen, elixir-format
+msgid "Resend invitation"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:224
+#, elixir-autogen, elixir-format
+msgid "Send invitation"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:244
+#, elixir-autogen, elixir-format, fuzzy
+msgid "State"
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:104
+#, elixir-autogen, elixir-format
+msgid "That account already exists."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:107
+#, elixir-autogen, elixir-format
+msgid "That email address is not valid."
+msgstr ""
+
+#: lib/emothe_web/live/admin/user_list_live.ex:149
+#, elixir-autogen, elixir-format
+msgid "This administrator is defined in ADMIN_EMAILS and cannot be changed here."
 msgstr ""

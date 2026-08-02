@@ -19,10 +19,7 @@ defmodule EmotheWeb.Admin.UserListLive do
      |> assign(:search, "")
      |> assign(:page, 1)
      |> assign(:total_pages, 1)
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Users")}
-     ])}
+     |> assign(:invite_form, to_form(%{"email" => "", "role" => "researcher"}, as: :invite))}
   end
 
   @impl true
@@ -34,14 +31,23 @@ defmodule EmotheWeb.Admin.UserListLive do
     total_pages = max(1, ceil(total / @per_page))
     page = min(page, total_pages)
 
-    users = Accounts.list_users(search: search, page: page, per_page: @per_page)
-
     {:noreply,
      socket
-     |> assign(:users, users)
      |> assign(:search, search)
      |> assign(:page, page)
-     |> assign(:total_pages, total_pages)}
+     |> assign(:total_pages, total_pages)
+     |> load_users()}
+  end
+
+  defp load_users(socket) do
+    users =
+      Accounts.list_users(
+        search: socket.assigns.search,
+        page: socket.assigns.page,
+        per_page: @per_page
+      )
+
+    assign(socket, :users, users)
   end
 
   @impl true
@@ -53,35 +59,94 @@ defmodule EmotheWeb.Admin.UserListLive do
   def handle_event("set_role", %{"id" => id, "role" => role}, socket) do
     user = Accounts.get_user!(id)
 
-    if user.id == socket.assigns.current_user.id do
-      {:noreply, put_flash(socket, :error, gettext("You cannot change your own role."))}
-    else
-      old_role = user.role
+    cond do
+      Accounts.protected_admin?(user) ->
+        {:noreply, put_flash(socket, :error, protected_message())}
 
-      case Accounts.update_user_role(user, role) do
-        {:ok, _user} ->
-          ActivityLog.log!(%{
-            user_id: socket.assigns.current_user.id,
-            action: "role_change",
-            resource_type: "user",
-            resource_id: user.id,
-            changes: %{"role" => [to_string(old_role), role]},
-            metadata: %{email: user.email}
-          })
+      user.id == socket.assigns.current_user.id ->
+        {:noreply, put_flash(socket, :error, gettext("You cannot change your own role."))}
 
-          users =
-            Accounts.list_users(
-              search: socket.assigns.search,
-              page: socket.assigns.page,
-              per_page: @per_page
-            )
+      true ->
+        old_role = user.role
 
-          {:noreply, assign(socket, :users, users)}
+        case Accounts.update_user_role(user, role) do
+          {:ok, _user} ->
+            ActivityLog.log!(%{
+              user_id: socket.assigns.current_user.id,
+              action: "role_change",
+              resource_type: "user",
+              resource_id: user.id,
+              changes: %{"role" => [to_string(old_role), role]},
+              metadata: %{email: user.email}
+            })
 
-        {:error, _changeset} ->
-          {:noreply, put_flash(socket, :error, gettext("Failed to update role."))}
-      end
+            {:noreply, load_users(socket)}
+
+          {:error, _changeset} ->
+            {:noreply, put_flash(socket, :error, gettext("Failed to update role."))}
+        end
     end
+  end
+
+  def handle_event("invite", %{"invite" => %{"email" => email, "role" => role}}, socket) do
+    role = String.to_existing_atom(role)
+
+    case Accounts.invite_user(email, role, socket.assigns.current_user) do
+      {:ok, user, token} ->
+        Accounts.deliver_invite(user, token, &Emothe.Accounts.AdminBootstrap.invite_url/1)
+
+        {:noreply,
+         socket
+         |> put_flash(:info, gettext("Invitation sent to %{email}.", email: email))
+         |> load_users()}
+
+      {:error, :already_active} ->
+        {:noreply, put_flash(socket, :error, gettext("That account already exists."))}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, gettext("That email address is not valid."))}
+    end
+  end
+
+  def handle_event("resend_invite", %{"id" => id}, socket) do
+    user = Accounts.get_user!(id)
+
+    case Accounts.invite_user(user.email, user.role, socket.assigns.current_user) do
+      {:ok, user, token} ->
+        Accounts.deliver_invite(user, token, &Emothe.Accounts.AdminBootstrap.invite_url/1)
+        {:noreply, put_flash(socket, :info, gettext("Invitation resent."))}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, gettext("Could not resend that invitation."))}
+    end
+  end
+
+  def handle_event("deactivate", %{"id" => id}, socket) do
+    user = Accounts.get_user!(id)
+
+    if Accounts.protected_admin?(user) do
+      {:noreply, put_flash(socket, :error, protected_message())}
+    else
+      {:ok, _} = Accounts.deactivate_user(user)
+
+      {:noreply, socket |> put_flash(:info, gettext("Account deactivated.")) |> load_users()}
+    end
+  end
+
+  def handle_event("reactivate", %{"id" => id}, socket) do
+    {:ok, _} = id |> Accounts.get_user!() |> Accounts.reactivate_user()
+
+    {:noreply, socket |> put_flash(:info, gettext("Account reactivated.")) |> load_users()}
+  end
+
+  def handle_event("force_logout", %{"id" => id}, socket) do
+    :ok = id |> Accounts.get_user!() |> Accounts.force_logout()
+
+    {:noreply, put_flash(socket, :info, gettext("All sessions ended."))}
+  end
+
+  defp protected_message do
+    gettext("This administrator is defined in ADMIN_EMAILS and cannot be changed here.")
   end
 
   defp parse_page(nil), do: 1
@@ -95,6 +160,28 @@ defmodule EmotheWeb.Admin.UserListLive do
 
   defp page_params("", page), do: [page: page]
   defp page_params(search, page), do: [search: search, page: page]
+
+  attr :user, :map, required: true
+
+  defp state_badge(assigns) do
+    ~H"""
+    <span :if={Emothe.Accounts.protected_admin?(@user)} class="badge badge-sm badge-neutral">
+      {gettext("Protected")}
+    </span>
+    <span :if={@user.deactivated_at} class="badge badge-sm badge-error">
+      {gettext("Deactivated")}
+    </span>
+    <span
+      :if={is_nil(@user.deactivated_at) and is_nil(@user.confirmed_at)}
+      class="badge badge-sm badge-warning"
+    >
+      {gettext("Invited")}
+    </span>
+    <span :if={Emothe.Accounts.active?(@user)} class="badge badge-sm badge-success">
+      {gettext("Active")}
+    </span>
+    """
+  end
 
   @impl true
   def render(assigns) do
@@ -110,6 +197,32 @@ defmodule EmotheWeb.Admin.UserListLive do
           </p>
         </div>
       </div>
+
+      <.form
+        for={@invite_form}
+        id="invite_form"
+        phx-submit="invite"
+        class="flex gap-2 items-end mb-6"
+      >
+        <div class="flex-1">
+          <.input
+            field={@invite_form[:email]}
+            type="email"
+            label={gettext("Invite by email")}
+            placeholder="persona@uv.es"
+            required
+          />
+        </div>
+        <div>
+          <.input
+            field={@invite_form[:role]}
+            type="select"
+            label={gettext("Role")}
+            options={[{gettext("Researcher"), "researcher"}, {gettext("Admin"), "admin"}]}
+          />
+        </div>
+        <.button phx-disable-with={gettext("Inviting...")}>{gettext("Send invitation")}</.button>
+      </.form>
 
       <form phx-change="search" phx-submit="search" class="mb-5">
         <input
@@ -128,9 +241,9 @@ defmodule EmotheWeb.Admin.UserListLive do
             <tr class="text-xs uppercase tracking-wide text-base-content/60">
               <th>{gettext("Email")}</th>
               <th class="w-28">{gettext("Role")}</th>
-              <th class="w-28">{gettext("Confirmed")}</th>
-              <th class="w-32">{gettext("Registered")}</th>
-              <th class="w-36 text-right">{gettext("Actions")}</th>
+              <th class="w-40">{gettext("State")}</th>
+              <th class="w-32">{gettext("Created")}</th>
+              <th class="w-64 text-right">{gettext("Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -154,15 +267,8 @@ defmodule EmotheWeb.Admin.UserListLive do
                   {user.role}
                 </span>
               </td>
-              <td>
-                <span class={[
-                  "badge badge-sm",
-                  if(user.confirmed_at, do: "badge-success", else: "badge-warning")
-                ]}>
-                  {if user.confirmed_at,
-                    do: gettext("confirmed"),
-                    else: gettext("unconfirmed")}
-                </span>
+              <td class="space-x-1">
+                <.state_badge user={user} />
               </td>
               <td class="text-sm text-base-content/60">
                 {Calendar.strftime(user.inserted_at, "%Y-%m-%d")}
@@ -194,6 +300,45 @@ defmodule EmotheWeb.Admin.UserListLive do
                       </button>
                     <% end %>
                   <% end %>
+                  <button
+                    :if={is_nil(user.confirmed_at) and is_nil(user.deactivated_at)}
+                    class="btn btn-xs btn-ghost"
+                    phx-click="resend_invite"
+                    phx-value-id={user.id}
+                  >
+                    {gettext("Resend invitation")}
+                  </button>
+                  <button
+                    :if={Emothe.Accounts.active?(user)}
+                    class="btn btn-xs btn-ghost"
+                    phx-click="force_logout"
+                    phx-value-id={user.id}
+                  >
+                    {gettext("Force logout")}
+                  </button>
+                  <button
+                    :if={is_nil(user.deactivated_at) and not Emothe.Accounts.protected_admin?(user)}
+                    class="btn btn-xs btn-ghost text-error"
+                    phx-click="deactivate"
+                    phx-value-id={user.id}
+                  >
+                    {gettext("Deactivate")}
+                  </button>
+                  <button
+                    :if={user.deactivated_at}
+                    class="btn btn-xs btn-ghost"
+                    phx-click="reactivate"
+                    phx-value-id={user.id}
+                  >
+                    {gettext("Reactivate")}
+                  </button>
+                  <span
+                    :if={Emothe.Accounts.protected_admin?(user)}
+                    class="tooltip"
+                    data-tip={gettext("Defined in ADMIN_EMAILS")}
+                  >
+                    <.icon name="hero-lock-closed-micro" class="size-4 text-base-content/40" />
+                  </span>
                 </div>
               </td>
             </tr>

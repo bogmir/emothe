@@ -7,7 +7,7 @@
 | S0 — corpus baseline | **done** — `archive/README.md` |
 | S0b — soft delete, re-importable plays | **done** — `archive/README.md` |
 | S1 — work families and language | **done** — `archive/README.md` |
-| S2 — version metadata | **in progress**, one field at a time; S2a has a spec and a plan |
+| S2 — version metadata | **in progress**, one field at a time; S2a done — `archive/README.md`, S2b next |
 | S3–S8 | scoped below, each gets its own plan when it comes up |
 
 Completed plans live in `archive/`, with exactly what shipped, the commit list, and what each
@@ -109,15 +109,17 @@ Everything here is capped at the 22 plays with a `T01` record.
 
 | | Field | Source | Coverage (of 22) | State |
 |---|---|---|---|---|
-| **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 8 with a note | **spec + plan written** |
+| **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 4 with a note | **done** — `archive/README.md` |
 | S2b | `place_of_action` | `pub_LugAccion` | 6 | scoped |
 | S2c | `composition_date` | `pub_datacion` | 6 | scoped — one `<li>` per *competing* dating, so the shape is a genuine open question |
 | S2d | `collection` | `bus_coleccion` | 22 | scoped — 1 EMOTHE, 2 HIE old-spelling quartos, 3 modern-spelling English |
 | S2e | `legacy_url` | `pub_edicionWeb` href | 13 | scoped |
 | S2f | `original_title`, `title_sort` | `pub_TituloObra`, `T00.pub_tituloOrden` | 22 | scoped — both columns and both admin fields already exist, so this is import-only |
 
-**S2a — historical time.** Spec: `../specs/2026-08-02-s2a-historical-time-design.md`. Plan:
-`2026-08-02-s2a-historical-time.md`. Establishes three things every later sub-slice reuses:
+**S2a — historical time. Done, 2026-08-02.** Spec:
+`../specs/2026-08-02-s2a-historical-time-design.md`. Plan and outcome:
+`archive/2026-08-02-s2a-historical-time.md` and the S2a section of `archive/README.md`.
+Establishes three things every later sub-slice reuses:
 
 1. `Filemaker.load_versions/1`, the `T01_tituloEM` reader, keyed by the code in the
    `pub_edicionWeb` href.

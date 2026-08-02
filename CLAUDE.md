@@ -77,6 +77,7 @@ lib/
 └── emothe_web/
     ├── router.ex
     ├── user_auth.ex                  # Auth plugs & LiveView on_mount hooks
+    ├── play_labels.ex                # Translated play metadata vocabularies (historical_time, …)
     ├── live/
     │   ├── play_catalogue_live.ex    # Public: /plays - searchable catalogue
     │   ├── play_show_live.ex         # Public: /plays/:code - play text, characters, stats
@@ -125,7 +126,7 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 
 - `plays.deleted_at` — archiving, not deletion. `Catalogue.delete_play/1` sets it, `restore_play/1` clears it, `purge_play/1` is the destructive path (wired to no button). Every Catalogue read hides archived plays; pass `include_deleted: true` for both or `archived: true` for only the archived ones. The unique index on `plays.code` is deliberately global, so an archived play keeps its code reserved.
 - `play_editors.origin`, `play_sources.origin`, `play_editorial_notes.origin` — `"tei" | "manual" | "filemaker"`, default `"manual"`. A TEI re-import deletes only its own `"tei"` rows, so hand-entered records survive.
-- **Re-importing a TEI file whose code exists updates that play in place** (same `id`, same history, un-archived). It does *not* write `language`, `relationship_type`, `parent_play_id` or `is_complete` — those are `@platform_owned` in `lib/emothe/import/tei_parser.ex`. Any new curated column must be added to that list, or the next re-import erases it.
+- **Re-importing a TEI file whose code exists updates that play in place** (same `id`, same history, un-archived). It does *not* write `language`, `relationship_type`, `parent_play_id`, `is_complete`, `historical_time` or `historical_time_note` — those are `@platform_owned` in `lib/emothe/import/tei_parser.ex`. Any new curated column must be added to that list: for a column the TEI parser emits, the list is what stops the re-import overwriting it; for one it does not emit, the list is what makes the import preview report it as preserved.
 - `TeiParser.preview_import/1` reports what an import would replace and keep, without writing. Used by the admin import page and `mix emothe.import.tei --dry-run`.
 
 ## Routes
@@ -268,13 +269,20 @@ mix emothe.import.tei --dry-run   # report what would happen, write nothing
 mix emothe.import.tei --force     # re-import every file, updating in place
 ```
 
-Correct `language`, `relationship_type` and `parent_play_id` from the FileMaker published index
+Correct `language`, `relationship_type` and `parent_play_id` from the FileMaker published index,
+and bootstrap `historical_time`/`historical_time_note` from the version records
 (`doc/w3emothe_T01_tituloEM.ndjson`, git-ignored):
 
 ```bash
 mix emothe.import.filemaker --dry-run   # print the changes, write nothing
 mix emothe.import.filemaker             # apply them
+mix emothe.import.filemaker --force     # also overwrite curated conflicts
 ```
+
+The derived fields (`language`, `relationship_type`, `parent_play_id`) overwrite unconditionally —
+the index is authoritative. The curated fields (`historical_time`, `historical_time_note`) are
+fill-only: written when blank, reported as a conflict when they differ, overwritten only under
+`--force`.
 
 The TEI header is not authoritative for language — every EMOTHE file carries `xml:lang="es"` for
 the editorial platform. The index's `[EN]`/`[FR]` tag is.
@@ -362,7 +370,8 @@ Then visit:
 ### Low Priority / Future
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
 - [x] **Soft delete & re-importable plays (S0b)** — `plays.deleted_at`, `origin` on the three mixed-ownership child tables, re-import updates in place, import preview + `--dry-run`, admin archive filter and restore. Archived plan: `docs/superpowers/plans/archive/README.md`
-- [ ] **FileMaker version metadata (S2)** — taken one field at a time, each its own migration + import + admin control + row in the public panel. **S2a `historical_time`** has a spec (`docs/superpowers/specs/2026-08-02-s2a-historical-time-design.md`) and a plan (`docs/superpowers/plans/2026-08-02-s2a-historical-time.md`); then S2b `place_of_action`, S2c `composition_date`, S2d `collection`, S2e `legacy_url`, S2f `original_title`/`title_sort`. All capped at the 22 plays with a `T01` record
+- [ ] **FileMaker version metadata (S2)** — taken one field at a time, each its own migration + import + admin control + row in the public panel. **S2a `historical_time` is done** (see below); next is S2b `place_of_action`, then S2c `composition_date`, S2d `collection`, S2e `legacy_url`, S2f `original_title`/`title_sort`. All capped at the 22 plays with a `T01` record
+- [x] **FileMaker historical time (S2a)** — `plays.historical_time` (nine-term vocabulary, `Play.historical_times/0`) and `plays.historical_time_note`. `Filemaker.load_versions/1` reads the `T01_tituloEM` layout keyed by the code in the `pub_edicionWeb` href; `FilemakerSync` writes curated fields **fill-only** — blank columns filled, disagreements reported under `:conflicts` and left alone, overwritten only with `mix emothe.import.filemaker --force`. Edited in the admin form's Research Metadata fieldset, shown in the `#meta-study` section on `/plays/:code`. Labels live in `EmotheWeb.PlayLabels`. Applied to `emothe_dev`: 11 plays, 4 with a note. Archived plan: `docs/superpowers/plans/archive/README.md`
 - [ ] **FileMaker import (S3-S8)** — witnesses, bibliography, historical performances, character reconciliation, credits, genre. Roadmap: `docs/superpowers/plans/2026-08-01-filemaker-import-slices.md`. Governing rule: the export is a bootstrap, not a dependency — every field it carries gets a permanent column *and* an admin form
 - [x] **FileMaker work families and language (S1)** — `Emothe.Import.Filemaker` parses the published index out of the NDJSON export; `Emothe.Import.FilemakerSync` diffs it against the database and writes `language`, `relationship_type` and `parent_play_id`. `mix emothe.import.filemaker [--dry-run] [--path ...]`. Creates nothing; codes absent from the index (every `AL####`) are reported, not failed. Applied to `emothe_dev`: 15 plays corrected, 11 work families linked. Archived plan: `docs/superpowers/plans/archive/README.md`
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting

@@ -124,3 +124,80 @@ never published.
 - **Filter dev SQL noise from mix output:**
   `mix emothe.import.tei 2>&1 | grep -Ev '^\[debug\]|^(SELECT|INSERT|UPDATE|DELETE|BEGIN|COMMIT|ROLLBACK)|↳'`
 - **A minimal TEI fixture produces 2 divisions**, not 1 — the front-matter `elenco` div counts.
+
+---
+
+## S2a — Historical time
+
+**Shipped 2026-08-02.** Plan: `2026-08-02-s2a-historical-time.md`, Tasks 1–7. Spec:
+`../../specs/2026-08-02-s2a-historical-time-design.md`. 299 tests passing.
+
+Every play can now carry a curated historical setting: a period from a nine-term vocabulary and a
+free-prose note. Bootstrapped from the FileMaker export, editable in the admin form, shown in a
+new "Study" section on the public play page.
+
+- `plays.historical_time` (`varchar`) and `plays.historical_time_note` (`text`). The vocabulary
+  lives in `Emothe.Catalogue.Play.historical_times/0` and is enforced with `validate_inclusion`.
+- Both columns are `@platform_owned` in `lib/emothe/import/tei_parser.ex`, so a TEI re-import
+  cannot erase them and the import preview lists them as preserved.
+- `Emothe.Import.Filemaker.load_versions/1` reads the `T01_tituloEM` layout the module previously
+  discarded, keyed by the play code hiding in the `pub_edicionWeb` href — the only place the
+  `HIE####` codes appear. Pure, no database.
+- `FilemakerSync.plan/3` gained a **fill-only** write policy for curated fields: written when
+  blank, reported under `:conflicts` when they differ, overwritten only under
+  `apply_plan(plan, force: true)`. The S1 derived fields keep overwriting unconditionally.
+- `mix emothe.import.filemaker --force` overwrites the conflicts; without it they are printed and
+  left alone.
+- `EmotheWeb.PlayLabels` holds the nine translated labels so the admin select and the public panel
+  share one list.
+
+**Result of the acceptance run against `emothe_dev`:** 11 plays gained a `historical_time`, 4 of
+them with a note, 0 conflicting, 0 failed.
+
+```
+EMOTHE0008|edad_media           EMOTHE0286|antiguedad_clasica
+EMOTHE0010|tiempo_indeterminado (note)   EMOTHE0337|antiguedad_clasica (note)
+EMOTHE0038|antiguedad_clasica (note)     EMOTHE0341|siglo_xvii
+EMOTHE0211|siglo_xvii           EMOTHE0346|siglo_xvii
+EMOTHE0254|tiempo_indeterminado EMOTHE0502|siglo_xv
+EMOTHE0281|siglo_xvii (note)
+```
+
+`EMOTHE0341` appears in both `changes` and `missing`, as designed: it has a T01 research record but
+was never published, so it is absent from the T00 index. `EMOTHE0033` has an empty
+`<ul><li></li></ul>` and no code, so it correctly gets nothing. No `AL####` play was touched.
+
+| Commit | |
+|---|---|
+| `b588bf8` | feat: a curated historical time on plays |
+| `c8016ed` | feat: read historical time out of the FileMaker version records |
+| `2711282` | feat: fill-only sync for curated fields, with a conflicts report |
+| `d17837b` | feat: --force to overwrite curated conflicts, and report them either way |
+| `143c855` | feat: edit a play's historical time in the admin form |
+| `eacd822` | feat: a research metadata panel on the public play page |
+
+### Things this slice learned that its plan did not say
+
+- **`@platform_owned` was never the thing protecting curated columns.** The plan predicted Task 1
+  Step 8 would fail; it passed. A TEI re-import calls `Catalogue.update_play/2` with an attrs map
+  built from the file, and Ecto only changes the keys it is given — a column the parser never
+  emits is preserved whether or not it is on the list. `@platform_owned` matters for columns the
+  parser *does* emit (`language` carries `xml:lang="es"` on every EMOTHE file). Both columns were
+  added anyway: the list is also what the import preview reports as preserved, which is real user
+  value, and it future-proofs the day the parser learns to emit them.
+- **`not opts[:force]` does not compile-and-run.** `not` is strict boolean in Elixir and
+  `OptionParser` yields `nil` for an absent switch, so `not nil` raises `ArgumentError` — and only
+  on the path that has conflicts and no `--force`, i.e. the common one. Use `!`.
+- **A pre-existing async test flake, fixed here.** The S1 test "reports codes that are not in the
+  index" inserted a play with code `AL0514_ElAusenteEnElLugar`, the same code the roundtrip and
+  TEI-validator suites import from the real fixture. Under load the async insert blocked on the
+  unique index on `plays.code` until their sandbox transactions ended, and the statement timed out
+  with `Postgrex.Error 57014 (query_canceled)`. It now uses `AL9999_NoEstaEnElIndice`, a code no
+  fixture uses. **A test that inserts a play must not reuse a code from `test/fixtures/tei_files/`.**
+- **The plan's note count was optimistic.** It predicted 8 of the 11 plays would get a
+  `historical_time_note`; the real export yields 4. `pub_TiemHistorico` is populated for 8 T01
+  records overall, but only 4 of those are plays we have.
+- **The public LiveView suite runs in Spanish.** `assert html =~ "Classical antiquity"` fails;
+  the label renders as `Antigüedad clásica`. The plan warned about this and it happened.
+- **`mix gettext.extract --merge` fuzzy-matched again:** it proposed `"Research Metadata"` →
+  `"Investigador"`. One bad entry out of 15 new strings, caught and corrected.

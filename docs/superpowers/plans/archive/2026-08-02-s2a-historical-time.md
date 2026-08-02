@@ -109,7 +109,7 @@ erasing them. These ship together because a column without its protection is a t
 - Produces: `plays.historical_time :: String.t() | nil`, `plays.historical_time_note :: String.t() | nil`
 - Consumed by: every later task
 
-- [ ] **Step 1: Write the failing changeset tests**
+- [x] **Step 1: Write the failing changeset tests**
 
 Append to `test/emothe/catalogue_test.exs`, inside the outermost `describe` block or at module
 level alongside the existing tests:
@@ -154,7 +154,7 @@ level alongside the existing tests:
   end
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 ```bash
 mix test test/emothe/catalogue_test.exs
@@ -164,7 +164,7 @@ Expected: FAIL. The first test fails because `historical_time` is not a castable
 silently dropped and `play.historical_time` raises `KeyError` on the struct; the fourth fails with
 `function Emothe.Catalogue.Play.historical_times/0 is undefined`.
 
-- [ ] **Step 3: Generate the migration**
+- [x] **Step 3: Generate the migration**
 
 ```bash
 mix ecto.gen.migration add_historical_time_to_plays
@@ -181,13 +181,13 @@ Then **Read** the generated file — it contains an empty `change do end` — an
   end
 ```
 
-- [ ] **Step 4: Run the migration in both environments**
+- [x] **Step 4: Run the migration in both environments**
 
 ```bash
 mix ecto.migrate && MIX_ENV=test mix ecto.migrate
 ```
 
-- [ ] **Step 5: Add the fields, the vocabulary and the validation**
+- [x] **Step 5: Add the fields, the vocabulary and the validation**
 
 In `lib/emothe/catalogue/play.ex`, add the two fields to the schema next to the other string
 fields:
@@ -231,7 +231,7 @@ And the validation, after the `relationship_type` one:
 `validate_inclusion/3` skips `nil` changes, so the nil case passes without extra work — the same
 way `relationship_type` already behaves.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 ```bash
 mix test test/emothe/catalogue_test.exs
@@ -239,7 +239,7 @@ mix test test/emothe/catalogue_test.exs
 
 Expected: PASS.
 
-- [ ] **Step 7: Write the failing re-import regression test**
+- [x] **Step 7: Write the failing re-import regression test**
 
 This is the test that proves a TEI re-import cannot erase a curated value. Append to
 `test/emothe/import/tei_parser_test.exs`:
@@ -267,7 +267,7 @@ This is the test that proves a TEI re-import cannot erase a curated value. Appen
   end
 ```
 
-- [ ] **Step 8: Run it to verify it fails**
+- [x] **Step 8: Run it to verify it fails**
 
 ```bash
 mix test test/emothe/import/tei_parser_test.exs
@@ -280,7 +280,7 @@ attribute map that did not include the curated columns, so they were reset.
 If it *passes* at this point, stop and find out why before continuing — the protection must not
 already exist.
 
-- [ ] **Step 9: Add both columns to `@platform_owned`**
+- [x] **Step 9: Add both columns to `@platform_owned`**
 
 In `lib/emothe/import/tei_parser.ex:23`:
 
@@ -295,7 +295,7 @@ In `lib/emothe/import/tei_parser.ex:23`:
   ]
 ```
 
-- [ ] **Step 10: Run the test to verify it passes**
+- [x] **Step 10: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe/import/tei_parser_test.exs
@@ -303,7 +303,7 @@ mix test test/emothe/import/tei_parser_test.exs
 
 Expected: PASS.
 
-- [ ] **Step 11: Run the whole suite and commit**
+- [x] **Step 11: Run the whole suite and commit**
 
 ```bash
 mix format
@@ -341,7 +341,7 @@ a second reader. Pure functions, no database.
   }
   ```
 
-- [ ] **Step 1: Create the test fixture**
+- [x] **Step 1: Create the test fixture**
 
 Create `test/fixtures/filemaker/versions_sample.ndjson`. Four lines: the `_meta` envelope, a record
 with a code and a note, a record with a code and empty rendered HTML, and a record with two `<li>`
@@ -357,7 +357,7 @@ entries. Copy verbatim — the escaping matters:
 Three things this fixture is testing, deliberately: the accented `Antigüedad clásica` label, the
 `HIE####` code that only exists in the href, and the two-`<li>` record.
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Append to `test/emothe/import/filemaker_test.exs`, inside the module:
 
@@ -400,7 +400,7 @@ Append to `test/emothe/import/filemaker_test.exs`, inside the module:
   end
 ```
 
-- [ ] **Step 3: Run the test to verify it fails**
+- [x] **Step 3: Run the test to verify it fails**
 
 ```bash
 mix test test/emothe/import/filemaker_test.exs
@@ -408,7 +408,7 @@ mix test test/emothe/import/filemaker_test.exs
 
 Expected: FAIL — `function Emothe.Import.Filemaker.load_versions/1 is undefined or private`.
 
-- [ ] **Step 4: Write the implementation**
+- [x] **Step 4: Write the implementation**
 
 In `lib/emothe/import/filemaker.ex`, add the layout name and the vocabulary near the existing
 `@index_layout`:
@@ -519,7 +519,7 @@ non-greedy. Log nothing for it: the note test above pins the behaviour, and a wa
 for two records in the whole export is noise. **Ceiling, recorded:** if a play ever needs both
 periods, this becomes an array column — see open question 5 in the roadmap.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe/import/filemaker_test.exs
@@ -531,7 +531,7 @@ If `historical_time_note` comes back `nil` for `EMOTHE0038`, the `<br/>Note:` sp
 check the fixture line has a literal `<br/>Note: ` with one space, and print
 `Regex.run(@first_item, html)` in IEx against it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 mix format
@@ -584,7 +584,7 @@ fields are written only when the column is blank, and a disagreement becomes a r
 | set, different | a value | `conflicts`, **not** written |
 | anything | blank | nothing — never blanks a set column |
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `test/emothe/import/filemaker_sync_test.exs`, inside the module. The `index/0` and
 `play/2` helpers already exist in that file from S1 — reuse them, do not redefine them:
@@ -695,7 +695,7 @@ Then the tests:
   end
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -703,7 +703,7 @@ mix test test/emothe/import/filemaker_sync_test.exs
 
 Expected: FAIL — `FilemakerSync.plan/3 is undefined or private` on every new test.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 In `lib/emothe/import/filemaker_sync.ex`, extend the module doc so the two policies are not read as
 an inconsistency:
@@ -813,7 +813,7 @@ Add the two curated helpers next to `changes_for/3`:
   defp blank?(_value), do: false
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -825,7 +825,7 @@ The S1 tests call `plan/2`; the default argument keeps them green. If any of the
 `plan.conflicts`, it is because an S1 test asserted the whole plan map by equality — change that
 assertion to check the specific keys and say why in a comment.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 mix format
@@ -848,7 +848,7 @@ git commit -m "feat: fill-only sync for curated fields, with a conflicts report"
 - Produces: `FilemakerSync.apply_plan(plan, opts)` where `opts` accepts `:user_id` (as today) and
   `force: boolean()` (default `false`). With `force: true` every conflict is written too.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append inside the `describe "curated fields are fill-only"` block from Task 3:
 
@@ -880,7 +880,7 @@ Append inside the `describe "curated fields are fill-only"` block from Task 3:
     end
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -890,7 +890,7 @@ Expected: the force test FAILS on `assert ... == "antiguedad_clasica"` with
 `left: "edad_media"`. The second test may already pass — that is fine, it is the guard that stops
 a later change quietly turning fill-only into overwrite.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 In `lib/emothe/import/filemaker_sync.ex`, replace `apply_plan/2`:
 
@@ -964,7 +964,7 @@ In `lib/emothe/import/filemaker_sync.ex`, replace `apply_plan/2`:
   end
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 ```bash
 mix test test/emothe/import/filemaker_sync_test.exs
@@ -972,7 +972,7 @@ mix test test/emothe/import/filemaker_sync_test.exs
 
 Expected: PASS, 16 tests.
 
-- [ ] **Step 5: Wire the mix task**
+- [x] **Step 5: Wire the mix task**
 
 In `lib/mix/tasks/emothe.import.filemaker.ex`, add `force` to the switches:
 
@@ -1041,7 +1041,7 @@ Finally document it in the `@moduledoc`:
       mix emothe.import.filemaker --force            # also overwrite curated conflicts
 ```
 
-- [ ] **Step 6: Verify the task compiles and the dry run works**
+- [x] **Step 6: Verify the task compiles and the dry run works**
 
 ```bash
 mix compile --warnings-as-errors
@@ -1052,7 +1052,7 @@ Expected: the same 15 plays S1 already corrected are now `0 to change` (S1 appli
 plays gain a `historical_time`. `0 conflicting`, because nothing has been curated by hand yet.
 Record the actual counts — Task 7 compares against them.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 mix format
@@ -1077,7 +1077,7 @@ git commit -m "feat: --force to overwrite curated conflicts, and report them eit
   - `EmotheWeb.PlayLabels.historical_time_options() :: [{String.t(), String.t()}]` — `{label, slug}`
     pairs with a leading blank, ready for `<.input type="select" options={...}>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `test/emothe_web/live/admin/play_form_live_test.exs`, inside the existing
 `describe "Play form behaviors"` block. That file already has a `log_in_admin/1` helper and aliases
@@ -1114,7 +1114,7 @@ Append to `test/emothe_web/live/admin/play_form_live_test.exs`, inside the exist
 `title` and `code` are resubmitted because they are `validate_required` — omitting them makes the
 changeset invalid and the test fails for the wrong reason.
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 ```bash
 mix test test/emothe_web/live/admin/play_form_live_test.exs
@@ -1122,7 +1122,7 @@ mix test test/emothe_web/live/admin/play_form_live_test.exs
 
 Expected: FAIL on the `has_element?` assertion — the select does not exist.
 
-- [ ] **Step 3: Create the labels module**
+- [x] **Step 3: Create the labels module**
 
 Create `lib/emothe_web/play_labels.ex`:
 
@@ -1164,7 +1164,7 @@ Check the gettext backend name against an existing LiveView before writing this 
 `use EmotheWeb, :verified_routes`-style helpers or an older `import EmotheWeb.Gettext`, match what
 `lib/emothe_web/live/play_show_live.ex` does.
 
-- [ ] **Step 4: Add the fieldset to the form**
+- [x] **Step 4: Add the fieldset to the form**
 
 In `lib/emothe_web/live/admin/play_form_live.ex`, add the alias at the top of the module:
 
@@ -1203,7 +1203,7 @@ so the form stays visually consistent:
         </div>
 ```
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 ```bash
 mix test test/emothe_web/live/admin/play_form_live_test.exs
@@ -1211,7 +1211,7 @@ mix test test/emothe_web/live/admin/play_form_live_test.exs
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 mix format
@@ -1232,7 +1232,7 @@ git commit -m "feat: edit a play's historical time in the admin form"
 **Interfaces:**
 - Consumes: `EmotheWeb.PlayLabels.historical_time_label/1` from Task 5
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `test/emothe_web/live/play_show_live_test.exs`, at module level alongside the existing
 tests. That file aliases `Emothe.TestFixtures` and imports `Phoenix.LiveViewTest` already:
@@ -1268,7 +1268,7 @@ tests. That file aliases `Emothe.TestFixtures` and imports `Phoenix.LiveViewTest
 fails while `#meta-study` is present, assert on `"Antigüedad clásica"` instead — and say so in a
 comment, because the reason is not obvious to the next reader.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 ```bash
 mix test test/emothe_web/live/play_show_live_test.exs
@@ -1277,7 +1277,7 @@ mix test test/emothe_web/live/play_show_live_test.exs
 Expected: the first FAILS on `assert html =~ "meta-study"`; the second passes, which is correct —
 it is the guard that the section really is conditional.
 
-- [ ] **Step 3: Add the section and the sidebar entry**
+- [x] **Step 3: Add the section and the sidebar entry**
 
 In `lib/emothe_web/live/play_show_live.ex`, add the alias at the top of the module:
 
@@ -1324,7 +1324,7 @@ after Overview and before Source, which is the order the sections appear in the 
   end
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 ```bash
 mix test test/emothe_web/live/play_show_live_test.exs
@@ -1332,7 +1332,7 @@ mix test test/emothe_web/live/play_show_live_test.exs
 
 Expected: PASS.
 
-- [ ] **Step 5: Add the Spanish translations**
+- [x] **Step 5: Add the Spanish translations**
 
 ```bash
 mix gettext.extract --merge
@@ -1362,7 +1362,7 @@ Then open `priv/gettext/es/LC_MESSAGES/default.po` and fill in every new `msgid`
 in the last slice it turned `"Restore"` into `"Nueva fuente"`. Check every entry it marked
 `#, fuzzy`, fix the wrong ones, and remove the `fuzzy` flag from the ones you corrected.
 
-- [ ] **Step 6: Run the whole suite and commit**
+- [x] **Step 6: Run the whole suite and commit**
 
 ```bash
 mix format
@@ -1379,7 +1379,7 @@ git commit -m "feat: a research metadata panel on the public play page"
 
 **Files:** none — this is the acceptance pass.
 
-- [ ] **Step 1: Snapshot the current state**
+- [x] **Step 1: Snapshot the current state**
 
 ```bash
 PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAF'|' \
@@ -1390,7 +1390,7 @@ grep -cv '|-$' /tmp/historical-before.txt
 
 Expected: `0` — nothing has a historical time yet.
 
-- [ ] **Step 2: Dry run**
+- [x] **Step 2: Dry run**
 
 ```bash
 mix emothe.import.filemaker --dry-run 2>&1 | grep -Ev '^\[debug\]|^(SELECT|INSERT|UPDATE|DELETE|BEGIN|COMMIT|ROLLBACK)|↳'
@@ -1408,7 +1408,7 @@ exactly this; if the dry run omits it here, that test is passing for the wrong r
 
 `EMOTHE0033` has an empty `<ul><li></li></ul>` and no code, so it correctly gets nothing.
 
-- [ ] **Step 3: Apply**
+- [x] **Step 3: Apply**
 
 ```bash
 mix emothe.import.filemaker 2>&1 | grep -Ev '^\[debug\]|^(SELECT|INSERT|UPDATE|DELETE|BEGIN|COMMIT|ROLLBACK)|↳' | tail -5
@@ -1416,7 +1416,7 @@ mix emothe.import.filemaker 2>&1 | grep -Ev '^\[debug\]|^(SELECT|INSERT|UPDATE|D
 
 Expected: `updated 11, failed 0`.
 
-- [ ] **Step 4: Verify the writes**
+- [x] **Step 4: Verify the writes**
 
 ```bash
 PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAF'|' -c \
@@ -1432,7 +1432,7 @@ EMOTHE0038|antiguedad_clasica|First century BC. The play dramatizes eve
 EMOTHE0211|siglo_xvii|-
 ```
 
-- [ ] **Step 5: Verify the fill-only policy against the live database**
+- [x] **Step 5: Verify the fill-only policy against the live database**
 
 ```bash
 PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -c \
@@ -1452,7 +1452,7 @@ PGPASSWORD=postgres psql -U postgres -h localhost -d emothe_dev -tAc \
 
 Expected: `antiguedad_clasica`.
 
-- [ ] **Step 6: Look at the app**
+- [x] **Step 6: Look at the app**
 
 ```bash
 mix phx.server
@@ -1468,7 +1468,7 @@ running and you can use it. Check:
 - `/admin/plays/<id>/edit` — the Research Metadata fieldset saves and reloads correctly
 - switch the locale to Spanish and confirm the panel reads "Tiempo histórico" / "Antigüedad clásica"
 
-- [ ] **Step 7: Run the whole suite**
+- [x] **Step 7: Run the whole suite**
 
 ```bash
 mix test
@@ -1476,7 +1476,7 @@ mix test
 
 Expected: PASS. 277 before this slice, plus roughly 18 new.
 
-- [ ] **Step 8: Update the docs and commit**
+- [x] **Step 8: Update the docs and commit**
 
 - Tick every checkbox in this plan.
 - Move this file to `docs/superpowers/plans/archive/` and add an S2a section to

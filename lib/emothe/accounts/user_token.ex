@@ -13,12 +13,14 @@ defmodule Emothe.Accounts.UserToken do
   @reset_password_validity_in_days 1
   @change_email_validity_in_days 7
   @invite_validity_in_days 7
-  @session_validity_in_days 60
+  @session_validity_in_days 30
 
   schema "users_tokens" do
     field :token, :binary
     field :context, :string
     field :sent_to, :string
+    field :ip_address, :string
+    field :user_agent, :string
 
     belongs_to :user, Emothe.Accounts.User
 
@@ -26,28 +28,31 @@ defmodule Emothe.Accounts.UserToken do
   end
 
   @doc """
-  Generates a token that will be stored in a signed place,
-  such as session or cookie. As they are signed, those
-  tokens do not need to be hashed.
+  Builds a session token, recording where it was issued.
 
-  The reason why we store session tokens in the database, even
-  though Phoenix already provides a session cookie, is because
-  Phoenix' default session cookies are not persisted, they are
-  simply signed and potentially encrypted. This means they are
-  valid indefinitely, unless you change the signing/encryption
-  salt.
+  Session tokens live in the database — not only in the signed cookie — so
+  that individual sessions can be expired.
 
-  Therefore, storing them allows individual user
-  sessions to be expired. The token system can also be extended
-  to store additional data, such as the device used for logging in.
-  You could then use this information to display all valid sessions
-  and devices in the UI and allow users to explicitly expire any
-  session they deem invalid.
+  `device_info` may carry `:ip_address` and `:user_agent`. They exist so the
+  "active sessions" list is legible — a bare timestamp tells nobody which row
+  is theirs. They are not identity: both change constantly and neither may
+  ever be treated as an authentication factor.
   """
-  def build_session_token(user) do
+  def build_session_token(user, device_info \\ %{}) do
     token = :crypto.strong_rand_bytes(@rand_size)
-    {token, %Emothe.Accounts.UserToken{token: token, context: "session", user_id: user.id}}
+
+    {token,
+     %Emothe.Accounts.UserToken{
+       token: token,
+       context: "session",
+       user_id: user.id,
+       ip_address: Map.get(device_info, :ip_address),
+       user_agent: device_info |> Map.get(:user_agent) |> truncate(255)
+     }}
   end
+
+  defp truncate(nil, _length), do: nil
+  defp truncate(string, length), do: String.slice(string, 0, length)
 
   @doc """
   Checks if the token is valid and returns its underlying lookup query.

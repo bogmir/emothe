@@ -74,6 +74,53 @@ defmodule EmotheWeb.UserSettingsLive do
           </:actions>
         </.simple_form>
       </div>
+      <div>
+        <.header class="text-lg">
+          {gettext("Active sessions")}
+          <:subtitle>
+            {gettext("Where your account is currently signed in.")}
+          </:subtitle>
+        </.header>
+
+        <table class="table table-sm mt-4">
+          <thead>
+            <tr>
+              <th>{gettext("Signed in")}</th>
+              <th>{gettext("Address")}</th>
+              <th>{gettext("Browser")}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr :for={session <- @sessions}>
+              <td>{Calendar.strftime(session.inserted_at, "%Y-%m-%d %H:%M")}</td>
+              <td class="font-mono text-xs">{session.ip_address || "—"}</td>
+              <td class="max-w-xs truncate text-xs">{session.user_agent || "—"}</td>
+              <td class="text-right">
+                <span :if={session.token == @current_token} class="badge badge-sm badge-primary">
+                  {gettext("This device")}
+                </span>
+                <button
+                  :if={session.token != @current_token}
+                  class="btn btn-xs btn-ghost text-error"
+                  phx-click="revoke_session"
+                  phx-value-id={session.id}
+                >
+                  {gettext("Revoke")}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button
+          :if={length(@sessions) > 1}
+          class="btn btn-sm btn-outline btn-error mt-4"
+          phx-click="revoke_other_sessions"
+        >
+          {gettext("Sign out everywhere else")}
+        </button>
+      </div>
     </div>
     """
   end
@@ -91,7 +138,7 @@ defmodule EmotheWeb.UserSettingsLive do
     {:ok, push_navigate(socket, to: ~p"/users/settings")}
   end
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     user = socket.assigns.current_user
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
@@ -104,8 +151,14 @@ defmodule EmotheWeb.UserSettingsLive do
       |> assign(:email_form, to_form(email_changeset, as: "user"))
       |> assign(:password_form, to_form(password_changeset, as: "user"))
       |> assign(:trigger_submit, false)
+      |> assign(:current_token, session["user_token"])
+      |> assign_sessions()
 
     {:ok, socket}
+  end
+
+  defp assign_sessions(socket) do
+    assign(socket, :sessions, Accounts.list_user_sessions(socket.assigns.current_user))
   end
 
   def handle_event("validate_email", params, socket) do
@@ -169,5 +222,27 @@ defmodule EmotheWeb.UserSettingsLive do
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset, as: "user"))}
     end
+  end
+
+  def handle_event("revoke_session", %{"id" => id}, socket) do
+    :ok = Accounts.delete_user_session(socket.assigns.current_user, id)
+
+    {:noreply,
+     socket
+     |> put_flash(:info, gettext("Session revoked."))
+     |> assign_sessions()}
+  end
+
+  def handle_event("revoke_other_sessions", _params, socket) do
+    :ok =
+      Accounts.delete_other_user_sessions(
+        socket.assigns.current_user,
+        socket.assigns.current_token
+      )
+
+    {:noreply,
+     socket
+     |> put_flash(:info, gettext("Signed out of all other sessions."))
+     |> assign_sessions()}
   end
 end

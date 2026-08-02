@@ -91,4 +91,61 @@ defmodule Emothe.AccountsTest do
       assert Repo.all(from t in UserToken, where: t.user_id == ^user.id) == []
     end
   end
+
+  describe "sessions" do
+    test "given a login with device info then it is stored and listable" do
+      user = user_fixture()
+
+      Accounts.generate_user_session_token(user, %{
+        ip_address: "10.0.0.7",
+        user_agent: "Firefox/141"
+      })
+
+      assert [session] = Accounts.list_user_sessions(user)
+      assert session.ip_address == "10.0.0.7"
+      assert session.user_agent == "Firefox/141"
+    end
+
+    test "given several sessions then deleting one leaves the others" do
+      user = user_fixture()
+      Accounts.generate_user_session_token(user)
+      Accounts.generate_user_session_token(user)
+
+      [first | _] = Accounts.list_user_sessions(user)
+      assert :ok = Accounts.delete_user_session(user, first.id)
+
+      assert length(Accounts.list_user_sessions(user)) == 1
+    end
+
+    test "given several sessions then delete_other_user_sessions keeps only the current one" do
+      user = user_fixture()
+      current = Accounts.generate_user_session_token(user)
+      Accounts.generate_user_session_token(user)
+      Accounts.generate_user_session_token(user)
+
+      assert :ok = Accounts.delete_other_user_sessions(user, current)
+
+      assert [remaining] = Accounts.list_user_sessions(user)
+      assert remaining.token == current
+    end
+
+    test "given force_logout then every session is gone" do
+      user = user_fixture()
+      Accounts.generate_user_session_token(user)
+      Accounts.generate_user_session_token(user)
+
+      assert :ok = Accounts.force_logout(user)
+      assert Accounts.list_user_sessions(user) == []
+    end
+
+    test "given another user's token id then deleting it is refused" do
+      mine = user_fixture()
+      theirs = user_fixture()
+      Accounts.generate_user_session_token(theirs)
+      [their_session] = Accounts.list_user_sessions(theirs)
+
+      assert :ok = Accounts.delete_user_session(mine, their_session.id)
+      assert length(Accounts.list_user_sessions(theirs)) == 1
+    end
+  end
 end

@@ -21,28 +21,35 @@ defmodule EmotheWeb.UserSessionController do
   defp create(conn, %{"user" => user_params}, info) do
     %{"email" => email, "password" => password} = user_params
     ip = conn.remote_ip |> :inet.ntoa() |> to_string()
+    email_key = "login-email:#{String.downcase(email)}"
 
-    case EmotheWeb.RateLimit.check_rate("login:#{ip}", 20, 60_000) do
+    # Two keys: a broad per-IP cap against bots, and a narrow per-email cap
+    # against guessing one known account. Deliberately a rate limit rather
+    # than an account lock — a lock would let a stranger shut a named admin
+    # out of their own site.
+    with :ok <- EmotheWeb.RateLimit.check_rate("login:#{ip}", 20, 60_000),
+         :ok <- EmotheWeb.RateLimit.check_rate(email_key, 10, 900_000) do
+      if user = Accounts.get_user_by_email_and_password(email, password) do
+        EmotheWeb.RateLimit.reset(email_key)
+
+        conn
+        |> put_flash(:info, info)
+        |> UserAuth.log_in_user(user, user_params)
+      else
+        # Don't disclose whether the email is registered.
+        conn
+        |> put_flash(:error, gettext("Invalid email or password"))
+        |> put_flash(:email, String.slice(email, 0, 160))
+        |> redirect(to: ~p"/users/log-in")
+      end
+    else
       {:error, :rate_limited} ->
         conn
         |> put_flash(
           :error,
-          gettext("Too many login attempts. Please wait a minute and try again.")
+          gettext("Too many login attempts. Please wait a few minutes and try again.")
         )
         |> redirect(to: ~p"/users/log-in")
-
-      :ok ->
-        if user = Accounts.get_user_by_email_and_password(email, password) do
-          conn
-          |> put_flash(:info, info)
-          |> UserAuth.log_in_user(user, user_params)
-        else
-          # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
-          conn
-          |> put_flash(:error, gettext("Invalid email or password"))
-          |> put_flash(:email, String.slice(email, 0, 160))
-          |> redirect(to: ~p"/users/log-in")
-        end
     end
   end
 

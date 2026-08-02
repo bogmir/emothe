@@ -12,10 +12,8 @@ defmodule EmotheWeb.UserAuth do
   alias Emothe.Accounts
   alias Emothe.Authz
 
-  # Make the remember me cookie valid for 60 days.
-  # If you want bump or reduce this value, also change
-  # the token expiry itself in UserToken.
-  @max_age 60 * 60 * 24 * 60
+  # Keep in step with @session_validity_in_days in UserToken.
+  @max_age 60 * 60 * 24 * 30
   @remember_me_cookie "_emothe_web_user_remember_me"
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
 
@@ -31,7 +29,7 @@ defmodule EmotheWeb.UserAuth do
   disconnected on log out.
   """
   def log_in_user(conn, user, params \\ %{}) do
-    token = Accounts.generate_user_session_token(user)
+    token = Accounts.generate_user_session_token(user, device_info(conn))
     user_return_to = get_session(conn, :user_return_to)
 
     conn
@@ -39,6 +37,13 @@ defmodule EmotheWeb.UserAuth do
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params)
     |> redirect(to: user_return_to || signed_in_path(conn, user))
+  end
+
+  defp device_info(conn) do
+    %{
+      ip_address: conn.remote_ip |> :inet.ntoa() |> to_string(),
+      user_agent: conn |> get_req_header("user-agent") |> List.first()
+    }
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do

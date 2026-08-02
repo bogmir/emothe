@@ -40,4 +40,14 @@ defmodule EmotheWeb.RateLimit do
         :ok
     end
   end
+
+  @doc """
+  Clears the counter for `key`. Called after a successful login so only
+  failures consume the budget.
+  """
+  @spec reset(String.t()) :: :ok
+  def reset(key) do
+    :ets.delete(@table, key)
+    :ok
+  end
 end

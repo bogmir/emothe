@@ -284,12 +284,73 @@ defmodule Emothe.Accounts do
   ## Session
 
   @doc """
-  Generates a session token.
+  Generates a session token, optionally recording the issuing device.
   """
-  def generate_user_session_token(user) do
-    {token, user_token} = UserToken.build_session_token(user)
+  def generate_user_session_token(user, device_info \\ %{}) do
+    {token, user_token} = UserToken.build_session_token(user, device_info)
     Repo.insert!(user_token)
     token
+  end
+
+  @doc """
+  Lists the user's session tokens, newest first.
+  """
+  def list_user_sessions(%User{} = user) do
+    from(t in UserToken,
+      where: t.user_id == ^user.id and t.context == "session",
+      order_by: [desc: t.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
+  Deletes one of the user's own sessions by token id.
+
+  Scoped by `user_id`: the id arrives from the browser, so an unscoped query
+  would let one user end another's session.
+  """
+  def delete_user_session(%User{} = user, token_id) do
+    from(t in UserToken,
+      where: t.user_id == ^user.id and t.context == "session" and t.id == ^token_id
+    )
+    |> Repo.all()
+    |> disconnect_and_delete()
+  end
+
+  @doc """
+  Deletes every session except the one identified by `current_token`.
+  """
+  def delete_other_user_sessions(%User{} = user, current_token) do
+    from(t in UserToken,
+      where: t.user_id == ^user.id and t.context == "session" and t.token != ^current_token
+    )
+    |> Repo.all()
+    |> disconnect_and_delete()
+  end
+
+  @doc """
+  Deletes every session the user holds. Used by admins to evict someone.
+  """
+  def force_logout(%User{} = user) do
+    from(t in UserToken, where: t.user_id == ^user.id and t.context == "session")
+    |> Repo.all()
+    |> disconnect_and_delete()
+  end
+
+  # The topic must match the live_socket_id written in put_token_in_session/2,
+  # so open LiveViews drop at once instead of on their next navigation.
+  defp disconnect_and_delete(tokens) do
+    Enum.each(tokens, fn token ->
+      EmotheWeb.Endpoint.broadcast(
+        "users_sessions:#{Base.url_encode64(token.token)}",
+        "disconnect",
+        %{}
+      )
+
+      Repo.delete!(token)
+    end)
+
+    :ok
   end
 
   @doc """
@@ -413,15 +474,17 @@ defmodule Emothe.Accounts do
   references this row.
   """
   def deactivate_user(%User{} = user) do
+    tokens = Repo.all(UserToken.by_user_and_contexts_query(user, :all))
+
     changeset = Ecto.Changeset.change(user, deactivated_at: DateTime.utc_now(:second))
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, :all))
-    |> Repo.transaction()
-    |> case do
-      {:ok, %{user: user}} -> {:ok, user}
-      {:error, :user, changeset, _} -> {:error, changeset}
+    case Repo.update(changeset) do
+      {:ok, user} ->
+        disconnect_and_delete(tokens)
+        {:ok, user}
+
+      {:error, changeset} ->
+        {:error, changeset}
     end
   end
 

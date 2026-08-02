@@ -92,11 +92,15 @@ defmodule Emothe.Import.FilemakerSyncTest do
   end
 
   test "reports codes that are not in the index instead of failing" do
-    artelope = play("AL0514_ElAusenteEnElLugar")
+    # Deliberately a code no TEI fixture uses. AL0514_ElAusenteEnElLugar is imported by
+    # the roundtrip and TEI-validator suites, and this async insert then blocks on the
+    # unique index on plays.code until their transactions end — a statement timeout
+    # under load, not a logic failure.
+    artelope = play("AL9999_NoEstaEnElIndice")
 
     plan = FilemakerSync.plan(index(), [artelope])
 
-    assert plan.missing == ["AL0514"]
+    assert plan.missing == ["AL9999"]
     assert plan.changes == []
   end
 

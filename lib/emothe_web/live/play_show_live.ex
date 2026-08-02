@@ -7,6 +7,7 @@ defmodule EmotheWeb.PlayShowLive do
   alias Emothe.Catalogue
   alias Emothe.PlayContent
   alias Emothe.Statistics
+  alias EmotheWeb.PlayLabels
 
   @impl true
   def mount(%{"code" => code}, _session, socket) do
@@ -321,6 +322,23 @@ defmodule EmotheWeb.PlayShowLive do
             </p>
           </header>
 
+          <%!-- Research metadata --%>
+          <section
+            :if={@play.historical_time}
+            id="meta-study"
+            class="mb-8 max-w-2xl mx-auto scroll-mt-20 text-sm"
+          >
+            <dl class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1">
+              <dt class="text-base-content/50">{gettext("Historical time")}</dt>
+              <dd>
+                {PlayLabels.historical_time_label(@play.historical_time)}
+                <p :if={@play.historical_time_note} class="mt-1 text-xs text-base-content/60">
+                  {@play.historical_time_note}
+                </p>
+              </dd>
+            </dl>
+          </section>
+
           <%!-- Editorial notes (text view only) --%>
           <div
             :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}
@@ -370,6 +388,7 @@ defmodule EmotheWeb.PlayShowLive do
     base = [%{id: "meta-overview", label: gettext("Overview")}]
 
     base
+    |> maybe_add_section(play.historical_time != nil, "meta-study", gettext("Study"))
     |> maybe_add_section(play.sources != [], "meta-sources", gettext("Source"))
     |> maybe_add_section(play.editors != [], "meta-editors", gettext("Editors"))
     |> Kernel.++(build_editorial_note_sections(play.editorial_notes))

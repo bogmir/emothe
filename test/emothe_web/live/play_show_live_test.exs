@@ -48,4 +48,30 @@ defmodule EmotheWeb.PlayShowLiveTest do
     assert has_element?(view, "#scroll-spy-nav a[href='#meta-editors']")
     assert has_element?(view, "#scroll-spy-nav a[href='#meta-note-1']")
   end
+
+  test "renders the research metadata panel when the play has a historical time", %{conn: conn} do
+    play =
+      TestFixtures.play_fixture(%{
+        "historical_time" => "antiguedad_clasica",
+        "historical_time_note" => "First century BC."
+      })
+
+    {:ok, view, html} = live(conn, ~p"/plays/#{play.code}")
+
+    assert has_element?(view, "#meta-study")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
+    # This suite runs in Spanish (see the "no puede estar en blanco" assertion above),
+    # so the gettext label renders translated, not as the msgid.
+    assert html =~ "Antigüedad clásica"
+    assert html =~ "First century BC."
+  end
+
+  test "omits the research metadata panel when there is no historical time", %{conn: conn} do
+    play = TestFixtures.play_fixture()
+
+    {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
+
+    refute has_element?(view, "#meta-study")
+    refute has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
+  end
 end

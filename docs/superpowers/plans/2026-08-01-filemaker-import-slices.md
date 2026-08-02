@@ -1,9 +1,17 @@
 # FileMaker Import — Feature Slices (roadmap)
 
-**Status:** written 2026-08-01. S0 is done. Slices with a full implementation plan:
-S1 — `docs/superpowers/plans/2026-08-01-s1-work-families-and-language.md`;
-S0b — `docs/superpowers/plans/2026-08-01-soft-delete-and-reimport.md`.
-The rest are scoped here and get their own plan when they come up.
+**Status:** written 2026-08-01, revised 2026-08-02.
+
+| Slice | State |
+|---|---|
+| S0 — corpus baseline | **done** — `archive/README.md` |
+| S0b — soft delete, re-importable plays | **done** — `archive/README.md` |
+| S1 — work families and language | **done** — `archive/README.md` |
+| S2 — version metadata | **in progress**, one field at a time; S2a has a spec and a plan |
+| S3–S8 | scoped below, each gets its own plan when it comes up |
+
+Completed plans live in `archive/`, with exactly what shipped, the commit list, and what each
+slice learned that its plan did not say. Read that before starting a new slice.
 
 **Interactive companion:** `doc/filemaker-import-analysis.html` — field-by-field verdicts,
 work families, and the exact corrections slice 1 makes. Regenerate after any corpus change:
@@ -60,10 +68,11 @@ Consequences, measured:
 | …of which Artelope (`AL####`) | 19 | absent from this export entirely — they get nothing, ever, from FileMaker |
 | …covered by the published index | 62 | these get language, work family, credits |
 | …with a `T01` research record | 22 | hard ceiling for metadata, witnesses, bibliography, performances |
-| Currently imported into `emothe_dev` | 8 | 3 of them have a wrong language or relationship today |
+| Imported into `emothe_dev` | 82 | all of them, since S0 |
 
-That 62 / 22 split is why the index slice goes first: it is the only one that touches most of the
-corpus, and it needs no new columns.
+That 62 / 22 split is why the index slice went first: it is the only one that touches most of the
+corpus, and it needed no new columns. Everything from S2 on is capped at those 22 plays, so the
+panel and the tables it fills will be empty for 60 of 82 — by design, not by omission.
 
 ## The join, once
 
@@ -81,79 +90,49 @@ T00._IdIndiceCtce = T01._IdObraEmothe   the work family — validated, 152 works
 
 Each slice is a vertical: parse → persist → show. Each ends with something visible in the app.
 
-### S0 — Corpus baseline *(prerequisite, folded into S1's plan as Task 1)*
+### S0, S0b, S1 — done
 
-Import the 82 local TEI files so the later slices have rows to attach to. Dedupe by code, skip
-codes already present unless forced.
+Corpus baseline, soft delete and re-importable plays, work families and language. What shipped,
+the commit list, and the traps each one hit: **`archive/README.md`**.
 
-- **From:** the files themselves, no FileMaker data
-- **Into:** `plays`, `characters`, `divisions`, `elements`
-- **Scale:** 82 plays (8 already done)
-- **Done when:** `mix emothe.import.tei` imports every file the admin UI would, idempotently
+The one rule they leave behind that binds everything below: **a new curated `plays` column gets
+appended to `@platform_owned` in `lib/emothe/import/tei_parser.ex`, or the next TEI re-import
+erases it.** A new child table either carries `origin` or stays outside the importer's reach.
 
-**Done 2026-08-01:** 81 of 82 imported — 19 `AL####`, 62 `EMOTHE`/`HIE`, which is exactly the set
-S1 needs. `EMOTHE0730_LaMariana` failed on a front-matter `<head>` longer than
-`play_divisions.title`'s `varchar(255)`; fixed in S0b Task 3.
+### S2 — Version metadata panel *(in progress, one field at a time)*
 
-### S0b — Soft delete, re-importable plays, protected hand-entered data *(has a full plan)*
+The research metadata that has no home in TEI. Taken **field by field**: each sub-slice is its own
+migration, import, admin control and row in the panel, and ships before the next starts. The first
+one builds the panel; the rest add rows to it.
 
-`docs/superpowers/plans/2026-08-01-soft-delete-and-reimport.md`. Carries no FileMaker data at all —
-it is the slice that makes "the database is the thing of record" true, so every slice after it can
-put its data behind an admin form and stop depending on the export.
+Everything here is capped at the 22 plays with a `T01` record.
 
-Three problems, one fix. Deleting a play is `Repo.delete` today: it destroys the row, its content,
-its activity history and its children's `parent_play_id`. Re-importing a TEI file whose code exists
-rolls back with `{:play_already_exists, code}`, so `mix emothe.import.tei --force` fails on all 81
-plays. And nothing distinguishes a row the importer created from a row a researcher typed — the
-importer writes `play_editors`, `play_sources` and `play_editorial_notes`, exactly the tables the
-admin UI edits and exactly where S3 and S7 will write.
+| | Field | Source | Coverage (of 22) | State |
+|---|---|---|---|---|
+| **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 8 with a note | **spec + plan written** |
+| S2b | `place_of_action` | `pub_LugAccion` | 6 | scoped |
+| S2c | `composition_date` | `pub_datacion` | 6 | scoped — one `<li>` per *competing* dating, so the shape is a genuine open question |
+| S2d | `collection` | `bus_coleccion` | 22 | scoped — 1 EMOTHE, 2 HIE old-spelling quartos, 3 modern-spelling English |
+| S2e | `legacy_url` | `pub_edicionWeb` href | 13 | scoped |
+| S2f | `original_title`, `title_sort` | `pub_TituloObra`, `T00.pub_tituloOrden` | 22 | scoped — both columns and both admin fields already exist, so this is import-only |
 
-- **Into:** new `plays.deleted_at`; `origin` on `play_editors` / `play_sources` /
-  `play_editorial_notes`; `Catalogue.delete_play/1` archives, `restore_play/1` and `purge_play/1`
-  added; `TeiParser.import_file/1` updates in place keeping the same `id`; an import preview in the
-  admin UI and `--dry-run` on the mix task
-- **Ownership:** the TEI file owns the text, the cast list and the rows it stamped `origin: "tei"`.
-  The platform owns `language`, `relationship_type`, `parent_play_id`, `is_complete`, every column
-  S2 adds, and every row a human typed. Without this rule a re-import silently undoes S1 and erases
-  S2–S5.
-- **Done when:** archive a play, add a source by hand, re-import its TEI — same row id, curated
-  fields intact, hand-entered source still there, and the UI said so before writing
-- **Owed by every later slice:** new `plays` columns get appended to `@platform_owned`; new child
-  tables either carry `origin` or stay outside the importer's reach
+**S2a — historical time.** Spec: `../specs/2026-08-02-s2a-historical-time-design.md`. Plan:
+`2026-08-02-s2a-historical-time.md`. Establishes three things every later sub-slice reuses:
 
-### S1 — Work families & language *(first — has a full plan)*
+1. `Filemaker.load_versions/1`, the `T01_tituloEM` reader, keyed by the code in the
+   `pub_edicionWeb` href.
+2. A **fill-only** sync policy with a `conflicts` bucket and `--force`. The S1 fields stay
+   overwrite-always — the index is authoritative for those. Research metadata a curator edits is
+   never stomped.
+3. `<section id="meta-study">` on `/plays/:code`, hidden when empty, in the sidebar scroll-spy.
 
-Set `language`, `relationship_type` and `parent_play_id` from the published index instead of
-guessing from the TEI. The TEI header's `xml:lang` is always `es` in EMOTHE files (it marks the
-editorial platform, not the play), which is why `EMOTHE0038` — the English *Antony and Cleopatra* —
-is stored as Spanish today.
+The vocabulary in the earlier draft of this roadmap was wrong. Correct, recovered by pairing the
+code against the rendered label across all 439 rows: 1 Tiempo indeterminado, 2 Antiguo Testamento,
+5 Edad Media, 6 Siglo XV, 7 Siglo XVI, 8 Siglo XVII, 9 Tiempo maravilloso (intemporal),
+10 Antigüedad clásica, 11 Tiempo alegórico. Codes 3 and 4 do not occur.
 
-- **From:** `T00_indiceEM.pub_listaObras` (language tag + `ed.`/`tra.` credit)
-- **Into:** `plays.language`, `plays.relationship_type`, `plays.parent_play_id`
-- **Scale:** 62 plays, 43 work families, 23 of them held complete
-- **Done when:** a dry run reports the 3 known corrections, an apply run fixes them, and the
-  existing relationship UI (admin combobox, catalogue grouping, compare view) shows the families
-  without any UI change
-- **Note:** `original_title` is deliberately *not* set here — the index titles are upper-cased
-  display strings. It comes from `T01.pub_TituloObra` in S2.
-
-### S2 — Version metadata panel
-
-The research metadata that has no home in TEI.
-
-- **From:** `T01`: `pub_TiemHistorico` (label + `<br/>Note:` commentary), `pub_LugAccion`,
-  `pub_datacion` (one `<li>` per competing dating), `bus_coleccion`, `pub_edicionWeb` (href),
-  `pub_TituloObra`, `pub_TituloOrden`
-- **Into:** new `plays` columns — `historical_time`, `historical_time_note`, `place_of_action`,
-  `composition_date`, `collection`, `legacy_url` — plus `original_title` and `title_sort`;
-  admin form fields and a public play-page panel
-- **Scale:** 22 plays (8 with a historical time, 6 a place of action, 6 a dating)
-- **Vocabulary:** `bus_tiemHistorico` decodes to 1 indeterminado, 2 Antiguo Testamento, 5 Edad
-  Media, 6 s.XV, 7 s.XVI, 8 s.XVII, 9 tiempo maravilloso, 10 Antigüedad clásica, 11 tiempo
-  alegórico. `bus_coleccion` decodes to 1 = EMOTHE, 2 = HIE (English old-spelling quartos),
-  3 = modern-spelling English under EMOTHE codes.
-- **Done when:** the panel renders on `/plays/:code` for the plays that have data, and admins can
-  edit every new field
+- **Done when:** every sub-slice has landed — the panel renders on `/plays/:code` for the plays
+  that have data, and admins can edit every field it shows
 
 ### S3 — Witnesses (testimonios)
 
@@ -236,6 +215,14 @@ Fixed once here so every slice looks the same:
   a new action.
 - **Idempotent.** Running a sync twice changes nothing the second time; the second report is all
   "unchanged".
+- **Two write policies, on purpose.** Fields the index is *authoritative* for — `language`,
+  `relationship_type`, `parent_play_id` — are overwritten whenever they differ. Fields a curator is
+  expected to *edit* — everything from S2 on — are fill-only: written when blank, reported as a
+  conflict when they differ, overwritten only under `--force`. Introduced in S2a. This is the
+  "bootstrap, not a dependency" rule made operational; without it the second import undoes a
+  researcher's afternoon.
+- **New curated column ⇒ `@platform_owned`.** Append it in `lib/emothe/import/tei_parser.ex`, or
+  the next TEI re-import erases it. Add the regression test in the same commit.
 
 ## Open questions
 
@@ -246,3 +233,9 @@ Fixed once here so every slice looks the same:
    web-edition href. Our `is_complete` gates the static-site export, so nothing should write to it
    automatically.
 3. **Genre value lists** — see S8.
+4. **Character re-import identity.** A TEI re-import still replaces the whole cast list, so a
+   manual `xml_id` fix on a character is lost. Protecting those needs per-character identity
+   matching — bigger than S0b, not scoped anywhere. Blocks nothing in S2–S5; blocks S6.
+5. **Multi-valued `pub_datacion` and multi-`<li>` historical times.** S2a takes the first `<li>`
+   and logs. Two of 439 export rows carry two historical periods; `pub_datacion` carries competing
+   datings as a matter of course. S2c has to decide the shape for real, and may retro-fit S2a.

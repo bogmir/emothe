@@ -4,6 +4,7 @@ defmodule EmotheWeb.Admin.PlayFormLive do
   alias Emothe.Catalogue
   alias Emothe.Catalogue.Play
   alias Emothe.ActivityLog
+  alias EmotheWeb.PlayLabels
 
   @al_project_description "El proyecto Artelope supone la creación de un banco de datos, argumentos y ediciones para un corpus fundamental del patrimonio literario español: el teatro de Lope de Vega y, extendido, en los últimos años, a Guillén de Castro."
 
@@ -700,6 +701,32 @@ defmodule EmotheWeb.Admin.PlayFormLive do
               field={@form[:editorial_declaration]}
               type="textarea"
               placeholder={gettext("Editorial methodology and approach")}
+            />
+          </div>
+        </div>
+
+        <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-base-content/60">
+            {gettext("Research Metadata")}
+          </h3>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Historical Time")}</span>
+            </label>
+            <.input
+              field={@form[:historical_time]}
+              type="select"
+              options={PlayLabels.historical_time_options()}
+            />
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Historical Time Note")}</span>
+            </label>
+            <.input
+              field={@form[:historical_time_note]}
+              type="textarea"
+              placeholder={gettext("When the action is set, and the evidence for it")}
             />
           </div>
         </div>

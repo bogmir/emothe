@@ -84,5 +84,30 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
       assert_redirect(view, ~p"/admin/plays/#{play.id}")
       assert Catalogue.get_play!(play.id).title == "Updated Title"
     end
+
+    test "given a historical time when saving then it is persisted", %{conn: conn} do
+      conn = log_in_admin(conn)
+      play = TestFixtures.play_fixture()
+
+      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
+
+      assert has_element?(view, "select[name='play[historical_time]']")
+      assert has_element?(view, "textarea[name='play[historical_time_note]']")
+
+      view
+      |> element("form[phx-submit]")
+      |> render_submit(%{
+        "play" => %{
+          "title" => play.title,
+          "code" => play.code,
+          "historical_time" => "siglo_xvii",
+          "historical_time_note" => "Contemporary. Reign of Philip IV."
+        }
+      })
+
+      updated = Catalogue.get_play!(play.id)
+      assert updated.historical_time == "siglo_xvii"
+      assert updated.historical_time_note == "Contemporary. Reign of Philip IV."
+    end
   end
 end

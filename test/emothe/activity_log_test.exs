@@ -1,19 +1,11 @@
 defmodule Emothe.ActivityLogTest do
   use Emothe.DataCase, async: true
 
+  import Emothe.TestFixtures
+
   alias Emothe.ActivityLog
   alias Emothe.ActivityLog.{Diff, Entry}
   alias Emothe.TestFixtures
-
-  defp user_fixture do
-    {:ok, user} =
-      Emothe.Accounts.register_user(%{
-        email: "user#{System.unique_integer([:positive])}@test.com",
-        password: "valid_password_123"
-      })
-
-    user
-  end
 
   describe "log/1" do
     test "creates an entry with valid attrs" do

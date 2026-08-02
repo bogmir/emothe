@@ -161,33 +161,22 @@ defmodule EmotheWeb.UserAuth do
   def on_mount(:ensure_authenticated, _params, session, socket) do
     socket = mount_current_user(socket, session)
 
-    cond do
-      is_nil(socket.assigns.current_user) ->
-        socket =
-          socket
-          |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
-          |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
-
-        {:halt, socket}
-
-      true ->
-        {:cont, socket}
+    if Accounts.active?(socket.assigns.current_user) do
+      {:cont, socket}
+    else
+      {:halt, redirect_to_login(socket)}
     end
   end
 
   def on_mount(:ensure_admin, _params, session, socket) do
     socket = mount_current_user(socket, session)
+    user = socket.assigns.current_user
 
     cond do
-      is_nil(socket.assigns.current_user) ->
-        socket =
-          socket
-          |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
-          |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+      not Accounts.active?(user) ->
+        {:halt, redirect_to_login(socket)}
 
-        {:halt, socket}
-
-      not Accounts.admin?(socket.assigns.current_user) ->
+      not Accounts.admin?(user) ->
         socket =
           socket
           |> Phoenix.LiveView.put_flash(
@@ -213,6 +202,12 @@ defmodule EmotheWeb.UserAuth do
     end
   end
 
+  defp redirect_to_login(socket) do
+    socket
+    |> Phoenix.LiveView.put_flash(:error, gettext("You must log in to access this page."))
+    |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+  end
+
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do
@@ -235,33 +230,63 @@ defmodule EmotheWeb.UserAuth do
   end
 
   @doc """
-  Used for routes that require the user to be authenticated and have confirmed their email.
+  Used for routes that require an active user: authenticated, confirmed
+  and not deactivated.
   """
   def require_authenticated_user(conn, _opts) do
+    user = conn.assigns[:current_user]
+
     cond do
-      is_nil(conn.assigns[:current_user]) ->
+      is_nil(user) ->
         conn
         |> put_flash(:error, gettext("You must log in to access this page."))
         |> maybe_store_return_to()
         |> redirect(to: ~p"/users/log-in")
         |> halt()
 
+      not Accounts.active?(user) ->
+        reject_inactive(conn)
+
       true ->
         conn
     end
   end
 
+  # Destroys the session of a user whose account is no longer usable, so they
+  # get an explanation instead of a redirect loop.
+  defp reject_inactive(conn) do
+    user_token = get_session(conn, :user_token)
+    user_token && Accounts.delete_user_session_token(user_token)
+
+    conn
+    |> renew_session()
+    |> delete_resp_cookie(@remember_me_cookie)
+    |> put_flash(
+      :error,
+      gettext("Your account is not active. Please contact an administrator.")
+    )
+    |> redirect(to: ~p"/users/log-in")
+    |> halt()
+  end
+
   @doc """
-  Used for routes that require the user to be an admin.
+  Used for routes that require an active admin.
   """
   def require_admin_user(conn, _opts) do
-    if conn.assigns[:current_user] && Accounts.admin?(conn.assigns[:current_user]) do
-      conn
-    else
-      conn
-      |> put_flash(:error, gettext("You must be an admin to access this page."))
-      |> redirect(to: ~p"/")
-      |> halt()
+    user = conn.assigns[:current_user]
+
+    cond do
+      is_nil(user) or not Accounts.active?(user) ->
+        require_authenticated_user(conn, [])
+
+      not Accounts.admin?(user) ->
+        conn
+        |> put_flash(:error, gettext("You must be an admin to access this page."))
+        |> redirect(to: ~p"/")
+        |> halt()
+
+      true ->
+        conn
     end
   end
 

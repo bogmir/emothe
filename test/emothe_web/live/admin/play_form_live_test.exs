@@ -3,32 +3,11 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias Emothe.Accounts
-  alias Emothe.Accounts.User
   alias Emothe.Catalogue
-  alias Emothe.Repo
   alias Emothe.TestFixtures
 
   defp log_in_admin(conn) do
-    email = "admin-#{System.unique_integer([:positive])}@example.com"
-
-    {:ok, user} =
-      Accounts.register_user(%{
-        "email" => email,
-        "password" => "verysecurepass123"
-      })
-
-    {:ok, user} =
-      user
-      |> User.role_changeset(%{role: :admin})
-      |> Ecto.Changeset.change(%{confirmed_at: DateTime.utc_now(:second)})
-      |> Repo.update()
-
-    token = Accounts.generate_user_session_token(user)
-
-    conn
-    |> init_test_session(%{})
-    |> put_session(:user_token, token)
+    log_in_user(conn, Emothe.TestFixtures.admin_fixture())
   end
 
   describe "Play form behaviors" do

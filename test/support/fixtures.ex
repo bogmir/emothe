@@ -169,4 +169,33 @@ defmodule Emothe.TestFixtures do
       stage_direction: stage_direction
     }
   end
+
+  @valid_user_password "verysecurepass123"
+
+  def valid_user_password, do: @valid_user_password
+
+  @doc """
+  Inserts a user directly. Defaults to an active researcher.
+
+  Accepts `:email`, `:role`, `:password`, `:confirmed_at`, `:deactivated_at`.
+  Pass `confirmed_at: nil` for an unconfirmed user.
+  """
+  def user_fixture(attrs \\ %{}) do
+    attrs = Enum.into(attrs, %{})
+
+    %Emothe.Accounts.User{
+      email: Map.get(attrs, :email, "user-#{System.unique_integer([:positive])}@example.com"),
+      role: Map.get(attrs, :role, :researcher),
+      confirmed_at: Map.get(attrs, :confirmed_at, DateTime.utc_now(:second)),
+      deactivated_at: Map.get(attrs, :deactivated_at)
+    }
+    |> Emothe.Accounts.User.password_changeset(%{
+      password: Map.get(attrs, :password, @valid_user_password)
+    })
+    |> Emothe.Repo.insert!()
+  end
+
+  def admin_fixture(attrs \\ %{}) do
+    attrs |> Enum.into(%{}) |> Map.put(:role, :admin) |> user_fixture()
+  end
 end

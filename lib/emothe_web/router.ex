@@ -74,7 +74,6 @@ defmodule EmotheWeb.Router do
         EmotheWeb.SetLocaleHook,
         {EmotheWeb.UserAuth, :redirect_if_user_is_authenticated}
       ] do
-      live "/users/register", UserRegistrationLive, :new
       live "/users/log-in", UserLoginLive, :new
       live "/users/reset-password", UserForgotPasswordLive, :new
       live "/users/reset-password/:token", UserResetPasswordLive, :edit
@@ -97,12 +96,6 @@ defmodule EmotheWeb.Router do
     pipe_through [:browser]
 
     delete "/users/log-out", UserSessionController, :delete
-
-    live_session :current_user,
-      on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
-    end
   end
 
   # Admin routes - requires admin role

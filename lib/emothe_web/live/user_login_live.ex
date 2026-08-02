@@ -7,11 +7,7 @@ defmodule EmotheWeb.UserLoginLive do
       <.header class="text-center">
         {gettext("Log in to EMOTHE")}
         <:subtitle>
-          {gettext("Don't have an account?")}
-          <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
-            {gettext("Sign up")}
-          </.link>
-          {gettext("for an account now.")}
+          {gettext("Access is by invitation. Contact an administrator to request an account.")}
         </:subtitle>
       </.header>
 

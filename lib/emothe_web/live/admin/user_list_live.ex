@@ -80,26 +80,6 @@ defmodule EmotheWeb.Admin.UserListLive do
     end
   end
 
-  def handle_event("resend_confirmation", %{"id" => id}, socket) do
-    user = Accounts.get_user!(id)
-
-    case Accounts.deliver_user_confirmation_instructions(
-           user,
-           &url(~p"/users/confirm/#{&1}")
-         ) do
-      {:ok, _} ->
-        {:noreply,
-         put_flash(
-           socket,
-           :info,
-           gettext("Confirmation email sent to %{email}.", email: user.email)
-         )}
-
-      {:error, :already_confirmed} ->
-        {:noreply, put_flash(socket, :error, gettext("User is already confirmed."))}
-    end
-  end
-
   defp parse_page(nil), do: 1
 
   defp parse_page(s) do
@@ -208,15 +188,6 @@ defmodule EmotheWeb.Admin.UserListLive do
                       </button>
                     <% end %>
                   <% end %>
-                  <button
-                    :if={is_nil(user.confirmed_at)}
-                    phx-click="resend_confirmation"
-                    phx-value-id={user.id}
-                    class="btn btn-ghost btn-xs tooltip tooltip-left"
-                    data-tip={gettext("Resend confirmation email")}
-                  >
-                    <.icon name="hero-envelope-mini" class="size-4" />
-                  </button>
                 </div>
               </td>
             </tr>

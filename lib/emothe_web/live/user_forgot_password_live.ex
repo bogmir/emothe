@@ -20,8 +20,7 @@ defmodule EmotheWeb.UserForgotPasswordLive do
         </:actions>
       </.simple_form>
       <p class="text-center text-sm mt-4">
-        <.link href={~p"/users/register"}>{gettext("Register")}</.link>
-        | <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
+        <.link href={~p"/users/log-in"}>{gettext("Log in")}</.link>
       </p>
     </div>
     """

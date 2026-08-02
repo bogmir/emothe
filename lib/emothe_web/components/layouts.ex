@@ -175,6 +175,155 @@ defmodule EmotheWeb.Layouts do
   end
 
   @doc """
+  Identity dropdown, locale toggle and theme toggle.
+
+  Shared by both layouts — this markup existed twice and drifted apart.
+  """
+  attr :current_user, :map, default: nil
+  attr :locale, :string, default: "es"
+
+  def user_menu(assigns) do
+    ~H"""
+    <div class="flex-none flex items-center gap-2">
+      <.locale_toggle locale={@locale} />
+      <.theme_toggle />
+      <div :if={@current_user} class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-xs gap-1">
+          <.icon name="hero-user-circle-micro" class="size-4" />
+          <span class="max-w-[8rem] truncate text-xs">{@current_user.email}</span>
+          <.icon name="hero-chevron-down-micro" class="size-3" />
+        </label>
+        <ul
+          tabindex="0"
+          class="dropdown-content z-[1] menu p-1 shadow-lg bg-base-100 rounded-box w-48 border border-base-300"
+        >
+          <li><.link navigate={~p"/users/settings"}>{gettext("Settings")}</.link></li>
+          <li><.link href={~p"/users/log-out"} method="delete">{gettext("Log out")}</.link></li>
+        </ul>
+      </div>
+      <.link :if={!@current_user} navigate={~p"/users/log-in"} class="btn btn-ghost btn-xs">
+        {gettext("Log in")}
+      </.link>
+    </div>
+    """
+  end
+
+  @doc """
+  Admin sidebar.
+
+  Entries are filtered through `Emothe.Authz.can?/3`, the same predicate that
+  guards the routes — so the menu cannot offer a page the user will be bounced
+  from, and cannot hide one they are entitled to.
+  """
+  attr :current_user, :map, default: nil
+  attr :current_path, :string, default: ""
+
+  def admin_sidebar(assigns) do
+    assigns = assign(assigns, :groups, sidebar_groups(assigns.current_user))
+
+    ~H"""
+    <aside class="w-56 shrink-0 border-r border-base-300 bg-base-200/40 min-h-full">
+      <nav class="p-3 space-y-4">
+        <div :for={{label, items} <- @groups}>
+          <p class="px-2 pb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-base-content/40">
+            {label}
+          </p>
+          <ul class="menu menu-sm gap-0.5 p-0">
+            <li :for={item <- items}>
+              <.link
+                navigate={item.to}
+                class={if sidebar_active?(@current_path, item.to, @groups), do: "active", else: ""}
+              >
+                <.icon name={item.icon} class="size-4" />
+                {item.label}
+              </.link>
+            </li>
+          </ul>
+        </div>
+
+        <div class="border-t border-base-300 pt-3">
+          <ul class="menu menu-sm p-0">
+            <li>
+              <.link navigate={~p"/plays"}>
+                <.icon name="hero-arrow-top-right-on-square-micro" class="size-4" />
+                {gettext("View public site")}
+              </.link>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+    """
+  end
+
+  defp sidebar_groups(user) do
+    [
+      {gettext("Content"),
+       [
+         %{
+           label: gettext("Plays"),
+           to: "/admin/plays",
+           icon: "hero-book-open-micro",
+           action: :manage_plays
+         },
+         %{
+           label: gettext("Import"),
+           to: "/admin/plays/import",
+           icon: "hero-arrow-down-tray-micro",
+           action: :import_tei
+         }
+       ]},
+      {gettext("Site"),
+       [
+         %{
+           label: gettext("Export"),
+           to: "/admin/export",
+           icon: "hero-globe-alt-micro",
+           action: :deploy_site
+         },
+         %{
+           label: gettext("Activity"),
+           to: "/admin/activity-log",
+           icon: "hero-clock-micro",
+           action: :view_activity_log
+         }
+       ]},
+      {gettext("System"),
+       [
+         %{
+           label: gettext("Users"),
+           to: "/admin/users",
+           icon: "hero-users-micro",
+           action: :manage_users
+         },
+         %{
+           label: gettext("Dashboard"),
+           to: "/admin/dashboard",
+           icon: "hero-chart-bar-micro",
+           action: :view_dashboard
+         }
+       ]}
+    ]
+    |> Enum.map(fn {label, items} ->
+      {label, Enum.filter(items, &Emothe.Authz.can?(user, &1.action))}
+    end)
+    |> Enum.reject(fn {_label, items} -> items == [] end)
+  end
+
+  # /admin/plays/import starts with /admin/plays, so the longest matching
+  # entry wins — otherwise both light up on the import page.
+  defp sidebar_active?(current_path, to, groups) do
+    longest =
+      groups
+      |> Enum.flat_map(fn {_label, items} -> items end)
+      |> Enum.map(& &1.to)
+      |> Enum.filter(&String.starts_with?(current_path, &1))
+      |> Enum.max_by(&String.length/1, fn -> nil end)
+
+    longest == to
+  end
+
+  @doc """
   Provides dark vs light theme toggle based on themes defined in app.css.
 
   See <head> in root.html.heex which applies the theme before page load.

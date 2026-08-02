@@ -242,6 +242,7 @@ msgid "Confirm new password"
 msgstr "Confirmar nueva contraseña"
 
 #: lib/emothe_web/components/layouts.ex:145
+#: lib/emothe_web/components/layouts.ex:261
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2553
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2741
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2758
@@ -261,6 +262,7 @@ msgstr "Índice"
 msgid "Current password"
 msgstr "Contraseña actual"
 
+#: lib/emothe_web/components/layouts.ex:300
 #: lib/emothe_web/components/layouts/admin.html.heex:25
 #: lib/emothe_web/components/layouts/app.html.heex:43
 #, elixir-autogen, elixir-format
@@ -428,6 +430,7 @@ msgstr "Modernidades Europeas en Teatro y Representación"
 msgid "European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions"
 msgstr "Teatro Europeo de los siglos XVI y XVII: Patrimonio y Ediciones Digitales"
 
+#: lib/emothe_web/components/layouts.ex:279
 #: lib/emothe_web/live/admin/export_site_live.ex:336
 #: lib/emothe_web/live/admin/play_detail_live.ex:159
 #, elixir-autogen, elixir-format
@@ -486,6 +489,7 @@ msgstr "Personaje oculto"
 msgid "If your email is in our system, you will receive instructions to reset your password shortly."
 msgstr "Si su correo está en nuestro sistema, recibirá instrucciones para restablecer su contraseña en breve."
 
+#: lib/emothe_web/components/layouts.ex:270
 #: lib/emothe_web/components/layouts/admin.html.heex:14
 #: lib/emothe_web/components/layouts/app.html.heex:22
 #: lib/emothe_web/components/layouts/app.html.heex:32
@@ -588,6 +592,7 @@ msgstr "Número de verso"
 msgid "Line numbers"
 msgstr "Números de verso"
 
+#: lib/emothe_web/components/layouts.ex:205
 #: lib/emothe_web/components/layouts/app.html.heex:66
 #: lib/emothe_web/live/user_forgot_password_live.ex:23
 #: lib/emothe_web/live/user_login_live.ex:26
@@ -601,6 +606,7 @@ msgstr "Iniciar sesión"
 msgid "Log in to EMOTHE"
 msgstr "Iniciar sesión en EMOTHE"
 
+#: lib/emothe_web/components/layouts.ex:201
 #: lib/emothe_web/components/layouts/admin.html.heex:42
 #: lib/emothe_web/components/layouts/app.html.heex:61
 #, elixir-autogen, elixir-format
@@ -780,6 +786,7 @@ msgstr "Obra actualizada correctamente."
 msgid "Play with code %{code} already exists"
 msgstr "Ya existe una obra con el código %{code}"
 
+#: lib/emothe_web/components/layouts.ex:264
 #: lib/emothe_web/components/layouts/admin.html.heex:13
 #: lib/emothe_web/components/layouts/app.html.heex:21
 #: lib/emothe_web/components/layouts/app.html.heex:31
@@ -945,6 +952,7 @@ msgstr "Enviar instrucciones para restablecer la contraseña"
 msgid "Sending..."
 msgstr "Enviando..."
 
+#: lib/emothe_web/components/layouts.ex:200
 #: lib/emothe_web/components/layouts/admin.html.heex:40
 #: lib/emothe_web/components/layouts/app.html.heex:59
 #, elixir-autogen, elixir-format
@@ -2109,6 +2117,7 @@ msgstr "Buscar por correo..."
 msgid "User Management"
 msgstr "Gestión de usuarios"
 
+#: lib/emothe_web/components/layouts.ex:294
 #: lib/emothe_web/live/admin/user_list_live.ex:24
 #, elixir-autogen, elixir-format
 msgid "Users"
@@ -3111,3 +3120,28 @@ msgstr "Dónde tiene la sesión iniciada actualmente."
 #, elixir-autogen, elixir-format
 msgid "You do not have access to that page."
 msgstr "No tiene acceso a esa página."
+
+#: lib/emothe_web/components/layouts.ex:285
+#, elixir-autogen, elixir-format
+msgid "Activity"
+msgstr "Actividad"
+
+#: lib/emothe_web/controllers/demo_ui_html/admin_shell.html.heex:3
+#, elixir-autogen, elixir-format
+msgid "Admin shell preview"
+msgstr "Vista previa del panel de administración"
+
+#: lib/emothe_web/components/layouts.ex:276
+#, elixir-autogen, elixir-format
+msgid "Site"
+msgstr "Sitio"
+
+#: lib/emothe_web/components/layouts.ex:291
+#, elixir-autogen, elixir-format
+msgid "System"
+msgstr "Sistema"
+
+#: lib/emothe_web/components/layouts.ex:249
+#, elixir-autogen, elixir-format
+msgid "View public site"
+msgstr "Ver el sitio público"

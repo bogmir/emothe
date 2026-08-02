@@ -198,4 +198,18 @@ defmodule Emothe.TestFixtures do
   def admin_fixture(attrs \\ %{}) do
     attrs |> Enum.into(%{}) |> Map.put(:role, :admin) |> user_fixture()
   end
+
+  @doc """
+  Creates an invited (password-less, unconfirmed) user.
+
+  Returns `{user, raw_invite_token}`.
+  """
+  def invited_user_fixture(attrs \\ %{}) do
+    attrs = Enum.into(attrs, %{})
+    email = Map.get(attrs, :email, "invited-#{System.unique_integer([:positive])}@example.com")
+    role = Map.get(attrs, :role, :researcher)
+
+    {:ok, user, token} = Emothe.Accounts.invite_user(email, role, nil)
+    {user, token}
+  end
 end

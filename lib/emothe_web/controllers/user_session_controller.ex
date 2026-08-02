@@ -4,8 +4,8 @@ defmodule EmotheWeb.UserSessionController do
   alias Emothe.Accounts
   alias EmotheWeb.UserAuth
 
-  def create(conn, %{"_action" => "registered"} = params) do
-    create(conn, params, gettext("Account created successfully!"))
+  def create(conn, %{"_action" => "invited"} = params) do
+    create(conn, params, gettext("Welcome to EMOTHE!"))
   end
 
   def create(conn, %{"_action" => "password_updated"} = params) do

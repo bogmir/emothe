@@ -22,20 +22,22 @@ defmodule Emothe.Accounts.UserNotifier do
   end
 
   @doc """
-  Deliver instructions to confirm account.
+  Deliver an invitation to join EMOTHE.
   """
-  def deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
+  def deliver_invite_instructions(user, url) do
+    deliver(user.email, "You have been invited to EMOTHE", """
 
     ==============================
 
     Hi #{user.email},
 
-    You can confirm your account by visiting the URL below:
+    You have been invited to the EMOTHE platform. Set your password by
+    visiting the URL below:
 
     #{url}
 
-    If you didn't create an account with us, please ignore this.
+    This invitation expires in 7 days. If you were not expecting it, ignore
+    this message.
 
     ==============================
     """)

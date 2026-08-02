@@ -75,6 +75,7 @@ defmodule EmotheWeb.Router do
         {EmotheWeb.UserAuth, :redirect_if_user_is_authenticated}
       ] do
       live "/users/log-in", UserLoginLive, :new
+      live "/users/accept-invite/:token", UserAcceptInviteLive, :edit
       live "/users/reset-password", UserForgotPasswordLive, :new
       live "/users/reset-password/:token", UserResetPasswordLive, :edit
     end

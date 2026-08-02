@@ -59,6 +59,103 @@ defmodule Emothe.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  ## Invitations
+
+  @doc """
+  Creates or re-invites a user.
+
+  Returns `{:ok, user, raw_token}`. Any outstanding invite token for the user
+  is deleted first, so re-inviting invalidates the earlier link. Refuses to
+  invite an account that can already log in.
+  """
+  def invite_user(email, role, invited_by \\ nil) when is_binary(email) do
+    case get_user_by_email(email) do
+      %User{} = user ->
+        if active?(user), do: {:error, :already_active}, else: issue_invite(user, role)
+
+      nil ->
+        %User{}
+        |> User.invite_changeset(%{email: email, role: role})
+        |> Repo.insert()
+        |> case do
+          {:ok, user} -> issue_invite(user, role)
+          {:error, changeset} -> {:error, changeset}
+        end
+    end
+    |> tap(fn
+      {:ok, user, _token} -> log_invite(user, invited_by)
+      _ -> :ok
+    end)
+  end
+
+  defp issue_invite(user, role) do
+    {encoded_token, user_token} = UserToken.build_email_token(user, "invite")
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(:old, UserToken.by_user_and_contexts_query(user, ["invite"]))
+    |> Ecto.Multi.update(:user, User.role_changeset(user, %{role: role}))
+    |> Ecto.Multi.insert(:token, user_token)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user, encoded_token}
+      {:error, _, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  defp log_invite(_user, nil), do: :ok
+
+  defp log_invite(user, %User{} = invited_by) do
+    Emothe.ActivityLog.log(%{
+      user_id: invited_by.id,
+      action: "invite",
+      resource_type: "user",
+      resource_id: user.id,
+      metadata: %{"email" => user.email, "role" => to_string(user.role)}
+    })
+
+    :ok
+  end
+
+  @doc """
+  Mails the invitation link.
+  """
+  def deliver_invite(%User{} = user, token, url_fun) when is_function(url_fun, 1) do
+    Emothe.Accounts.UserNotifier.deliver_invite_instructions(user, url_fun.(token))
+  end
+
+  @doc """
+  Returns the user for a valid, unexpired invite token, or nil.
+  """
+  def get_user_by_invite_token(token) when is_binary(token) do
+    with {:ok, query} <- UserToken.verify_email_token_query(token, "invite"),
+         %User{} = user <- Repo.one(query) do
+      user
+    else
+      _ -> nil
+    end
+  end
+
+  @doc """
+  Changeset for the accept-invitation form.
+  """
+  def change_user_invite_acceptance(%User{} = user, attrs \\ %{}) do
+    User.accept_invite_changeset(user, attrs, hash_password: false)
+  end
+
+  @doc """
+  Sets the password, confirms the account and consumes the invite token.
+  """
+  def accept_invite(%User{} = user, attrs) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:user, User.accept_invite_changeset(user, attrs))
+    |> Ecto.Multi.delete_all(:tokens, UserToken.by_user_and_contexts_query(user, ["invite"]))
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
   ## Settings
 
   @doc """

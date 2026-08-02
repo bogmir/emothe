@@ -17,6 +17,27 @@ defmodule Emothe.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  @doc """
+  A changeset for creating an invited user: email and role, no password.
+  """
+  def invite_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :role])
+    |> validate_required([:role])
+    |> validate_email([])
+  end
+
+  @doc """
+  A changeset for accepting an invitation: sets the password and marks the
+  account confirmed, because clicking the emailed link proves control of the
+  mailbox.
+  """
+  def accept_invite_changeset(user, attrs, opts \\ []) do
+    user
+    |> password_changeset(attrs, opts)
+    |> put_change(:confirmed_at, DateTime.utc_now(:second))
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])

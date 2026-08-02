@@ -32,6 +32,8 @@ defmodule Emothe.Catalogue.Play do
     field :relationship_type, :string
     field :edition_title, :string
     field :is_complete, :boolean, default: false
+    field :historical_time, :string
+    field :historical_time_note, :string
 
     # Set only through Catalogue.delete_play/1 and restore_play/1 — deliberately absent
     # from every cast list so no form can archive a play.
@@ -66,6 +68,18 @@ defmodule Emothe.Catalogue.Play do
 
   def language_name(code), do: Map.get(@language_names, code, code)
 
+  # FileMaker bus_tiemHistorico codes, recovered by pairing the code against the rendered
+  # label across all 439 rows of the export. Codes 3 and 4 do not occur.
+  #   1 tiempo_indeterminado   2 antiguo_testamento   5 edad_media
+  #   6 siglo_xv               7 siglo_xvi            8 siglo_xvii
+  #   9 tiempo_maravilloso    10 antiguedad_clasica  11 tiempo_alegorico
+  @historical_times ~w(
+    tiempo_indeterminado antiguo_testamento edad_media siglo_xv siglo_xvi
+    siglo_xvii tiempo_maravilloso antiguedad_clasica tiempo_alegorico
+  )
+
+  def historical_times, do: @historical_times
+
   def changeset(play, attrs) do
     play
     |> cast(attrs, [
@@ -94,12 +108,15 @@ defmodule Emothe.Catalogue.Play do
       :parent_play_id,
       :relationship_type,
       :edition_title,
-      :is_complete
+      :is_complete,
+      :historical_time,
+      :historical_time_note
     ])
     |> validate_required([:title, :code])
     |> validate_inclusion(:language, @valid_languages)
     |> validate_number(:verse_count, greater_than_or_equal_to: 0)
     |> validate_inclusion(:relationship_type, ~w(traduccion adaptacion refundicion))
+    |> validate_inclusion(:historical_time, @historical_times)
     |> unique_constraint(:code)
   end
 

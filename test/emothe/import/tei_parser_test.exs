@@ -90,6 +90,27 @@ defmodule Emothe.Import.TeiParserTest do
     assert reimported.id == play.id
   end
 
+  test "import_file/1 does not erase a curated historical time on re-import" do
+    code = "HT9001"
+    path = write_tei(minimal_tei(title: "Curated", code: code))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    {:ok, _} =
+      Emothe.Catalogue.update_play(play, %{
+        "historical_time" => "edad_media",
+        "historical_time_note" => "Reinado de Juan I de Portugal (1385-1433)"
+      })
+
+    # The TEI file owns the text; the platform owns curated research metadata.
+    # See @platform_owned in lib/emothe/import/tei_parser.ex and
+    # docs/superpowers/plans/archive/README.md, S0b.
+    assert {:ok, reimported} = TeiParser.import_file(path)
+    assert reimported.id == play.id
+    assert reimported.historical_time == "edad_media"
+    assert reimported.historical_time_note == "Reinado de Juan I de Portugal (1385-1433)"
+  end
+
   test "import_file/1 returns error for valid XML without teiHeader" do
     path = write_tei("<TEI><text><body></body></text></TEI>")
 

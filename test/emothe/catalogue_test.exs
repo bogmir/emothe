@@ -59,4 +59,42 @@ defmodule Emothe.CatalogueTest do
     assert {:ok, _} = Catalogue.delete_play(play)
     assert_raise Ecto.NoResultsError, fn -> Catalogue.get_play!(play.id) end
   end
+
+  describe "historical_time" do
+    test "accepts a slug from the vocabulary" do
+      assert {:ok, play} =
+               Emothe.Catalogue.create_play(%{
+                 "title" => "A Play",
+                 "code" => "HT0001",
+                 "historical_time" => "siglo_xvii",
+                 "historical_time_note" => "Contemporary. Reign of Philip IV."
+               })
+
+      assert play.historical_time == "siglo_xvii"
+      assert play.historical_time_note == "Contemporary. Reign of Philip IV."
+    end
+
+    test "rejects a slug outside the vocabulary" do
+      assert {:error, changeset} =
+               Emothe.Catalogue.create_play(%{
+                 "title" => "A Play",
+                 "code" => "HT0002",
+                 "historical_time" => "siglo_xxi"
+               })
+
+      assert %{historical_time: ["is invalid"]} = errors_on(changeset)
+    end
+
+    test "accepts nil" do
+      assert {:ok, play} =
+               Emothe.Catalogue.create_play(%{"title" => "A Play", "code" => "HT0003"})
+
+      assert play.historical_time == nil
+    end
+
+    test "historical_times/0 lists the nine terms" do
+      assert length(Emothe.Catalogue.Play.historical_times()) == 9
+      assert "antiguedad_clasica" in Emothe.Catalogue.Play.historical_times()
+    end
+  end
 end

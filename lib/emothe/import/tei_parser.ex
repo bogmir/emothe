@@ -20,7 +20,14 @@ defmodule Emothe.Import.TeiParser do
   # file carries xml:lang="es" for the editorial platform, so a re-import would undo the
   # FileMaker sync (docs/superpowers/plans/2026-08-01-s1-work-families-and-language.md).
   # New research columns added by later slices belong on this list.
-  @platform_owned [:language, :relationship_type, :parent_play_id, :is_complete]
+  @platform_owned [
+    :language,
+    :relationship_type,
+    :parent_play_id,
+    :is_complete,
+    :historical_time,
+    :historical_time_note
+  ]
 
   @title_small_words MapSet.new([
                        "a",

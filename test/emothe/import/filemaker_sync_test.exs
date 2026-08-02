@@ -237,5 +237,31 @@ defmodule Emothe.Import.FilemakerSyncTest do
       assert [%{code: "EMOTHE0341", sets: %{historical_time: "siglo_xvii"}}] = plan.changes
       assert plan.missing == ["EMOTHE0341"]
     end
+
+    test "force writes the conflicting value" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "historical_time" => "edad_media"
+        })
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+      results = FilemakerSync.apply_plan(plan, force: true)
+
+      assert Enum.sort(results) == [{:ok, "EMOTHE0038"}]
+      assert Emothe.Catalogue.get_play!(original.id).historical_time == "antiguedad_clasica"
+    end
+
+    test "without force the conflicting value survives" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "historical_time" => "edad_media"
+        })
+
+      index() |> FilemakerSync.plan([original], versions()) |> FilemakerSync.apply_plan()
+
+      assert Emothe.Catalogue.get_play!(original.id).historical_time == "edad_media"
+    end
   end
 end

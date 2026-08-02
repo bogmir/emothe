@@ -76,12 +76,18 @@ defmodule Emothe.Import.FilemakerSync do
   end
 
   @doc """
-  Writes every change in the plan and logs it. Returns one result per change.
+  Writes every change in the plan and logs it. Returns one result per play written.
+
+  `force: true` also writes the conflicts — the curated values a researcher edited that
+  disagree with the export. Without it they are left alone.
   """
   def apply_plan(plan, opts \\ []) do
     user_id = Keyword.get(opts, :user_id)
+    force = Keyword.get(opts, :force, false)
 
-    Enum.map(plan.changes, fn change ->
+    plan
+    |> writes(force)
+    |> Enum.map(fn change ->
       play = Catalogue.get_play!(change.play_id)
 
       case Catalogue.update_play(play, change.sets) do
@@ -102,6 +108,39 @@ defmodule Emothe.Import.FilemakerSync do
           {:error, change.code, changeset}
       end
     end)
+  end
+
+  defp writes(plan, false), do: plan.changes
+
+  defp writes(plan, true) do
+    forced =
+      Enum.reduce(plan.conflicts, %{}, fn conflict, acc ->
+        Map.update(
+          acc,
+          conflict.play_id,
+          %{
+            play_id: conflict.play_id,
+            code: conflict.code,
+            title: conflict.title,
+            sets: %{conflict.field => conflict.indexed}
+          },
+          fn change -> put_in(change.sets[conflict.field], conflict.indexed) end
+        )
+      end)
+
+    # A play can be in both buckets — one field filled, another conflicting.
+    plan.changes
+    |> Enum.map(fn change ->
+      case Map.pop(forced, change.play_id) do
+        {nil, _rest} -> change
+        {extra, _rest} -> %{change | sets: Map.merge(change.sets, extra.sets)}
+      end
+    end)
+    |> Kernel.++(
+      Enum.reject(Map.values(forced), fn forced_change ->
+        Enum.any?(plan.changes, &(&1.play_id == forced_change.play_id))
+      end)
+    )
   end
 
   defp stringify(sets) do

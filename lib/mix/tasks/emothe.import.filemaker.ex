@@ -8,6 +8,7 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
       mix emothe.import.filemaker --dry-run          # print the changes, write nothing
       mix emothe.import.filemaker                    # apply them
       mix emothe.import.filemaker --path other.ndjson
+      mix emothe.import.filemaker --force            # also overwrite curated conflicts
 
   Plays whose code is absent from the index — every Artelope play — are listed at the
   end and left untouched.
@@ -18,7 +19,7 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
   alias Emothe.Import.Filemaker
   alias Emothe.Import.FilemakerSync
 
-  @switches [dry_run: :boolean, path: :string]
+  @switches [dry_run: :boolean, path: :string, force: :boolean]
 
   @impl Mix.Task
   def run(args) do
@@ -28,14 +29,20 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
     path = opts[:path] || Filemaker.default_path()
 
     case Filemaker.load_index(path) do
-      {:ok, index} -> sync(index, path, opts)
-      {:error, reason} -> Mix.raise("cannot read #{path}: #{inspect(reason)}")
+      {:ok, index} ->
+        # load_versions/1 cannot fail here — load_index/1 already read the same file.
+        # If it ever does, crash loudly rather than sync half the data.
+        {:ok, versions} = Filemaker.load_versions(path)
+        sync(index, versions, path, opts)
+
+      {:error, reason} ->
+        Mix.raise("cannot read #{path}: #{inspect(reason)}")
     end
   end
 
-  defp sync(index, path, opts) do
+  defp sync(index, versions, path, opts) do
     plays = FilemakerSync.all_plays()
-    plan = FilemakerSync.plan(index, plays)
+    plan = FilemakerSync.plan(index, plays, versions)
 
     Mix.shell().info("#{map_size(index)} indexed versions in #{path}")
     Mix.shell().info("#{length(plays)} plays in the database\n")
@@ -48,10 +55,22 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
       end)
     end)
 
+    Enum.each(plan.conflicts, fn conflict ->
+      Mix.shell().info(
+        "#{conflict.code}  #{conflict.title}\n" <>
+          "    #{conflict.field}: kept #{inspect(conflict.current)}, " <>
+          "index says #{inspect(conflict.indexed)}"
+      )
+    end)
+
     Mix.shell().info(
-      "\n#{length(plan.changes)} to change, #{length(plan.unchanged)} already correct, " <>
-        "#{length(plan.missing)} not in the index"
+      "\n#{length(plan.changes)} to change, #{length(plan.conflicts)} conflicting, " <>
+        "#{length(plan.unchanged)} already correct, #{length(plan.missing)} not in the index"
     )
+
+    if plan.conflicts != [] and !opts[:force] do
+      Mix.shell().info("conflicts left alone; re-run with --force to overwrite them")
+    end
 
     if plan.missing != [] do
       Mix.shell().info("not in the index: #{Enum.join(plan.missing, ", ")}")
@@ -60,7 +79,7 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
     if opts[:dry_run] do
       Mix.shell().info("\ndry run, nothing written")
     else
-      results = FilemakerSync.apply_plan(plan)
+      results = FilemakerSync.apply_plan(plan, force: opts[:force] || false)
       failed = for {:error, code, changeset} <- results, do: {code, changeset}
 
       Enum.each(failed, fn {code, changeset} ->

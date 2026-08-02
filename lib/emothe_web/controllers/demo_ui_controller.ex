@@ -65,8 +65,9 @@ defmodule EmotheWeb.DemoUIController do
       page_title: "Admin Shell (Demo)",
       play: UIDemoData.play(),
       variants: [
-        {"Admin — on /admin/plays/import", admin, "/admin/plays/import"},
-        {"Researcher — on /admin/plays", researcher, "/admin/plays"}
+        {"Admin — on /admin/plays/import", admin, "/admin/plays/import", false},
+        {"Researcher — on /admin/plays", researcher, "/admin/plays", false},
+        {"Admin in play mode — sidebar hidden by default", admin, "/admin/plays/x/content", true}
       ]
     )
   end

@@ -222,7 +222,7 @@ defmodule EmotheWeb.Layouts do
     assigns = assign(assigns, :groups, sidebar_groups(assigns.current_user))
 
     ~H"""
-    <aside class="w-56 shrink-0 border-r border-base-300 bg-base-200/40 min-h-full">
+    <aside class="w-56 shrink-0 border-r border-base-300 bg-base-200 min-h-full">
       <nav class="p-3 space-y-4">
         <div :for={{label, items} <- @groups}>
           <p class="px-2 pb-1 text-[0.65rem] font-semibold uppercase tracking-wider text-base-content/40">

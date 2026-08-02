@@ -3,25 +3,38 @@
     <h1 class="text-xl font-bold">{gettext("Admin shell preview")}</h1>
     <p class="text-sm text-base-content/60">
       Static mockup. Nothing here is wired up — judge the layout, spacing and
-      role filtering, then approve or send it back.
+      role filtering, then approve or send it back. The hamburger hides and
+      shows the sidebar at every screen size; in play mode it starts hidden.
     </p>
   </div>
 
-  <section :for={{label, user, path} <- @variants} class="space-y-2">
+  <section :for={{label, user, path, collapsed} <- @variants} class="space-y-2">
     <h2 class="text-sm font-semibold uppercase tracking-wide text-base-content/50">
       {label}
     </h2>
 
     <div class="border border-base-300 rounded-box overflow-hidden h-[32rem]">
-      <div class="drawer lg:drawer-open h-full">
-        <input id={"preview-drawer-#{user.role}"} type="checkbox" class="drawer-toggle" />
+      <div class="flex h-full">
+        <%!-- Checked means collapsed. CSS-only: the sidebar is a sibling of
+              the checkbox, so peer-checked removes it from the layout
+              entirely rather than dimming it behind an overlay. --%>
+        <input
+          id={"sidebar-#{String.replace(path, "/", "-")}"}
+          type="checkbox"
+          class="peer sr-only"
+          checked={collapsed}
+        />
 
-        <div class="drawer-content flex flex-col">
+        <div class="peer-checked:hidden h-full">
+          <.admin_sidebar current_user={user} current_path={path} />
+        </div>
+
+        <div class="flex-1 min-w-0 flex flex-col">
           <header class="navbar bg-base-100 border-b border-base-300 px-4 min-h-0 py-2">
             <div class="flex-1 gap-3">
               <label
-                for={"preview-drawer-#{user.role}"}
-                class="btn btn-ghost btn-xs btn-square lg:hidden"
+                for={"sidebar-#{String.replace(path, "/", "-")}"}
+                class="btn btn-ghost btn-xs btn-square"
               >
                 <.icon name="hero-bars-3-micro" class="size-4" />
               </label>
@@ -33,7 +46,7 @@
             <.user_menu current_user={user} locale="es" />
           </header>
 
-          <.play_context_bar play={@play} active_tab={:content} />
+          <.play_context_bar :if={collapsed} play={@play} active_tab={:content} />
 
           <main class="flex-1 p-6 bg-base-100">
             <div class="skeleton h-8 w-1/3 mb-4"></div>
@@ -41,11 +54,6 @@
             <div class="skeleton h-4 w-5/6 mb-2"></div>
             <div class="skeleton h-4 w-2/3"></div>
           </main>
-        </div>
-
-        <div class="drawer-side">
-          <label for={"preview-drawer-#{user.role}"} class="drawer-overlay"></label>
-          <.admin_sidebar current_user={user} current_path={path} />
         </div>
       </div>
     </div>

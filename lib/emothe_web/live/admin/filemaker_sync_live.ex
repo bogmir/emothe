@@ -61,6 +61,44 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
      |> assign(:results, nil)}
   end
 
+  # The key is {play_id, field-as-string} because phx-value-* arrives as strings.
+  def handle_event("toggle-conflict", %{"play-id" => play_id, "field" => field}, socket) do
+    key = {play_id, field}
+
+    selected =
+      if MapSet.member?(socket.assigns.selected, key) do
+        MapSet.delete(socket.assigns.selected, key)
+      else
+        MapSet.put(socket.assigns.selected, key)
+      end
+
+    {:noreply, assign(socket, :selected, selected)}
+  end
+
+  # ponytail: the plan is held in assigns, so it can go stale if someone else
+  # edits a play between preview and Apply. Single-curator tool; re-plan on
+  # Apply if that stops being true.
+  #
+  # The ticked set *is* the force list. Narrowing plan.conflicts before handing it
+  # over is what makes per-conflict force free: an empty selection folds nothing
+  # in, which is exactly force: false.
+  def handle_event("apply", _params, socket) do
+    %{plan: plan, selected: selected} = socket.assigns
+
+    results =
+      %{plan | conflicts: Enum.filter(plan.conflicts, &selected?(&1, selected))}
+      |> FilemakerSync.apply_plan(user_id: socket.assigns.current_user.id, force: true)
+
+    written = Enum.count(results, &match?({:ok, _code}, &1))
+
+    {:noreply,
+     socket
+     |> assign(:results, results)
+     |> assign(:plan, nil)
+     |> assign(:selected, MapSet.new())
+     |> put_flash(:info, gettext("Updated %{count} play(s).", count: written))}
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -141,6 +179,53 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
         </div>
       </div>
 
+      <div
+        :if={@plan && @plan.conflicts != []}
+        id="conflicts"
+        class="card mb-6 border border-warning bg-base-100 shadow-sm"
+      >
+        <div class="card-body">
+          <h2 class="card-title text-warning">
+            <.icon name="hero-exclamation-triangle" class="size-5" />
+            {gettext("%{count} value(s) already set by a researcher",
+              count: length(@plan.conflicts)
+            )}
+          </h2>
+          <p class="text-sm text-base-content/70">
+            {gettext(
+              "These are left alone unless you tick them. For research metadata the export is a starting point, not the authority."
+            )}
+          </p>
+
+          <ul class="mt-3 space-y-2">
+            <li :for={conflict <- @plan.conflicts} class="rounded-box bg-base-200 px-3 py-2">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-warning checkbox-sm mt-0.5"
+                  checked={selected?(conflict, @selected)}
+                  phx-click="toggle-conflict"
+                  phx-value-play-id={conflict.play_id}
+                  phx-value-field={conflict.field}
+                />
+                <span class="min-w-0">
+                  <span class="badge badge-primary badge-sm">{conflict.code}</span>
+                  <span class="font-medium">{conflict.title}</span>
+                  <span class="block text-xs mt-1">
+                    <span class="font-medium">{field_label(conflict.field)}</span>: {gettext(
+                      "keep %{current}",
+                      current: value_label(conflict.field, conflict.current, @plays_by_id)
+                    )} — {gettext("the export says %{indexed}",
+                      indexed: value_label(conflict.field, conflict.indexed, @plays_by_id)
+                    )}
+                  </span>
+                </span>
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       <div :if={@plan} id="counts" class="card mb-6 border border-base-300 bg-base-100 shadow-sm">
         <div class="card-body gap-2">
           <details :if={@plan.unchanged != []} id="unchanged">
@@ -177,7 +262,36 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
         >
           {gettext("Everything already matches the export.")}
         </p>
+        <button
+          :if={@plan.changes != [] or @plan.conflicts != []}
+          phx-click="apply"
+          class="btn btn-primary"
+        >
+          {gettext("Apply")}
+        </button>
         <button phx-click="discard" class="btn btn-ghost">{gettext("Discard")}</button>
+      </div>
+
+      <div :if={@results} id="results" class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title">{gettext("Applied")}</h2>
+          <ul class="space-y-1 text-sm">
+            <li :for={result <- @results}>
+              <%= case result do %>
+                <% {:ok, code} -> %>
+                  <span class="badge badge-success badge-sm">{code}</span>
+                <% {:error, code, changeset} -> %>
+                  <span class="badge badge-error badge-sm">{code}</span>
+                  <span class="ml-2 text-xs text-error">{inspect(changeset.errors)}</span>
+              <% end %>
+            </li>
+          </ul>
+          <div class="card-actions mt-4">
+            <button phx-click="discard" class="btn btn-sm btn-outline">
+              {gettext("Sync another export")}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     """
@@ -241,5 +355,9 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
       blank when blank in [nil, ""] -> gettext("(blank)")
       value -> value_label(field, value, plays_by_id)
     end
+  end
+
+  defp selected?(conflict, selected) do
+    MapSet.member?(selected, {conflict.play_id, to_string(conflict.field)})
   end
 end

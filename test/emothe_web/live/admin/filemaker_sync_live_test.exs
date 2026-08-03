@@ -4,6 +4,9 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
   import Phoenix.LiveViewTest
   import Emothe.TestFixtures
 
+  alias Emothe.ActivityLog
+  alias Emothe.Catalogue
+
   describe "access" do
     test "given an admin then the upload form is rendered", %{conn: conn} do
       {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
@@ -83,6 +86,10 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
       missing = lv |> element("#missing") |> render()
       assert missing =~ "AL0001"
       assert missing =~ "EMOTHE0211"
+
+      conflicts = lv |> element("#conflicts") |> render()
+      assert conflicts =~ "EMOTHE0038"
+      assert conflicts =~ "HIE0393"
     end
 
     # A play absent from the published index can still carry a T01 research
@@ -117,6 +124,73 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
       lv |> element("button", t("Discard")) |> render_click()
 
       assert has_element?(lv, "#upload-form")
+      refute has_element?(lv, "#changes")
+    end
+  end
+
+  describe "apply" do
+    setup do
+      Map.put(corpus(), :admin, admin_fixture())
+    end
+
+    test "given no conflict ticked then fills are written and curated values are left alone",
+         %{conn: conn, admin: admin, p38: p38, p211: p211, p393: p393} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+      lv |> element("#sync-actions button", t("Apply")) |> render_click()
+
+      # Blank columns filled.
+      assert Catalogue.get_play!(p211.id).historical_time == "siglo_xvii"
+      assert Catalogue.get_play!(p38.id).language == "en"
+
+      assert Catalogue.get_play!(p38.id).historical_time_note ==
+               "First century BC. The play dramatizes events taking place between 40 and 30 BC."
+
+      # Curated values a researcher set are untouched.
+      assert Catalogue.get_play!(p38.id).historical_time == "edad_media"
+      assert Catalogue.get_play!(p393.id).historical_time == "edad_media"
+    end
+
+    test "given one conflict ticked then only that one is overwritten",
+         %{conn: conn, admin: admin, p38: p38, p393: p393} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+
+      lv
+      |> element(~s(#conflicts input[phx-value-play-id="#{p393.id}"]))
+      |> render_click()
+
+      lv |> element("#sync-actions button", t("Apply")) |> render_click()
+
+      assert Catalogue.get_play!(p393.id).historical_time == "siglo_xvi"
+      assert Catalogue.get_play!(p38.id).historical_time == "edad_media"
+    end
+
+    # apply_plan/2 already logs; only a LiveView has a user_id to give it. This
+    # is the whole provenance argument for the page.
+    test "given an apply then every write is attributed to the signed-in admin",
+         %{conn: conn, admin: admin, p211: p211} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+      lv |> element("#sync-actions button", t("Apply")) |> render_click()
+
+      entries = ActivityLog.list_entries(play_id: p211.id)
+
+      assert Enum.any?(entries, fn entry ->
+               entry.user_id == admin.id and entry.metadata["source"] == "filemaker_index"
+             end)
+    end
+
+    test "given an apply then the results replace the preview", %{conn: conn, admin: admin} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+      lv |> element("#sync-actions button", t("Apply")) |> render_click()
+
+      assert has_element?(lv, "#results")
       refute has_element?(lv, "#changes")
     end
   end

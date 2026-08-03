@@ -196,12 +196,18 @@ defmodule EmotheWeb.Admin.PlayListLive do
                 />
               </td>
               <td>
+                <%!-- Archived plays are hidden from every Catalogue reader, so
+                      linking to their pages raises. Restore is the only action. --%>
                 <.link
+                  :if={is_nil(play.deleted_at)}
                   navigate={~p"/admin/plays/#{play.id}"}
                   class="font-medium text-base-content hover:text-primary"
                 >
                   {play.title}
                 </.link>
+                <span :if={play.deleted_at} class="font-medium text-base-content/70">
+                  {play.title}
+                </span>
                 <span :if={play.deleted_at} class="badge badge-ghost badge-sm ml-2">
                   {gettext("Archived")}
                 </span>
@@ -215,6 +221,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
               <td>
                 <div class="flex items-center justify-end gap-1">
                   <.link
+                    :if={is_nil(play.deleted_at)}
                     navigate={~p"/admin/plays/#{play.id}/edit"}
                     class="btn btn-ghost btn-xs tooltip tooltip-left"
                     data-tip={gettext("Edit metadata")}
@@ -222,6 +229,7 @@ defmodule EmotheWeb.Admin.PlayListLive do
                     <.icon name="hero-pencil-mini" class="size-4" />
                   </.link>
                   <.link
+                    :if={is_nil(play.deleted_at)}
                     href={~p"/plays/#{play.code}"}
                     target="_blank"
                     class="btn btn-ghost btn-xs tooltip tooltip-left"

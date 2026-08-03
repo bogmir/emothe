@@ -32,6 +32,24 @@ defmodule EmotheWeb.Admin.PlayListLiveTest do
       refute html =~ beta.title
     end
 
+    # Regression: the archived list offered Edit, the title link and the public
+    # page, all of which load through readers that hide archived plays — every
+    # one of them raised Ecto.NoResultsError.
+    test "given an archived play then no link points at a page that cannot load it", %{conn: conn} do
+      conn = log_in_admin(conn)
+      play = TestFixtures.play_fixture(%{"title" => "Archived Play"})
+      {:ok, _} = Emothe.Catalogue.delete_play(play)
+
+      {:ok, view, html} = live(conn, ~p"/admin/plays?archived=1")
+
+      assert html =~ play.title
+      refute html =~ ~p"/admin/plays/#{play.id}/edit"
+      refute html =~ ~p"/admin/plays/#{play.id}"
+      refute html =~ ~p"/plays/#{play.code}"
+
+      assert has_element?(view, "button[phx-click='restore'][phx-value-id='#{play.id}']")
+    end
+
     test "given a play when deleting from list then it disappears", %{conn: conn} do
       conn = log_in_admin(conn)
       play = TestFixtures.play_fixture(%{"title" => "Delete Me"})

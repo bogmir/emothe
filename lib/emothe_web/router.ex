@@ -90,23 +90,26 @@ defmodule EmotheWeb.Router do
       ] do
       live "/users/log-in", UserLoginLive, :new
       live "/users/reset-password", UserForgotPasswordLive, :new
-      live "/users/reset-password/:token", UserResetPasswordLive, :edit
     end
   end
 
-  # Accepting an invitation must work on a browser that already holds a
-  # session: the admin who sent the invite often clicks the link themselves,
-  # and the token — not the current session — is the authority over which
-  # account is being set up. Both the page and the login POST it submits to
-  # therefore sit outside :redirect_if_user_is_authenticated, and logging in
-  # renews the session, so the old one is replaced rather than merged.
+  # An emailed token — invitation or password reset — must work on a browser
+  # that already holds a session: the token, not the current session, is the
+  # authority over which account is being set up. The admin who sent an invite
+  # often clicks the link themselves, and an unconfirmed account can log in
+  # while every gate refuses it, so the reset link is that user's only way out
+  # — and holding a session was exactly what swallowed it. Both pages and the
+  # login POST they submit to therefore sit outside
+  # :redirect_if_user_is_authenticated, and logging in renews the session, so
+  # the old one is replaced rather than merged.
   scope "/", EmotheWeb do
     pipe_through [:browser]
 
-    live_session :accept_invite,
+    live_session :emailed_token,
       layout: {EmotheWeb.Layouts, :app},
       on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :mount_current_user}] do
       live "/users/accept-invite/:token", UserAcceptInviteLive, :edit
+      live "/users/reset-password/:token", UserResetPasswordLive, :edit
     end
 
     post "/users/log-in", UserSessionController, :create

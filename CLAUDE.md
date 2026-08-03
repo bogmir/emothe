@@ -155,6 +155,11 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 - **Per-play scoping is a planned extension**, not a rewrite: `can?/3` already takes the
   resource, so restricting researchers to assigned plays is one new clause plus a
   `play_assignments` table. See the `@moduledoc` in `lib/emothe/authz.ex`.
+- **A password reset confirms an unconfirmed account.** The link was mailed to that
+  address, so following it proves the mailbox — the same argument as accepting an invite.
+  Without this, an invited user who reaches for "forgot password" instead of their invite
+  link ends up with a working password on an account every gate refuses, which is a lockout
+  with no UI escape. A reset never clears `deactivated_at`.
 - **Accounts are deactivated, never deleted** — `activity_logs.user_id` references them.
   Deactivating destroys every token and disconnects open LiveViews.
 - Sessions last 30 days and are listed and revocable at `/users/settings`; admins can force

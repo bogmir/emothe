@@ -208,6 +208,7 @@ msgstr ""
 msgid "Choose one or more TEI-XML files from your computer."
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:154
 #: lib/emothe_web/live/admin/import_live.ex:365
 #: lib/emothe_web/live/admin/play_form_live.ex:429
 #: lib/emothe_web/live/admin/play_list_live.ex:182
@@ -241,7 +242,7 @@ msgstr ""
 msgid "Current password"
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:300
+#: lib/emothe_web/components/layouts.ex:306
 #, elixir-autogen, elixir-format
 msgid "Dashboard"
 msgstr ""
@@ -374,6 +375,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:303
 #: lib/emothe_web/live/admin/import_live.ex:442
 #, elixir-autogen, elixir-format
 msgid "Error"
@@ -389,7 +391,7 @@ msgstr ""
 msgid "European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions"
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:279
+#: lib/emothe_web/components/layouts.ex:285
 #: lib/emothe_web/live/admin/export_site_live.ex:332
 #: lib/emothe_web/live/admin/play_detail_live.ex:154
 #, elixir-autogen, elixir-format
@@ -417,6 +419,7 @@ msgstr ""
 msgid "File"
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:300
 #: lib/emothe_web/live/admin/import_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "File is too large (max 20MB)"
@@ -513,6 +516,7 @@ msgstr ""
 msgid "Keep me logged in"
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:334
 #: lib/emothe_web/live/admin/play_form_live.ex:573
 #: lib/emothe_web/live/admin/play_sources_live.ex:215
 #: lib/emothe_web/live/admin/play_sources_live.ex:312
@@ -984,6 +988,7 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:155
 #: lib/emothe_web/live/admin/import_live.ex:364
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2627
 #: lib/emothe_web/live/admin/play_form_live.ex:351
@@ -2040,7 +2045,7 @@ msgstr ""
 msgid "User Management"
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:294
+#: lib/emothe_web/components/layouts.ex:300
 #, elixir-autogen, elixir-format
 msgid "Users"
 msgstr ""
@@ -2875,6 +2880,7 @@ msgstr ""
 msgid "Historical Time Note"
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:337
 #: lib/emothe_web/live/play_show_live.ex:332
 #, elixir-autogen, elixir-format
 msgid "Historical time"
@@ -3021,17 +3027,17 @@ msgstr ""
 msgid "You do not have access to that page."
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:285
+#: lib/emothe_web/components/layouts.ex:291
 #, elixir-autogen, elixir-format
 msgid "Activity"
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:276
+#: lib/emothe_web/components/layouts.ex:282
 #, elixir-autogen, elixir-format
 msgid "Site"
 msgstr ""
 
-#: lib/emothe_web/components/layouts.ex:291
+#: lib/emothe_web/components/layouts.ex:297
 #, elixir-autogen, elixir-format
 msgid "System"
 msgstr ""
@@ -3186,4 +3192,150 @@ msgstr ""
 #: lib/emothe_web/live/admin/user_list_live.ex:160
 #, elixir-autogen, elixir-format
 msgid "Invitation created, but the email could not be sent to %{email}. Resend it once mail delivery works."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:233
+#, elixir-autogen, elixir-format
+msgid "%{count} play(s) already match"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:242
+#, elixir-autogen, elixir-format
+msgid "%{count} play(s) are not in the published index"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:148
+#, elixir-autogen, elixir-format
+msgid "%{count} play(s) to update"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:190
+#, elixir-autogen, elixir-format
+msgid "%{count} value(s) already set by a researcher"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:355
+#, elixir-autogen, elixir-format
+msgid "(blank)"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:277
+#, elixir-autogen, elixir-format
+msgid "Applied"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:270
+#, elixir-autogen, elixir-format
+msgid "Apply"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:324
+#, elixir-autogen, elixir-format
+msgid "Cannot read the file"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:156
+#, elixir-autogen, elixir-format
+msgid "Changes"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:272
+#, elixir-autogen, elixir-format
+msgid "Discard"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:263
+#, elixir-autogen, elixir-format
+msgid "Everything already matches the export."
+msgstr ""
+
+#: lib/emothe_web/components/layouts.ex:276
+#, elixir-autogen, elixir-format
+msgid "FileMaker"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:16
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:108
+#, elixir-autogen, elixir-format
+msgid "FileMaker sync"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:338
+#, elixir-autogen, elixir-format
+msgid "Historical time note"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:320
+#, elixir-autogen, elixir-format
+msgid "No FileMaker records found in that file. Is it the right export?"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:247
+#, elixir-autogen, elixir-format
+msgid "Nothing is created for these. A play can be absent from the index and still have research metadata to fill, in which case it is listed above as well."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:122
+#, elixir-autogen, elixir-format
+msgid "One .ndjson file, as exported from FileMaker."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:301
+#, elixir-autogen, elixir-format
+msgid "Only .ndjson files are accepted"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:336
+#, elixir-autogen, elixir-format
+msgid "Parent play"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:135
+#, elixir-autogen, elixir-format
+msgid "Preview changes"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:335
+#, elixir-autogen, elixir-format
+msgid "Relationship"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:120
+#, elixir-autogen, elixir-format
+msgid "Select the export"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:291
+#, elixir-autogen, elixir-format
+msgid "Sync another export"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:195
+#, elixir-autogen, elixir-format
+msgid "These are left alone unless you tick them. For research metadata the export is a starting point, not the authority."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:99
+#, elixir-autogen, elixir-format
+msgid "Updated %{count} play(s)."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:302
+#, elixir-autogen, elixir-format
+msgid "Upload one file at a time"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:111
+#, elixir-autogen, elixir-format
+msgid "Upload the FileMaker export, review what it would change, then apply it."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:215
+#, elixir-autogen, elixir-format
+msgid "keep %{current}"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:218
+#, elixir-autogen, elixir-format
+msgid "the export says %{indexed}"
 msgstr ""

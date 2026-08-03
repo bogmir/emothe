@@ -128,6 +128,20 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
     end
   end
 
+  describe "a file that is not the export" do
+    test "given a file with no FileMaker records then nothing is planned or written",
+         %{conn: conn} do
+      corpus()
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      html = upload_and_preview(lv, "test/fixtures/filemaker/not_an_export.ndjson")
+
+      assert html =~ t("No FileMaker records found in that file. Is it the right export?")
+      refute has_element?(lv, "#changes")
+      assert has_element?(lv, "#upload-form")
+    end
+  end
+
   describe "apply" do
     setup do
       Map.put(corpus(), :admin, admin_fixture())

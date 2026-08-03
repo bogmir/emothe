@@ -271,6 +271,12 @@ defmodule EmotheWeb.Layouts do
            to: "/admin/plays/import",
            icon: "hero-arrow-down-tray-micro",
            action: :import_tei
+         },
+         %{
+           label: gettext("FileMaker"),
+           to: "/admin/filemaker",
+           icon: "hero-circle-stack-micro",
+           action: :import_filemaker
          }
        ]},
       {gettext("Site"),

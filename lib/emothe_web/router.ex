@@ -153,6 +153,7 @@ defmodule EmotheWeb.Router do
       live "/users", UserListLive, :index
       live "/activity-log", ActivityLogLive, :index
       live "/export", ExportSiteLive, :index
+      live "/filemaker", FilemakerSyncLive, :index
     end
 
     # Export endpoints

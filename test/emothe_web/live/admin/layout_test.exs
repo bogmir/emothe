@@ -9,6 +9,7 @@ defmodule EmotheWeb.Admin.LayoutTest do
       {:ok, _lv, html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays")
 
       assert html =~ ~p"/admin/plays/import"
+      assert html =~ ~p"/admin/filemaker"
       assert html =~ ~p"/admin/export"
       assert html =~ ~p"/admin/activity-log"
       assert html =~ ~p"/admin/users"
@@ -20,6 +21,7 @@ defmodule EmotheWeb.Admin.LayoutTest do
         live(log_in_user(conn, user_fixture(role: :researcher)), ~p"/admin/plays")
 
       assert html =~ ~p"/admin/plays/import"
+      refute html =~ ~p"/admin/filemaker"
       refute html =~ ~p"/admin/users"
       refute html =~ ~p"/admin/activity-log"
       refute html =~ "/admin/dashboard"

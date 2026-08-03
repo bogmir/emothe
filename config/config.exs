@@ -15,6 +15,13 @@ config :emothe, EmotheWeb.Gettext,
   default_locale: "es",
   locales: ~w(es en)
 
+# .ndjson has no registered MIME type by default; the FileMaker sync upload
+# (lib/emothe_web/live/admin/filemaker_sync_live.ex) needs it for allow_upload's
+# accept list.
+config :mime, :types, %{
+  "application/x-ndjson" => ["ndjson"]
+}
+
 # Configure the endpoint
 config :emothe, EmotheWeb.Endpoint,
   url: [host: "localhost"],

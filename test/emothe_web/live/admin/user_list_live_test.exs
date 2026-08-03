@@ -60,4 +60,36 @@ defmodule EmotheWeb.Admin.UserListLiveTest do
 
     assert Accounts.active?(Emothe.Repo.reload!(protected))
   end
+
+  # Regression: the result of deliver_invite/3 was discarded, so an SMTP relay
+  # that refused the mail still flashed "Invitation sent" and the invitee was
+  # left waiting for a link that was never delivered.
+  test "given a mailer that cannot deliver then the flash says so", %{conn: conn} do
+    Application.put_env(:emothe, Emothe.Mailer,
+      adapter: Swoosh.Adapters.SMTP,
+      relay: "127.0.0.1",
+      port: 1,
+      retries: 0,
+      no_mx_lookups: true
+    )
+
+    on_exit(fn -> Application.put_env(:emothe, Emothe.Mailer, adapter: Swoosh.Adapters.Test) end)
+
+    {:ok, lv, _html} = live(conn, ~p"/admin/users")
+
+    html =
+      lv
+      |> form("#invite_form", invite: %{"email" => "sinmail@uv.es", "role" => "researcher"})
+      |> render_submit()
+
+    assert html =~
+             Gettext.gettext(
+               EmotheWeb.Gettext,
+               "Invitation created, but the email could not be sent to %{email}. Resend it once mail delivery works.",
+               email: "sinmail@uv.es"
+             )
+
+    # The account still exists, so the invitation can be resent.
+    assert Accounts.get_user_by_email("sinmail@uv.es")
+  end
 end

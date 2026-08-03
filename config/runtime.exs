@@ -144,7 +144,20 @@ if config_env() == :prod do
       password: System.get_env("SMTP_PASSWORD"),
       tls: :always,
       auth: :always,
-      no_mx_lookups: true
+      no_mx_lookups: true,
+      # gen_smtp defaults tls_options to versions [tlsv1, tlsv1.1, tlsv1.2].
+      # OTP 28 dropped TLS 1.0 and 1.1, so :ssl rejects that list and every
+      # STARTTLS attempt fails with {:temporary_failure, host, :tls_failed} —
+      # which Swoosh reports as an error nobody was reading. Naming the
+      # supported versions also lets us verify the relay's certificate against
+      # the OS trust store the image already installs.
+      tls_options: [
+        versions: [:"tlsv1.2", :"tlsv1.3"],
+        verify: :verify_peer,
+        cacerts: :public_key.cacerts_get(),
+        server_name_indication: to_charlist(smtp_host),
+        depth: 3
+      ]
   end
 
   config :emothe, :mail_from, System.get_env("MAIL_FROM", "noreply@emothe.uv.es")

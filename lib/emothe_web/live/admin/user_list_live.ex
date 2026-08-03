@@ -5,7 +5,10 @@ defmodule EmotheWeb.Admin.UserListLive do
   # sections still navigate without a full page reload.
   on_mount {EmotheWeb.UserAuth, {:ensure_can, :manage_users}}
 
+  require Logger
+
   alias Emothe.Accounts
+  alias Emothe.Accounts.AdminBootstrap
   alias Emothe.ActivityLog
 
   @per_page 50
@@ -93,12 +96,7 @@ defmodule EmotheWeb.Admin.UserListLive do
 
     case Accounts.invite_user(email, role, socket.assigns.current_user) do
       {:ok, user, token} ->
-        Accounts.deliver_invite(user, token, &Emothe.Accounts.AdminBootstrap.invite_url/1)
-
-        {:noreply,
-         socket
-         |> put_flash(:info, gettext("Invitation sent to %{email}.", email: email))
-         |> load_users()}
+        {:noreply, socket |> load_users() |> flash_delivery(user, token)}
 
       {:error, :already_active} ->
         {:noreply, put_flash(socket, :error, gettext("That account already exists."))}
@@ -113,8 +111,7 @@ defmodule EmotheWeb.Admin.UserListLive do
 
     case Accounts.invite_user(user.email, user.role, socket.assigns.current_user) do
       {:ok, user, token} ->
-        Accounts.deliver_invite(user, token, &Emothe.Accounts.AdminBootstrap.invite_url/1)
-        {:noreply, put_flash(socket, :info, gettext("Invitation resent."))}
+        {:noreply, flash_delivery(socket, user, token)}
 
       {:error, _} ->
         {:noreply, put_flash(socket, :error, gettext("Could not resend that invitation."))}
@@ -143,6 +140,29 @@ defmodule EmotheWeb.Admin.UserListLive do
     :ok = id |> Accounts.get_user!() |> Accounts.force_logout()
 
     {:noreply, put_flash(socket, :info, gettext("All sessions ended."))}
+  end
+
+  # The invitation row is written before the mail goes out, so a relay that
+  # refuses it must not be reported as a sent invitation: the invitee would be
+  # waiting for a link nobody can produce. The account survives, so the fix is
+  # to repair delivery and resend.
+  defp flash_delivery(socket, user, token) do
+    case Accounts.deliver_invite(user, token, &AdminBootstrap.invite_url/1) do
+      {:ok, _email} ->
+        put_flash(socket, :info, gettext("Invitation sent to %{email}.", email: user.email))
+
+      {:error, reason} ->
+        Logger.error("invitation to #{user.email} was not delivered: #{inspect(reason)}")
+
+        put_flash(
+          socket,
+          :error,
+          gettext(
+            "Invitation created, but the email could not be sent to %{email}. Resend it once mail delivery works.",
+            email: user.email
+          )
+        )
+    end
   end
 
   defp protected_message do

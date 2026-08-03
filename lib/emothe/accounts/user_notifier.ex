@@ -1,6 +1,8 @@
 defmodule Emothe.Accounts.UserNotifier do
   import Swoosh.Email
 
+  require Logger
+
   alias Emothe.Mailer
 
   defp from_address do
@@ -16,8 +18,17 @@ defmodule Emothe.Accounts.UserNotifier do
       |> subject(subject)
       |> text_body(body)
 
-    with {:ok, _metadata} <- Mailer.deliver(email) do
-      {:ok, email}
+    # Logged here rather than at the call sites: the forgot-password flow must
+    # answer the same way whether or not the address exists, so a failure there
+    # has nowhere else to surface. A dropped invitation or reset link is a
+    # lockout, and a lockout must never be silent.
+    case Mailer.deliver(email) do
+      {:ok, _metadata} ->
+        {:ok, email}
+
+      {:error, reason} = error ->
+        Logger.error("could not send #{inspect(subject)} to #{recipient}: #{inspect(reason)}")
+        error
     end
   end
 

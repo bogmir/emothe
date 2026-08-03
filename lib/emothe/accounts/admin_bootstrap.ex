@@ -68,8 +68,19 @@ defmodule Emothe.Accounts.AdminBootstrap do
   defp invite_admin(email) do
     case Accounts.invite_user(email, :admin, nil) do
       {:ok, user, token} ->
-        Accounts.deliver_invite(user, token, &invite_url/1)
-        Logger.info("admin bootstrap: invited #{email}")
+        case Accounts.deliver_invite(user, token, &invite_url/1) do
+          {:ok, _email} ->
+            Logger.info("admin bootstrap: invited #{email}")
+
+          {:error, _reason} ->
+            # The notifier already logged why. Say what it means for the
+            # operator: the account exists but nobody received a link, so
+            # break-glass is the way in.
+            Logger.error(
+              "admin bootstrap: #{email} was invited but the mail was not delivered — " <>
+                "use Emothe.Release.invite_url(\"#{email}\") to get the link"
+            )
+        end
 
       {:error, reason} ->
         Logger.error("admin bootstrap: could not invite #{email}: #{inspect(reason)}")

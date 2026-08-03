@@ -38,8 +38,19 @@ defmodule Mix.Tasks.Emothe.Invite do
         if opts[:print_url] do
           Mix.shell().info(AdminBootstrap.invite_url(token))
         else
-          Accounts.deliver_invite(user, token, &AdminBootstrap.invite_url/1)
-          Mix.shell().info("invitation sent to #{email}")
+          case Accounts.deliver_invite(user, token, &AdminBootstrap.invite_url/1) do
+            {:ok, _email} ->
+              Mix.shell().info("invitation sent to #{email}")
+
+            {:error, reason} ->
+              Mix.raise("""
+              #{email} was invited but the mail was not delivered: #{inspect(reason)}
+
+              The account exists. Re-run with --print-url to get the link:
+
+                  mix emothe.invite #{email}#{if opts[:admin], do: " --admin"} --print-url
+              """)
+          end
         end
 
       {:error, :already_active} ->

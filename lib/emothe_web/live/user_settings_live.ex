@@ -19,7 +19,11 @@ defmodule EmotheWeb.UserSettingsLive do
         <div class="card-body gap-2">
           <h2 class="text-base font-semibold">{gettext("Email address")}</h2>
           <p class="font-mono text-sm">{@current_email}</p>
-          <p class="text-sm text-base-content/60">
+          <%!-- Only useful to someone who cannot change it themselves. --%>
+          <p
+            :if={not Emothe.Authz.can?(@current_user, :manage_users)}
+            class="text-sm text-base-content/60"
+          >
             {gettext("Your address is set by the administrator who invited you.")}
           </p>
         </div>
@@ -116,8 +120,11 @@ defmodule EmotheWeb.UserSettingsLive do
                   <td class="max-w-[16rem] truncate text-xs" title={session.user_agent}>
                     {session.user_agent || "—"}
                   </td>
-                  <td class="text-right">
-                    <span :if={session.token == @current_token} class="badge badge-sm badge-primary">
+                  <td class="whitespace-nowrap text-right">
+                    <span
+                      :if={session.token == @current_token}
+                      class="badge badge-sm badge-primary whitespace-nowrap"
+                    >
                       {gettext("This device")}
                     </span>
                     <button

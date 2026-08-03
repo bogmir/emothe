@@ -6,6 +6,29 @@ defmodule EmotheWeb.UserSettingsLiveTest do
 
   alias Emothe.Accounts
 
+  describe "email address card" do
+    test "given a researcher then the who-set-it hint is shown", %{conn: conn} do
+      {:ok, _lv, html} =
+        live(log_in_user(conn, user_fixture(role: :researcher)), ~p"/users/settings")
+
+      assert html =~
+               Gettext.gettext(
+                 EmotheWeb.Gettext,
+                 "Your address is set by the administrator who invited you."
+               )
+    end
+
+    test "given an admin then the hint is omitted", %{conn: conn} do
+      {:ok, _lv, html} = live(log_in_user(conn, admin_fixture()), ~p"/users/settings")
+
+      refute html =~
+               Gettext.gettext(
+                 EmotheWeb.Gettext,
+                 "Your address is set by the administrator who invited you."
+               )
+    end
+  end
+
   describe "active sessions panel" do
     test "given two sessions then both are listed and only one is this device", %{conn: conn} do
       user = user_fixture()

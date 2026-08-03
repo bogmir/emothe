@@ -166,12 +166,12 @@ msgstr "Catalán"
 msgid "Catalogue"
 msgstr "Catálogo"
 
-#: lib/emothe_web/live/user_settings_live.ex:75
+#: lib/emothe_web/live/user_settings_live.ex:79
 #, elixir-autogen, elixir-format
 msgid "Change Password"
 msgstr "Cambiar contraseña"
 
-#: lib/emothe_web/live/user_settings_live.ex:74
+#: lib/emothe_web/live/user_settings_live.ex:78
 #, elixir-autogen, elixir-format
 msgid "Changing..."
 msgstr "Cambiando..."
@@ -216,7 +216,7 @@ msgid "Code"
 msgstr "Código"
 
 #: lib/emothe_web/live/user_reset_password_live.ex:25
-#: lib/emothe_web/live/user_settings_live.ex:62
+#: lib/emothe_web/live/user_settings_live.ex:66
 #, elixir-autogen, elixir-format
 msgid "Confirm new password"
 msgstr "Confirmar nueva contraseña"
@@ -236,7 +236,7 @@ msgstr "Contenido"
 msgid "Contents"
 msgstr "Índice"
 
-#: lib/emothe_web/live/user_settings_live.ex:68
+#: lib/emothe_web/live/user_settings_live.ex:72
 #, elixir-autogen, elixir-format
 msgid "Current password"
 msgstr "Contraseña actual"
@@ -333,7 +333,7 @@ msgstr "Editar en administración"
 
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1537
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1583
-#: lib/emothe_web/live/admin/play_list_live.ex:220
+#: lib/emothe_web/live/admin/play_list_live.ex:227
 #, elixir-autogen, elixir-format
 msgid "Edit metadata"
 msgstr "Editar metadatos"
@@ -601,14 +601,14 @@ msgid "New Play"
 msgstr "Nueva obra"
 
 #: lib/emothe_web/live/user_reset_password_live.ex:21
-#: lib/emothe_web/live/user_settings_live.ex:56
+#: lib/emothe_web/live/user_settings_live.ex:60
 #, elixir-autogen, elixir-format
 msgid "New password"
 msgstr "Nueva contraseña"
 
 #: lib/emothe_web/live/admin/activity_log_live.ex:334
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1768
-#: lib/emothe_web/live/admin/play_list_live.ex:286
+#: lib/emothe_web/live/admin/play_list_live.ex:294
 #: lib/emothe_web/live/admin/user_list_live.ex:372
 #: lib/emothe_web/live/play_catalogue_live.ex:151
 #, elixir-autogen, elixir-format
@@ -645,7 +645,7 @@ msgstr "Aún no hay contenido. Añada un parlamento, acotación o prosa."
 msgid "No plays found. Try a different search term."
 msgstr "No se encontraron obras. Pruebe con otro término de búsqueda."
 
-#: lib/emothe_web/live/admin/play_list_live.ex:266
+#: lib/emothe_web/live/admin/play_list_live.ex:274
 #, elixir-autogen, elixir-format
 msgid "No plays yet. Import a TEI-XML file or create a new play."
 msgstr "Aún no hay obras. Importe un archivo TEI-XML o cree una nueva obra."
@@ -681,9 +681,9 @@ msgstr "Error al generar el PDF: %{reason}"
 msgid "Part (split line)"
 msgstr "Parte (verso partido)"
 
-#: lib/emothe_web/live/user_accept_invite_live.ex:38
+#: lib/emothe_web/live/user_accept_invite_live.ex:50
 #: lib/emothe_web/live/user_login_live.ex:16
-#: lib/emothe_web/live/user_settings_live.ex:31
+#: lib/emothe_web/live/user_settings_live.ex:35
 #, elixir-autogen, elixir-format
 msgid "Password"
 msgstr "Contraseña"
@@ -748,7 +748,7 @@ msgstr "Portugués"
 
 #: lib/emothe_web/live/admin/activity_log_live.ex:324
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1759
-#: lib/emothe_web/live/admin/play_list_live.ex:276
+#: lib/emothe_web/live/admin/play_list_live.ex:284
 #: lib/emothe_web/live/admin/user_list_live.ex:362
 #: lib/emothe_web/live/play_catalogue_live.ex:141
 #, elixir-autogen, elixir-format
@@ -1056,7 +1056,7 @@ msgid "View all plays"
 msgstr "Ver todas las obras"
 
 #: lib/emothe_web/live/admin/import_live.ex:410
-#: lib/emothe_web/live/admin/play_list_live.ex:228
+#: lib/emothe_web/live/admin/play_list_live.ex:236
 #, elixir-autogen, elixir-format
 msgid "View public page"
 msgstr "Ver página pública"
@@ -1761,7 +1761,7 @@ msgid "Otro"
 msgstr "Otro"
 
 #: lib/emothe_web/live/admin/activity_log_live.ex:327
-#: lib/emothe_web/live/admin/play_list_live.ex:279
+#: lib/emothe_web/live/admin/play_list_live.ex:287
 #: lib/emothe_web/live/admin/user_list_live.ex:365
 #: lib/emothe_web/live/play_catalogue_live.ex:144
 #, elixir-autogen, elixir-format
@@ -2548,17 +2548,17 @@ msgstr ""
 msgid "About the Static Site"
 msgstr ""
 
-#: lib/emothe_web/live/admin/play_list_live.ex:251
+#: lib/emothe_web/live/admin/play_list_live.ex:259
 #, elixir-autogen, elixir-format
 msgid "Archive"
 msgstr "Archivar"
 
-#: lib/emothe_web/live/admin/play_list_live.ex:246
+#: lib/emothe_web/live/admin/play_list_live.ex:254
 #, elixir-autogen, elixir-format
 msgid "Archive «%{title}»? It is hidden from the site and can be restored."
 msgstr "¿Archivar «%{title}»? Se ocultará del sitio y podrá restaurarse."
 
-#: lib/emothe_web/live/admin/play_list_live.ex:206
+#: lib/emothe_web/live/admin/play_list_live.ex:212
 #, elixir-autogen, elixir-format
 msgid "Archived"
 msgstr "Archivada"
@@ -2760,7 +2760,7 @@ msgstr "Reemplazar e importar"
 msgid "Replaces %{divisions} division(s), %{elements} element(s), %{characters} character(s) and %{tei} record(s) imported from TEI."
 msgstr "Reemplaza %{divisions} división(es), %{elements} elemento(s), %{characters} personaje(s) y %{tei} registro(s) importado(s) del TEI."
 
-#: lib/emothe_web/live/admin/play_list_live.ex:237
+#: lib/emothe_web/live/admin/play_list_live.ex:245
 #, elixir-autogen, elixir-format
 msgid "Restore"
 msgstr "Restaurar"
@@ -2932,12 +2932,12 @@ msgstr "Pida a un administrador que le envíe una nueva."
 msgid "Choose a password for %{email}"
 msgstr "Elija una contraseña para %{email}"
 
-#: lib/emothe_web/live/user_accept_invite_live.ex:43
+#: lib/emothe_web/live/user_accept_invite_live.ex:55
 #, elixir-autogen, elixir-format
 msgid "Saving..."
 msgstr "Guardando..."
 
-#: lib/emothe_web/live/user_accept_invite_live.ex:44
+#: lib/emothe_web/live/user_accept_invite_live.ex:56
 #, elixir-autogen, elixir-format
 msgid "Set password and sign in"
 msgstr "Establecer contraseña e iniciar sesión"
@@ -2962,47 +2962,47 @@ msgstr "¡Bienvenido a EMOTHE!"
 msgid "Your account is not active. Please contact an administrator."
 msgstr "Su cuenta no está activa. Póngase en contacto con un administrador."
 
-#: lib/emothe_web/live/user_settings_live.ex:86
+#: lib/emothe_web/live/user_settings_live.ex:90
 #, elixir-autogen, elixir-format
 msgid "Active sessions"
 msgstr "Sesiones activas"
 
-#: lib/emothe_web/live/user_settings_live.ex:105
+#: lib/emothe_web/live/user_settings_live.ex:109
 #, elixir-autogen, elixir-format
 msgid "Address"
 msgstr "Dirección"
 
-#: lib/emothe_web/live/user_settings_live.ex:106
+#: lib/emothe_web/live/user_settings_live.ex:110
 #, elixir-autogen, elixir-format
 msgid "Browser"
 msgstr "Navegador"
 
-#: lib/emothe_web/live/user_settings_live.ex:129
+#: lib/emothe_web/live/user_settings_live.ex:136
 #, elixir-autogen, elixir-format
 msgid "Revoke"
 msgstr "Revocar"
 
-#: lib/emothe_web/live/user_settings_live.ex:197
+#: lib/emothe_web/live/user_settings_live.ex:204
 #, elixir-autogen, elixir-format
 msgid "Session revoked."
 msgstr "Sesión revocada."
 
-#: lib/emothe_web/live/user_settings_live.ex:96
+#: lib/emothe_web/live/user_settings_live.ex:100
 #, elixir-autogen, elixir-format
 msgid "Sign out everywhere else"
 msgstr "Cerrar sesión en los demás dispositivos"
 
-#: lib/emothe_web/live/user_settings_live.ex:104
+#: lib/emothe_web/live/user_settings_live.ex:108
 #, elixir-autogen, elixir-format
 msgid "Signed in"
 msgstr "Inicio de sesión"
 
-#: lib/emothe_web/live/user_settings_live.ex:210
+#: lib/emothe_web/live/user_settings_live.ex:217
 #, elixir-autogen, elixir-format
 msgid "Signed out of all other sessions."
 msgstr "Se han cerrado todas las demás sesiones."
 
-#: lib/emothe_web/live/user_settings_live.ex:121
+#: lib/emothe_web/live/user_settings_live.ex:128
 #, elixir-autogen, elixir-format
 msgid "This device"
 msgstr "Este dispositivo"
@@ -3014,7 +3014,7 @@ msgstr ""
 "Demasiados intentos de inicio de sesión. Espere unos minutos e inténtelo de "
 "nuevo."
 
-#: lib/emothe_web/live/user_settings_live.ex:88
+#: lib/emothe_web/live/user_settings_live.ex:92
 #, elixir-autogen, elixir-format
 msgid "Where your account is currently signed in."
 msgstr "Dónde tiene la sesión iniciada actualmente."
@@ -3167,7 +3167,7 @@ msgstr "Esa dirección de correo no es válida."
 msgid "This administrator is defined in ADMIN_EMAILS and cannot be changed here."
 msgstr "Este administrador está definido en ADMIN_EMAILS y no se puede modificar aquí."
 
-#: lib/emothe_web/live/user_settings_live.ex:33
+#: lib/emothe_web/live/user_settings_live.ex:37
 #, elixir-autogen, elixir-format
 msgid "At least 12 characters. Changing it signs out your other sessions."
 msgstr "Al menos 12 caracteres. Al cambiarla se cierran sus demás sesiones."
@@ -3182,7 +3182,14 @@ msgstr "Dirección de correo electrónico"
 msgid "Manage your password and the devices where you are signed in."
 msgstr "Gestione su contraseña y los dispositivos donde tiene la sesión iniciada."
 
-#: lib/emothe_web/live/user_settings_live.ex:23
+#: lib/emothe_web/live/user_settings_live.ex:27
 #, elixir-autogen, elixir-format
 msgid "Your address is set by the administrator who invited you."
 msgstr "Su dirección la establece el administrador que le invitó."
+
+#: lib/emothe_web/live/user_accept_invite_live.ex:31
+#, elixir-autogen, elixir-format
+msgid "You are signed in as %{email}. Continuing will sign you out of that account."
+msgstr ""
+"Ha iniciado sesión como %{email}. Si continúa, se cerrará la sesión de esa "
+"cuenta."

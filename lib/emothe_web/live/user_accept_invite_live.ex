@@ -22,6 +22,18 @@ defmodule EmotheWeb.UserAcceptInviteLive do
         <:subtitle>{gettext("Choose a password for %{email}", email: @user.email)}</:subtitle>
       </.header>
 
+      <div
+        :if={@current_user && @current_user.id != @user.id}
+        class="alert alert-warning mt-4 text-sm"
+      >
+        <.icon name="hero-exclamation-triangle-micro" class="size-4 shrink-0" />
+        <span>
+          {gettext("You are signed in as %{email}. Continuing will sign you out of that account.",
+            email: @current_user.email
+          )}
+        </span>
+      </div>
+
       <.simple_form
         for={@form}
         id="accept_invite_form"

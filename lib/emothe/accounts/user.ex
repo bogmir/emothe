@@ -38,6 +38,28 @@ defmodule Emothe.Accounts.User do
     |> put_change(:confirmed_at, DateTime.utc_now(:second))
   end
 
+  @doc """
+  A changeset for a password reset.
+
+  Confirms the account if it was not confirmed yet, for the same reason
+  accepting an invitation does: the reset link was mailed to that address, so
+  following it proves control of the mailbox. Without this an invited user who
+  reaches for "forgot password" instead of their invite link ends up with a
+  working password on an account every gate refuses.
+
+  Deliberately leaves `deactivated_at` alone — a reset must not resurrect an
+  account an administrator switched off.
+  """
+  def reset_password_changeset(user, attrs, opts \\ []) do
+    changeset = password_changeset(user, attrs, opts)
+
+    if is_nil(user.confirmed_at) do
+      put_change(changeset, :confirmed_at, DateTime.utc_now(:second))
+    else
+      changeset
+    end
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])

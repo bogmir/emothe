@@ -92,6 +92,40 @@ defmodule Emothe.AccountsTest do
     end
   end
 
+  describe "reset_user_password/2" do
+    # Regression: an invited account that used "forgot password" instead of its
+    # invite link got a valid password and confirmed_at: nil. It could
+    # authenticate, then every gate refused it and destroyed the session —
+    # a lockout with no way out through the UI.
+    test "given an invited user then resetting the password activates the account" do
+      {user, _token} = invited_user_fixture()
+
+      assert {:ok, reset} =
+               Accounts.reset_user_password(user, %{password: valid_user_password()})
+
+      assert Accounts.active?(reset)
+    end
+
+    test "given a confirmed user then the original confirmation time is kept" do
+      user = user_fixture(confirmed_at: ~U[2020-01-01 00:00:00Z])
+
+      assert {:ok, reset} =
+               Accounts.reset_user_password(user, %{password: valid_user_password()})
+
+      assert reset.confirmed_at == ~U[2020-01-01 00:00:00Z]
+    end
+
+    test "given a deactivated user then resetting the password does not let them back in" do
+      user = user_fixture()
+      {:ok, user} = Accounts.deactivate_user(user)
+
+      assert {:ok, reset} =
+               Accounts.reset_user_password(user, %{password: valid_user_password()})
+
+      refute Accounts.active?(reset)
+    end
+  end
+
   describe "sessions" do
     test "given a login with device info then it is stored and listable" do
       user = user_fixture()

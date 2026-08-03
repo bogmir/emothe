@@ -112,7 +112,7 @@ lib/
 All tables use UUID primary keys. Key relationships:
 
 - `users` - email/password auth with role (`:admin`, `:researcher`), `confirmed_at`, `deactivated_at`; `hashed_password` is nullable because an invited account has no password yet
-- `users_tokens` - session tokens (with `ip_address`/`user_agent`), invite/reset/change-email tokens
+- `users_tokens` - session tokens (with `ip_address`/`user_agent`), invite and password-reset tokens. There is no self-service email change, so no `change:` context
 - `plays` has_many `play_editors`, `play_sources`, `play_editorial_notes`, `characters`, `play_divisions`, `play_elements`
 - `play_divisions` self-references via `parent_id` (acts contain scenes)
 - `play_elements` self-references via `parent_id` (speeches contain line_groups contain verse_lines)
@@ -173,7 +173,7 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 - `GET /users/log-in` - Login (redirects if already logged in)
 - `POST /users/log-in` - Create session
 - `DELETE /users/log-out` - Destroy session
-- `GET /users/settings` - Email, password and active sessions (requires an active account)
+- `GET /users/settings` - Password and active sessions (requires an active account). The email address is shown read-only: only an admin can change it
 - `GET /users/reset-password` - Forgot password
 - `GET /users/reset-password/:token` - Reset password form
 
@@ -356,6 +356,7 @@ Then visit:
 - [x] Account state enforced - the three auth gates require `confirmed_at` set and `deactivated_at` nil. This is the claim that was previously false in this file
 - [x] `ADMIN_EMAILS` reconciled at boot by `Emothe.Accounts.AdminBootstrap`; those admins are protected from UI demotion/deactivation
 - [x] Visible, revocable sessions - `/users/settings` lists IP and browser per session, revokes one or all others; 30-day tokens; admins force logout from `/admin/users`
+- [x] Self-service email change removed - the address identifies the invited account, so `/users/settings` shows it read-only. `change_user_email/2`, `apply_user_email/3`, `update_user_email/2`, `User.email_changeset/3`, `User.confirm_changeset/1` and the `change:` token context are all deleted
 - [x] Admin sidebar shell - three permission-filtered groups, collapsible at every breakpoint, hidden by default on play pages; breadcrumbs removed from the admin layout
 - [x] Compile & fix errors (all modules compile cleanly)
 - [x] TEI parser test suite - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding, split verse parts, line_id, rend, source fields, principal/respStmt editors, author_attribution, edition_title, is_verse, lg part, prose asides, multiple bibl sources, listBibl wrapper

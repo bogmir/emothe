@@ -5,150 +5,148 @@ defmodule EmotheWeb.UserSettingsLive do
 
   def render(assigns) do
     ~H"""
-    <.header class="text-center">
-      {gettext("Account Settings")}
-      <:subtitle>{gettext("Manage your account email address and password settings")}</:subtitle>
-    </.header>
-
-    <div class="space-y-12 divide-y">
+    <div class="mx-auto max-w-2xl px-4 py-10 space-y-6">
       <div>
-        <.simple_form
-          for={@email_form}
-          id="email_form"
-          phx-submit="update_email"
-          phx-change="validate_email"
-        >
-          <.input field={@email_form[:email]} type="email" label={gettext("Email")} required />
-          <.input
-            field={@email_form[:current_password]}
-            name="current_password"
-            id="current_password_for_email"
-            type="password"
-            label={gettext("Current password")}
-            value={@email_form_current_password}
-            required
-          />
-          <:actions>
-            <.button phx-disable-with={gettext("Changing...")}>{gettext("Change Email")}</.button>
-          </:actions>
-        </.simple_form>
+        <h1 class="text-2xl font-semibold tracking-tight text-base-content">
+          {gettext("Account Settings")}
+        </h1>
+        <p class="mt-1 text-sm text-base-content/70">
+          {gettext("Manage your password and the devices where you are signed in.")}
+        </p>
       </div>
-      <div>
-        <.simple_form
-          for={@password_form}
-          id="password_form"
-          action={~p"/users/log-in?_action=password_updated"}
-          method="post"
-          phx-change="validate_password"
-          phx-submit="update_password"
-          phx-trigger-action={@trigger_submit}
-        >
-          <input
-            name={@password_form[:email].name}
-            type="hidden"
-            id="hidden_user_email"
-            value={@current_email}
-          />
-          <.input
-            field={@password_form[:password]}
-            type="password"
-            label={gettext("New password")}
-            required
-          />
-          <.input
-            field={@password_form[:password_confirmation]}
-            type="password"
-            label={gettext("Confirm new password")}
-          />
-          <.input
-            field={@password_form[:current_password]}
-            name="current_password"
-            type="password"
-            label={gettext("Current password")}
-            id="current_password_for_password"
-            value={@current_password}
-            required
-          />
-          <:actions>
-            <.button phx-disable-with={gettext("Changing...")}>{gettext("Change Password")}</.button>
-          </:actions>
-        </.simple_form>
-      </div>
-      <div>
-        <.header class="text-lg">
-          {gettext("Active sessions")}
-          <:subtitle>
-            {gettext("Where your account is currently signed in.")}
-          </:subtitle>
-        </.header>
 
-        <table class="table table-sm mt-4">
-          <thead>
-            <tr>
-              <th>{gettext("Signed in")}</th>
-              <th>{gettext("Address")}</th>
-              <th>{gettext("Browser")}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr :for={session <- @sessions}>
-              <td>{Calendar.strftime(session.inserted_at, "%Y-%m-%d %H:%M")}</td>
-              <td class="font-mono text-xs">{session.ip_address || "—"}</td>
-              <td class="max-w-xs truncate text-xs">{session.user_agent || "—"}</td>
-              <td class="text-right">
-                <span :if={session.token == @current_token} class="badge badge-sm badge-primary">
-                  {gettext("This device")}
-                </span>
-                <button
-                  :if={session.token != @current_token}
-                  class="btn btn-xs btn-ghost text-error"
-                  phx-click="revoke_session"
-                  phx-value-id={session.id}
-                >
-                  {gettext("Revoke")}
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <section class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body gap-2">
+          <h2 class="text-base font-semibold">{gettext("Email address")}</h2>
+          <p class="font-mono text-sm">{@current_email}</p>
+          <p class="text-sm text-base-content/60">
+            {gettext("Your address is set by the administrator who invited you.")}
+          </p>
+        </div>
+      </section>
 
-        <button
-          :if={length(@sessions) > 1}
-          class="btn btn-sm btn-outline btn-error mt-4"
-          phx-click="revoke_other_sessions"
-        >
-          {gettext("Sign out everywhere else")}
-        </button>
-      </div>
+      <section class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body gap-4">
+          <div>
+            <h2 class="text-base font-semibold">{gettext("Password")}</h2>
+            <p class="text-sm text-base-content/60">
+              {gettext("At least 12 characters. Changing it signs out your other sessions.")}
+            </p>
+          </div>
+
+          <.form
+            for={@password_form}
+            id="password_form"
+            action={~p"/users/log-in?_action=password_updated"}
+            method="post"
+            phx-change="validate_password"
+            phx-submit="update_password"
+            phx-trigger-action={@trigger_submit}
+            class="space-y-4"
+          >
+            <input
+              name={@password_form[:email].name}
+              type="hidden"
+              id="hidden_user_email"
+              value={@current_email}
+            />
+            <.input
+              field={@password_form[:password]}
+              type="password"
+              label={gettext("New password")}
+              required
+            />
+            <.input
+              field={@password_form[:password_confirmation]}
+              type="password"
+              label={gettext("Confirm new password")}
+            />
+            <.input
+              field={@password_form[:current_password]}
+              name="current_password"
+              type="password"
+              label={gettext("Current password")}
+              id="current_password_for_password"
+              value={@current_password}
+              required
+            />
+            <div class="flex justify-end">
+              <.button phx-disable-with={gettext("Changing...")}>
+                {gettext("Change Password")}
+              </.button>
+            </div>
+          </.form>
+        </div>
+      </section>
+
+      <section class="card border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body gap-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-base font-semibold">{gettext("Active sessions")}</h2>
+              <p class="text-sm text-base-content/60">
+                {gettext("Where your account is currently signed in.")}
+              </p>
+            </div>
+            <button
+              :if={length(@sessions) > 1}
+              class="btn btn-sm btn-outline btn-error"
+              phx-click="revoke_other_sessions"
+            >
+              {gettext("Sign out everywhere else")}
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead>
+                <tr class="text-xs uppercase tracking-wide text-base-content/60">
+                  <th>{gettext("Signed in")}</th>
+                  <th>{gettext("Address")}</th>
+                  <th>{gettext("Browser")}</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr :for={session <- @sessions} class="hover">
+                  <td class="whitespace-nowrap">
+                    {Calendar.strftime(session.inserted_at, "%Y-%m-%d %H:%M")}
+                  </td>
+                  <td class="font-mono text-xs">{session.ip_address || "—"}</td>
+                  <td class="max-w-[16rem] truncate text-xs" title={session.user_agent}>
+                    {session.user_agent || "—"}
+                  </td>
+                  <td class="text-right">
+                    <span :if={session.token == @current_token} class="badge badge-sm badge-primary">
+                      {gettext("This device")}
+                    </span>
+                    <button
+                      :if={session.token != @current_token}
+                      class="btn btn-xs btn-ghost text-error"
+                      phx-click="revoke_session"
+                      phx-value-id={session.id}
+                    >
+                      {gettext("Revoke")}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
     """
   end
 
-  def mount(%{"token" => token}, _session, socket) do
-    socket =
-      case Accounts.update_user_email(socket.assigns.current_user, token) do
-        :ok ->
-          put_flash(socket, :info, gettext("Email changed successfully."))
-
-        :error ->
-          put_flash(socket, :error, gettext("Email change link is invalid or it has expired."))
-      end
-
-    {:ok, push_navigate(socket, to: ~p"/users/settings")}
-  end
-
   def mount(_params, session, socket) do
     user = socket.assigns.current_user
-    email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
 
     socket =
       socket
       |> assign(:current_password, nil)
-      |> assign(:email_form_current_password, nil)
       |> assign(:current_email, user.email)
-      |> assign(:email_form, to_form(email_changeset, as: "user"))
       |> assign(:password_form, to_form(password_changeset, as: "user"))
       |> assign(:trigger_submit, false)
       |> assign(:current_token, session["user_token"])
@@ -159,39 +157,6 @@ defmodule EmotheWeb.UserSettingsLive do
 
   defp assign_sessions(socket) do
     assign(socket, :sessions, Accounts.list_user_sessions(socket.assigns.current_user))
-  end
-
-  def handle_event("validate_email", params, socket) do
-    %{"current_password" => password, "user" => user_params} = params
-
-    email_form =
-      socket.assigns.current_user
-      |> Accounts.change_user_email(user_params)
-      |> Map.put(:action, :validate)
-      |> to_form(as: "user")
-
-    {:noreply, assign(socket, email_form: email_form, email_form_current_password: password)}
-  end
-
-  def handle_event("update_email", params, socket) do
-    %{"current_password" => password, "user" => user_params} = params
-    user = socket.assigns.current_user
-
-    case Accounts.apply_user_email(user, password, user_params) do
-      {:ok, applied_user} ->
-        Accounts.deliver_user_update_email_instructions(
-          applied_user,
-          user.email,
-          &url(~p"/users/settings/confirm-email/#{&1}")
-        )
-
-        info = gettext("A link to confirm your email change has been sent to the new address.")
-        {:noreply, socket |> put_flash(:info, info) |> assign(email_form_current_password: nil)}
-
-      {:error, changeset} ->
-        {:noreply,
-         assign(socket, :email_form, to_form(Map.put(changeset, :action, :insert), as: "user"))}
-    end
   end
 
   def handle_event("validate_password", params, socket) do

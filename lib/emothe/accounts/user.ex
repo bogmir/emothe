@@ -81,21 +81,6 @@ defmodule Emothe.Accounts.User do
   end
 
   @doc """
-  A user changeset for changing the email.
-
-  It requires the email to change otherwise an error is added.
-  """
-  def email_changeset(user, attrs, opts \\ []) do
-    user
-    |> cast(attrs, [:email])
-    |> validate_email(opts)
-    |> case do
-      %{changes: %{email: _}} = changeset -> changeset
-      %{} = changeset -> add_error(changeset, :email, "did not change")
-    end
-  end
-
-  @doc """
   A user changeset for changing the password.
 
   ## Options
@@ -121,14 +106,6 @@ defmodule Emothe.Accounts.User do
     user
     |> cast(attrs, [:role])
     |> validate_required([:role])
-  end
-
-  @doc """
-  Confirms the account by setting `confirmed_at`.
-  """
-  def confirm_changeset(user) do
-    now = DateTime.utc_now() |> DateTime.truncate(:second)
-    change(user, confirmed_at: now)
   end
 
   @doc """

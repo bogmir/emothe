@@ -103,7 +103,6 @@ defmodule EmotheWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [EmotheWeb.SetLocaleHook, {EmotheWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm-email/:token", UserSettingsLive, :confirm_email
     end
   end
 

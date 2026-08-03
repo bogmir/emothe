@@ -205,3 +205,15 @@ a.scroll-spy-active {
     transform: translateY(0);
   }
 }
+
+/* Browser autofill paints its own yellow background, which is unreadable on
+   the dark theme. Repaint it with the theme's own colours. */
+input:autofill,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-base-content);
+  caret-color: var(--color-base-content);
+  box-shadow: 0 0 0 1000px var(--color-base-100) inset;
+  transition: background-color 9999s ease-out 0s;
+}

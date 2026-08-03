@@ -29,7 +29,7 @@ defmodule Emothe.Authz do
 
   @admin_actions @researcher_actions ++
                    ~w(purge_play manage_users view_activity_log deploy_site
-                      view_dashboard)a
+                      view_dashboard import_filemaker)a
 
   @doc """
   Every action this system knows about. Useful for exhaustive tests.

@@ -9,7 +9,7 @@ defmodule Emothe.AuthzTest do
                          manage_sources import_tei download_export archive_play)a
 
   @admin_only_actions ~w(purge_play manage_users view_activity_log
-                         deploy_site view_dashboard)a
+                         deploy_site view_dashboard import_filemaker)a
 
   describe "an active researcher" do
     setup do: %{user: user_fixture(role: :researcher)}

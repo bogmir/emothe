@@ -19,6 +19,122 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
     end
   end
 
+  @export "test/fixtures/filemaker/export_sample.ndjson"
+
+  defp corpus do
+    p38 =
+      play_fixture(%{
+        "code" => "EMOTHE0038",
+        "title" => "Antony and Cleopatra",
+        "historical_time" => "edad_media"
+      })
+
+    p52 =
+      play_fixture(%{
+        "code" => "EMOTHE0052",
+        "title" => "Antonio y Cleopatra",
+        "relationship_type" => "traduccion",
+        "parent_play_id" => p38.id
+      })
+
+    p211 = play_fixture(%{"code" => "EMOTHE0211", "title" => "El caballero de Olmedo"})
+
+    p393 =
+      play_fixture(%{
+        "code" => "HIE0393",
+        "title" => "The Spanish Bawd",
+        "historical_time" => "edad_media"
+      })
+
+    al = play_fixture(%{"code" => "AL0001", "title" => "Artelope play"})
+
+    %{p38: p38, p52: p52, p211: p211, p393: p393, al: al}
+  end
+
+  defp upload_and_preview(lv, path) do
+    lv
+    |> file_input("#upload-form", :export, [
+      %{name: Path.basename(path), content: File.read!(path), type: "application/x-ndjson"}
+    ])
+    |> render_upload(Path.basename(path))
+
+    lv |> element("#upload-form") |> render_submit()
+  end
+
+  describe "preview" do
+    setup do
+      corpus()
+      :ok
+    end
+
+    test "given the export then every bucket is reported", %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+
+      changes = lv |> element("#changes") |> render()
+      assert changes =~ "EMOTHE0038"
+      assert changes =~ "EMOTHE0211"
+      assert changes =~ "HIE0393"
+      refute changes =~ "AL0001"
+
+      assert lv |> element("#unchanged") |> render() =~ "EMOTHE0052"
+
+      missing = lv |> element("#missing") |> render()
+      assert missing =~ "AL0001"
+      assert missing =~ "EMOTHE0211"
+    end
+
+    # A play absent from the published index can still carry a T01 research
+    # record. EMOTHE0341 is that case in the real export. Presenting the buckets
+    # as tabs would imply they are exclusive; they are not.
+    test "given a play with research metadata but no index entry then it is in both buckets",
+         %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+
+      assert lv |> element("#changes") |> render() =~ "EMOTHE0211"
+      assert lv |> element("#missing") |> render() =~ "EMOTHE0211"
+    end
+
+    test "given a new value then the current one is shown beside it", %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+      changes = lv |> element("#changes") |> render()
+
+      assert changes =~ t("Historical time")
+      assert changes =~ EmotheWeb.PlayLabels.historical_time_label("siglo_xvii")
+    end
+
+    test "given discard then the upload form comes back", %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+      assert has_element?(lv, "#changes")
+
+      lv |> element("button", t("Discard")) |> render_click()
+
+      assert has_element?(lv, "#upload-form")
+      refute has_element?(lv, "#changes")
+    end
+  end
+
+  # A field with no field_label/1 clause of its own must still render. This is
+  # what makes S2b--S2f (place_of_action, composition_date, …) land on this page
+  # with no edit to it.
+  describe "field labels" do
+    test "given an unknown field then the catch-all renders it readably" do
+      assert EmotheWeb.Admin.FilemakerSyncLive.field_label(:place_of_action) == "place of action"
+    end
+
+    test "given an unknown field then its value renders as text" do
+      assert EmotheWeb.Admin.FilemakerSyncLive.value_label(:place_of_action, "Roma", %{}) ==
+               "Roma"
+    end
+  end
+
   defp t(msgid, bindings \\ []) do
     Gettext.gettext(EmotheWeb.Gettext, msgid, bindings)
   end

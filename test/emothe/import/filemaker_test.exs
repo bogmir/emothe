@@ -49,6 +49,18 @@ defmodule Emothe.Import.FilemakerTest do
     assert {:error, :enoent} = Filemaker.load_index("test/fixtures/filemaker/nope.ndjson")
   end
 
+  # The admin page uploads one file carrying both layouts, the way the real
+  # export does. Both readers must find their own records in it.
+  test "given one file with both layouts then each reader finds its own records" do
+    path = "test/fixtures/filemaker/export_sample.ndjson"
+
+    assert {:ok, index} = Filemaker.load_index(path)
+    assert {:ok, versions} = Filemaker.load_versions(path)
+
+    assert Enum.sort(Map.keys(index)) == ["EMOTHE0038", "EMOTHE0052", "HIE0393"]
+    assert Enum.sort(Map.keys(versions)) == ["EMOTHE0038", "EMOTHE0211", "HIE0393"]
+  end
+
   describe "load_versions/1" do
     @versions "test/fixtures/filemaker/versions_sample.ndjson"
 

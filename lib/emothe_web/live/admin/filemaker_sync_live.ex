@@ -19,7 +19,7 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
      |> assign(:selected, MapSet.new())
      |> assign(:results, nil)
      |> allow_upload(:export,
-       accept: ~w(.ndjson .json),
+       accept: ~w(.ndjson),
        max_entries: 1,
        max_file_size: 20_000_000
      )}
@@ -33,22 +33,26 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
   end
 
   def handle_event("preview", _params, socket) do
-    case consume_uploaded_entries(socket, :export, fn %{path: path}, _entry ->
-           {:ok, read_plan(path)}
-         end) do
-      [] ->
-        {:noreply, socket}
+    if Enum.all?(socket.assigns.uploads.export.entries, & &1.done?) do
+      case consume_uploaded_entries(socket, :export, fn %{path: path}, _entry ->
+             {:ok, read_plan(path)}
+           end) do
+        [] ->
+          {:noreply, socket}
 
-      [{:ok, plan, plays}] ->
-        {:noreply,
-         socket
-         |> assign(:plan, plan)
-         |> assign(:plays_by_id, Map.new(plays, &{&1.id, &1}))
-         |> assign(:selected, MapSet.new())
-         |> assign(:results, nil)}
+        [{:ok, plan, plays}] ->
+          {:noreply,
+           socket
+           |> assign(:plan, plan)
+           |> assign(:plays_by_id, Map.new(plays, &{&1.id, &1}))
+           |> assign(:selected, MapSet.new())
+           |> assign(:results, nil)}
 
-      [{:error, reason}] ->
-        {:noreply, put_flash(socket, :error, error_message(reason))}
+        [{:error, reason}] ->
+          {:noreply, put_flash(socket, :error, error_message(reason))}
+      end
+    else
+      {:noreply, socket}
     end
   end
 
@@ -226,7 +230,11 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
         </div>
       </div>
 
-      <div :if={@plan} id="counts" class="card mb-6 border border-base-300 bg-base-100 shadow-sm">
+      <div
+        :if={@plan && (@plan.unchanged != [] or @plan.missing != [])}
+        id="counts"
+        class="card mb-6 border border-base-300 bg-base-100 shadow-sm"
+      >
         <div class="card-body gap-2">
           <details :if={@plan.unchanged != []} id="unchanged">
             <summary class="cursor-pointer text-sm">
@@ -308,12 +316,14 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
     with {:ok, index} <- Filemaker.load_index(path),
          {:ok, versions} <- Filemaker.load_versions(path),
          true <- map_size(index) > 0 or map_size(versions) > 0 do
-      plays = FilemakerSync.all_plays()
+      plays = FilemakerSync.all_plays() |> Enum.reject(& &1.deleted_at)
       {:ok, FilemakerSync.plan(index, plays, versions), plays}
     else
       false -> {:error, :no_records}
       {:error, reason} -> {:error, reason}
     end
+  rescue
+    e -> {:error, e}
   end
 
   defp error_message(:no_records) do
@@ -339,6 +349,11 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
   def field_label(other), do: other |> to_string() |> String.replace("_", " ")
 
   @doc "The display value of a field, given the plays keyed by id."
+  # Blank takes priority over every field-specific clause below: a play with no
+  # parent must read the same "(blank)" whether it is the current value or the
+  # value a change sets, not "—" for one side and "" (PlayLabels' catch-all) for
+  # the other.
+  def value_label(_field, blank, _plays) when blank in [nil, ""], do: gettext("(blank)")
   def value_label(:historical_time, value, _plays), do: PlayLabels.historical_time_label(value)
 
   def value_label(:parent_play_id, id, plays) do
@@ -351,10 +366,7 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
   def value_label(_field, value, _plays), do: to_string(value)
 
   defp current_value(plays_by_id, play_id, field) do
-    case plays_by_id |> Map.fetch!(play_id) |> Map.get(field) do
-      blank when blank in [nil, ""] -> gettext("(blank)")
-      value -> value_label(field, value, plays_by_id)
-    end
+    value_label(field, plays_by_id |> Map.fetch!(play_id) |> Map.get(field), plays_by_id)
   end
 
   defp selected?(conflict, selected) do

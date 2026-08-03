@@ -113,6 +113,38 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
 
       assert changes =~ t("Historical time")
       assert changes =~ EmotheWeb.PlayLabels.historical_time_label("siglo_xvii")
+      # EMOTHE0211's historical_time is unset in the fixture corpus: the current
+      # value beside the new one must read as blank, not merely be present.
+      assert changes =~ t("(blank)")
+    end
+
+    test "given a rejected file then clicking preview does not crash the page", %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      lv
+      |> file_input("#upload-form", :export, [
+        %{name: "notes.txt", content: "hello", type: "text/plain"}
+      ])
+      |> render_upload("notes.txt")
+
+      lv |> element("#upload-form") |> render_submit()
+
+      assert has_element?(lv, "#upload-form")
+      refute has_element?(lv, "#changes")
+    end
+
+    test "given a change that clears a value then it renders as (blank), not empty",
+         %{conn: conn} do
+      # corpus/0, run by this describe's setup, already has EMOTHE0052 with
+      # relationship_type "traduccion". This fixture's index credits it "ed."
+      # instead, so relationship_for/1 sets it to nil.
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, "test/fixtures/filemaker/index_relationship_clear.ndjson")
+
+      changes = lv |> element("#changes") |> render()
+      assert changes =~ t("Relationship")
+      assert changes =~ t("(blank)")
     end
 
     test "given discard then the upload form comes back", %{conn: conn} do
@@ -128,6 +160,62 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
     end
   end
 
+  describe "archived plays" do
+    test "given an archived play then it is absent from the preview and apply still succeeds",
+         %{conn: conn} do
+      %{p38: p38, p211: p211} = corpus()
+      {:ok, _} = Catalogue.delete_play(p38)
+
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, @export)
+
+      refute lv |> element("#changes") |> render() =~ "EMOTHE0038"
+      refute lv |> element("#conflicts") |> render() =~ "EMOTHE0038"
+
+      lv |> element("#sync-actions button", t("Apply")) |> render_click()
+
+      assert has_element?(lv, "#results")
+      assert Catalogue.get_play!(p211.id).historical_time == "siglo_xvii"
+    end
+  end
+
+  describe "upload accept list" do
+    test "given a .json file then it is rejected, matching the accepted-file message",
+         %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload =
+        file_input(lv, "#upload-form", :export, [
+          %{name: "export.json", content: "{}", type: "application/json"}
+        ])
+
+      # The upload message promises only .ndjson; the accept list must agree,
+      # rather than silently taking .json too.
+      assert {:error, [[_ref, :not_accepted]]} = render_upload(upload, "export.json")
+    end
+  end
+
+  describe "counts card" do
+    test "given nothing unchanged or missing then the counts card does not render",
+         %{conn: conn} do
+      # The only play in the DB and the only code in this index — one change,
+      # nothing unchanged, nothing missing.
+      play_fixture(%{
+        "code" => "EMOTHE0052",
+        "title" => "Antonio y Cleopatra",
+        "relationship_type" => "traduccion"
+      })
+
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, "test/fixtures/filemaker/index_relationship_clear.ndjson")
+
+      assert has_element?(lv, "#changes")
+      refute has_element?(lv, "#counts")
+    end
+  end
+
   describe "a file that is not the export" do
     test "given a file with no FileMaker records then nothing is planned or written",
          %{conn: conn} do
@@ -137,6 +225,18 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
       html = upload_and_preview(lv, "test/fixtures/filemaker/not_an_export.ndjson")
 
       assert html =~ t("No FileMaker records found in that file. Is it the right export?")
+      refute has_element?(lv, "#changes")
+      assert has_element?(lv, "#upload-form")
+    end
+
+    test "given a malformed record then the page reports it and stays on the upload form",
+         %{conn: conn} do
+      corpus()
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      html = upload_and_preview(lv, "test/fixtures/filemaker/malformed_version.ndjson")
+
+      assert html =~ t("Cannot read the file")
       refute has_element?(lv, "#changes")
       assert has_element?(lv, "#upload-form")
     end

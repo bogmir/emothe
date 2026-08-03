@@ -379,7 +379,7 @@ Then visit:
 
 ### High Priority
 - [x] **Create initial admin user** - set `ADMIN_EMAILS` (comma-separated); `Emothe.Accounts.AdminBootstrap` reconciles it at boot and mails each address an invitation. Break-glass with SMTP down: `mix emothe.invite EMAIL --admin --print-url`
-- [ ] **Fly.io deployment** configuration (Dockerfile, fly.toml, runtime.exs). Required secrets: `DATABASE_URL`, `SECRET_KEY_BASE`, `ADMIN_EMAILS` (**unset means zero admins**), `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`
+- [ ] **Fly.io deployment** — `Dockerfile`, `fly.toml` and the `:prod` block of `config/runtime.exs` are written; `[deploy] release_command` runs `Emothe.Release.migrate`. What is left is setting the secrets and running `fly deploy`. Required secrets: `DATABASE_URL`, `SECRET_KEY_BASE`, `ADMIN_EMAILS` (**unset means zero admins**), `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`. With `SMTP_HOST` unset the mailer falls back to the Local adapter and **every invitation is silently dropped** — use `bin/emothe rpc 'Emothe.Release.invite_url("...")'` to get the link instead
 - [x] **Email delivery** - SMTP adapter via `gen_smtp`; configure `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` (+ optional `SMTP_PORT`, `MAIL_FROM`) as Fly.io secrets
 - [x] **Account state enforced** - `require_authenticated_user`, `require_permission` and the `{:ensure_can, action}` LiveView hook all require `Accounts.active?/1` (confirmed and not deactivated); an inactive session is destroyed with an explanatory flash rather than looping
 - [x] **Login rate limiting** - 20/minute per IP plus 10/15 minutes per email address via ETS-backed `EmotheWeb.RateLimit`; a successful login calls `RateLimit.reset/1` so only failures consume the email budget

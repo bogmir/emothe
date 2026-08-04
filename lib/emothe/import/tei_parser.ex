@@ -716,7 +716,8 @@ defmodule Emothe.Import.TeiParser do
   end
 
   defp import_place({_name, attrs, children} = place_el, parent_id) do
-    slug = attr_value(attrs, "xml:id") || Places.slugify(first_place_name(children))
+    declared_slug = attr_value(attrs, "xml:id")
+    slug = declared_slug || Places.slugify(first_place_name(children))
     {latitude, longitude} = place_geo(children)
 
     place_attrs =
@@ -734,8 +735,21 @@ defmodule Emothe.Import.TeiParser do
 
     case Places.find_or_create_by_slug(place_attrs) do
       {:ok, place, outcome} ->
-        if outcome == :existing do
-          Logger.info("TEI import: place #{slug} already exists, left unchanged")
+        cond do
+          outcome != :existing ->
+            :ok
+
+          # No xml:id means the slug was derived from the name, so two distinct
+          # referents that happen to share a name silently become one row. Our own
+          # exporter always writes xml:id; a hand-authored file may not.
+          is_nil(declared_slug) ->
+            Logger.warning(
+              "TEI import: <place> without xml:id resolved to existing place #{inspect(slug)} " <>
+                "by name — if these are different places, give each an xml:id"
+            )
+
+          true ->
+            Logger.info("TEI import: place #{slug} already exists, left unchanged")
         end
 
         # Nested <place> elements are this place's children.
@@ -858,11 +872,21 @@ defmodule Emothe.Import.TeiParser do
           # A hand-linked place (origin "manual") surviving from before this file ever
           # mentioned it collides with the (play_id, place_id) unique index on a blind
           # insert — reset_tei_content only clears this play's own "tei" links, on
-          # purpose. Update in place instead, same as find_or_create_by_slug does for
-          # the place row itself.
+          # purpose. Leave the curated row alone: writing "tei" over its origin would
+          # hand it to reset_tei_content, and the next re-import would delete it along
+          # with its note. Only a link this importer already owns gets refreshed.
           case Repo.get_by(Places.PlayPlace, play_id: play.id, place_id: place.id) do
-            nil -> Places.link_place(play.id, place.id, link_attrs)
-            existing -> Places.update_play_place(existing, link_attrs)
+            nil ->
+              Places.link_place(play.id, place.id, link_attrs)
+
+            %{origin: "tei"} = existing ->
+              Places.update_play_place(existing, link_attrs)
+
+            existing ->
+              Logger.info(
+                "TEI import: <setting> names #{inspect(slug)}, already linked with " <>
+                  "origin #{inspect(existing.origin)} — left untouched"
+              )
           end
       end
     end)

@@ -146,6 +146,9 @@ defmodule EmotheWeb.Admin.PlaceFormComponent do
   defp maybe_put(params, _key, nil), do: params
   defp maybe_put(params, key, value), do: Map.put(params, key, to_string(value))
 
+  # ponytail: one indexed find_by_name query per name field per keystroke. Fine at
+  # gazetteer scale (hundreds of places, two or three name fields); debounce the
+  # validate event or move the lookup to blur if the form ever feels slow.
   defp duplicate_for(%{"names" => names}, place) when is_map(names) do
     names
     |> Map.values()

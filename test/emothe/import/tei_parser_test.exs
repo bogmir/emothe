@@ -1325,6 +1325,36 @@ defmodule Emothe.Import.TeiParserTest do
       assert length(slugs) == 3
     end
 
+    test "a re-import leaves a hand-entered link to a place the file also names alone" do
+      {:ok, play} = import_places_tei()
+
+      # The hand-entered link is to "roma" — a place this very file names in <setting>,
+      # so the import hits the collision branch rather than a blind insert. The Atenas
+      # case above only proves the origin filter in reset_tei_content.
+      roma = Emothe.Repo.get_by!(Emothe.Places.Place, slug: "roma")
+      tei_link = Emothe.Repo.get_by!(Emothe.Places.PlayPlace, play_id: play.id, place_id: roma.id)
+      {:ok, _} = Emothe.Repo.delete(tei_link)
+
+      {:ok, manual} =
+        Emothe.Places.link_place(play.id, roma.id, %{
+          "role" => "mentioned",
+          "note" => "Hand-entered.",
+          "origin" => "manual"
+        })
+
+      {:ok, _play} = import_places_tei()
+
+      reloaded = Emothe.Repo.get(Emothe.Places.PlayPlace, manual.id)
+      assert reloaded, "the curated link was deleted by the re-import"
+      assert reloaded.origin == "manual"
+      assert reloaded.note == "Hand-entered."
+
+      # And it still survives a second re-import, which is where an origin flipped to
+      # "tei" would be swept away by reset_tei_content.
+      {:ok, _play} = import_places_tei()
+      assert Emothe.Repo.get(Emothe.Places.PlayPlace, manual.id)
+    end
+
     test "an existing place is left alone, not overwritten" do
       curated =
         Emothe.TestFixtures.place_fixture(%{

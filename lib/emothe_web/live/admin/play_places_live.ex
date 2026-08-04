@@ -4,6 +4,7 @@ defmodule EmotheWeb.Admin.PlayPlacesLive do
   alias Emothe.ActivityLog
   alias Emothe.Catalogue
   alias Emothe.Places
+  alias Emothe.Places.Authority
   alias Emothe.Places.Place
   alias EmotheWeb.PlayLabels
 
@@ -16,18 +17,33 @@ defmodule EmotheWeb.Admin.PlayPlacesLive do
      |> assign(:page_title, "#{play.title} — #{gettext("Places")}")
      |> assign(:play, play)
      |> assign(:editing, nil)
+     |> assign(:term, "")
+     |> assign(:suggestions, [])
+     |> assign(:picked, nil)
+     |> assign(:initial_candidates, [])
      |> assign(:play_context, %{play: play, active_tab: :places})
      |> load_links()}
   end
 
   @impl true
+  def handle_event("link", %{"place_id" => ""}, socket) do
+    {:noreply, put_flash(socket, :error, gettext("Search for a place first."))}
+  end
+
   def handle_event("link", %{"place_id" => place_id} = params, socket) do
     case Places.link_place(socket.assigns.play.id, place_id, %{
            "role" => params["role"] || "setting"
          }) do
       {:ok, link} ->
         log(socket, "create", link)
-        {:noreply, socket |> load_links() |> put_flash(:info, gettext("Place added."))}
+
+        {:noreply,
+         socket
+         |> assign(:picked, nil)
+         |> assign(:term, "")
+         |> assign(:suggestions, [])
+         |> load_links()
+         |> put_flash(:info, gettext("Place added."))}
 
       {:error, _changeset} ->
         {:noreply,
@@ -65,12 +81,65 @@ defmodule EmotheWeb.Admin.PlayPlacesLive do
     {:noreply, socket |> load_links() |> put_flash(:info, gettext("Place removed."))}
   end
 
+  # The gazetteer is corpus-global, so listing every place in a <select> stops being
+  # usable long before the corpus is fully imported. Search instead, and never offer a
+  # place this play already has.
+  def handle_event("search_places", %{"term" => term}, socket) do
+    linked = MapSet.new(socket.assigns.links, & &1.place_id)
+
+    suggestions =
+      term
+      |> Places.search_names(limit: 10)
+      |> Enum.reject(&MapSet.member?(linked, &1.id))
+
+    {:noreply, socket |> assign(:term, term) |> assign(:suggestions, suggestions)}
+  end
+
+  def handle_event("pick_place", %{"id" => id}, socket) do
+    {:noreply,
+     socket
+     |> assign(:picked, Places.get_place!(id))
+     |> assign(:term, "")
+     |> assign(:suggestions, [])}
+  end
+
+  def handle_event("clear_pick", _params, socket) do
+    {:noreply, assign(socket, :picked, nil)}
+  end
+
   def handle_event("new", _params, socket) do
-    {:noreply, assign(socket, :editing, %Place{names: [%Places.PlaceName{}]})}
+    open_form(socket, %Place{names: [%Places.PlaceName{}]}, [])
+  end
+
+  # Opened from the picker's "create" row, so the name is already known. Running the
+  # authority lookup here is what keeps a hand-added place from landing with no type and
+  # no coordinates — the state that had London offering "continent".
+  def handle_event("new_from_search", %{"name" => name}, socket) do
+    place = %Place{
+      names: [%Places.PlaceName{name: name, language: "es", is_preferred: true}]
+    }
+
+    open_form(socket, place, authority_candidates(name))
   end
 
   def handle_event("cancel_edit", _params, socket) do
     {:noreply, assign(socket, :editing, nil)}
+  end
+
+  defp open_form(socket, place, candidates) do
+    {:noreply,
+     socket
+     |> assign(:editing, place)
+     |> assign(:initial_candidates, candidates)
+     |> assign(:term, "")
+     |> assign(:suggestions, [])}
+  end
+
+  defp authority_candidates(name) do
+    case Authority.impl().search(name, locale: Gettext.get_locale(EmotheWeb.Gettext)) do
+      {:ok, candidates} -> candidates
+      {:error, _reason} -> []
+    end
   end
 
   @impl true
@@ -97,17 +166,8 @@ defmodule EmotheWeb.Admin.PlayPlacesLive do
   end
 
   defp load_links(socket) do
-    links = Places.list_play_places(socket.assigns.play.id)
-    linked = MapSet.new(links, & &1.place_id)
-
-    available =
-      Places.list_places()
-      |> Enum.reject(&MapSet.member?(linked, &1.id))
-      |> Enum.map(&{Places.display_name(&1, "es"), &1.id})
-
     socket
-    |> assign(:links, links)
-    |> assign(:available, available)
+    |> assign(:links, Places.list_play_places(socket.assigns.play.id))
     |> assign(:gazetteer, Places.gazetteer())
   end
 
@@ -135,28 +195,102 @@ defmodule EmotheWeb.Admin.PlayPlacesLive do
         id="place-form-component"
         place={@editing}
         current_user={@current_user}
+        initial_candidates={@initial_candidates}
         on_saved={fn place -> send(self(), {:place_saved, place}) end}
       />
 
-      <form :if={@available != []} phx-submit="link" class="mb-6 mt-4 flex items-end gap-2">
-        <div class="grow">
-          <label class="label">
-            <span class="label-text font-medium">{gettext("Add an existing place")}</span>
-          </label>
-          <select name="place_id" class="select select-bordered select-sm w-full">
-            <option :for={{label, id} <- @available} value={id}>{label}</option>
-          </select>
+      <div :if={is_nil(@editing)} class="mb-6 mt-4">
+        <label class="label">
+          <span class="label-text font-medium">{gettext("Add an existing place")}</span>
+        </label>
+        <div class="flex items-end gap-2">
+          <div class="relative grow">
+            <%!-- Picked state: the place is chosen, only the role is left to set. --%>
+            <div
+              :if={@picked}
+              class="input input-bordered input-sm flex h-auto min-h-8 items-center justify-between gap-2"
+            >
+              <span class="truncate text-sm">
+                {Places.breadcrumb(@picked, @gazetteer, "es")}
+              </span>
+              <button
+                type="button"
+                phx-click="clear_pick"
+                class="btn btn-circle btn-ghost btn-xs shrink-0"
+                title={gettext("Clear")}
+              >
+                <.icon name="hero-x-mark-mini" class="size-3.5" />
+              </button>
+            </div>
+            <%!-- Search state. A <select> of every place stops scaling well before the
+                 corpus is fully imported, so this searches names in any language. --%>
+            <form :if={is_nil(@picked)} phx-change="search_places">
+              <input
+                type="text"
+                name="term"
+                value={@term}
+                phx-debounce="200"
+                placeholder={gettext("Search any name, in any language")}
+                class="input input-bordered input-sm w-full"
+                autocomplete="off"
+              />
+            </form>
+            <ul
+              :if={@suggestions != []}
+              class="rounded-box absolute z-20 mt-1 max-h-64 w-full overflow-y-auto border border-base-300 bg-base-100 shadow-lg"
+            >
+              <li :for={place <- @suggestions}>
+                <button
+                  type="button"
+                  phx-click="pick_place"
+                  phx-value-id={place.id}
+                  class="w-full px-3 py-2 text-left transition-colors hover:bg-base-200"
+                >
+                  <div class="truncate text-sm font-medium">
+                    {Places.display_name(place, "es")}
+                  </div>
+                  <div class="mt-0.5 truncate text-xs text-base-content/50">
+                    {Places.breadcrumb(place, @gazetteer, "es")}
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <form phx-submit="link" class="flex items-end gap-2">
+            <input type="hidden" name="place_id" value={(@picked && @picked.id) || ""} />
+            <div class="w-40">
+              <label class="label">
+                <span class="label-text font-medium">{gettext("Role")}</span>
+              </label>
+              <select name="role" class="select select-bordered select-sm w-full">
+                <option :for={{label, value} <- PlayLabels.place_role_options()} value={value}>
+                  {label}
+                </option>
+              </select>
+            </div>
+            <button type="submit" disabled={is_nil(@picked)} class="btn btn-primary btn-sm">
+              {gettext("Add")}
+            </button>
+          </form>
         </div>
-        <div class="w-40">
-          <label class="label"><span class="label-text font-medium">{gettext("Role")}</span></label>
-          <select name="role" class="select select-bordered select-sm w-full">
-            <option :for={{label, value} <- PlayLabels.place_role_options()} value={value}>
-              {label}
-            </option>
-          </select>
+        <%!-- Nothing matched: offer to create it rather than making the curator leave,
+             carrying the term across so the name is already typed. --%>
+        <div
+          :if={is_nil(@picked) and @term != "" and @suggestions == []}
+          class="mt-2 flex items-center gap-2 text-xs text-base-content/60"
+        >
+          <span>{gettext("No places found")}</span>
+          <button
+            type="button"
+            phx-click="new_from_search"
+            phx-value-name={@term}
+            class="btn btn-outline btn-xs gap-1"
+          >
+            <.icon name="hero-plus-mini" class="size-3.5" />
+            {gettext("Create %{name}", name: @term)}
+          </button>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm">{gettext("Add")}</button>
-      </form>
+      </div>
 
       <div :if={@links == []} class="py-12 text-center text-base-content/50">
         <.icon name="hero-map-pin" class="mx-auto mb-3 size-12 opacity-30" />

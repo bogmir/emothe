@@ -20,7 +20,11 @@ defmodule EmotheWeb.Admin.PlaceFormComponent do
      socket
      |> assign(assigns)
      |> assign(:form, to_form(Places.change_place(place)))
-     |> assign_new(:candidates, fn -> [] end)
+     # Seeded, not assigned: the per-play picker can open this form with the authority
+     # already searched for the name the curator typed. `assign_new` runs on mount only,
+     # so the component owns `candidates` from then on and a parent re-render cannot
+     # clobber a search the curator ran here.
+     |> assign_new(:candidates, fn -> Map.get(assigns, :initial_candidates, []) end)
      |> assign_new(:authority_error, fn -> nil end)
      |> assign_new(:duplicate, fn -> nil end)
      |> assign_new(:duplicate_chain, fn -> nil end)

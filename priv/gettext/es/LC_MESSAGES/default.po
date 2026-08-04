@@ -24,7 +24,7 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1035
-#: lib/emothe_web/live/admin/play_places_live.ex:158
+#: lib/emothe_web/live/admin/play_places_live.ex:272
 #, elixir-autogen, elixir-format
 msgid "Add"
 msgstr "Añadir"
@@ -137,7 +137,7 @@ msgid "Browse, edit, and curate imported plays."
 msgstr "Explorar, editar y gestionar las obras importadas."
 
 #: lib/emothe_web/live/admin/import_live.ex:326
-#: lib/emothe_web/live/admin/place_form_component.ex:319
+#: lib/emothe_web/live/admin/place_form_component.ex:346
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1841
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2560
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2601
@@ -380,7 +380,7 @@ msgid "English"
 msgstr "Inglés"
 
 #: lib/emothe_web/live/admin/filemaker_sync_live.ex:311
-#: lib/emothe_web/live/admin/import_live.ex:442
+#: lib/emothe_web/live/admin/import_live.ex:441
 #, elixir-autogen, elixir-format
 msgid "Error"
 msgstr "Error"
@@ -424,7 +424,7 @@ msgid "File"
 msgstr "Archivo"
 
 #: lib/emothe_web/live/admin/filemaker_sync_live.ex:308
-#: lib/emothe_web/live/admin/import_live.ex:439
+#: lib/emothe_web/live/admin/import_live.ex:438
 #, elixir-autogen, elixir-format
 msgid "File is too large (max 20MB)"
 msgstr "El archivo es demasiado grande (máx. 20MB)"
@@ -596,7 +596,7 @@ msgstr "Metadatos"
 msgid "N/A"
 msgstr "N/D"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:223
+#: lib/emothe_web/live/admin/place_form_component.ex:250
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2582
 #: lib/emothe_web/live/admin/play_editors_live.ex:206
 #, elixir-autogen, elixir-format
@@ -664,7 +664,7 @@ msgstr "Aún no hay obras. Importe un archivo TEI-XML o cree una nueva obra."
 msgid "Number"
 msgstr "Número"
 
-#: lib/emothe_web/live/admin/import_live.ex:440
+#: lib/emothe_web/live/admin/import_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "Only .xml files are accepted"
 msgstr "Solo se aceptan archivos .xml"
@@ -810,9 +810,9 @@ msgstr "Recalcular"
 
 #: lib/emothe_web/live/admin/export_site_live.ex:317
 #: lib/emothe_web/live/admin/import_live.ex:256
-#: lib/emothe_web/live/admin/place_form_component.ex:255
+#: lib/emothe_web/live/admin/place_form_component.ex:282
 #: lib/emothe_web/live/admin/play_compare_live.ex:158
-#: lib/emothe_web/live/admin/play_places_live.ex:192
+#: lib/emothe_web/live/admin/play_places_live.ex:326
 #: lib/emothe_web/live/play_compare_live.ex:158
 #, elixir-autogen, elixir-format
 msgid "Remove"
@@ -834,13 +834,13 @@ msgstr "El enlace para restablecer la contraseña no es válido o ha expirado."
 msgid "Resetting..."
 msgstr "Restableciendo..."
 
-#: lib/emothe_web/live/admin/place_form_component.ex:321
+#: lib/emothe_web/live/admin/place_form_component.ex:348
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2558
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2599
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2632
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2799
 #: lib/emothe_web/live/admin/play_editors_live.ex:247
-#: lib/emothe_web/live/admin/play_places_live.ex:223
+#: lib/emothe_web/live/admin/play_places_live.ex:357
 #: lib/emothe_web/live/admin/play_sources_live.ex:249
 #, elixir-autogen, elixir-format
 msgid "Save"
@@ -1009,12 +1009,12 @@ msgstr "Texto"
 msgid "Title"
 msgstr "Título"
 
-#: lib/emothe_web/live/admin/import_live.ex:441
+#: lib/emothe_web/live/admin/import_live.ex:440
 #, elixir-autogen, elixir-format
 msgid "Too many files (max 20)"
 msgstr "Demasiados archivos (máx. 20)"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:277
+#: lib/emothe_web/live/admin/place_form_component.ex:304
 #: lib/emothe_web/live/admin/place_list_live.ex:133
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2619
 #, elixir-autogen, elixir-format
@@ -1607,6 +1607,7 @@ msgstr "Canción"
 #: lib/emothe_web/live/admin/activity_log_live.ex:262
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2148
 #: lib/emothe_web/live/admin/play_form_live.ex:480
+#: lib/emothe_web/live/admin/play_places_live.ex:220
 #, elixir-autogen, elixir-format
 msgid "Clear"
 msgstr "Limpiar"
@@ -1743,7 +1744,7 @@ msgstr "Sin editores listados aún."
 msgid "No plays found"
 msgstr "No se encontraron obras"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:310
+#: lib/emothe_web/live/admin/place_form_component.ex:337
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1064
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:1072
 #, elixir-autogen, elixir-format
@@ -1816,7 +1817,7 @@ msgid "Reworking"
 msgstr "Refundición"
 
 #: lib/emothe_web/live/admin/play_editors_live.ex:212
-#: lib/emothe_web/live/admin/play_places_live.ex:151
+#: lib/emothe_web/live/admin/play_places_live.ex:263
 #: lib/emothe_web/live/admin/user_list_live.ex:240
 #: lib/emothe_web/live/admin/user_list_live.ex:263
 #, elixir-autogen, elixir-format
@@ -2831,7 +2832,7 @@ msgstr ""
 msgid "archived — will be restored"
 msgstr "archivada — se restaurará"
 
-#: lib/emothe_web/live/admin/import_live.ex:437
+#: lib/emothe_web/live/admin/import_live.ex:436
 #, elixir-autogen, elixir-format
 msgid "completeness"
 msgstr "estado de completitud"
@@ -2841,17 +2842,17 @@ msgstr "estado de completitud"
 msgid "e.g. username/emothe-static — leave empty to skip deploy"
 msgstr ""
 
-#: lib/emothe_web/live/admin/import_live.ex:434
+#: lib/emothe_web/live/admin/import_live.ex:433
 #, elixir-autogen, elixir-format
 msgid "language"
 msgstr "idioma"
 
-#: lib/emothe_web/live/admin/import_live.ex:436
+#: lib/emothe_web/live/admin/import_live.ex:435
 #, elixir-autogen, elixir-format
 msgid "parent play"
 msgstr "obra original"
 
-#: lib/emothe_web/live/admin/import_live.ex:435
+#: lib/emothe_web/live/admin/import_live.ex:434
 #, elixir-autogen, elixir-format
 msgid "relationship"
 msgstr "relación"
@@ -3362,17 +3363,17 @@ msgstr "mantener %{current}"
 msgid "the export says %{indexed}"
 msgstr "la exportación dice %{indexed}"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:213
+#: lib/emothe_web/live/admin/place_form_component.ex:240
 #, elixir-autogen, elixir-format
 msgid "A place with this name already exists."
 msgstr "Ya existe un lugar con este nombre."
 
-#: lib/emothe_web/live/admin/play_places_live.ex:144
+#: lib/emothe_web/live/admin/play_places_live.ex:204
 #, elixir-autogen, elixir-format
 msgid "Add an existing place"
 msgstr "Añadir un lugar existente"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:268
+#: lib/emothe_web/live/admin/place_form_component.ex:295
 #, elixir-autogen, elixir-format
 msgid "Add name"
 msgstr "Añadir nombre"
@@ -3387,7 +3388,7 @@ msgstr "Edificio"
 msgid "City"
 msgstr "Ciudad"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:285
+#: lib/emothe_web/live/admin/place_form_component.ex:312
 #, elixir-autogen, elixir-format
 msgid "Contained in"
 msgstr "Contenido en"
@@ -3412,7 +3413,7 @@ msgstr "¿Eliminar este lugar?"
 msgid "District"
 msgstr "Distrito"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:177
+#: lib/emothe_web/live/admin/place_form_component.ex:204
 #, elixir-autogen, elixir-format
 msgid "Edit place"
 msgstr "Editar lugar"
@@ -3423,7 +3424,7 @@ msgstr "Editar lugar"
 msgid "Fictional"
 msgstr "Ficticio"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:306
+#: lib/emothe_web/live/admin/place_form_component.ex:333
 #, elixir-autogen, elixir-format
 msgid "Fictional place"
 msgstr "Lugar ficticio"
@@ -3433,7 +3434,7 @@ msgstr "Lugar ficticio"
 msgid "Forest"
 msgstr "Bosque"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:246
+#: lib/emothe_web/live/admin/place_form_component.ex:273
 #, elixir-autogen, elixir-format
 msgid "Historical"
 msgstr "Histórico"
@@ -3448,17 +3449,17 @@ msgstr "Isla"
 msgid "Lake"
 msgstr "Lago"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:290
+#: lib/emothe_web/live/admin/place_form_component.ex:317
 #, elixir-autogen, elixir-format
 msgid "Latitude"
 msgstr "Latitud"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:314
+#: lib/emothe_web/live/admin/place_form_component.ex:341
 #, elixir-autogen, elixir-format
 msgid "Leave the coordinates empty for a place that cannot be located."
 msgstr "Deja las coordenadas vacías si el lugar no se puede localizar."
 
-#: lib/emothe_web/live/admin/place_form_component.ex:293
+#: lib/emothe_web/live/admin/place_form_component.ex:320
 #, elixir-autogen, elixir-format
 msgid "Longitude"
 msgstr "Longitud"
@@ -3473,19 +3474,19 @@ msgstr "Mencionado"
 msgid "Mountain"
 msgstr "Montaña"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:218
+#: lib/emothe_web/live/admin/place_form_component.ex:245
 #, elixir-autogen, elixir-format
 msgid "Names"
 msgstr "Nombres"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:177
+#: lib/emothe_web/live/admin/place_form_component.ex:204
 #: lib/emothe_web/live/admin/place_list_live.ex:101
-#: lib/emothe_web/live/admin/play_places_live.ex:128
+#: lib/emothe_web/live/admin/play_places_live.ex:188
 #, elixir-autogen, elixir-format
 msgid "New place"
 msgstr "Nuevo lugar"
 
-#: lib/emothe_web/live/admin/play_places_live.ex:163
+#: lib/emothe_web/live/admin/play_places_live.ex:297
 #, elixir-autogen, elixir-format
 msgid "No places recorded for this play."
 msgstr "No hay lugares registrados para esta obra."
@@ -3495,7 +3496,7 @@ msgstr "No hay lugares registrados para esta obra."
 msgid "No places yet."
 msgstr "Todavía no hay lugares."
 
-#: lib/emothe_web/live/admin/play_places_live.ex:219
+#: lib/emothe_web/live/admin/play_places_live.ex:353
 #, elixir-autogen, elixir-format
 msgid "Note, e.g. Act III only"
 msgstr "Nota, p. ej. solo en el acto III"
@@ -3510,12 +3511,12 @@ msgstr "Un registro por lugar, compartido por todas las obras que lo referencian
 msgid "Other"
 msgstr "Otro"
 
-#: lib/emothe_web/live/admin/play_places_live.ex:30
+#: lib/emothe_web/live/admin/play_places_live.ex:46
 #, elixir-autogen, elixir-format
 msgid "Place added."
 msgstr "Lugar añadido."
 
-#: lib/emothe_web/live/admin/play_places_live.ex:85
+#: lib/emothe_web/live/admin/play_places_live.ex:154
 #, elixir-autogen, elixir-format
 msgid "Place created and added."
 msgstr "Lugar creado y añadido."
@@ -3525,7 +3526,7 @@ msgstr "Lugar creado y añadido."
 msgid "Place deleted."
 msgstr "Lugar eliminado."
 
-#: lib/emothe_web/live/admin/play_places_live.ex:65
+#: lib/emothe_web/live/admin/play_places_live.ex:81
 #, elixir-autogen, elixir-format
 msgid "Place removed."
 msgstr "Lugar eliminado del texto."
@@ -3535,7 +3536,7 @@ msgstr "Lugar eliminado del texto."
 msgid "Place saved."
 msgstr "Lugar guardado."
 
-#: lib/emothe_web/live/admin/play_places_live.ex:44
+#: lib/emothe_web/live/admin/play_places_live.ex:60
 #, elixir-autogen, elixir-format
 msgid "Place updated."
 msgstr "Lugar actualizado."
@@ -3544,15 +3545,15 @@ msgstr "Lugar actualizado."
 #: lib/emothe_web/components/layouts.ex:284
 #: lib/emothe_web/live/admin/place_list_live.ex:17
 #: lib/emothe_web/live/admin/place_list_live.ex:94
-#: lib/emothe_web/live/admin/play_places_live.ex:16
-#: lib/emothe_web/live/admin/play_places_live.ex:121
+#: lib/emothe_web/live/admin/play_places_live.ex:17
+#: lib/emothe_web/live/admin/play_places_live.ex:181
 #: lib/emothe_web/live/play_show_live.ex:353
 #: lib/emothe_web/live/play_show_live.ex:429
 #, elixir-autogen, elixir-format
 msgid "Places"
 msgstr "Lugares"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:242
+#: lib/emothe_web/live/admin/place_form_component.ex:269
 #, elixir-autogen, elixir-format
 msgid "Preferred"
 msgstr "Preferido"
@@ -3567,7 +3568,7 @@ msgstr "Provincia"
 msgid "Region"
 msgstr "Región"
 
-#: lib/emothe_web/live/admin/play_places_live.ex:189
+#: lib/emothe_web/live/admin/play_places_live.ex:323
 #, elixir-autogen, elixir-format
 msgid "Remove this place from the play?"
 msgstr "¿Quitar este lugar de la obra?"
@@ -3582,12 +3583,13 @@ msgstr "Río"
 msgid "Sea"
 msgstr "Mar"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:184
+#: lib/emothe_web/live/admin/place_form_component.ex:211
 #, elixir-autogen, elixir-format
 msgid "Search Wikidata"
 msgstr "Buscar en Wikidata"
 
 #: lib/emothe_web/live/admin/place_list_live.ex:119
+#: lib/emothe_web/live/admin/play_places_live.ex:233
 #, elixir-autogen, elixir-format
 msgid "Search any name, in any language"
 msgstr "Buscar cualquier nombre, en cualquier idioma"
@@ -3597,23 +3599,23 @@ msgstr "Buscar cualquier nombre, en cualquier idioma"
 msgid "Setting"
 msgstr "Escenario"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:296
+#: lib/emothe_web/live/admin/place_form_component.ex:323
 #, elixir-autogen, elixir-format
 msgid "Slug"
 msgstr "Identificador"
 
-#: lib/emothe_web/live/admin/play_places_live.ex:47
+#: lib/emothe_web/live/admin/play_places_live.ex:63
 #, elixir-autogen, elixir-format
 msgid "That change could not be saved."
 msgstr "No se pudo guardar ese cambio."
 
-#: lib/emothe_web/live/admin/play_places_live.ex:34
+#: lib/emothe_web/live/admin/play_places_live.ex:50
 #, elixir-autogen, elixir-format
 msgid "That place is already linked to this play."
 msgstr "Ese lugar ya está vinculado a esta obra."
 
-#: lib/emothe_web/live/admin/place_form_component.ex:57
-#: lib/emothe_web/live/admin/place_form_component.ex:79
+#: lib/emothe_web/live/admin/place_form_component.ex:59
+#: lib/emothe_web/live/admin/place_form_component.ex:81
 #, elixir-autogen, elixir-format
 msgid "The authority is unavailable. Enter the details by hand."
 msgstr "La autoridad no está disponible. Introduce los datos a mano."
@@ -3638,17 +3640,32 @@ msgstr "Este lugar todavía se usa en una obra. Quítalo allí primero."
 msgid "Town"
 msgstr "Villa"
 
-#: lib/emothe_web/live/admin/play_places_live.ex:124
+#: lib/emothe_web/live/admin/play_places_live.ex:184
 #, elixir-autogen, elixir-format
 msgid "Where this play is set, and the places it names."
 msgstr "Dónde se sitúa la obra y los lugares que menciona."
 
-#: lib/emothe_web/live/admin/place_form_component.ex:299
+#: lib/emothe_web/live/admin/place_form_component.ex:326
 #, elixir-autogen, elixir-format
 msgid "Wikidata id"
 msgstr "Identificador de Wikidata"
 
-#: lib/emothe_web/live/admin/place_form_component.ex:166
+#: lib/emothe_web/live/admin/place_form_component.ex:193
 #, elixir-autogen, elixir-format
 msgid "— none —"
 msgstr "— ninguno —"
+
+#: lib/emothe_web/live/admin/play_places_live.ex:290
+#, elixir-autogen, elixir-format
+msgid "Create %{name}"
+msgstr "Crear «%{name}»"
+
+#: lib/emothe_web/live/admin/play_places_live.ex:282
+#, elixir-autogen, elixir-format
+msgid "No places found"
+msgstr "No se encontraron lugares"
+
+#: lib/emothe_web/live/admin/play_places_live.ex:30
+#, elixir-autogen, elixir-format
+msgid "Search for a place first."
+msgstr "Busca primero un lugar."

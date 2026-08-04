@@ -84,6 +84,82 @@ defmodule EmotheWeb.Admin.PlayPlacesLiveTest do
     assert Places.list_places() != []
   end
 
+  describe "the place picker" do
+    test "searches by name rather than listing the whole gazetteer", %{conn: conn} do
+      {conn, play} = setup_play(conn)
+      TestFixtures.place_fixture(%{"name" => "Londres", "slug" => "ppl-londres"})
+      TestFixtures.place_fixture(%{"name" => "Zaragoza", "slug" => "ppl-zaragoza"})
+
+      {:ok, view, html} = live(conn, ~p"/admin/plays/#{play.id}/places")
+
+      # Nothing is offered before a term is typed — that is the whole point.
+      refute html =~ "Zaragoza"
+
+      html =
+        view
+        |> element("form[phx-change=search_places]")
+        |> render_change(%{"term" => "Lond"})
+
+      assert html =~ "Londres"
+      refute html =~ "Zaragoza"
+    end
+
+    test "a place already linked to this play is not offered again", %{conn: conn} do
+      {conn, play} = setup_play(conn)
+      place = TestFixtures.place_fixture(%{"name" => "Atenas", "slug" => "ppl-atenas"})
+      TestFixtures.play_place_fixture(play, place)
+
+      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/places")
+
+      html =
+        view
+        |> element("form[phx-change=search_places]")
+        |> render_change(%{"term" => "Atenas"})
+
+      assert html =~ t("No places found")
+    end
+
+    test "picking a suggestion then submitting links it with the chosen role", %{conn: conn} do
+      {conn, play} = setup_play(conn)
+      place = TestFixtures.place_fixture(%{"name" => "Venecia", "slug" => "ppl-venecia"})
+
+      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/places")
+
+      view
+      |> element("form[phx-change=search_places]")
+      |> render_change(%{"term" => "Vene"})
+
+      view |> element("button[phx-value-id='#{place.id}']") |> render_click()
+
+      view
+      |> element("form[phx-submit=link]")
+      |> render_submit(%{"role" => "mentioned"})
+
+      assert [link] = Places.list_play_places(play.id)
+      assert link.place_id == place.id
+      assert link.role == "mentioned"
+    end
+
+    test "a term matching nothing offers to create it, pre-filled", %{conn: conn} do
+      {conn, play} = setup_play(conn)
+      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/places")
+
+      html =
+        view
+        |> element("form[phx-change=search_places]")
+        |> render_change(%{"term" => "Helsingør"})
+
+      assert html =~ t("No places found")
+
+      # The create row carries the term, so the form opens with the name already typed
+      # and the curator only has to confirm the type and coordinates.
+      html = view |> element("button[phx-click=new_from_search]") |> render_click()
+
+      assert html =~ "place-form"
+      assert html =~ "Helsingør"
+    end
+  end
+
   test "a new place is created and linked in one pass", %{conn: conn} do
     {conn, play} = setup_play(conn)
     {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/places")

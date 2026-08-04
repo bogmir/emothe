@@ -1,0 +1,16 @@
+{
+  "searchinfo": { "search": "Roma" },
+  "search": [
+    {
+      "id": "Q220",
+      "label": "Rome",
+      "description": "capital city of Italy"
+    },
+    {
+      "id": "Q2634",
+      "label": "Roma",
+      "description": "ethnic group"
+    }
+  ],
+  "success": 1
+}

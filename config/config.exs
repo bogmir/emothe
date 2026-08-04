@@ -42,6 +42,8 @@ config :emothe, EmotheWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :emothe, Emothe.Mailer, adapter: Swoosh.Adapters.Local
 
+config :emothe, :place_authority, Emothe.Places.Authority.Wikidata
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.25.4",

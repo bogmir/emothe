@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "Q220": {
+      "id": "Q220",
+      "labels": {
+        "es": { "language": "es", "value": "Roma" },
+        "en": { "language": "en", "value": "Rome" },
+        "fr": { "language": "fr", "value": "Rome" },
+        "it": { "language": "it", "value": "Roma" }
+      },
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "snaktype": "value",
+              "property": "P31",
+              "datavalue": { "value": { "id": "Q515" }, "type": "wikibase-entityid" }
+            }
+          }
+        ],
+        "P17": [
+          {
+            "mainsnak": {
+              "snaktype": "value",
+              "property": "P17",
+              "datavalue": { "value": { "id": "Q38" }, "type": "wikibase-entityid" }
+            }
+          }
+        ],
+        "P625": [
+          {
+            "mainsnak": {
+              "snaktype": "value",
+              "property": "P625",
+              "datavalue": {
+                "value": { "latitude": 41.9028, "longitude": 12.4964 },
+                "type": "globecoordinate"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "success": 1
+}

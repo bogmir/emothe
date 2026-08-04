@@ -23,6 +23,9 @@ config :emothe, EmotheWeb.Endpoint,
 # In test we don't send emails
 config :emothe, Emothe.Mailer, adapter: Swoosh.Adapters.Test
 
+# No test touches the network.
+config :emothe, :place_authority, Emothe.Places.Authority.Stub
+
 # Cheapest bcrypt work factor. Every auth test hashes a password, and 12 rounds
 # cost ~480ms each; 4 rounds cost ~4ms and prove the same behaviour.
 config :bcrypt_elixir, log_rounds: 4

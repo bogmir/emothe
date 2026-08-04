@@ -6,7 +6,8 @@ defmodule Emothe.AuthzTest do
   alias Emothe.Authz
 
   @researcher_actions ~w(view_admin manage_plays edit_content manage_editors
-                         manage_sources import_tei download_export archive_play)a
+                         manage_sources manage_places import_tei download_export
+                         archive_play)a
 
   @admin_only_actions ~w(purge_play manage_users view_activity_log
                          deploy_site view_dashboard import_filemaker)a

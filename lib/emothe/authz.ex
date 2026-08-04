@@ -25,7 +25,8 @@ defmodule Emothe.Authz do
   alias Emothe.Accounts.User
 
   @researcher_actions ~w(view_admin manage_plays edit_content manage_editors
-                         manage_sources import_tei download_export archive_play)a
+                         manage_sources manage_places import_tei download_export
+                         archive_play)a
 
   @admin_actions @researcher_actions ++
                    ~w(purge_play manage_users view_activity_log deploy_site

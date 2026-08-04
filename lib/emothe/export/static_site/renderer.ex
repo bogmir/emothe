@@ -84,6 +84,8 @@ defmodule Emothe.Export.StaticSite.Renderer do
     #{render_sources(play.sources)}
     #{render_editors(play.editors)}
     #{render_verse_info(play)}
+    #{render_places(play)}
+    #{render_study(play)}
           <p class="tei-link"><a href="#{escape_attr(play.code)}.xml">Download TEI-XML source</a></p>
         </header>
 
@@ -512,6 +514,54 @@ defmodule Emothe.Export.StaticSite.Renderer do
 
     "      <div class=\"editors\">\n#{items}\n      </div>"
   end
+
+  # The archival artifact must not change language with whichever locale the admin
+  # running the export happened to have (Ruling 3) — historical_time_label/1 and
+  # place_type_label/1 go through gettext, so this is pinned to English explicitly.
+  defp render_study(%{historical_time: nil}), do: ""
+
+  defp render_study(play) do
+    Gettext.with_locale(EmotheWeb.Gettext, "en", fn ->
+      note =
+        if play.historical_time_note,
+          do: "<p class=\"meta-note\">#{escape(play.historical_time_note)}</p>",
+          else: ""
+
+      """
+            <p class="historical-time">Historical time: #{escape(EmotheWeb.PlayLabels.historical_time_label(play.historical_time))}</p>
+      #{note}
+      """
+    end)
+  end
+
+  defp render_places(%{play_places: []}), do: ""
+
+  defp render_places(%{play_places: links}) when is_list(links) do
+    Gettext.with_locale(EmotheWeb.Gettext, "en", fn ->
+      gazetteer = Emothe.Places.gazetteer()
+
+      items =
+        links
+        |> Enum.sort_by(fn link -> {link.role != "setting", link.position} end)
+        |> Enum.map_join("\n", fn link ->
+          role = if link.role == "mentioned", do: " (mentioned)", else: ""
+          note = if link.note, do: " — #{escape(link.note)}", else: ""
+
+          "        <li>#{escape(Emothe.Places.breadcrumb(link.place, gazetteer, "es"))}#{role}#{note}</li>"
+        end)
+
+      """
+            <div class="places">
+              <p class="places-label">Places</p>
+              <ul>
+      #{items}
+              </ul>
+            </div>
+      """
+    end)
+  end
+
+  defp render_places(_play), do: ""
 
   defp render_verse_info(play) do
     cond do

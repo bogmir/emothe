@@ -6,6 +6,7 @@ defmodule Emothe.Catalogue do
   import Ecto.Query
   alias Emothe.Repo
   alias Emothe.Catalogue.{Play, PlayEditor, PlaySource, PlayEditorialNote}
+  alias Emothe.Places.PlayPlace
 
   # --- Plays ---
 
@@ -76,7 +77,8 @@ defmodule Emothe.Catalogue do
       :derived_plays,
       editors: from(e in PlayEditor, order_by: e.position),
       sources: from(s in PlaySource, order_by: s.position),
-      editorial_notes: from(n in PlayEditorialNote, order_by: n.inserted_at)
+      editorial_notes: from(n in PlayEditorialNote, order_by: n.inserted_at),
+      play_places: {from(pp in PlayPlace, order_by: pp.position), [place: :names]}
     ])
   end
 
@@ -90,7 +92,8 @@ defmodule Emothe.Catalogue do
       :derived_plays,
       editors: from(e in PlayEditor, order_by: e.position),
       sources: from(s in PlaySource, order_by: s.position),
-      editorial_notes: from(n in PlayEditorialNote, order_by: n.inserted_at)
+      editorial_notes: from(n in PlayEditorialNote, order_by: n.inserted_at),
+      play_places: {from(pp in PlayPlace, order_by: pp.position), [place: :names]}
     ])
   end
 

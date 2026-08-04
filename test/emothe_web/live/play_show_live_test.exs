@@ -74,4 +74,60 @@ defmodule EmotheWeb.PlayShowLiveTest do
     refute has_element?(view, "#meta-study")
     refute has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
   end
+
+  describe "the places panel" do
+    defp t(msgid), do: Gettext.gettext(EmotheWeb.Gettext, msgid)
+
+    test "is absent when the play has no places", %{conn: conn} do
+      play = Emothe.TestFixtures.play_fixture()
+      {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+
+      refute html =~ "meta-places"
+    end
+
+    test "lists settings before mentions, with breadcrumb and note", %{conn: conn} do
+      play = Emothe.TestFixtures.play_fixture()
+
+      italy =
+        Emothe.TestFixtures.place_fixture(%{"name" => "Italia", "type" => "country"})
+
+      roma =
+        Emothe.TestFixtures.place_fixture(%{"name" => "Roma", "parent_place_id" => italy.id})
+
+      miseno = Emothe.TestFixtures.place_fixture(%{"name" => "Miseno"})
+
+      Emothe.TestFixtures.play_place_fixture(play, miseno, %{
+        "role" => "mentioned",
+        "note" => "Named, not staged."
+      })
+
+      Emothe.TestFixtures.play_place_fixture(play, roma, %{"role" => "setting"})
+
+      {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+
+      assert html =~ "meta-places"
+      assert html =~ "Roma, Italia"
+      assert html =~ "Named, not staged."
+      assert html =~ t("Places")
+
+      # settings first, whatever order they were linked in
+      assert :binary.match(html, "Roma") < :binary.match(html, "Miseno")
+    end
+
+    test "a fictional place is marked", %{conn: conn} do
+      play = Emothe.TestFixtures.play_fixture()
+
+      atlantis =
+        Emothe.TestFixtures.place_fixture(%{
+          "name" => "Atlántida",
+          "type" => "island",
+          "is_fictional" => "true"
+        })
+
+      Emothe.TestFixtures.play_place_fixture(play, atlantis)
+
+      {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+      assert html =~ t("Fictional")
+    end
+  end
 end

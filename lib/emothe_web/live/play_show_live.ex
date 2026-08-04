@@ -6,6 +6,8 @@ defmodule EmotheWeb.PlayShowLive do
 
   alias Emothe.Catalogue
   alias Emothe.PlayContent
+  alias Emothe.Places
+  alias Emothe.Places.Authority
   alias Emothe.Statistics
   alias EmotheWeb.PlayLabels
 
@@ -28,6 +30,8 @@ defmodule EmotheWeb.PlayShowLive do
      |> assign(:statistic, statistic)
      |> assign(:metadata_sections, metadata_sections)
      |> assign(:play_sections, play_sections)
+     |> assign(:gazetteer, Places.gazetteer())
+     |> assign(:locale, Gettext.get_locale(EmotheWeb.Gettext))
      |> assign(:show_line_numbers, true)
      |> assign(:show_stage_directions, true)
      |> assign(:show_asides, true)
@@ -339,6 +343,39 @@ defmodule EmotheWeb.PlayShowLive do
             </dl>
           </section>
 
+          <%!-- Places --%>
+          <section
+            :if={@play.play_places != []}
+            id="meta-places"
+            class="mb-8 max-w-2xl mx-auto scroll-mt-20 text-sm"
+          >
+            <dl class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2">
+              <dt class="text-base-content/50">{gettext("Places")}</dt>
+              <dd>
+                <ul class="space-y-1">
+                  <li :for={link <- sorted_places(@play.play_places)}>
+                    <span>{Places.breadcrumb(link.place, @gazetteer, @locale)}</span>
+                    <span :if={link.role == "mentioned"} class="text-xs text-base-content/50">
+                      ({PlayLabels.place_role_label(link.role)})
+                    </span>
+                    <span :if={link.place.is_fictional} class="badge badge-outline badge-xs">
+                      {gettext("Fictional")}
+                    </span>
+                    <a
+                      :if={Authority.url(link.place.authority, link.place.authority_id)}
+                      href={Authority.url(link.place.authority, link.place.authority_id)}
+                      target="_blank"
+                      class="link text-xs"
+                    >
+                      {Authority.label(link.place.authority)}
+                    </a>
+                    <p :if={link.note} class="text-xs text-base-content/60">{link.note}</p>
+                  </li>
+                </ul>
+              </dd>
+            </dl>
+          </section>
+
           <%!-- Editorial notes (text view only) --%>
           <div
             :for={{note, index} <- Enum.with_index(@play.editorial_notes, 1)}
@@ -389,6 +426,7 @@ defmodule EmotheWeb.PlayShowLive do
 
     base
     |> maybe_add_section(play.historical_time != nil, "meta-study", gettext("Study"))
+    |> maybe_add_section(play.play_places != [], "meta-places", gettext("Places"))
     |> maybe_add_section(play.sources != [], "meta-sources", gettext("Source"))
     |> maybe_add_section(play.editors != [], "meta-editors", gettext("Editors"))
     |> Kernel.++(build_editorial_note_sections(play.editorial_notes))
@@ -396,6 +434,11 @@ defmodule EmotheWeb.PlayShowLive do
 
   defp maybe_add_section(sections, true, id, label), do: sections ++ [%{id: id, label: label}]
   defp maybe_add_section(sections, false, _id, _label), do: sections
+
+  # Settings first, then mentions, each keeping its own curated order.
+  defp sorted_places(play_places) do
+    Enum.sort_by(play_places, fn link -> {link.role != "setting", link.position} end)
+  end
 
   defp build_editorial_note_sections(notes) do
     notes

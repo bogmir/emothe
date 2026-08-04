@@ -48,6 +48,7 @@ defmodule Emothe.Catalogue.Play do
     has_many :characters, Emothe.PlayContent.Character
     has_many :divisions, Emothe.PlayContent.Division
     has_many :elements, Emothe.PlayContent.Element
+    has_many :play_places, Emothe.Places.PlayPlace
     has_one :statistic, Emothe.Statistics.PlayStatistic
 
     timestamps(type: :utc_datetime)

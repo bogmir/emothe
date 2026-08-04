@@ -55,14 +55,15 @@ defmodule EmotheWeb.Layouts do
   end
 
   @doc """
-  Renders breadcrumb navigation.
+  Renders breadcrumb navigation. Public pages only — the admin shell uses the
+  sidebar and the play context bar instead.
 
   Each item is a map with `:label` and optional `:to` (path for link).
   The last item is rendered as plain text (current page).
 
   ## Examples
 
-      <.breadcrumbs items={[%{label: "Admin", to: "/admin/plays"}, %{label: "La Virginie"}]} />
+      <.breadcrumbs items={[%{label: "Catalogue", to: "/plays"}, %{label: "La Virginie"}]} />
   """
   attr :items, :list, required: true, doc: "list of %{label, to} maps"
 

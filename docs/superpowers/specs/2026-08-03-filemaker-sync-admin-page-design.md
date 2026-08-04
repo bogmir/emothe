@@ -242,8 +242,8 @@ is the second reason this page exists.
 
 `mx-auto max-w-5xl px-4 py-8` with an `h1.text-3xl font-semibold tracking-tight`, following
 `user_list_live.ex`. `assign(:page_title, gettext("FileMaker sync"))`. **No `:breadcrumbs`
-assign** — breadcrumbs left the admin layout in the auth and admin UX work, and the one still
-assigned in `import_live.ex:20` is dead code. No `:play_context`, so the sidebar starts open,
+assign** — breadcrumbs left the admin layout in the auth and admin UX work.
+No `:play_context`, so the sidebar starts open,
 which is right for a corpus-wide page.
 
 ## Testing
@@ -305,4 +305,3 @@ entries document.
 
 - `CLAUDE.md` lists "Fly.io deployment configuration" as still to do. `Dockerfile` and `fly.toml`
   both exist; what is left is setting secrets and running `fly deploy`.
-- `import_live.ex:20-24` assigns `:breadcrumbs`, which nothing reads any more.

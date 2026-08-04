@@ -255,7 +255,7 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
 end
 ```
 
-There is no `"preview"` handler yet — the form cannot be submitted in this task, which is fine; Task 3 adds it. Do **not** assign `:breadcrumbs`: breadcrumbs left the admin layout in the auth and admin UX work, and the one still assigned in `import_live.ex:20-24` is dead code. Do not assign `:play_context` either — its absence is what leaves the sidebar open, which is right for a corpus-wide page.
+There is no `"preview"` handler yet — the form cannot be submitted in this task, which is fine; Task 3 adds it. Do **not** assign `:breadcrumbs`: breadcrumbs left the admin layout in the auth and admin UX work. Do not assign `:play_context` either — its absence is what leaves the sidebar open, which is right for a corpus-wide page.
 
 In `lib/emothe_web/router.ex`, inside `live_session :admin`, after the `live "/export", ExportSiteLive, :index` line:
 
@@ -1136,17 +1136,7 @@ mix format && mix compile --warnings-as-errors && mix test
 
 Expected: 0 failures. Translating a string is exactly what breaks a literal-English assertion, so if a test fails here it is asserting English somewhere and should be switched to `Gettext.gettext(EmotheWeb.Gettext, …)`.
 
-- [ ] **Step 5: Fix the two stale documentation facts**
-
-In `lib/emothe_web/live/admin/import_live.ex`, delete the `:breadcrumbs` assign at lines 20-24 — nothing reads it since breadcrumbs left the admin layout:
-
-```elixir
-     |> assign(:breadcrumbs, [
-       %{label: gettext("Admin"), to: ~p"/admin/plays"},
-       %{label: gettext("Plays"), to: ~p"/admin/plays"},
-       %{label: gettext("Import TEI-XML")}
-     ])
-```
+- [ ] **Step 5: Fix the stale documentation facts**
 
 In `CLAUDE.md`:
 

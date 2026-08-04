@@ -118,8 +118,20 @@ defmodule Emothe.Import.TeiParser do
     }
   end
 
+  @doc """
+  Sums the mixed-ownership counts in one half of a `preview_import/1` result.
+
+  Those four tables — editors, sources, notes and places — hold both TEI-imported and
+  hand-entered rows, so `:replaces` and `:preserves` split each one by `origin`. Both
+  the admin import page and the `--dry-run` output report the totals, and adding a
+  fifth such table must not mean remembering two more addition sites.
+  """
+  def mixed_ownership_total(counts) do
+    [:editors, :sources, :notes, :places] |> Enum.map(&Map.fetch!(counts, &1)) |> Enum.sum()
+  end
+
   defp replaced_counts(nil),
-    do: %{divisions: 0, elements: 0, characters: 0, editors: 0, sources: 0, notes: 0}
+    do: %{divisions: 0, elements: 0, characters: 0, editors: 0, sources: 0, notes: 0, places: 0}
 
   defp replaced_counts(%Play{id: id}) do
     %{
@@ -128,17 +140,19 @@ defmodule Emothe.Import.TeiParser do
       characters: count_rows(Character, id),
       editors: count_rows(PlayEditor, id, "tei"),
       sources: count_rows(PlaySource, id, "tei"),
-      notes: count_rows(PlayEditorialNote, id, "tei")
+      notes: count_rows(PlayEditorialNote, id, "tei"),
+      places: count_rows(Places.PlayPlace, id, "tei")
     }
   end
 
-  defp preserved_counts(nil), do: %{editors: 0, sources: 0, notes: 0}
+  defp preserved_counts(nil), do: %{editors: 0, sources: 0, notes: 0, places: 0}
 
   defp preserved_counts(%Play{id: id}) do
     %{
       editors: count_rows(PlayEditor, id) - count_rows(PlayEditor, id, "tei"),
       sources: count_rows(PlaySource, id) - count_rows(PlaySource, id, "tei"),
-      notes: count_rows(PlayEditorialNote, id) - count_rows(PlayEditorialNote, id, "tei")
+      notes: count_rows(PlayEditorialNote, id) - count_rows(PlayEditorialNote, id, "tei"),
+      places: count_rows(Places.PlayPlace, id) - count_rows(Places.PlayPlace, id, "tei")
     }
   end
 

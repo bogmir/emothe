@@ -302,7 +302,7 @@ defmodule EmotheWeb.Admin.ImportLive do
                   divisions: p.replaces.divisions,
                   elements: p.replaces.elements,
                   characters: p.replaces.characters,
-                  tei: p.replaces.editors + p.replaces.sources + p.replaces.notes
+                  tei: tei_total(p)
                 )}
               </div>
               <div :if={preserved_total(p) > 0} class="mt-1 text-xs font-medium text-success">
@@ -427,9 +427,8 @@ defmodule EmotheWeb.Admin.ImportLive do
     """
   end
 
-  defp preserved_total(preview) do
-    preview.preserves.editors + preview.preserves.sources + preview.preserves.notes
-  end
+  defp tei_total(preview), do: TeiParser.mixed_ownership_total(preview.replaces)
+  defp preserved_total(preview), do: TeiParser.mixed_ownership_total(preview.preserves)
 
   defp field_label(:language), do: gettext("language")
   defp field_label(:relationship_type), do: gettext("relationship")

@@ -676,11 +676,16 @@ defmodule Emothe.RoundtripTest do
     test "export, import and re-export produce the same places" do
       play = Emothe.TestFixtures.play_fixture(%{"code" => "ROUNDPLACE1"})
 
+      # `places.slug` is globally unique, so two async tests inserting the same chain of
+      # slugs in different orders deadlock on the index. This test compares one export
+      # against another, so the words do not matter — only that they are ours alone.
+      ns = "rt#{System.unique_integer([:positive])}"
+
       italy =
         Emothe.TestFixtures.place_fixture(%{
           "name" => "Italia",
           "type" => "country",
-          "slug" => "italia"
+          "slug" => "#{ns}-italia"
         })
 
       roma =
@@ -690,7 +695,7 @@ defmodule Emothe.RoundtripTest do
             %{"name" => "Rome", "language" => "en", "is_preferred" => "true"}
           ],
           "type" => "city",
-          "slug" => "roma",
+          "slug" => "#{ns}-roma",
           "parent_place_id" => italy.id,
           "latitude" => "41.9028",
           "longitude" => "12.4964",
@@ -702,7 +707,7 @@ defmodule Emothe.RoundtripTest do
         Emothe.TestFixtures.place_fixture(%{
           "name" => "Miseno",
           "type" => "town",
-          "slug" => "miseno",
+          "slug" => "#{ns}-miseno",
           "parent_place_id" => italy.id
         })
 

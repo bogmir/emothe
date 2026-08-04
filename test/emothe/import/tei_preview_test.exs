@@ -56,10 +56,11 @@ defmodule Emothe.Import.TeiPreviewTest do
              characters: 0,
              editors: 0,
              sources: 0,
-             notes: 0
+             notes: 0,
+             places: 0
            }
 
-    assert preview.preserves == %{editors: 0, sources: 0, notes: 0}
+    assert preview.preserves == %{editors: 0, sources: 0, notes: 0, places: 0}
   end
 
   test "an existing play reports what is replaced and what is kept", %{path: path} do
@@ -76,6 +77,23 @@ defmodule Emothe.Import.TeiPreviewTest do
     assert preview.replaces.characters == 1
     assert preview.preserves.sources == 1
     assert :language in preview.preserves_fields
+  end
+
+  test "a hand-linked place counts as kept, a TEI one as replaced", %{path: path} do
+    {:ok, play} = TeiParser.import_file(path)
+
+    # Unique names, not "Roma" — place_fixture derives the slug from the name, and the
+    # slug index is global, so two async tests inserting the same slug inside their
+    # transactions deadlock on it.
+    hand = Emothe.TestFixtures.place_fixture()
+    from_tei = Emothe.TestFixtures.place_fixture()
+    {:ok, _} = Emothe.Places.link_place(play.id, hand.id, %{"origin" => "manual"})
+    {:ok, _} = Emothe.Places.link_place(play.id, from_tei.id, %{"origin" => "tei"})
+
+    assert {:ok, preview} = TeiParser.preview_import(path)
+
+    assert preview.replaces.places == 1
+    assert preview.preserves.places == 1
   end
 
   test "an archived play is flagged so the UI can say it will be restored", %{path: path} do

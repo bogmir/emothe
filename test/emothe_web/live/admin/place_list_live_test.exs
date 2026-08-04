@@ -141,7 +141,6 @@ defmodule EmotheWeb.Admin.PlaceListLiveTest do
   # and a TEI xml:id.
   test "editing a place's name does not change its slug", %{conn: conn} do
     place = TestFixtures.place_fixture(%{"name" => "Roma"})
-    assert place.slug == "roma"
 
     {:ok, view, _html} = live(log_in_researcher(conn), ~p"/admin/places")
     view |> element("button[phx-value-id='#{place.id}'][phx-click=edit]") |> render_click()
@@ -155,7 +154,9 @@ defmodule EmotheWeb.Admin.PlaceListLiveTest do
     |> render_submit()
 
     reloaded = Places.get_place!(place.id)
-    assert reloaded.slug == "roma"
+    # The literal slug is the fixture's, not "roma" — what matters is that the name edit
+    # did not move it.
+    assert reloaded.slug == place.slug
     assert Places.display_name(reloaded) == "Rome"
   end
 end

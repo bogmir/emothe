@@ -60,7 +60,7 @@ defmodule Mix.Tasks.Emothe.Import.Tei do
               "  #{code}  replaces #{preview.replaces.divisions} division(s), " <>
                 "#{preview.replaces.elements} element(s), " <>
                 "#{preview.replaces.characters} character(s), " <>
-                "#{preview.replaces.editors + preview.replaces.sources + preview.replaces.notes} TEI record(s)" <>
+                "#{TeiParser.mixed_ownership_total(preview.replaces)} TEI record(s)" <>
                 keeps(preview)
             )
 
@@ -78,7 +78,7 @@ defmodule Mix.Tasks.Emothe.Import.Tei do
   end
 
   defp keeps(preview) do
-    kept = preview.preserves.editors + preview.preserves.sources + preview.preserves.notes
+    kept = TeiParser.mixed_ownership_total(preview.preserves)
     restored = if preview.archived, do: ", restores it from the archive", else: ""
 
     case kept do

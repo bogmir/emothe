@@ -22,10 +22,12 @@ defmodule Emothe.Places.SchemaTest do
 
   describe "places" do
     test "a slug is unique across the corpus" do
-      insert_place(%{"slug" => "roma"})
+      insert_place(%{"slug" => "sch-roma"})
 
       assert {:error, changeset} =
-               %Place{} |> Place.changeset(%{"slug" => "roma", "type" => "city"}) |> Repo.insert()
+               %Place{}
+               |> Place.changeset(%{"slug" => "sch-roma", "type" => "city"})
+               |> Repo.insert()
 
       assert "has already been taken" in errors_on(changeset).slug
     end
@@ -141,7 +143,7 @@ defmodule Emothe.Places.SchemaTest do
     end
 
     test "a place that is a parent cannot be deleted" do
-      parent = insert_place(%{"slug" => "italia", "type" => "country"})
+      parent = insert_place(%{"slug" => "sch-italia", "type" => "country"})
       _child = insert_place(%{"parent_place_id" => parent.id})
 
       assert_raise Ecto.ConstraintError, fn -> Repo.delete!(parent) end

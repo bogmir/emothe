@@ -217,15 +217,22 @@ defmodule Emothe.TestFixtures do
   @doc """
   A place with one or more names. `"name"` is shorthand for a single preferred
   Spanish name; pass `"names"` for the full list.
+
+  The slug is made unique unless you pass one. `places.slug` is unique across the whole
+  corpus, so two async tests both creating a place named "Roma" would take the same
+  index lock inside their own transactions — a pair of those, acquired in opposite
+  order, deadlocks. Pass `"slug"` only when the test asserts on the literal value, and
+  then give it a per-file prefix.
   """
   def place_fixture(attrs \\ %{}) do
     {name, attrs} = Map.pop(attrs, "name")
+    unique = System.unique_integer([:positive])
 
     names =
       Map.get(attrs, "names") ||
         [
           %{
-            "name" => name || "Place #{System.unique_integer([:positive])}",
+            "name" => name || "Place #{unique}",
             "language" => "es",
             "is_preferred" => "true"
           }
@@ -234,6 +241,7 @@ defmodule Emothe.TestFixtures do
     attrs =
       attrs
       |> Map.put_new("type", "city")
+      |> Map.put_new("slug", "#{Places.slugify(hd(names)["name"])}-#{unique}")
       |> Map.put("names", names)
 
     {:ok, place} = Places.create_place(attrs)

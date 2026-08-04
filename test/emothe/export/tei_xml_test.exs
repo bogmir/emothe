@@ -1026,10 +1026,15 @@ defmodule Emothe.Export.TeiXmlTest do
   end
 
   describe "places" do
+    # Every slug here carries a "tx-" prefix. `places.slug` is globally unique and these
+    # tests run async alongside others that use the same toponyms, so two transactions
+    # inserting the same chain in different orders deadlock on the index. The prefix is
+    # a per-file namespace; it is uniform, so the alphabetical-sibling assertion below
+    # still means what it says.
     setup do
       play = play_fixture()
 
-      europe = place_fixture(%{"name" => "Europa", "type" => "continent", "slug" => "europa"})
+      europe = place_fixture(%{"name" => "Europa", "type" => "continent", "slug" => "tx-europa"})
 
       italy =
         place_fixture(%{
@@ -1038,7 +1043,7 @@ defmodule Emothe.Export.TeiXmlTest do
             %{"name" => "Italy", "language" => "en", "is_preferred" => "true"}
           ],
           "type" => "country",
-          "slug" => "italia",
+          "slug" => "tx-italia",
           "parent_place_id" => europe.id
         })
 
@@ -1046,7 +1051,7 @@ defmodule Emothe.Export.TeiXmlTest do
         place_fixture(%{
           "name" => "Roma",
           "type" => "city",
-          "slug" => "roma",
+          "slug" => "tx-roma",
           "parent_place_id" => italy.id,
           "latitude" => "41.9028",
           "longitude" => "12.4964",
@@ -1058,7 +1063,7 @@ defmodule Emothe.Export.TeiXmlTest do
         place_fixture(%{
           "name" => "Miseno",
           "type" => "town",
-          "slug" => "miseno",
+          "slug" => "tx-miseno",
           "parent_place_id" => italy.id
         })
 
@@ -1070,9 +1075,12 @@ defmodule Emothe.Export.TeiXmlTest do
 
     test "containment is expressed by nesting", %{xml: xml} do
       assert xml =~ ~s(<settingDesc>)
-      assert xml =~ ~s(<place xml:id="europa" type="continent">)
-      assert :binary.match(xml, ~s(xml:id="europa")) < :binary.match(xml, ~s(xml:id="italia"))
-      assert :binary.match(xml, ~s(xml:id="italia")) < :binary.match(xml, ~s(xml:id="roma"))
+      assert xml =~ ~s(<place xml:id="tx-europa" type="continent">)
+
+      assert :binary.match(xml, ~s(xml:id="tx-europa")) <
+               :binary.match(xml, ~s(xml:id="tx-italia"))
+
+      assert :binary.match(xml, ~s(xml:id="tx-italia")) < :binary.match(xml, ~s(xml:id="tx-roma"))
     end
 
     test "a place carries its names, coordinates and authority id", %{xml: xml} do
@@ -1089,7 +1097,7 @@ defmodule Emothe.Export.TeiXmlTest do
         place_fixture(%{
           "name" => "Bosque",
           "type" => "forest",
-          "slug" => "bosque",
+          "slug" => "tx-bosque",
           "note" => "Ubicación aproximada."
         })
 
@@ -1103,16 +1111,16 @@ defmodule Emothe.Export.TeiXmlTest do
     test "europa appears exactly once in listPlace though two links descend from it", %{
       xml: xml
     } do
-      assert length(:binary.matches(xml, ~s(xml:id="europa"))) == 1
+      assert length(:binary.matches(xml, ~s(xml:id="tx-europa"))) == 1
     end
 
     test "sibling places nest alphabetically by slug under the same parent", %{xml: xml} do
-      assert :binary.match(xml, ~s(xml:id="miseno")) < :binary.match(xml, ~s(xml:id="roma"))
+      assert :binary.match(xml, ~s(xml:id="tx-miseno")) < :binary.match(xml, ~s(xml:id="tx-roma"))
     end
 
     test "the play's own links live in setting, with role and note", %{xml: xml} do
-      assert xml =~ ~s(<placeName ref="#roma" ana="setting"/>)
-      assert xml =~ ~s(ref="#miseno" ana="mentioned")
+      assert xml =~ ~s(<placeName ref="#tx-roma" ana="setting"/>)
+      assert xml =~ ~s(ref="#tx-miseno" ana="mentioned")
       assert xml =~ "Named, not staged."
     end
 
@@ -1129,7 +1137,7 @@ defmodule Emothe.Export.TeiXmlTest do
         place_fixture(%{
           "name" => "Atlántida",
           "type" => "island",
-          "slug" => "atlantida",
+          "slug" => "tx-atlantida",
           "is_fictional" => "true"
         })
 
@@ -1137,7 +1145,7 @@ defmodule Emothe.Export.TeiXmlTest do
 
       xml = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))
 
-      assert xml =~ ~s(<place xml:id="atlantida" type="island" subtype="fictional">)
+      assert xml =~ ~s(<place xml:id="tx-atlantida" type="island" subtype="fictional">)
       refute xml =~ "<geo>"
     end
 

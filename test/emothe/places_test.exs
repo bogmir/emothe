@@ -34,10 +34,25 @@ defmodule Emothe.PlacesTest do
     end
 
     test "a colliding slug is suffixed rather than rejected" do
-      _first = place_fixture(%{"name" => "Woods"})
-      second = place_fixture(%{"name" => "Woods"})
+      # Straight through create_place/1, not place_fixture/1 — the fixture pins a unique
+      # slug of its own to keep async tests off the same index lock, which is exactly the
+      # derivation this test is about.
+      # The name is unique to this test on purpose: it claims two slugs, and a second
+      # test claiming the same two in the other order would deadlock on the index.
+      attrs = fn ->
+        %{
+          "type" => "forest",
+          "names" => %{
+            "0" => %{"name" => "Sotobosque", "language" => "es", "is_preferred" => "true"}
+          }
+        }
+      end
 
-      assert second.slug == "woods-2"
+      {:ok, first} = Places.create_place(attrs.())
+      {:ok, second} = Places.create_place(attrs.())
+
+      assert first.slug == "sotobosque"
+      assert second.slug == "sotobosque-2"
     end
 
     test "an explicit slug is respected" do
@@ -219,7 +234,7 @@ defmodule Emothe.PlacesTest do
   describe "find_or_create_by_slug/1" do
     test "creates a place the first time and reuses it the second" do
       attrs = %{
-        "slug" => "roma",
+        "slug" => "pl-roma",
         "type" => "city",
         "names" => [%{"name" => "Roma", "language" => "es", "is_preferred" => "true"}]
       }
@@ -230,11 +245,11 @@ defmodule Emothe.PlacesTest do
     end
 
     test "never overwrites the existing place" do
-      curated = place_fixture(%{"name" => "Roma", "slug" => "roma", "note" => "Curated note"})
+      curated = place_fixture(%{"name" => "Roma", "slug" => "pl-roma", "note" => "Curated note"})
 
       {:ok, found, :existing} =
         Places.find_or_create_by_slug(%{
-          "slug" => "roma",
+          "slug" => "pl-roma",
           "type" => "town",
           "note" => "From a stale file",
           "names" => [%{"name" => "Rooma", "language" => "es", "is_preferred" => "true"}]

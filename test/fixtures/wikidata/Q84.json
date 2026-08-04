@@ -1,0 +1,296 @@
+{
+  "entities": {
+    "Q84": {
+      "id": "Q84",
+      "labels": {
+        "en": {
+          "language": "en",
+          "value": "London"
+        },
+        "it": {
+          "language": "it",
+          "value": "Londra"
+        },
+        "fr": {
+          "language": "fr",
+          "value": "Londres"
+        },
+        "es": {
+          "language": "es",
+          "value": "Londres"
+        },
+        "ca": {
+          "language": "ca",
+          "value": "Londres"
+        },
+        "pt": {
+          "language": "pt",
+          "value": "Londres"
+        }
+      },
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 200250,
+                  "id": "Q200250"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 1066984,
+                  "id": "Q1066984"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 515,
+                  "id": "Q515"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 208511,
+                  "id": "Q208511"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 174844,
+                  "id": "Q174844"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 51929311,
+                  "id": "Q51929311"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 108178728,
+                  "id": "Q108178728"
+                }
+              }
+            },
+            "rank": "normal"
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 1048835,
+                  "id": "Q1048835"
+                }
+              }
+            },
+            "rank": "normal"
+          }
+        ],
+        "P17": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 2277,
+                  "id": "Q2277"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 110888,
+                  "id": "Q110888"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 105092,
+                  "id": "Q105092"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 105313,
+                  "id": "Q105313"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 179876,
+                  "id": "Q179876"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 161885,
+                  "id": "Q161885"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 174193,
+                  "id": "Q174193"
+                }
+              }
+            },
+            "rank": "normal",
+            "qualifiers": {
+              "P582": [
+                {
+                  "snaktype": "value"
+                }
+              ]
+            }
+          },
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "entity-type": "item",
+                  "numeric-id": 145,
+                  "id": "Q145"
+                }
+              }
+            },
+            "rank": "preferred"
+          }
+        ],
+        "P625": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "value": {
+                  "latitude": 51.507222222222,
+                  "longitude": -0.1275,
+                  "altitude": null,
+                  "precision": 0.00027777777777778,
+                  "globe": "http://www.wikidata.org/entity/Q2"
+                }
+              }
+            },
+            "rank": "normal"
+          }
+        ]
+      }
+    }
+  }
+}

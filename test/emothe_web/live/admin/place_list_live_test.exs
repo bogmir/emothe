@@ -109,6 +109,54 @@ defmodule EmotheWeb.Admin.PlaceListLiveTest do
     assert html =~ t("A place with this name already exists.")
   end
 
+  # Two real places legitimately share a name — Toledo in Spain and Toledo in Ohio — so
+  # the warning must not read as "you are making a mistake". Naming the container is what
+  # lets the curator tell that case from entering the same place twice.
+  test "the duplicate warning names the container, not just the place", %{conn: conn} do
+    europa =
+      TestFixtures.place_fixture(%{
+        "name" => "Europa",
+        "type" => "continent",
+        "slug" => "pll-europa"
+      })
+
+    espana =
+      TestFixtures.place_fixture(%{
+        "name" => "España",
+        "type" => "country",
+        "slug" => "pll-espana",
+        "parent_place_id" => europa.id
+      })
+
+    TestFixtures.place_fixture(%{
+      "name" => "Toledo",
+      "type" => "city",
+      "slug" => "pll-toledo",
+      "parent_place_id" => espana.id
+    })
+
+    {:ok, view, _html} = live(log_in_researcher(conn), ~p"/admin/places")
+    view |> element("button", t("New place")) |> render_click()
+
+    view
+    |> form("#place-form",
+      place: %{
+        "type" => "city",
+        "names" => %{
+          "0" => %{"name" => "Toledo", "language" => "es", "is_preferred" => "true"}
+        }
+      }
+    )
+    |> render_change()
+
+    # Scoped to the alert on purpose: the list behind the form renders a breadcrumb per
+    # row, so asserting against the whole page passes without the warning saying anything.
+    warning = view |> element(".alert-warning") |> render()
+
+    assert warning =~ t("A place with this name already exists.")
+    assert warning =~ "Toledo, España, Europa"
+  end
+
   test "a Wikidata search fills the coordinates and one name per language", %{conn: conn} do
     {:ok, view, _html} = live(log_in_researcher(conn), ~p"/admin/places")
     view |> element("button", t("New place")) |> render_click()

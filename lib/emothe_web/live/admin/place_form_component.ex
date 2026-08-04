@@ -23,6 +23,7 @@ defmodule EmotheWeb.Admin.PlaceFormComponent do
      |> assign_new(:candidates, fn -> [] end)
      |> assign_new(:authority_error, fn -> nil end)
      |> assign_new(:duplicate, fn -> nil end)
+     |> assign_new(:duplicate_chain, fn -> nil end)
      |> assign(:parent_options, parent_options(place))}
   end
 
@@ -33,10 +34,7 @@ defmodule EmotheWeb.Admin.PlaceFormComponent do
       |> Places.change_place(params)
       |> Map.put(:action, :validate)
 
-    {:noreply,
-     socket
-     |> assign(:form, to_form(changeset))
-     |> assign(:duplicate, duplicate_for(params, socket.assigns.place))}
+    {:noreply, socket |> assign(:form, to_form(changeset)) |> assign_duplicate(params)}
   end
 
   def handle_event("save", %{"place" => params}, socket) do
@@ -146,6 +144,28 @@ defmodule EmotheWeb.Admin.PlaceFormComponent do
   defp maybe_put(params, _key, nil), do: params
   defp maybe_put(params, key, value), do: Map.put(params, key, to_string(value))
 
+  # Toledo (Spain) and Toledo (Ohio) are both real, so the warning has to let a curator
+  # tell a legitimate namesake from the same place entered twice — which means naming the
+  # container, not just the place. The chain is resolved only when the matched place
+  # *changes*, so holding a duplicate name on screen does not re-read the gazetteer on
+  # every keystroke.
+  defp assign_duplicate(socket, params) do
+    case duplicate_for(params, socket.assigns.place) do
+      nil ->
+        assign(socket, duplicate: nil, duplicate_chain: nil)
+
+      found ->
+        if socket.assigns.duplicate && socket.assigns.duplicate.id == found.id do
+          socket
+        else
+          assign(socket,
+            duplicate: found,
+            duplicate_chain: Places.breadcrumb(found, Places.gazetteer(), "es")
+          )
+        end
+    end
+  end
+
   # ponytail: one indexed find_by_name query per name field per keystroke. Fine at
   # gazetteer scale (hundreds of places, two or three name fields); debounce the
   # validate event or move the lookup to blur if the form ever feels slow.
@@ -214,7 +234,7 @@ defmodule EmotheWeb.Admin.PlaceFormComponent do
       >
         <div :if={@duplicate} class="alert alert-warning mb-4 text-sm">
           {gettext("A place with this name already exists.")}
-          <span class="font-medium">{Places.display_name(@duplicate, "es")}</span>
+          <span class="font-medium">{@duplicate_chain}</span>
         </div>
 
         <fieldset class="mb-4">

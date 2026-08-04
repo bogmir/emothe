@@ -49,6 +49,27 @@ defmodule Emothe.Places.Authority.WikidataTest do
       assert details.url == "https://www.wikidata.org/wiki/Q220"
     end
 
+    # The Q220 fixture above is idealised: one P31, one P17. Real entities are not like
+    # that, and both of the bugs below shipped because the stub was built to match the
+    # implementation instead of the source. Q84 is real London, trimmed but unedited.
+    test "a type hint is found even when it is not the first P31 claim" do
+      assert {:ok, details} = Wikidata.fetch("Q84", plug: stub(json("Q84")))
+
+      # London's P31 order is metropolis, financial centre, city, global city, … — so
+      # reading only the first claim yields nil and the form falls back to its first
+      # option, offering "continent" for London.
+      assert details.type_hint == "city"
+    end
+
+    test "the parent skips countries whose claim has ended" do
+      assert {:ok, details} = Wikidata.fetch("Q84", plug: stub(json("Q84")))
+
+      # London carries eight P17 claims. Seven are historical and marked with an end
+      # time (P582) — the first of them is the Roman Empire. Only Q145 is current, and
+      # it is the one Wikidata ranks "preferred".
+      assert details.parent == %{id: "Q145", label: "Q145"}
+    end
+
     test "an entity with no coordinates yields nil rather than failing" do
       body = %{
         "entities" => %{

@@ -61,6 +61,16 @@ defmodule Emothe.Places do
   def list_places(opts \\ []) do
     locale = opts[:locale] || "es"
 
+    Place
+    |> Repo.all()
+    |> Repo.preload(names: from(n in PlaceName, order_by: ^@name_order))
+    |> with_play_counts()
+    |> Enum.sort_by(&slugify(display_name(&1, locale)))
+  end
+
+  # Shared by list_places/1 and search_names/2 so the "Plays" column never blanks out
+  # depending on which one loaded the place.
+  defp with_play_counts(places) do
     counts =
       PlayPlace
       |> group_by([pp], pp.place_id)
@@ -68,11 +78,7 @@ defmodule Emothe.Places do
       |> Repo.all()
       |> Map.new()
 
-    Place
-    |> Repo.all()
-    |> Repo.preload(names: from(n in PlaceName, order_by: ^@name_order))
-    |> Enum.map(&%{&1 | play_count: Map.get(counts, &1.id, 0)})
-    |> Enum.sort_by(&slugify(display_name(&1, locale)))
+    Enum.map(places, &%{&1 | play_count: Map.get(counts, &1.id, 0)})
   end
 
   @doc """
@@ -203,6 +209,79 @@ defmodule Emothe.Places do
       end
     end)
     |> elem(1)
+  end
+
+  @doc """
+  Every place, keyed by id, with names preloaded. Feeds `ancestors/2` and
+  `breadcrumb/3` so a page walks the tree in memory instead of issuing a query per
+  level.
+
+  ponytail: one full load is right at a hundred places. Past a few thousand, replace
+  with a recursive CTE returning only the requested place's chain.
+  """
+  def gazetteer do
+    Place
+    |> Repo.all()
+    |> Repo.preload(names: from(n in PlaceName, order_by: ^@name_order))
+    |> Map.new(&{&1.id, &1})
+  end
+
+  @doc "The containing places, outermost first. Bounded, so a data loop cannot hang a page."
+  def ancestors(%Place{} = place, gazetteer) do
+    Enum.reduce_while(1..10, {place.parent_place_id, []}, fn _, {id, acc} ->
+      case id && Map.get(gazetteer, id) do
+        nil -> {:halt, {nil, acc}}
+        parent -> {:cont, {parent.parent_place_id, [parent | acc]}}
+      end
+    end)
+    |> elem(1)
+  end
+
+  @doc ~S(The place and its containers, `"Bosque, Transilvania, Rumanía, Europa"`.)
+  def breadcrumb(%Place{} = place, gazetteer, locale \\ "es") do
+    [place | Enum.reverse(ancestors(place, gazetteer))]
+    |> Enum.map(&display_name(&1, locale))
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.join(", ")
+  end
+
+  @doc """
+  Places with any name matching `term`, in any language. Searching every variant is why
+  the names are normalised: typing `Istanbul` has to find the place whose preferred
+  form is `Constantinopla`, or two curators will each create one.
+  """
+  def search_names(term, opts \\ [])
+  def search_names(term, _opts) when term in [nil, ""], do: []
+
+  def search_names(term, opts) do
+    pattern = "%#{String.replace(term, ~r/[%_]/, "")}%"
+
+    PlaceName
+    |> join(:inner, [n], p in assoc(n, :place))
+    |> where([n], ilike(n.name, ^pattern))
+    |> select([n, p], p)
+    |> distinct(true)
+    |> limit(^(opts[:limit] || 20))
+    |> Repo.all()
+    |> Repo.preload(names: from(n in PlaceName, order_by: ^@name_order))
+    |> with_play_counts()
+  end
+
+  @doc """
+  For importers. An existing slug is returned untouched — the gazetteer is curated and
+  the file may be stale — so the caller can report what it left alone.
+  """
+  def find_or_create_by_slug(%{"slug" => slug} = attrs) do
+    case Repo.get_by(Place, slug: slug) do
+      nil ->
+        case create_place(attrs) do
+          {:ok, place} -> {:ok, get_place!(place.id), :created}
+          {:error, changeset} -> {:error, changeset}
+        end
+
+      %Place{id: id} ->
+        {:ok, get_place!(id), :existing}
+    end
   end
 
   # --- Play links (completed in Task 5) ---

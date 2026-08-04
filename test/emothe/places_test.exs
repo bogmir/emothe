@@ -135,4 +135,115 @@ defmodule Emothe.PlacesTest do
       assert counts[zaragoza.id] == 0
     end
   end
+
+  describe "hierarchy" do
+    setup do
+      europe = place_fixture(%{"name" => "Europa", "type" => "continent"})
+
+      romania =
+        place_fixture(%{"name" => "Rumanía", "type" => "country", "parent_place_id" => europe.id})
+
+      transylvania =
+        place_fixture(%{
+          "name" => "Transilvania",
+          "type" => "region",
+          "parent_place_id" => romania.id
+        })
+
+      woods =
+        place_fixture(%{
+          "name" => "Bosque",
+          "type" => "forest",
+          "parent_place_id" => transylvania.id
+        })
+
+      %{europe: europe, woods: woods}
+    end
+
+    test "ancestors are returned root first", %{woods: woods, europe: europe} do
+      gazetteer = Places.gazetteer()
+      ancestors = Places.ancestors(gazetteer[woods.id], gazetteer)
+
+      assert Enum.map(ancestors, & &1.id) |> List.first() == europe.id
+      assert length(ancestors) == 3
+    end
+
+    test "a breadcrumb reads outward from the place", %{woods: woods} do
+      gazetteer = Places.gazetteer()
+
+      assert Places.breadcrumb(gazetteer[woods.id], gazetteer, "es") ==
+               "Bosque, Transilvania, Rumanía, Europa"
+    end
+
+    test "a place with no parent is its own breadcrumb", %{europe: europe} do
+      gazetteer = Places.gazetteer()
+      assert Places.breadcrumb(gazetteer[europe.id], gazetteer, "es") == "Europa"
+    end
+  end
+
+  describe "search_names/2" do
+    test "matches a name variant that is not the preferred one" do
+      place =
+        place_fixture(%{
+          "names" => [
+            %{"name" => "Constantinopla", "language" => "es", "is_preferred" => "true"},
+            %{"name" => "İstanbul", "language" => "tr"}
+          ]
+        })
+
+      assert [found] = Places.search_names("istanbul")
+      assert found.id == place.id
+    end
+
+    test "is case insensitive and matches a fragment" do
+      place = place_fixture(%{"name" => "Alexandría"})
+      assert [found] = Places.search_names("ALEX")
+      assert found.id == place.id
+    end
+
+    test "an empty term returns nothing" do
+      place_fixture(%{"name" => "Roma"})
+      assert Places.search_names("") == []
+    end
+
+    test "carries the play count, same as list_places/1" do
+      play = play_fixture()
+      place = place_fixture(%{"name" => "Cartagena"})
+      {:ok, _} = Places.link_place(play.id, place.id, %{})
+
+      assert [found] = Places.search_names("cartagena")
+      assert found.play_count == 1
+    end
+  end
+
+  describe "find_or_create_by_slug/1" do
+    test "creates a place the first time and reuses it the second" do
+      attrs = %{
+        "slug" => "roma",
+        "type" => "city",
+        "names" => [%{"name" => "Roma", "language" => "es", "is_preferred" => "true"}]
+      }
+
+      assert {:ok, first, :created} = Places.find_or_create_by_slug(attrs)
+      assert {:ok, second, :existing} = Places.find_or_create_by_slug(attrs)
+      assert first.id == second.id
+    end
+
+    test "never overwrites the existing place" do
+      curated = place_fixture(%{"name" => "Roma", "slug" => "roma", "note" => "Curated note"})
+
+      {:ok, found, :existing} =
+        Places.find_or_create_by_slug(%{
+          "slug" => "roma",
+          "type" => "town",
+          "note" => "From a stale file",
+          "names" => [%{"name" => "Rooma", "language" => "es", "is_preferred" => "true"}]
+        })
+
+      assert found.id == curated.id
+      assert found.note == "Curated note"
+      assert found.type == "city"
+      assert Places.display_name(found, "es") == "Roma"
+    end
+  end
 end

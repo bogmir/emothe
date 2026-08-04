@@ -1082,6 +1082,34 @@ defmodule Emothe.Export.TeiXmlTest do
       assert xml =~ ~s(<idno type="wikidata">Q220</idno>)
     end
 
+    test "a place's own note is marked type=\"place\", unambiguous against a link note" do
+      play = play_fixture()
+
+      noted_place =
+        place_fixture(%{
+          "name" => "Bosque",
+          "type" => "forest",
+          "slug" => "bosque",
+          "note" => "Ubicación aproximada."
+        })
+
+      play_place_fixture(play, noted_place)
+
+      xml = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))
+
+      assert xml =~ ~s(<note type="place">Ubicación aproximada.</note>)
+    end
+
+    test "europa appears exactly once in listPlace though two links descend from it", %{
+      xml: xml
+    } do
+      assert length(:binary.matches(xml, ~s(xml:id="europa"))) == 1
+    end
+
+    test "sibling places nest alphabetically by slug under the same parent", %{xml: xml} do
+      assert :binary.match(xml, ~s(xml:id="miseno")) < :binary.match(xml, ~s(xml:id="roma"))
+    end
+
     test "the play's own links live in setting, with role and note", %{xml: xml} do
       assert xml =~ ~s(<placeName ref="#roma" ana="setting"/>)
       assert xml =~ ~s(ref="#miseno" ana="mentioned")
@@ -1111,6 +1139,34 @@ defmodule Emothe.Export.TeiXmlTest do
 
       assert xml =~ ~s(<place xml:id="atlantida" type="island" subtype="fictional">)
       refute xml =~ "<geo>"
+    end
+
+    test "a half-populated authority pair emits no idno" do
+      play = play_fixture()
+
+      authority_only =
+        place_fixture(%{
+          "name" => "Solo autoridad",
+          "type" => "city",
+          "slug" => "solo-autoridad",
+          "authority" => "wikidata"
+        })
+
+      id_only =
+        place_fixture(%{
+          "name" => "Solo id",
+          "type" => "city",
+          "slug" => "solo-id",
+          "authority_id" => "Q1"
+        })
+
+      play_place_fixture(play, authority_only)
+      play_place_fixture(play, id_only)
+
+      xml = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))
+
+      [_before, setting_desc] = String.split(xml, "<settingDesc>")
+      refute setting_desc =~ "<idno"
     end
   end
 end

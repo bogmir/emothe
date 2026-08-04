@@ -378,7 +378,12 @@ defmodule Emothe.Export.TeiXml do
 
   defp build_place_note(%{note: nil}), do: []
   defp build_place_note(%{note: ""}), do: []
-  defp build_place_note(place), do: [element(:note, place.note)]
+
+  # type="place" disambiguates this from the link-note nested inside <setting>/<placeName>
+  # (see build_setting_ref/1) — same element name, different scope, and a bare <note>
+  # sitting among <placeName>/<location>/<idno>/<place> siblings would otherwise be
+  # unreadable to a parser without positional guesswork.
+  defp build_place_note(place), do: [element(:note, %{type: "place"}, place.note)]
 
   # `@ana` normally points at an interpretation element; a bare token is a project
   # convention, chosen over `@type` because `@type` on a `<placeName>` already means

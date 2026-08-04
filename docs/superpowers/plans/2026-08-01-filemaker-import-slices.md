@@ -14,7 +14,7 @@
 | S2f — titles | **dropped as an import** — nothing to import, folded into S7's cross-check |
 | S3–S8 | scoped below, each gets its own plan when it comes up |
 | S9 — places | **Phase 1 done** (the app, no FileMaker code) — `CLAUDE.md` |
-| S9b — `pub_LugAccion` import | **dropped** — 2 plays, 15 markup shapes, worse than Wikidata; see S9 |
+| S9b — `pub_LugAccion` import | **scoped, build it** — 138 links / ~94 places at full corpus; after the ~300 import |
 
 Completed plans live in `archive/`, with exactly what shipped, the commit list, and what each
 slice learned that its plan did not say. Read that before starting a new slice.
@@ -84,12 +84,17 @@ Two consequences that bind every slice:
 
 ## Scope decision
 
-**Only plays we already hold.** The export describes 379 published plays. We are not building a
-catalogue of the archive and we are not fetching the 317 TEI files we lack — that is a separate
-decision needing permission from the project. Every slice applies to plays that exist in our
-database.
+**Only plays we already hold — but that set is going to grow.** The export describes 379 published
+plays; we hold 82. Every slice applies to plays that exist in our database, and nothing here creates
+a play.
 
-Consequences, measured:
+**Revised 2026-08-05:** importing the remaining ~300 plays is now intended (open question 5 is a
+"when", not an "if"). That changes how slices get *sized*, not how they behave. A slice measured
+against 82 plays can look not-worth-writing and be clearly worth writing at 379 — S9b was drafted as
+dropped on exactly that mistake. **Size every remaining slice against both columns**, and prefer
+running an importer once, after the big import, over running it twice.
+
+Consequences, measured at the present 82:
 
 | Set | Count | Notes |
 |---|---|---|
@@ -102,6 +107,31 @@ Consequences, measured:
 That 62 / 22 split is why the index slice went first: it is the only one that touches most of the
 corpus, and it needed no new columns. Everything from S2 on is capped at those 22 plays, so the
 panel and the tables it fills will be empty for 60 of 82 — by design, not by omission.
+
+Per-field scale, measured 2026-08-05 against `emothe_dev` through `Filemaker.load_versions/1`.
+**Read both columns.** The left is what a slice writes today; the right is what it writes once the
+~300 plays land. Every slice grows 10–20×, which is the difference between "an afternoon of typing
+beats an importer" and "an importer is the only sane option":
+
+| Field | Slice | Plays now | Plays at 379 | Child records now → then |
+|---|---|---|---|---|
+| `bus_coleccion` | S2d | 22 | 438 | — |
+| `bus_personaje` | S6 | 18 | 308 | 712 → **8450** names |
+| `bus_tiemHistorico` | S2a *(done)* | 11 | 150 | — |
+| `pub_BibSelectaCritica` | S4 | 7 | 106 | 198 → **2003** |
+| `pub_testimonio` | S3 | 7 | 105 | 27 → **450** |
+| `pub_EdModernas` | S4 | 6 | 120 | 84 → **823** |
+| `pub_datacion` | S2c | 6 | 97 | 11 → 125 |
+| `pub_LugAccion` | S9b | 6 | 101 | 9 → 138 |
+| `pub_RepAntiguas` | S5 | 5 | 77 | 12 → **265** |
+| `bus_genero` | S8 | 5 | 82 | — |
+| `pub_BibSelectaTraduccion` | S4 | 4 | 61 | 29 → 187 |
+| `pub_BibSelectaAdaptacion` | S4 | 1 | 17 | 7 → 50 |
+
+Two things follow. **S4 becomes the biggest slice by an order of magnitude** — over 3000 citations
+across four fields, where the present corpus suggests a few hundred. And **S6's completeness check
+goes from 712 names to 8450**, which stops being something a human reviews row by row and starts
+needing a real reconciliation UI.
 
 ## The join, once
 
@@ -141,7 +171,7 @@ Everything here is capped at the 22 plays with a `T01` record.
 | **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 4 with a note | **done** — `archive/README.md` |
 | S2c | `composition_date_from/_to` + note | `pub_datacion` | 6 | proposal below, **needs sign-off** on attribution |
 | S2d | `collection` | `bus_coleccion` | 22 | labels decoded below, **blocked** on whether the field is still wanted |
-| ~~S2b~~ | `place_of_action` | `pub_LugAccion` | 2, not 6 | **split out** — toponym-based, now **S9**; the import is **dropped as S9b** |
+| ~~S2b~~ | `place_of_action` | `pub_LugAccion` | 6 | **split out** — toponym-based, now **S9**; the import is **S9b** |
 | ~~S2e~~ | `legacy_url` | `pub_edicionWeb` href | 13 | **dropped** — derivable, see below |
 | ~~S2f~~ | `original_title`, `title_sort` | `pub_TituloObra`, `T00.pub_tituloOrden` | 22 | **dropped as an import** — nothing left to import, see below |
 
@@ -295,7 +325,8 @@ Two findings from that check that outlive S2f:
   Year. Format. Notes.`
 - **Into:** existing `play_sources` (title, author, pub_place, publisher, pub_date already fit),
   plus new `source_type` (from `bus_testSoporte`) and `format` columns
-- **Scale:** 7 plays, 27 witness records
+- **Scale:** 7 plays, 27 witness records **today; 105 plays and 450 records** once the ~300 land.
+  Build it after that import, not before (question 5)
 - **Cross-check:** `bus_testCiudad` / `bus_testAnyo` / `bus_testFormato` line counts match the
   `<li>` count on 75 of 105 rows across the whole export — use them to validate the parse, not as
   the source
@@ -307,7 +338,10 @@ Two findings from that check that outlive S2f:
   outer `<li>` is a language header `FR:` / `EN:` / `IT:` / `DE:`), `pub_BibSelectaAdaptacion`
 - **Into:** new `play_bibliography` table with `kind` (`modern_edition`, `criticism`,
   `translation`, `adaptation`), `citation`, `language`, `position`
-- **Scale:** 7 plays, ~326 citations
+- **Scale:** 7 plays, ~326 citations **today; ~120 plays and over 3000 citations** once the ~300
+  land — criticism alone goes 198 → 2003. **This is the largest remaining slice**, and at that size
+  the grouped-by-kind rendering and the reorder UI both need to work against hundreds of rows per
+  play, not a dozen. Build it after that import (question 5)
 - **Done when:** a bibliography section renders per play grouped by kind, **and** admins can add,
   edit, reorder and delete citations without an import
 - **S0b:** the new table stays outside the importer's reach, so a TEI re-import never touches it
@@ -318,7 +352,8 @@ Two findings from that check that outlive S2f:
   `<b>Cast</b>` (nested `<ul>`, one `<li>` per actor), `<b>Location</b>`, `<b>Venue type</b>`,
   `<b>Note</b>`, `<b>Information source</b>`
 - **Into:** new `play_performances` + `play_performance_cast` tables
-- **Scale:** 5 plays, 12 performances
+- **Scale:** 5 plays, 12 performances **today; 77 plays and 265 performances** once the ~300 land,
+  plus their cast rows. Build it after that import (question 5)
 - **Sources:** CATCOM and Wiggins, *British Drama 1533-1642* — keep the attribution text, it is
   a licensing requirement of CATCOM
 - **Done when:** performances render per play with their source attribution, **and** admins can add
@@ -331,6 +366,12 @@ Not an import: TEI stays the source of truth for characters. `T01.bus_personaje`
 line, 18 of our 22 plays) is a completeness check — flag characters present in FileMaker but
 missing from the imported cast list, and vice versa. Feeds the "review character in text" UI
 already on the roadmap in `CLAUDE.md`.
+
+**Scale changes what this has to be.** 18 plays and 712 names today; **308 plays and 8450 names**
+once the ~300 land. At 712 a curator reads the report; at 8450 they cannot, so the output has to be
+per-play, sorted by how bad the mismatch is, and dismissible — a reconciliation screen, not a
+printout. Also still blocked by question 7: a TEI re-import replaces the whole cast list, so any fix
+a curator makes here is lost on the next import.
 
 ### S7 — Editor & translator credits
 
@@ -349,15 +390,36 @@ EMOTHE0341, see S2f.
 either table**. Send the value lists for `bus_genero`, `bus_generoAnnals` and
 `bus_repCircunstancia`. Everything else the CSV was missing, the JSON supplied.
 
+Exactly which codes need a label, measured 2026-08-05 — the value lists can be checked against this,
+and anything outside it is a code we never see:
+
+| Field | Distinct codes, corpus-wide | Codes our 22 actually use | Multi-valued? |
+|---|---|---|---|
+| `bus_genero` | 12 — `3 5 6 8 10 15 16 17 19 20 21 23` | `5`, `20`, `21` | yes, 17 rows carry 2+ |
+| `bus_generoAnnals` | 14 — `1 2 3 5 6 7 9 10 11 13 14 15 16 17` | `5`, `16`, `17` | no, always one |
+| `bus_repCircunstancia` | 7 — `1 2 3 4 5 6 8` | `2 3 5 8` | yes, 59 rows carry 2+ |
+
+`bus_genero` being multi-valued is a shape decision, not just a label one, and the ~300-play import
+settles it: **a single `genre` string column is not enough.** Our five plays each carry one code
+today, but 17 export rows carry two or more, and 82 plays get a genre once the rest land. A play with
+`20/21` needs either a `{:array, :string}` or a join table — pick when the value lists arrive and the
+labels show whether the two codes are alternatives or genuinely co-held.
+
+`bus_repCircunstancia` belongs to **S5**, not here — it qualifies a performance, so it lands on
+`play_performances` rather than the play. It is listed with the genre request only because it is the
+third code list to ask for in the same message.
+
 What is blocked is the *import*, not the field. An editable `genre` on the play form can ship
-whenever it is wanted — 5 plays is an afternoon of typing. The value lists only decide whether the
-existing codes can be turned into labels automatically or have to be re-entered by hand.
+whenever it is wanted. The "5 plays is an afternoon of typing" argument **expires with the ~300-play
+import** — at 82 plays with a genre the value lists stop being a convenience and become the
+difference between an import and a fortnight of data entry.
 
 #### The `bus_lugAccion` request *(added 2026-08-04, ask in the same message as the value lists)*
 
 Grouped with S8 only because it is the **second** thing we need from the FileMaker side and one
-message should carry both. It has nothing to do with genre and blocks nothing — S9b is dropped
-either way. Kept here so the ask does not get lost.
+message should carry both. It has nothing to do with genre. It **gates tier 2 of S9b** — the
+historical polities — and it is also the cleanest fix for S9b's cross-language dedupe problem, since
+language-tagged names remove the guessing entirely. Kept here so the ask does not get lost.
 
 `bus_lugAccion` sits beside `pub_LugAccion` and holds the same places **as a containment chain with
 a name per language**. EMOTHE0038, verbatim, newlines as in the export:
@@ -415,59 +477,106 @@ Two things were called "Phase 2" and they are not the same work, so they are spl
   catalogue browse-by-place, multiple authority links per place. **Not a FileMaker slice at all**;
   it touches no export field and belongs in its own spec. Scope is recorded in `CLAUDE.md` under
   "Places Phase 2". Not planned as of 2026-08-04, deliberately.
-- **S9b, the `pub_LugAccion` import** — what this roadmap promised. **Dropped, see below.**
+- **S9b, the `pub_LugAccion` import** — what this roadmap promised. **Scoped, build it, see below**,
+  after the ~300-play import and ideally after `bus_lugAccion` arrives.
 
-#### S9b — the `pub_LugAccion` import *(dropped 2026-08-04)*
+#### S9b — the `pub_LugAccion` import *(scoped 2026-08-05, build it)*
 
-Not built. Measured against `emothe_dev` and all 439 export rows, and the numbers in the earlier
-draft of this section were wrong in both directions.
+**Size this against the future corpus, not the present one.** The plan is to import the other ~300
+plays (open question 5), so the target is the whole field, not the slice of it we happen to hold
+today:
 
-**Coverage is 2 of our 22 plays, not 6.** The field is non-empty on 101 of 439 rows, but 99 of those
-are plays we do not hold, and the scope rule gives them nothing:
-
-```
-EMOTHE0010  <ul><li>Helsingør. [Denmark]. Europe</li></ul>
-EMOTHE0038  <ul><li>Rome. [Italy]. Europe</li>
-                <li>Alexandria. [Egypt]. Africa</li>
-                <li>Athens. [Greece]. Europe</li>
-                <li>( Miseno ) [Italy]. Europe</li></ul>
-```
-
-Five links, about eight places. EMOTHE0337 (`Jerusalem. [Israel]. Asia` in the earlier draft) has no
-`pub_LugAccion` value at all.
-
-**`place . [modern country] . continent` is the largest of fifteen shapes, not the format.** Across
-the 138 non-empty `<li>`, splitting on `.`:
-
-| Count | Shape | Example |
+| | Today (82 plays) | Full export |
 |---|---|---|
-| 57 | `W . [] . W` | `Helsingør. [Denmark]. Europe` |
-| 27 | `[] . W` | `[Germany]. Europe` — no settlement at all |
-| 21 | `W . [] . W . W` | `Madrid. [España]. Europa. Madrid: iglesia de la Victoria, cerro de San Blas…` |
-| 7 | `[] . [] . W` | `[Kent]. [United Kingdom]. Europe` |
-| 5 | `W . [] . [] . W` | `Mantua. [Italian Peninsula]. []. Europe` — empty bracket slot |
-| 4 | `W` | `Europe` |
-| 5 | `()` first | `( bosco pastorale )`, `( An island )` |
-| 10 more | — | incl. `<li></li>`, and one `<li>` that is a Wiggins prose citation |
+| Plays with place data | 6 | **101** |
+| Place links (`<li>`) | 9 | **138** |
+| Distinct settlements | ~10 | **58** |
+| Distinct countries/regions | 6 | **31** |
+| Continents | 3 | 5 |
+| **Gazetteer rows** | ~16 | **~94** |
 
-Segments per `<li>` run 1 to 6, and 21 segments are freeform Spanish scene description
-(`Puerto; habitación de Lucindo; patio y sala en casa de Fenisa`), not toponyms. A parser for all of
-that is real work, for five links.
+At 9 links, hand entry wins and this is not worth writing. At 138 links and a 94-row gazetteer it
+is clearly worth writing, and **the earlier "drop it" verdict was sized against the wrong corpus.**
+Max 5 places per play; `London` appears in 14 plays, `Madrid` in 9, `Rome` in 6 — which is precisely
+the shared-referent case the corpus-global gazetteer was built for.
 
-**Phase 1 already ships the cheaper and better path.** `Emothe.Places.Authority` fetches from
-Wikidata: labels in `es en fr it pt ca` (`lib/emothe/places/authority/wikidata.ex`), plus
-coordinates, a type hint and a parent — **none of which FileMaker holds**. For two plays, a curator
-typing "Helsingør" into the autocomplete at `/admin/plays/:id/places` gets strictly more than the
-importer could produce. Against this roadmap's governing rule — the export is a bootstrap, not a
-dependency — there is nothing here to bootstrap.
+**It is one grammar, not fifteen shapes.** The fifteen "shapes" are one production with optional
+parts:
+
+```
+[ "(" ] settlement [ ")" ] "." { "[" region "]" "." } continent { "." note }
+   ↑ mentioned, not staged        ↑ 0, 1 or 2 of these      ↑ freeform Spanish
+```
+
+Verified against all 138 `<li>`: **135 parse cleanly**, with settlement, region chain, continent and
+`mentioned` flag each landing in the right slot. Distribution: 95 have a settlement and 43 do not
+(`[Germany]. Europe` is a country-level setting, which the model handles — a link to the country
+place); 116 have one bracketed region, 8 have two (`[Kent]. [United Kingdom]`), 14 have none;
+33 carry a trailing freeform note; 5 are parenthesised.
+
+The 3 that do not parse are the ones that *should* be reported rather than guessed at:
+
+```
+( bosco pastorale )      ← fictional, no continent → is_fictional, no parent
+( An island )            ← same
+. The play is "based on mythological events…" (Wiggins, 2013)   ← a citation, not a place
+```
+
+**One parse trap, found and fixed while measuring.** A parenthesised settlement is not always
+followed by a `.`, so splitting on `.` first yields `Miseno ) [Italy` as the settlement and loses the
+country. Peel the `( … )` before splitting. `( Miseno ) [Italy]. Europe`, `( Forest of Ardennes )
+[France]. Europe` and `( Costa de Tarragona ) [España]. Europa` all depend on this.
 
 **`( Miseno )` → `role: "mentioned"` is confirmed**, no longer "unconfirmed": five `<li>` use the
-parenthesis and every one reads as a named-not-staged place. Phase 1 already has that role, so this
-is a reading vindicated, not work outstanding.
+parenthesis and every one reads as named-not-staged. Phase 1 already has that role.
 
-**What survives is a request to the FileMaker side, not an import.** `bus_lugAccion` is not the
-search blob the earlier draft assumed — it is the containment chain with multilingual names, and it
-is editorially *better* than `pub_LugAccion`. See "The `bus_lugAccion` request" under S8.
+**The hard part is dedupe across languages, not parsing.** The same referent arrives under different
+surface forms depending on the row's language, and a naive `slugify` would create a row for each:
+
+```
+Europe / Europa              Africa / África / Afrique
+Spain / España               Germany / Alemania
+United Kingdom / Reino Unido Italy / Italia / Italie / Italian Peninsula / Península itálica
+```
+
+Import blindly and the gazetteer holds ~94 rows for perhaps 60 real referents — the exact drift
+Phase 1's no-name-column design exists to prevent, reintroduced by the importer. So:
+
+- `find_or_create_by_slug/1` **is not sufficient on its own** here. It matches on slug, and
+  `europe` and `europa` are different slugs.
+- The importer needs a **name-based lookup across languages** before it creates: `Places.find_by_name/1`
+  already exists and is the seam, but it is exact-match and single-language. Widening it, or adding
+  an alias pass, is the real work of this slice.
+- **`Italian Peninsula` vs `Italy` is an editorial question, not a string one** — they may be
+  deliberately different referents. Report the pair, do not merge it automatically.
+
+**Two tiers, and tier 2 is the one worth waiting for.** Wikidata's `P17` gives Rome's parent as
+modern `Italy`; `bus_lugAccion` says `Roman Republic`, which is the editorially right answer for a
+play set in antiquity, and it carries the names in five languages — which would also *solve the
+dedupe problem above*, because each name arrives language-tagged instead of having to be guessed.
+
+| Play | `pub_LugAccion` | `bus_lugAccion` |
+|---|---|---|
+| EMOTHE0010 | `[Denmark]` | Kingdom of Denmark |
+| EMOTHE0038 | `[Italy]`, `[Egypt]` | Roman Republic, Ptolemaic Egypt |
+| EMOTHE0281/0341/0346 | `[United Kingdom]` | Kingdom of England |
+| EMOTHE0337 | `[Israel]` | Roman Republic |
+
+- **Tier 1** — parse `pub_LugAccion`, create places from the modern names, link with `role`,
+  `position` and `origin: "filemaker"`, report every unparsed `<li>` and every cross-language
+  near-duplicate. Buildable from the export as it stands.
+- **Tier 2** — needs the language-tagged `bus_lugAccion` (request under S8). Replaces the modern
+  country with the historical polity and loads the five-language names. Verified the schema already
+  supports it with no change: `Europe > Roman Republic > Rome` resolves through `ancestors/2`, and
+  `place_names.is_historical` carries `Roman Republic` / `República romana` / `Repubblica romana`.
+
+**Ordering:** ask for `bus_lugAccion` first. If it arrives, build once and the dedupe problem largely
+dissolves. If it is refused, build tier 1 with the cross-language matching done by hand-reviewed
+report — and expect that report, not the parser, to be where the time goes.
+
+**Do not build this before the ~300 plays are imported** (open question 5). Running it against 82
+plays writes 9 links and then has to run again; running it once, after, writes 138 against a corpus
+that can actually use them.
 
 ## Shared conventions
 
@@ -509,15 +618,25 @@ Ordered by what is actually blocking work.
    answer may delete it. See S2d for the decoded label table and the one suspect row.
 2. **Do competing composition datings need per-dating attribution?** Blocks the *shape* of S2c:
    three columns if no, a child table with admin CRUD if yes. See S2c.
-3. ~~**Place of action requirements** — S9.~~ **Closed 2026-08-04.** Answered by building it: S9
-   Phase 1 shipped the gazetteer, and the `pub_LugAccion` import (S9b) is dropped — 2 of our 22
-   plays, fifteen markup shapes, and less data than the Wikidata lookup already gives. What is left
-   of the field is a request for a language-tagged `bus_lugAccion`, folded into the S8 message.
-4. **Genre value lists** — S8, plus the language-tagged `bus_lugAccion` in the same message. The
-   only outstanding requests to the FileMaker side.
-5. **Fetching the other 317 plays.** The index gives a download path for every published play
-   (`textosXML/<code>_<Name>.xml`). Out of scope until someone asks the project for permission and
-   a rate.
+3. ~~**Place of action requirements** — S9.~~ **Closed 2026-08-04** by building it: S9 Phase 1
+   shipped the gazetteer. The import is S9b, scoped and buildable — 6 plays, 9 links — and waits on
+   the `bus_lugAccion` request in (4) so it can load the historical polities in one pass.
+4. **Genre value lists, and a language-tagged `bus_lugAccion`** — S8 and S9b tier 2. The only
+   outstanding requests to the FileMaker side; one message should carry both.
+5. **Importing the other ~300 plays.** *Intended as of 2026-08-05 — a "when", not an "if", and now
+   the sequencing constraint for most of what is left.* The index gives a download path for every
+   published play (`textosXML/<code>_<Name>.xml`). Still needs permission and a fetch rate from the
+   project, but the roadmap should now assume it happens.
+
+   **It should land before S3, S4, S5, S6 and S9b.** Each of those writes child rows per play, so
+   running one against 82 plays writes a tenth of its rows and then has to run again over a corpus
+   ten times larger — with the second run's dedupe and conflict reporting untested at that scale.
+   The scale table under "Scope decision" has the multipliers. S2c, S2d and S8 write a column on the
+   play and are indifferent to the ordering.
+
+   Two things to check when it happens, both cheap now and expensive later: whether the 21 unlinked
+   translations (question 9) close once their originals exist, and whether `AL####` stays at 19 or
+   the Artelope files also grow.
 6. **`bus_publicada` vs `is_complete`.** 61 rows are flagged published, but 301 have a real
    web-edition href. Our `is_complete` gates the static-site export, so nothing should write to it
    automatically.
@@ -534,4 +653,12 @@ Ordered by what is actually blocking work.
 
 Closed since 2026-08-01: the multi-valued `pub_datacion` shape is now a written proposal (S2c) rather
 than an open question; `legacy_url` (S2e) and the title import (S2f) are dropped outright; and the
-place-of-action question (3) is closed by S9 Phase 1 shipping and S9b being dropped.
+place-of-action question (3) is closed by S9 Phase 1 shipping, with the import scoped as S9b.
+
+**A measurement trap, recorded because it cost a wrong verdict on 2026-08-04.** Nine of the 22
+matched `T01` records have an **empty `pub_edicionWeb`** and are reachable only through
+`version_code/1`'s numeric fallback: 0211, 0281, 0286, 0305, 0337, 0341, 0346, 0502, 0542. A quick
+script that matches on the href alone silently finds 13 of 22 and understates every coverage number
+— it is how S9b was briefly and wrongly written off at "2 of 22" when the answer is 6. Use
+`Emothe.Import.Filemaker.load_versions/1`, which handles the fallback, rather than re-deriving the
+code in a throwaway script.

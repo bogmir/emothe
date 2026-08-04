@@ -13,6 +13,7 @@ defmodule Emothe.Import.TeiParser do
   alias Emothe.Catalogue.{Play, PlayEditor, PlaySource, PlayEditorialNote}
   alias Emothe.PlayContent
   alias Emothe.PlayContent.{Character, Division, Element}
+  alias Emothe.Places
 
   require Logger
 
@@ -253,6 +254,10 @@ defmodule Emothe.Import.TeiParser do
     for schema <- [PlayEditor, PlaySource, PlayEditorialNote] do
       Repo.delete_all(from(r in schema, where: r.play_id == ^id and r.origin == "tei"))
     end
+
+    # Only the links, never the places: the gazetteer is corpus-global authority data,
+    # and an orphaned place shows in the admin list with a play count of 0.
+    Places.delete_tei_play_places(id)
   end
 
   # Every editor, source and note the importer creates is stamped `origin: "tei"`, so a
@@ -300,6 +305,8 @@ defmodule Emothe.Import.TeiParser do
       import_editors(file_desc, play)
       import_sources(file_desc, play)
     end
+
+    import_places(profile_desc, play)
 
     play
   end
@@ -676,6 +683,182 @@ defmodule Emothe.Import.TeiParser do
           position: idx
         })
       end)
+    end
+  end
+
+  # --- Places ---
+
+  # `listPlace` supplies the places and their containment; `setting` supplies this
+  # play's links. Reading them separately is what keeps a pure container — Italia in
+  # `<place xml:id="italia">…<place xml:id="roma">` — from becoming a setting.
+  defp import_places(nil, _play), do: :ok
+
+  defp import_places({_name, _attrs, children}, play) do
+    case find_child(children, "settingDesc") do
+      nil ->
+        :ok
+
+      {_n, _a, setting_children} ->
+        list_place = find_child(setting_children, "listPlace")
+        setting = find_child(setting_children, "setting")
+
+        if list_place, do: import_list_place(list_place, nil)
+        if setting, do: import_setting(setting, play)
+
+        :ok
+    end
+  end
+
+  defp import_list_place({_name, _attrs, children}, parent_id) do
+    children
+    |> Enum.filter(&match?({"place", _, _}, &1))
+    |> Enum.each(&import_place(&1, parent_id))
+  end
+
+  defp import_place({_name, attrs, children} = place_el, parent_id) do
+    slug = attr_value(attrs, "xml:id") || Places.slugify(first_place_name(children))
+    {latitude, longitude} = place_geo(children)
+
+    place_attrs =
+      %{
+        "slug" => slug,
+        "type" => attr_value(attrs, "type") || "other",
+        "parent_place_id" => parent_id,
+        "is_fictional" => attr_value(attrs, "subtype") == "fictional",
+        "latitude" => latitude,
+        "longitude" => longitude,
+        "note" => place_note(children),
+        "names" => place_names(children)
+      }
+      |> Map.merge(place_idno(children))
+
+    case Places.find_or_create_by_slug(place_attrs) do
+      {:ok, place, outcome} ->
+        if outcome == :existing do
+          Logger.info("TEI import: place #{slug} already exists, left unchanged")
+        end
+
+        # Nested <place> elements are this place's children.
+        import_list_place(place_el, place.id)
+
+      {:error, changeset} ->
+        Logger.warning("TEI import: could not create place #{slug}: #{inspect(changeset.errors)}")
+    end
+  end
+
+  defp place_names(children) do
+    children
+    |> Enum.filter(&match?({"placeName", _, _}, &1))
+    |> Enum.with_index()
+    |> Enum.map(fn {{_n, attrs, _c} = el, index} ->
+      language = attr_value(attrs, "xml:lang")
+
+      %{
+        "name" => text_content(el),
+        "language" => language,
+        "is_historical" => attr_value(attrs, "type") == "historical",
+        "is_preferred" => attr_value(attrs, "type") != "historical",
+        "position" => index
+      }
+    end)
+    |> Enum.reject(&(&1["name"] in [nil, ""]))
+    |> dedupe_preferred()
+  end
+
+  # The partial index allows one preferred name per language; a file with two
+  # non-historical names in the same language would violate it, so the first wins.
+  defp dedupe_preferred(names) do
+    {names, _seen} =
+      Enum.map_reduce(names, MapSet.new(), fn name, seen ->
+        key = name["language"]
+
+        if name["is_preferred"] and not MapSet.member?(seen, key) do
+          {name, MapSet.put(seen, key)}
+        else
+          {Map.put(name, "is_preferred", false), seen}
+        end
+      end)
+
+    names
+  end
+
+  defp first_place_name(children) do
+    case Enum.find(children, &match?({"placeName", _, _}, &1)) do
+      nil -> "place"
+      el -> text_content(el)
+    end
+  end
+
+  defp place_geo(children) do
+    with {_n, _a, location_children} <- find_child(children, "location"),
+         geo when not is_nil(geo) <- find_child(location_children, "geo"),
+         [lat, long] <- geo |> text_content() |> String.split(~r/\s+/, trim: true),
+         {latitude, _} <- Float.parse(lat),
+         {longitude, _} <- Float.parse(long) do
+      {latitude, longitude}
+    else
+      _ -> {nil, nil}
+    end
+  end
+
+  defp place_idno(children) do
+    case find_child(children, "idno") do
+      {_n, attrs, _c} = el ->
+        authority = attr_value(attrs, "type")
+
+        if authority in Places.Place.authorities() do
+          %{"authority" => authority, "authority_id" => text_content(el)}
+        else
+          %{}
+        end
+
+      _ ->
+        %{}
+    end
+  end
+
+  # A place's own note is `<note type="place">`, a direct child of `<place>`. Do not
+  # match a bare `<note>` here — that shape belongs to a link's note nested inside
+  # `<setting>/<placeName>` (see setting_note/1), one level deeper and without the
+  # type attribute. See task-10-report.md for the export side of this contract.
+  defp place_note(children) do
+    case Enum.find(children, &match?({"note", _, _}, &1)) do
+      {_n, attrs, _c} = el ->
+        if attr_value(attrs, "type") == "place", do: text_content(el)
+
+      nil ->
+        nil
+    end
+  end
+
+  defp import_setting({_name, _attrs, children}, play) do
+    children
+    |> Enum.filter(&match?({"placeName", _, _}, &1))
+    |> Enum.with_index()
+    |> Enum.each(fn {{_n, attrs, name_children}, index} ->
+      slug = attrs |> attr_value("ref") |> to_string() |> String.trim_leading("#")
+
+      case Repo.get_by(Places.Place, slug: slug) do
+        nil ->
+          Logger.warning("TEI import: setting references unknown place #{inspect(slug)}")
+
+        place ->
+          Places.link_place(play.id, place.id, %{
+            "role" => attr_value(attrs, "ana") || "setting",
+            "position" => index,
+            "note" => setting_note(name_children),
+            "origin" => "tei"
+          })
+      end
+    end)
+  end
+
+  # A link's note is a bare `<note>` inside `<setting>/<placeName>` — no `type`
+  # attribute, and one tree level deeper than a place's own `<note type="place">`.
+  defp setting_note(children) do
+    case find_child(children, "note") do
+      nil -> nil
+      el -> text_content(el)
     end
   end
 

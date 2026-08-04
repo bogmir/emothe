@@ -1183,4 +1183,121 @@ defmodule Emothe.Import.TeiParserTest do
     assert play.code == "UTF16LE"
     assert play.title == "UTF16 Test"
   end
+
+  describe "places" do
+    @places_tei """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="es">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Play With Places</title><title key="archivo">PLACES0001</title></titleStmt>
+          <publicationStmt><p/></publicationStmt>
+          <sourceDesc><p/></sourceDesc>
+        </fileDesc>
+        <profileDesc>
+          <langUsage><language ident="es-ES">Español</language></langUsage>
+          <settingDesc>
+            <listPlace>
+              <place xml:id="italia" type="country">
+                <placeName xml:lang="es">Italia</placeName>
+                <place xml:id="roma" type="city">
+                  <placeName xml:lang="es">Roma</placeName>
+                  <placeName xml:lang="en">Rome</placeName>
+                  <placeName xml:lang="la" type="historical">Roma Aeterna</placeName>
+                  <location><geo>41.9028 12.4964</geo></location>
+                  <idno type="wikidata">Q220</idno>
+                </place>
+                <place xml:id="miseno" type="town">
+                  <placeName xml:lang="it">Miseno</placeName>
+                </place>
+              </place>
+            </listPlace>
+            <setting>
+              <placeName ref="#roma" ana="setting"/>
+              <placeName ref="#miseno" ana="mentioned"><note>Named, not staged.</note></placeName>
+            </setting>
+          </settingDesc>
+        </profileDesc>
+      </teiHeader>
+      <text><body><div1 type="acto" n="1"><head>Acto I</head></div1></body></text>
+    </TEI>
+    """
+
+    defp import_places_tei(xml \\ @places_tei) do
+      TeiParser.import_file(write_tei(xml))
+    end
+
+    test "creates the places, their names and the containment" do
+      {:ok, play} = import_places_tei()
+
+      roma = Emothe.Repo.get_by!(Emothe.Places.Place, slug: "roma")
+      roma = Emothe.Places.get_place!(roma.id)
+
+      assert roma.type == "city"
+      assert roma.latitude == 41.9028
+      assert roma.longitude == 12.4964
+      assert roma.authority == "wikidata"
+      assert roma.authority_id == "Q220"
+      assert roma.parent.slug == "italia"
+
+      names = Map.new(roma.names, &{&1.language, &1})
+      assert names["es"].name == "Roma"
+      assert names["en"].name == "Rome"
+      assert names["la"].is_historical
+
+      assert play.code == "PLACES0001"
+    end
+
+    test "only the places named in setting become play links" do
+      {:ok, play} = import_places_tei()
+
+      links = Emothe.Places.list_play_places(play.id)
+
+      assert Enum.map(links, & &1.place.slug) == ["roma", "miseno"]
+      assert Enum.map(links, & &1.role) == ["setting", "mentioned"]
+      assert Enum.map(links, & &1.origin) == ["tei", "tei"]
+      assert Enum.at(links, 1).note == "Named, not staged."
+
+      # italia is a container, not a setting
+      refute "italia" in Enum.map(links, & &1.place.slug)
+    end
+
+    test "a re-import replaces its own links and leaves a hand-entered one alone" do
+      {:ok, play} = import_places_tei()
+
+      extra = Emothe.TestFixtures.place_fixture(%{"name" => "Atenas"})
+      Emothe.TestFixtures.play_place_fixture(play, extra, %{"origin" => "manual"})
+
+      {:ok, _play} = import_places_tei()
+
+      slugs = Emothe.Places.list_play_places(play.id) |> Enum.map(& &1.place.slug)
+      assert "roma" in slugs
+      assert extra.slug in slugs
+      assert length(slugs) == 3
+    end
+
+    test "an existing place is left alone, not overwritten" do
+      curated =
+        Emothe.TestFixtures.place_fixture(%{
+          "name" => "Roma",
+          "slug" => "roma",
+          "type" => "region",
+          "note" => "Curated"
+        })
+
+      {:ok, _play} = import_places_tei()
+
+      reloaded = Emothe.Places.get_place!(curated.id)
+      assert reloaded.type == "region"
+      assert reloaded.note == "Curated"
+    end
+
+    test "a file with no settingDesc creates no places" do
+      xml = String.replace(@places_tei, ~r|<settingDesc>.*</settingDesc>|s, "")
+      {:ok, play} = import_places_tei(xml)
+
+      assert Emothe.Places.list_play_places(play.id) == []
+      assert Emothe.Places.list_places() == []
+    end
+  end
 end

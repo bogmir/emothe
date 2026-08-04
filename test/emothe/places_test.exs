@@ -324,6 +324,33 @@ defmodule Emothe.PlacesTest do
       assert Places.get_place!(roma.id)
     end
 
+    test "a link created after an unlink does not collide with a surviving position", %{
+      play: play,
+      roma: roma,
+      miseno: miseno
+    } do
+      cartagena = place_fixture(%{"name" => "Cartagena"})
+      alejandria = place_fixture(%{"name" => "Alejandria"})
+
+      {:ok, _a} = Places.link_place(play.id, roma.id, %{})
+      {:ok, b} = Places.link_place(play.id, miseno.id, %{})
+      {:ok, c} = Places.link_place(play.id, cartagena.id, %{})
+
+      {:ok, _} = Places.unlink_place(b)
+      {:ok, d} = Places.link_place(play.id, alejandria.id, %{})
+
+      :ok = Places.move_play_place(d, :up)
+
+      assert Places.list_play_places(play.id)
+             |> Enum.map(&Places.display_name(&1.place, "es")) == [
+               "Roma",
+               "Alejandria",
+               "Cartagena"
+             ]
+
+      refute d.position == c.position
+    end
+
     test "delete_tei_play_places/1 removes only importer-created links", %{
       play: play,
       roma: roma,

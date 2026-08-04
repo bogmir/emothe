@@ -304,8 +304,15 @@ defmodule Emothe.Places do
     PlayPlace.changeset(play_place, attrs)
   end
 
+  # A count would collide after an unlink: unlink leaves a gap instead of renumbering
+  # (deliberately — see `renumber/1`), so a play with links at 0 and 2 has a count of 2,
+  # and a naive count-based next position would tie the surviving 2. max + 1 always
+  # lands past every existing position, gap or no gap.
   def link_place(play_id, place_id, attrs) do
-    next = Repo.aggregate(from(pp in PlayPlace, where: pp.play_id == ^play_id), :count, :id)
+    max_position =
+      Repo.aggregate(from(pp in PlayPlace, where: pp.play_id == ^play_id), :max, :position)
+
+    next = if is_nil(max_position), do: 0, else: max_position + 1
 
     attrs
     |> Map.merge(%{"play_id" => play_id, "place_id" => place_id})

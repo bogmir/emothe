@@ -1,6 +1,7 @@
 defmodule Emothe.TestFixtures do
   alias Emothe.Catalogue
   alias Emothe.PlayContent
+  alias Emothe.Places
 
   def unique_code, do: "PLAY-#{System.unique_integer([:positive])}"
 
@@ -211,5 +212,36 @@ defmodule Emothe.TestFixtures do
 
     {:ok, user, token} = Emothe.Accounts.invite_user(email, role, nil)
     {user, token}
+  end
+
+  @doc """
+  A place with one or more names. `"name"` is shorthand for a single preferred
+  Spanish name; pass `"names"` for the full list.
+  """
+  def place_fixture(attrs \\ %{}) do
+    {name, attrs} = Map.pop(attrs, "name")
+
+    names =
+      Map.get(attrs, "names") ||
+        [
+          %{
+            "name" => name || "Place #{System.unique_integer([:positive])}",
+            "language" => "es",
+            "is_preferred" => "true"
+          }
+        ]
+
+    attrs =
+      attrs
+      |> Map.put_new("type", "city")
+      |> Map.put("names", names)
+
+    {:ok, place} = Places.create_place(attrs)
+    place
+  end
+
+  def play_place_fixture(play, place, attrs \\ %{}) do
+    {:ok, play_place} = Places.link_place(play.id, place.id, attrs)
+    play_place
   end
 end

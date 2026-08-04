@@ -284,12 +284,81 @@ defmodule Emothe.Places do
     end
   end
 
-  # --- Play links (completed in Task 5) ---
+  # --- Play links ---
+
+  def list_play_places(play_id) do
+    PlayPlace
+    |> where([pp], pp.play_id == ^play_id)
+    |> order_by([pp], asc: pp.position, asc: pp.inserted_at)
+    |> Repo.all()
+    |> Repo.preload(place: [names: from(n in PlaceName, order_by: ^@name_order)])
+  end
+
+  def get_play_place!(id) do
+    PlayPlace
+    |> Repo.get!(id)
+    |> Repo.preload(place: [names: from(n in PlaceName, order_by: ^@name_order)])
+  end
+
+  def change_play_place(%PlayPlace{} = play_place, attrs \\ %{}) do
+    PlayPlace.changeset(play_place, attrs)
+  end
 
   def link_place(play_id, place_id, attrs) do
+    next = Repo.aggregate(from(pp in PlayPlace, where: pp.play_id == ^play_id), :count, :id)
+
     attrs
     |> Map.merge(%{"play_id" => play_id, "place_id" => place_id})
+    |> Map.put_new("position", next)
     |> then(&PlayPlace.changeset(%PlayPlace{}, &1))
     |> Repo.insert()
+  end
+
+  def update_play_place(%PlayPlace{} = play_place, attrs) do
+    play_place
+    |> PlayPlace.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def unlink_place(%PlayPlace{} = play_place), do: Repo.delete(play_place)
+
+  @doc "Swaps a link with its neighbour. A move past either end is a no-op."
+  def move_play_place(%PlayPlace{} = play_place, direction) when direction in [:up, :down] do
+    links = list_play_places(play_place.play_id)
+    index = Enum.find_index(links, &(&1.id == play_place.id))
+    target = if direction == :up, do: index - 1, else: index + 1
+
+    if is_nil(index) or target < 0 or target >= length(links) do
+      :ok
+    else
+      neighbour = Enum.at(links, target)
+
+      Repo.transaction(fn ->
+        Repo.update!(PlayPlace.changeset(play_place, %{"position" => neighbour.position}))
+        Repo.update!(PlayPlace.changeset(neighbour, %{"position" => play_place.position}))
+      end)
+
+      renumber(play_place.play_id)
+      :ok
+    end
+  end
+
+  @doc """
+  Deletes only the links a TEI import created. Place rows are never deleted by an
+  import: the gazetteer is authority data, and an orphan shows with a play count of 0.
+  """
+  def delete_tei_play_places(play_id) do
+    Repo.delete_all(from pp in PlayPlace, where: pp.play_id == ^play_id and pp.origin == "tei")
+  end
+
+  defp renumber(play_id) do
+    play_id
+    |> list_play_places()
+    |> Enum.with_index()
+    |> Enum.each(fn {link, index} ->
+      if link.position != index do
+        Repo.update!(PlayPlace.changeset(link, %{"position" => index}))
+      end
+    end)
   end
 end

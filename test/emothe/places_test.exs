@@ -246,4 +246,96 @@ defmodule Emothe.PlacesTest do
       assert Places.display_name(found, "es") == "Roma"
     end
   end
+
+  describe "play links" do
+    setup do
+      play = play_fixture()
+      roma = place_fixture(%{"name" => "Roma"})
+      miseno = place_fixture(%{"name" => "Miseno"})
+      %{play: play, roma: roma, miseno: miseno}
+    end
+
+    test "linking appends at the end", %{play: play, roma: roma, miseno: miseno} do
+      {:ok, first} = Places.link_place(play.id, roma.id, %{})
+      {:ok, second} = Places.link_place(play.id, miseno.id, %{"role" => "mentioned"})
+
+      assert first.position == 0
+      assert second.position == 1
+      assert second.role == "mentioned"
+      assert first.origin == "manual"
+    end
+
+    test "listing returns them in position order with the place preloaded", %{
+      play: play,
+      roma: roma,
+      miseno: miseno
+    } do
+      {:ok, _} = Places.link_place(play.id, roma.id, %{})
+      {:ok, _} = Places.link_place(play.id, miseno.id, %{})
+
+      assert [one, two] = Places.list_play_places(play.id)
+      assert Places.display_name(one.place, "es") == "Roma"
+      assert Places.display_name(two.place, "es") == "Miseno"
+    end
+
+    test "a place cannot be linked to the same play twice", %{play: play, roma: roma} do
+      {:ok, _} = Places.link_place(play.id, roma.id, %{})
+
+      assert {:error, changeset} = Places.link_place(play.id, roma.id, %{})
+      assert "is already linked to this play" in errors_on(changeset).place_id
+    end
+
+    test "role and note are editable", %{play: play, roma: roma} do
+      {:ok, link} = Places.link_place(play.id, roma.id, %{})
+
+      {:ok, updated} =
+        Places.update_play_place(link, %{"role" => "mentioned", "note" => "Act III only"})
+
+      assert updated.role == "mentioned"
+      assert updated.note == "Act III only"
+    end
+
+    test "moving a link down swaps it with its neighbour", %{
+      play: play,
+      roma: roma,
+      miseno: miseno
+    } do
+      {:ok, first} = Places.link_place(play.id, roma.id, %{})
+      {:ok, _second} = Places.link_place(play.id, miseno.id, %{})
+
+      :ok = Places.move_play_place(first, :down)
+
+      assert Places.list_play_places(play.id)
+             |> Enum.map(&Places.display_name(&1.place, "es")) == ["Miseno", "Roma"]
+    end
+
+    test "moving the first link up is a no-op", %{play: play, roma: roma} do
+      {:ok, first} = Places.link_place(play.id, roma.id, %{})
+      assert :ok = Places.move_play_place(first, :up)
+      assert [only] = Places.list_play_places(play.id)
+      assert only.position == 0
+    end
+
+    test "unlinking leaves the place in the gazetteer", %{play: play, roma: roma} do
+      {:ok, link} = Places.link_place(play.id, roma.id, %{})
+      {:ok, _} = Places.unlink_place(link)
+
+      assert Places.list_play_places(play.id) == []
+      assert Places.get_place!(roma.id)
+    end
+
+    test "delete_tei_play_places/1 removes only importer-created links", %{
+      play: play,
+      roma: roma,
+      miseno: miseno
+    } do
+      {:ok, _} = Places.link_place(play.id, roma.id, %{"origin" => "tei"})
+      {:ok, _} = Places.link_place(play.id, miseno.id, %{"origin" => "manual"})
+
+      {1, nil} = Places.delete_tei_play_places(play.id)
+
+      assert [kept] = Places.list_play_places(play.id)
+      assert Places.display_name(kept.place, "es") == "Miseno"
+    end
+  end
 end

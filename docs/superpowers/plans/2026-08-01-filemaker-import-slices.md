@@ -12,7 +12,9 @@
 | S2c, S2d | scoped below, **both waiting on a question to the project** |
 | S2e — `legacy_url` | **dropped** — derivable from code + filename, see below |
 | S2f — titles | **dropped as an import** — nothing to import, folded into S7's cross-check |
-| S3–S9 | scoped below, each gets its own plan when it comes up |
+| S3–S8 | scoped below, each gets its own plan when it comes up |
+| S9 — places | **Phase 1 done** (the app, no FileMaker code) — `CLAUDE.md` |
+| S9b — `pub_LugAccion` import | **dropped** — 2 plays, 15 markup shapes, worse than Wikidata; see S9 |
 
 Completed plans live in `archive/`, with exactly what shipped, the commit list, and what each
 slice learned that its plan did not say. Read that before starting a new slice.
@@ -139,7 +141,7 @@ Everything here is capped at the 22 plays with a `T01` record.
 | **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 4 with a note | **done** — `archive/README.md` |
 | S2c | `composition_date_from/_to` + note | `pub_datacion` | 6 | proposal below, **needs sign-off** on attribution |
 | S2d | `collection` | `bus_coleccion` | 22 | labels decoded below, **blocked** on whether the field is still wanted |
-| ~~S2b~~ | `place_of_action` | `pub_LugAccion` | 6 | **split out** — toponym-based, now **S9** |
+| ~~S2b~~ | `place_of_action` | `pub_LugAccion` | 2, not 6 | **split out** — toponym-based, now **S9**; the import is **dropped as S9b** |
 | ~~S2e~~ | `legacy_url` | `pub_edicionWeb` href | 13 | **dropped** — derivable, see below |
 | ~~S2f~~ | `original_title`, `title_sort` | `pub_TituloObra`, `T00.pub_tituloOrden` | 22 | **dropped as an import** — nothing left to import, see below |
 
@@ -344,23 +346,84 @@ EMOTHE0341, see S2f.
 ### S8 — Genre *(blocked)*
 
 `bus_genero` and `bus_generoAnnals` are bare numeric codes with **no text counterpart anywhere in
-either table**. This is the only outstanding request to the FileMaker side: send the value lists
-for `bus_genero`, `bus_generoAnnals` and `bus_repCircunstancia`. Everything else the CSV was
-missing, the JSON supplied.
+either table**. Send the value lists for `bus_genero`, `bus_generoAnnals` and
+`bus_repCircunstancia`. Everything else the CSV was missing, the JSON supplied.
 
 What is blocked is the *import*, not the field. An editable `genre` on the play form can ship
 whenever it is wanted — 5 plays is an afternoon of typing. The value lists only decide whether the
 existing codes can be turned into labels automatically or have to be re-entered by hand.
 
-### S9 — Place of action *(was S2b; designed 2026-08-04)*
+#### The `bus_lugAccion` request *(added 2026-08-04, ask in the same message as the value lists)*
+
+Grouped with S8 only because it is the **second** thing we need from the FileMaker side and one
+message should carry both. It has nothing to do with genre and blocks nothing — S9b is dropped
+either way. Kept here so the ask does not get lost.
+
+`bus_lugAccion` sits beside `pub_LugAccion` and holds the same places **as a containment chain with
+a name per language**. EMOTHE0038, verbatim, newlines as in the export:
+
+```
+Europe / Europa / Europe / Europa / Europa
+Roman Republic / República romana / République romaine / Repubblica romana / República Romana
+Rome / Roma / Rome / Roma / Roma
+                                          ← blank line ends the chain
+Africa / África / Afrique / Africa / África
+Ptolemaic Egypt / Egipto ptolemaico / Égypte ptolémaïque / Egitto tolemaico / Egito Ptolemaico
+Alexandria / Alejandría / Alexandrie / Alessandria / Alexandria
+```
+
+This is better than `pub_LugAccion` in two ways that matter to us. It names the **historical**
+polity — `Roman Republic`, where `pub_LugAccion` flattens to modern `[Italy]` — and it carries the
+names in five languages, which is exactly `place_names`.
+
+**Why we cannot use it as exported.** The grouping is positional with no delimiter, and blank values
+are *dropped* rather than held as empty slots, so the block length varies and the boundaries are
+unrecoverable:
+
+```
+Europe / Europa / Europe / Europa / Europa / Germany        ← 6 lines: Germany has 1 name, not 5
+Europe / … / Kingdom of England / Reino de Inglaterra /
+         Royaume d'Angleterre / Regno d'Inghilterra /
+         England / Reino da Inglaterra                      ← 11 lines: England has 6, not 5
+```
+
+**68 of 227 groups (30%) are not a multiple of five**, so no chunking rule recovers which line
+belongs to which place, or in which language. Measured across all 439 rows.
+
+**What to ask for:** the same field with each name tagged by language and grouped by place — one
+row per (place, language, name), or any JSON/CSV shape that keeps those three together. With that,
+`Places.find_or_create_by_slug/1` plus `place_names` takes it directly and the historical polities
+land as real places, which no Wikidata lookup gives us for free (Wikidata returns modern `Italy`
+for Rome's `P17`). Without it, curators enter the handful of historical names by hand, which the
+schema already supports.
+
+Worth saying in the message that this is a **contribution to the gazetteer**, not a blocker: their
+five-language place names are research work we would otherwise redo.
+
+### S9 — Place of action *(was S2b; Phase 1 shipped 2026-08-04)*
 
 **Spec: `../specs/2026-08-04-s9-places-design.md`.** Split out of S2 because it is not a text field
 and turned out to be a feature rather than a column: a corpus-global gazetteer with a three-layer
 place / place-name / mention model, Wikidata as a swappable authority, and TEI `<listPlace>` +
-`<setting>` in both directions. **Phase 1 is the app; the `pub_LugAccion` import is a later slice and
-ships no FileMaker code.** `plays.place_of_action` is never created.
+`<setting>` in both directions. **Phase 1 shipped no FileMaker code**, on purpose, and
+`plays.place_of_action` was never created. See `Emothe.Places` in `CLAUDE.md`.
 
-`pub_LugAccion` is a **toponym**, and a play carries several:
+Two things were called "Phase 2" and they are not the same work, so they are split here:
+
+- **In-text mentions and the rest of the app work** — `<placeName ref>` in the body, an
+  `element_places` table, the tagging UI, map rendering from the stored coordinates,
+  catalogue browse-by-place, multiple authority links per place. **Not a FileMaker slice at all**;
+  it touches no export field and belongs in its own spec. Scope is recorded in `CLAUDE.md` under
+  "Places Phase 2". Not planned as of 2026-08-04, deliberately.
+- **S9b, the `pub_LugAccion` import** — what this roadmap promised. **Dropped, see below.**
+
+#### S9b — the `pub_LugAccion` import *(dropped 2026-08-04)*
+
+Not built. Measured against `emothe_dev` and all 439 export rows, and the numbers in the earlier
+draft of this section were wrong in both directions.
+
+**Coverage is 2 of our 22 plays, not 6.** The field is non-empty on 101 of 439 rows, but 99 of those
+are plays we do not hold, and the scope rule gives them nothing:
 
 ```
 EMOTHE0010  <ul><li>Helsingør. [Denmark]. Europe</li></ul>
@@ -368,17 +431,43 @@ EMOTHE0038  <ul><li>Rome. [Italy]. Europe</li>
                 <li>Alexandria. [Egypt]. Africa</li>
                 <li>Athens. [Greece]. Europe</li>
                 <li>( Miseno ) [Italy]. Europe</li></ul>
-EMOTHE0337  <ul><li>Jerusalem. [Israel]. Asia</li></ul>
 ```
 
-So the shape FileMaker uses is already `place . [modern country] . continent`, one row per place,
-with parentheses apparently marking a place mentioned rather than staged (EMOTHE0038's `( Miseno )`
-— unconfirmed). 6 of our 22 plays, 4 places at most.
+Five links, about eight places. EMOTHE0337 (`Jerusalem. [Israel]. Asia` in the earlier draft) has no
+`pub_LugAccion` value at all.
 
-That is a small gazetteer, not a string column, and a gazetteer has consequences the rest of S2 does
-not: shared place records across plays, a modern-vs-historical name distinction, coordinates and
-external authority links. All of that is settled in the spec; the parenthesised `( Miseno )` becomes
-`role: "mentioned"` on the play link.
+**`place . [modern country] . continent` is the largest of fifteen shapes, not the format.** Across
+the 138 non-empty `<li>`, splitting on `.`:
+
+| Count | Shape | Example |
+|---|---|---|
+| 57 | `W . [] . W` | `Helsingør. [Denmark]. Europe` |
+| 27 | `[] . W` | `[Germany]. Europe` — no settlement at all |
+| 21 | `W . [] . W . W` | `Madrid. [España]. Europa. Madrid: iglesia de la Victoria, cerro de San Blas…` |
+| 7 | `[] . [] . W` | `[Kent]. [United Kingdom]. Europe` |
+| 5 | `W . [] . [] . W` | `Mantua. [Italian Peninsula]. []. Europe` — empty bracket slot |
+| 4 | `W` | `Europe` |
+| 5 | `()` first | `( bosco pastorale )`, `( An island )` |
+| 10 more | — | incl. `<li></li>`, and one `<li>` that is a Wiggins prose citation |
+
+Segments per `<li>` run 1 to 6, and 21 segments are freeform Spanish scene description
+(`Puerto; habitación de Lucindo; patio y sala en casa de Fenisa`), not toponyms. A parser for all of
+that is real work, for five links.
+
+**Phase 1 already ships the cheaper and better path.** `Emothe.Places.Authority` fetches from
+Wikidata: labels in `es en fr it pt ca` (`lib/emothe/places/authority/wikidata.ex`), plus
+coordinates, a type hint and a parent — **none of which FileMaker holds**. For two plays, a curator
+typing "Helsingør" into the autocomplete at `/admin/plays/:id/places` gets strictly more than the
+importer could produce. Against this roadmap's governing rule — the export is a bootstrap, not a
+dependency — there is nothing here to bootstrap.
+
+**`( Miseno )` → `role: "mentioned"` is confirmed**, no longer "unconfirmed": five `<li>` use the
+parenthesis and every one reads as a named-not-staged place. Phase 1 already has that role, so this
+is a reading vindicated, not work outstanding.
+
+**What survives is a request to the FileMaker side, not an import.** `bus_lugAccion` is not the
+search blob the earlier draft assumed — it is the containment chain with multilingual names, and it
+is editorially *better* than `pub_LugAccion`. See "The `bus_lugAccion` request" under S8.
 
 ## Shared conventions
 
@@ -420,9 +509,12 @@ Ordered by what is actually blocking work.
    answer may delete it. See S2d for the decoded label table and the one suspect row.
 2. **Do competing composition datings need per-dating attribution?** Blocks the *shape* of S2c:
    three columns if no, a child table with admin CRUD if yes. See S2c.
-3. **Place of action requirements** — S9. Toponyms with country and continent, up to 4 per play.
-   Waiting on Bogdan.
-4. **Genre value lists** — S8. The only outstanding request to the FileMaker side.
+3. ~~**Place of action requirements** — S9.~~ **Closed 2026-08-04.** Answered by building it: S9
+   Phase 1 shipped the gazetteer, and the `pub_LugAccion` import (S9b) is dropped — 2 of our 22
+   plays, fifteen markup shapes, and less data than the Wikidata lookup already gives. What is left
+   of the field is a request for a language-tagged `bus_lugAccion`, folded into the S8 message.
+4. **Genre value lists** — S8, plus the language-tagged `bus_lugAccion` in the same message. The
+   only outstanding requests to the FileMaker side.
 5. **Fetching the other 317 plays.** The index gives a download path for every published play
    (`textosXML/<code>_<Name>.xml`). Out of scope until someone asks the project for permission and
    a rate.
@@ -441,4 +533,5 @@ Ordered by what is actually blocking work.
    to say so. Found while dropping S2f.
 
 Closed since 2026-08-01: the multi-valued `pub_datacion` shape is now a written proposal (S2c) rather
-than an open question, and `legacy_url` (S2e) and the title import (S2f) are dropped outright.
+than an open question; `legacy_url` (S2e) and the title import (S2f) are dropped outright; and the
+place-of-action question (3) is closed by S9 Phase 1 shipping and S9b being dropped.

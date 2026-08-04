@@ -102,7 +102,8 @@ defmodule EmotheWeb.Layouts do
 
   attr :active_tab, :atom,
     default: nil,
-    doc: "which tab is active (:overview, :metadata, :editors, :sources, :content, :public)"
+    doc:
+      "which tab is active (:overview, :metadata, :editors, :sources, :places, :content, :public)"
 
   def play_context_bar(assigns) do
     ~H"""
@@ -138,6 +139,12 @@ defmodule EmotheWeb.Layouts do
             class={ctx_tab_class(@active_tab == :sources)}
           >
             {gettext("Sources")}
+          </.link>
+          <.link
+            navigate={~p"/admin/plays/#{@play.id}/places"}
+            class={ctx_tab_class(@active_tab == :places)}
+          >
+            {gettext("Places")}
           </.link>
           <.link
             navigate={~p"/admin/plays/#{@play.id}/content"}

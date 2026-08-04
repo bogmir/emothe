@@ -1,6 +1,8 @@
 defmodule Emothe.Export.TeiXmlTest do
   use Emothe.DataCase, async: true
 
+  import Emothe.TestFixtures
+
   alias Emothe.Import.TeiParser
   alias Emothe.Export.TeiXml
   alias Emothe.Catalogue
@@ -1021,5 +1023,94 @@ defmodule Emothe.Export.TeiXmlTest do
     exported_xml = TeiXml.generate(play_with_all)
 
     assert exported_xml =~ ~r/<publisher>.*ARTELOPE.*<\/publisher>/s
+  end
+
+  describe "places" do
+    setup do
+      play = play_fixture()
+
+      europe = place_fixture(%{"name" => "Europa", "type" => "continent", "slug" => "europa"})
+
+      italy =
+        place_fixture(%{
+          "names" => [
+            %{"name" => "Italia", "language" => "es", "is_preferred" => "true"},
+            %{"name" => "Italy", "language" => "en", "is_preferred" => "true"}
+          ],
+          "type" => "country",
+          "slug" => "italia",
+          "parent_place_id" => europe.id
+        })
+
+      roma =
+        place_fixture(%{
+          "name" => "Roma",
+          "type" => "city",
+          "slug" => "roma",
+          "parent_place_id" => italy.id,
+          "latitude" => "41.9028",
+          "longitude" => "12.4964",
+          "authority" => "wikidata",
+          "authority_id" => "Q220"
+        })
+
+      miseno =
+        place_fixture(%{
+          "name" => "Miseno",
+          "type" => "town",
+          "slug" => "miseno",
+          "parent_place_id" => italy.id
+        })
+
+      play_place_fixture(play, roma, %{"role" => "setting"})
+      play_place_fixture(play, miseno, %{"role" => "mentioned", "note" => "Named, not staged."})
+
+      %{xml: Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))}
+    end
+
+    test "containment is expressed by nesting", %{xml: xml} do
+      assert xml =~ ~s(<settingDesc>)
+      assert xml =~ ~s(<place xml:id="europa" type="continent">)
+      assert :binary.match(xml, ~s(xml:id="europa")) < :binary.match(xml, ~s(xml:id="italia"))
+      assert :binary.match(xml, ~s(xml:id="italia")) < :binary.match(xml, ~s(xml:id="roma"))
+    end
+
+    test "a place carries its names, coordinates and authority id", %{xml: xml} do
+      assert xml =~ ~s(<placeName xml:lang="es">Italia</placeName>)
+      assert xml =~ ~s(<placeName xml:lang="en">Italy</placeName>)
+      assert xml =~ ~s(<geo>41.9028 12.4964</geo>)
+      assert xml =~ ~s(<idno type="wikidata">Q220</idno>)
+    end
+
+    test "the play's own links live in setting, with role and note", %{xml: xml} do
+      assert xml =~ ~s(<placeName ref="#roma" ana="setting"/>)
+      assert xml =~ ~s(ref="#miseno" ana="mentioned")
+      assert xml =~ "Named, not staged."
+    end
+
+    test "a play with no places emits no settingDesc" do
+      play = play_fixture()
+      xml = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))
+      refute xml =~ "settingDesc"
+    end
+
+    test "a fictional place is marked with a subtype and has no location" do
+      play = play_fixture()
+
+      atlantis =
+        place_fixture(%{
+          "name" => "Atlántida",
+          "type" => "island",
+          "slug" => "atlantida",
+          "is_fictional" => "true"
+        })
+
+      play_place_fixture(play, atlantis)
+
+      xml = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))
+
+      assert xml =~ ~s(<place xml:id="atlantida" type="island" subtype="fictional">)
+      refute xml =~ "<geo>"
+    end
   end
 end

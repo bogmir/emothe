@@ -9,7 +9,14 @@ defmodule Emothe.Export.TeiXml do
   @body_types ~w(acto jornada prologo argumento act acte play prologue epilogue)
 
   def generate(play) do
-    play = Emothe.Repo.preload(play, [:editors, :sources, :editorial_notes])
+    play =
+      Emothe.Repo.preload(play, [
+        :editors,
+        :sources,
+        :editorial_notes,
+        play_places: [place: :names]
+      ])
+
     characters = PlayContent.list_characters(play.id)
     divisions = PlayContent.load_play_content(play.id)
 
@@ -281,11 +288,112 @@ defmodule Emothe.Export.TeiXml do
   defp build_profile_desc(play) do
     {ident, label} = Map.get(@language_ident_labels, play.language || "es", {"es-ES", "Español"})
 
-    element(:profileDesc, [
-      element(:langUsage, [
-        element(:language, %{ident: ident}, label)
+    children = [
+      element(:langUsage, [element(:language, %{ident: ident}, label)])
+    ]
+
+    element(:profileDesc, children ++ build_setting_desc(play))
+  end
+
+  # Two elements, on purpose. `listPlace` nests every place the play needs *plus every
+  # ancestor*, so containment is complete — which means a `<place>` may be a pure
+  # container. `setting` is therefore what says which of them the play actually
+  # references, because "the leaves are the settings" is wrong: a play can be set in
+  # Italy itself.
+  defp build_setting_desc(%{play_places: []}), do: []
+
+  defp build_setting_desc(%{play_places: links}) when is_list(links) do
+    gazetteer = Emothe.Places.gazetteer()
+    ordered = Enum.sort_by(links, fn link -> {link.role != "setting", link.position} end)
+
+    roots =
+      ordered
+      |> Enum.map(& &1.place)
+      |> Enum.flat_map(fn place ->
+        [place | Emothe.Places.ancestors(place, gazetteer)]
+      end)
+      |> Enum.uniq_by(& &1.id)
+      |> Enum.filter(&is_nil(&1.parent_place_id))
+
+    wanted =
+      ordered
+      |> Enum.map(& &1.place)
+      |> Enum.flat_map(fn place -> [place | Emothe.Places.ancestors(place, gazetteer)] end)
+      |> MapSet.new(& &1.id)
+
+    [
+      element(:settingDesc, [
+        element(:listPlace, Enum.map(roots, &build_place(&1, gazetteer, wanted))),
+        element(:setting, Enum.map(ordered, &build_setting_ref/1))
       ])
-    ])
+    ]
+  end
+
+  defp build_setting_desc(_play), do: []
+
+  defp build_place(place, gazetteer, wanted) do
+    attrs =
+      [{"xml:id", place.slug}, {"type", place.type}]
+      |> then(fn attrs ->
+        if place.is_fictional, do: attrs ++ [{"subtype", "fictional"}], else: attrs
+      end)
+
+    children =
+      Enum.map(place.names, &build_place_name/1) ++
+        build_location(place) ++
+        build_place_idno(place) ++
+        build_place_note(place) ++
+        child_places(place, gazetteer, wanted)
+
+    element(:place, attrs, children)
+  end
+
+  defp child_places(place, gazetteer, wanted) do
+    gazetteer
+    |> Map.values()
+    |> Enum.filter(&(&1.parent_place_id == place.id and MapSet.member?(wanted, &1.id)))
+    |> Enum.sort_by(& &1.slug)
+    |> Enum.map(&build_place(&1, gazetteer, wanted))
+  end
+
+  defp build_place_name(name) do
+    attrs = if name.language, do: [{"xml:lang", name.language}], else: []
+    attrs = if name.is_historical, do: attrs ++ [{"type", "historical"}], else: attrs
+    element(:placeName, attrs, name.name)
+  end
+
+  defp build_location(%{latitude: nil}), do: []
+  defp build_location(%{longitude: nil}), do: []
+
+  defp build_location(place) do
+    [element(:location, [element(:geo, "#{place.latitude} #{place.longitude}")])]
+  end
+
+  defp build_place_idno(%{authority: nil}), do: []
+  defp build_place_idno(%{authority_id: nil}), do: []
+
+  defp build_place_idno(place) do
+    [element(:idno, %{type: place.authority}, place.authority_id)]
+  end
+
+  defp build_place_note(%{note: nil}), do: []
+  defp build_place_note(%{note: ""}), do: []
+  defp build_place_note(place), do: [element(:note, place.note)]
+
+  # `@ana` normally points at an interpretation element; a bare token is a project
+  # convention, chosen over `@type` because `@type` on a `<placeName>` already means
+  # historical-versus-current inside `<listPlace>`, and one attribute with two meanings
+  # in one file is how a parser acquires a bug.
+  defp build_setting_ref(link) do
+    attrs = [{"ref", "##{link.place.slug}"}, {"ana", link.role}]
+
+    case link.note do
+      note when is_binary(note) and note != "" ->
+        element(:placeName, attrs, [element(:note, note)])
+
+      _ ->
+        element(:placeName, attrs, nil)
+    end
   end
 
   # --- Text ---

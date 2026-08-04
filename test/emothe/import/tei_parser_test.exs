@@ -1248,6 +1248,55 @@ defmodule Emothe.Import.TeiParserTest do
       assert play.code == "PLACES0001"
     end
 
+    @deep_places_tei """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="es">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Play With Deep Places</title><title key="archivo">PLACESDEEP1</title></titleStmt>
+          <publicationStmt><p/></publicationStmt>
+          <sourceDesc><p/></sourceDesc>
+        </fileDesc>
+        <profileDesc>
+          <langUsage><language ident="es-ES">Español</language></langUsage>
+          <settingDesc>
+            <listPlace>
+              <place xml:id="europa" type="continent">
+                <placeName xml:lang="es">Europa</placeName>
+                <place xml:id="italia" type="country">
+                  <placeName xml:lang="es">Italia</placeName>
+                  <place xml:id="roma" type="city">
+                    <placeName xml:lang="es">Roma</placeName>
+                  </place>
+                </place>
+              </place>
+            </listPlace>
+            <setting>
+              <placeName ref="#roma" ana="setting"/>
+            </setting>
+          </settingDesc>
+        </profileDesc>
+      </teiHeader>
+      <text><body><div1 type="acto" n="1"><head>Acto I</head></div1></body></text>
+    </TEI>
+    """
+
+    test "a parent chain deeper than two levels resolves at every level" do
+      {:ok, _play} = import_places_tei(@deep_places_tei)
+
+      europa = Emothe.Repo.get_by!(Emothe.Places.Place, slug: "europa")
+      italia = Emothe.Repo.get_by!(Emothe.Places.Place, slug: "italia")
+      roma = Emothe.Places.get_place!(Emothe.Repo.get_by!(Emothe.Places.Place, slug: "roma").id)
+
+      assert italia.parent_place_id == europa.id
+      assert roma.parent_place_id == italia.id
+      assert roma.parent.slug == "italia"
+
+      gazetteer = Emothe.Places.gazetteer()
+      ancestor_slugs = Emothe.Places.ancestors(roma, gazetteer) |> Enum.map(& &1.slug)
+      assert ancestor_slugs == ["europa", "italia"]
+    end
+
     test "only the places named in setting become play links" do
       {:ok, play} = import_places_tei()
 

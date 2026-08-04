@@ -824,7 +824,12 @@ defmodule Emothe.Import.TeiParser do
   defp place_note(children) do
     case Enum.find(children, &match?({"note", _, _}, &1)) do
       {_n, attrs, _c} = el ->
-        if attr_value(attrs, "type") == "place", do: text_content(el)
+        if attr_value(attrs, "type") == "place" do
+          text_content(el)
+        else
+          Logger.info("TEI import: <note> under <place> without type=\"place\", skipped")
+          nil
+        end
 
       nil ->
         nil

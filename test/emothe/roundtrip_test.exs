@@ -671,4 +671,76 @@ defmodule Emothe.RoundtripTest do
       :ok
     end
   end
+
+  describe "places roundtrip" do
+    test "export, import and re-export produce the same places" do
+      play = Emothe.TestFixtures.play_fixture(%{"code" => "ROUNDPLACE1"})
+
+      italy =
+        Emothe.TestFixtures.place_fixture(%{
+          "name" => "Italia",
+          "type" => "country",
+          "slug" => "italia"
+        })
+
+      roma =
+        Emothe.TestFixtures.place_fixture(%{
+          "names" => [
+            %{"name" => "Roma", "language" => "es", "is_preferred" => "true"},
+            %{"name" => "Rome", "language" => "en", "is_preferred" => "true"}
+          ],
+          "type" => "city",
+          "slug" => "roma",
+          "parent_place_id" => italy.id,
+          "latitude" => "41.9028",
+          "longitude" => "12.4964",
+          "authority" => "wikidata",
+          "authority_id" => "Q220"
+        })
+
+      miseno =
+        Emothe.TestFixtures.place_fixture(%{
+          "name" => "Miseno",
+          "type" => "town",
+          "slug" => "miseno",
+          "parent_place_id" => italy.id
+        })
+
+      Emothe.TestFixtures.play_place_fixture(play, roma, %{"role" => "setting"})
+
+      Emothe.TestFixtures.play_place_fixture(play, miseno, %{
+        "role" => "mentioned",
+        "note" => "Named, not staged."
+      })
+
+      first = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(play.id))
+
+      path = Path.join(System.tmp_dir!(), "roundtrip-places.xml")
+      File.write!(path, first)
+      on_exit(fn -> File.rm(path) end)
+
+      {:ok, reimported} = Emothe.Import.TeiParser.import_file(path)
+      second = Emothe.Export.TeiXml.generate(Emothe.Catalogue.get_play_with_all!(reimported.id))
+
+      assert settings(second) == settings(first)
+      assert place_ids(second) == place_ids(first)
+      assert second =~ ~s(<geo>41.9028 12.4964</geo>)
+      assert second =~ ~s(<idno type="wikidata">Q220</idno>)
+      assert second =~ "Named, not staged."
+    end
+
+    defp settings(xml), do: Regex.scan(~r/ref="#([^"]+)" ana="([^"]+)"/, xml)
+    defp place_ids(xml), do: Regex.scan(~r/<place xml:id="([^"]+)"/, xml)
+
+    test "the real fixtures still produce no places" do
+      # Every corpus fixture predates <settingDesc>, so importing one must leave the
+      # gazetteer empty. This is the guard against the new parser branch firing on a
+      # file that has no places in it.
+      fixture = Path.join(@fixtures_dir, "AL0514_ElAusenteEnElLugar.xml")
+
+      {:ok, _play} = Emothe.Import.TeiParser.import_file(fixture)
+
+      assert Emothe.Places.list_places() == []
+    end
+  end
 end

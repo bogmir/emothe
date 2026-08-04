@@ -848,12 +848,22 @@ defmodule Emothe.Import.TeiParser do
           Logger.warning("TEI import: setting references unknown place #{inspect(slug)}")
 
         place ->
-          Places.link_place(play.id, place.id, %{
+          link_attrs = %{
             "role" => attr_value(attrs, "ana") || "setting",
             "position" => index,
             "note" => setting_note(name_children),
             "origin" => "tei"
-          })
+          }
+
+          # A hand-linked place (origin "manual") surviving from before this file ever
+          # mentioned it collides with the (play_id, place_id) unique index on a blind
+          # insert — reset_tei_content only clears this play's own "tei" links, on
+          # purpose. Update in place instead, same as find_or_create_by_slug does for
+          # the place row itself.
+          case Repo.get_by(Places.PlayPlace, play_id: play.id, place_id: place.id) do
+            nil -> Places.link_place(play.id, place.id, link_attrs)
+            existing -> Places.update_play_place(existing, link_attrs)
+          end
       end
     end)
   end

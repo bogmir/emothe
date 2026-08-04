@@ -262,20 +262,26 @@ The `plays.is_complete` boolean (default `false`) controls which plays are expor
 
 ## Running Commands
 
-When using the Bash tool, the asdf shims don't work in the sandbox (they are bash scripts that need `/bin/bash`). Instead, set PATH directly to the Erlang and Elixir binary directories before running any mix/elixir/iex command:
+Run mix plainly — no PATH export:
 
 ```bash
-export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/bin:/usr/local/bin:/bin:$PATH"
 mix test
 mix compile
 mix phx.server
+mix test 2>&1 | tail -10
 ```
 
-For piping output, system commands like `tail` and `head` are at `/usr/bin/`:
+`.claude/settings.json` sets `env.PATH` to the Erlang and Elixir `bin` directories, so every Bash tool call inherits them. The asdf shims are *not* on that PATH and do not work in the sandbox anyway (they are bash scripts needing `/bin/bash`).
+
+Prefixing commands with `export PATH=...` is what the repo used to require, and it is now actively harmful: a compound `export ... && mix test` starts with `export`, so the `Bash(mix test:*)` permission rule no longer matches and every run asks for approval.
+
+**If `mix: command not found`**, `env.PATH` did not reach the Bash tool. Fall back for that session only, and say so rather than editing this file:
 
 ```bash
-export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/bin:/usr/local/bin:/bin:$PATH" && mix test 2>&1 | /usr/bin/tail -10
+export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/local/bin:/usr/bin:/bin"
 ```
+
+The version numbers are pinned in both places. An asdf upgrade means editing `env.PATH` in `.claude/settings.json` and the line above; `.tool-versions` stays the source of truth for which versions those are.
 
 ### Finding missing gettext translations without mix
 
@@ -383,6 +389,14 @@ Then visit:
 - [x] i18n: full Spanish translations for all UI strings (public + admin); `mix gettext.extract/merge` workflow established
 - [x] Statistics panel act label i18n fix - stores raw division type (`"acto"`, `"jornada"`) and translates at display time
 - [x] `Emothe.Places` — corpus-global gazetteer on a three-layer model: `places` (referent, self-referencing containment, coordinates, one authority link), `place_names` (surface forms, one preferred per language), `play_places` (per-play index with `role`, `position`, `note`, `origin`). `/admin/places` for the gazetteer, `/admin/plays/:id/places` as a peer context-bar tab, `#meta-places` on `/plays/:code`, and TEI `<settingDesc>` with nested `<listPlace>` plus `<setting>` in both directions. Wikidata behind a swappable `Places.Authority` behaviour, stubbed in test so no test touches the network. Spec: `docs/superpowers/specs/2026-08-04-s9-places-design.md`
+
+  **Testing gotcha:** `places.slug` is unique across the whole corpus, so two async tests
+  creating a place with the same name take the same index lock inside their own
+  transactions — a pair of those acquired in opposite order deadlocks Postgres.
+  `place_fixture/1` therefore derives a *unique* slug unless you pass `"slug"`. Pass one
+  only when the test asserts on the literal value, and then give it a per-file prefix
+  (`tx-roma`, `sch-roma`). A test about slug derivation itself should call
+  `Places.create_place/1` directly and use a toponym no other test uses.
 
 ## What Still Needs To Be Done
 

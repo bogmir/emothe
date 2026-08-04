@@ -88,6 +88,39 @@ defmodule Emothe.ActivityLogTest do
       result = ActivityLog.log!(%{action: "invalid", resource_type: "bad"})
       assert {:error, _} = result
     end
+
+    # Regression: resource_type's whitelist previously lacked "place" and
+    # "play_place", so a place write logged nothing and log!/1 swallowed the
+    # resulting changeset error without a trace.
+    test "persists a place entry" do
+      place = TestFixtures.place_fixture()
+
+      assert {:ok, %Entry{} = entry} =
+               ActivityLog.log!(%{
+                 action: "create",
+                 resource_type: "place",
+                 resource_id: place.id,
+                 metadata: %{slug: place.slug}
+               })
+
+      assert Repo.get(Entry, entry.id).resource_type == "place"
+    end
+
+    test "persists a play_place entry" do
+      play = TestFixtures.play_fixture()
+      place = TestFixtures.place_fixture()
+      play_place = TestFixtures.play_place_fixture(play, place)
+
+      assert {:ok, %Entry{} = entry} =
+               ActivityLog.log!(%{
+                 action: "create",
+                 resource_type: "play_place",
+                 resource_id: play_place.id,
+                 play_id: play.id
+               })
+
+      assert Repo.get(Entry, entry.id).resource_type == "play_place"
+    end
   end
 
   describe "list_entries/1" do

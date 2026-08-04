@@ -11,6 +11,7 @@ defmodule EmotheWeb.PlayLabels do
   use Gettext, backend: EmotheWeb.Gettext
 
   alias Emothe.Catalogue.Play
+  alias Emothe.Places.{Place, PlayPlace}
 
   @doc "The Spanish-or-English name of a historical period slug."
   def historical_time_label("tiempo_indeterminado"), do: gettext("Indeterminate")
@@ -28,4 +29,30 @@ defmodule EmotheWeb.PlayLabels do
   def historical_time_options do
     [{"", nil} | Enum.map(Play.historical_times(), &{historical_time_label(&1), &1})]
   end
+
+  @doc "The Spanish-or-English name of a place type slug."
+  def place_type_label("continent"), do: gettext("Continent")
+  def place_type_label("country"), do: gettext("Country")
+  def place_type_label("province"), do: gettext("Province")
+  def place_type_label("region"), do: gettext("Region")
+  def place_type_label("district"), do: gettext("District")
+  def place_type_label("city"), do: gettext("City")
+  def place_type_label("town"), do: gettext("Town")
+  def place_type_label("building"), do: gettext("Building")
+  def place_type_label("forest"), do: gettext("Forest")
+  def place_type_label("river"), do: gettext("River")
+  def place_type_label("lake"), do: gettext("Lake")
+  def place_type_label("sea"), do: gettext("Sea")
+  def place_type_label("island"), do: gettext("Island")
+  def place_type_label("mountain"), do: gettext("Mountain")
+  def place_type_label("other"), do: gettext("Other")
+  def place_type_label(_other), do: ""
+
+  def place_type_options, do: Enum.map(Place.types(), &{place_type_label(&1), &1})
+
+  def place_role_label("setting"), do: gettext("Setting")
+  def place_role_label("mentioned"), do: gettext("Mentioned")
+  def place_role_label(_other), do: ""
+
+  def place_role_options, do: Enum.map(PlayPlace.roles(), &{place_role_label(&1), &1})
 end

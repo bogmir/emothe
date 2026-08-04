@@ -71,7 +71,7 @@ end
 
 create unique_index(:places, [:slug])
 create index(:places, [:parent_place_id])
-create index(:places, [:authority, :authority_id])
+create unique_index(:places, [:authority, :authority_id], where: "authority_id IS NOT NULL")
 
 create table(:place_names, primary_key: false) do
   add :id,       :binary_id, primary_key: true
@@ -164,10 +164,20 @@ chain the source hands it (`Rome. [Italy]. Europe` → find-or-create three rows
 place can stand alone. Nothing forces a curator to construct Europe → Romania → Transylvania before
 saving "Woods".
 
+**One authority entity, one place row.** The unique index on `(authority, authority_id)` — partial,
+because most places have neither — makes "two rows for one referent" structurally impossible whenever
+both carry an authority link. Same QID means the same referent by definition. This is the only
+mechanical defence against duplicates that exists: `type` is in no uniqueness constraint, so two rows
+named `Miseno` typed `town` and `port` would otherwise both be accepted as `miseno` and `miseno-2`.
+The rest of the defence is behavioural and lives in the UI — the typeahead searches every name
+variant in every language, and a slug collision is surfaced rather than silently suffixed, because
+`-2` is evidence that a row by that name already exists.
+
 ## Vocabularies
 
 ```elixir
-Place.types/0      # continent country region city town building river sea island mountain other
+Place.types/0      # continent country province region district city town
+                   # building forest river lake sea island mountain other
 PlayPlace.roles/0  # setting mentioned
 ```
 
@@ -175,6 +185,31 @@ Both are slugs, validated with `validate_inclusion`, translated at display time.
 existing `EmotheWeb.PlayLabels` — `place_type_label/1` and `place_role_label/1` — rather than a new
 module: it is already the single home for translated vocabularies, and a second module with the same
 job is how the statistics-panel act labels drifted before.
+
+### Two rules the type list has to obey
+
+**One axis only.** Every term answers the same question — *what kind of geographic feature is this* —
+and never a second one. `port` was proposed and rejected on exactly this ground: `town` classifies a
+settlement, `port` describes a function, and Naples is both. An enum holds one value, so mixing axes
+forces a false either/or, and each false either/or is a duplicate with a rationale behind it, which is
+harder to clean up than a duplicate with none. If "port" turns out to matter editorially it goes in
+the note now and becomes a second dimension later, if researchers ask to filter on it.
+
+**Geographic kinds, not set-design terms.** `garden`, `street`, `room`, `inn`, `battlefield` describe
+*unnamed generic settings* — TEI's `<locale>` inside `<setting>`, a different concept from a named
+referent with coordinates. A garden is not a toponym and will never carry a QID. A *specific named*
+garden — the Buen Retiro — is a `building` with a name and a location and does belong here. Without
+this boundary the vocabulary heads for fifty terms.
+
+`forest` is in the list on evidence rather than taste: the worked example that settled the hierarchy
+design was "woods in Transylvania", and in a list without `forest` it falls through to `other`. When
+the motivating example lands in the escape hatch, a term is missing.
+
+Extending the list is a three-line change and no migration — the column is a plain string. **Removing
+or renaming** a term is a data migration, because rows already carry the old slug, so the list errs
+toward too few terms rather than too many. Curators cannot add terms at runtime: that needs a lookup
+table plus a second admin CRUD page, which the S2a spec already considered and rejected for the same
+reason, and a closed vocabulary is what makes grouping, filtering and the TEI `@type` mean anything.
 
 `role` defaults to `"setting"`. `"mentioned"` exists because the FileMaker export encodes it —
 `( Miseno )` — and because "where is this play set" and "what places does it name" are different
@@ -306,6 +341,10 @@ One modal, two call sites — the unit worth isolating, so there is exactly one 
 Fields: name rows (name, language, preferred, historical), type, parent, authority search,
 latitude/longitude, `is_fictional`, note, and the slug, auto-derived and editable.
 
+A name that collides with an existing place's name **warns and offers that place** instead of silently
+suffixing the slug to `miseno-2`. The suffix is the mechanism of last resort — two genuinely different
+places can share a name — but it must never be the thing that quietly hides a duplicate.
+
 Name rows use the framework mechanism rather than hand-rolled add/remove:
 
 ```elixir
@@ -324,6 +363,44 @@ otherwise the form shows `Wikidata: in Italy (Q38) — not in your gazetteer` an
 entry. Both routes sit inside the existing `:admin` live_session, exactly as sources and editors do —
 `pipe_through` needs no new pipeline, because every researcher action is granted together and the
 live_session's `{:ensure_can, :view_admin}` hook already covers entry.
+
+**Researcher-level, decided rather than defaulted.** Places are the first thing in this codebase that
+is *content* — the researchers' domain — and simultaneously *corpus-wide* — everything else
+corpus-wide is admin-only. Both readings are defensible, so here is the reasoning, because the next
+person will ask.
+
+What a researcher can actually do with it is narrower than "corpus-wide" suggests: edit the names,
+type, parent or coordinates of a shared place; delete a place **no** play references; create a
+duplicate; attach the wrong authority entity. Deleting a place out from under twelve plays is not on
+the list — the foreign key refuses it.
+
+Against restricting it: the people who know that Miseno is in the Bay of Naples are the researchers,
+not the admins, and there is roughly one admin. Admin-only would make *adding a place* a prerequisite
+a researcher cannot satisfy, so the task "record where this play is set" stalls on three of four
+entries. That ends in one of three ways — the work queues behind one person, the admin becomes a
+data-entry clerk for judgements they are less qualified to make, or researchers quietly stop recording
+places. It would also make places the only content thing a researcher cannot touch, next to editing
+the text, the cast list, the bibliography and archiving the play outright.
+
+The real protection against the two plausible accidents is not a permission. A rename that changes
+eleven other plays is prevented by *seeing* "used by 12 plays" beside the edit button; a duplicate is
+prevented by a search that matches every name variant in every language. Both are in this design, and
+an admin searching in the wrong language creates the identical duplicate.
+
+**The recorded upgrade, if it is ever needed:** additive stays free, mutative narrows. This is the
+extension `Authz`'s `@moduledoc` already advertises, and it needs no call-site changes because every
+caller passes the resource:
+
+```elixir
+def can?(%User{role: :researcher} = user, :manage_places, %Place{} = place) do
+  Accounts.active?(user) and Places.play_count(place) <= 1
+end
+```
+
+**The tripwire that should trigger it:** more than a handful of researchers, or a researcher who is
+not a project member — an external contributor, a student cohort. Researcher-level is safe because
+"everyone with an account is someone I can talk to" is currently true. When it stops being true, add
+the clause.
 
 ## Public presentation
 
@@ -425,9 +502,9 @@ TDD per `CLAUDE.md` — failing test first, whole suite before any completion cl
 
 | File | Covers |
 |---|---|
-| `test/emothe/places_test.exs` | names required; one preferred per language, including the `NULL`-language case; ancestors and breadcrumb; delete refused when linked and when a parent; `find_or_create_by_slug` idempotence and leave-alone policy; `search_names` matching a non-preferred variant; `slugify` collisions |
+| `test/emothe/places_test.exs` | names required; one preferred per language, including the `NULL`-language case; ancestors and breadcrumb; delete refused when linked and when a parent; `find_or_create_by_slug` idempotence and leave-alone policy; `search_names` matching a non-preferred variant; `slugify` collisions; **a second place with the same `authority_id` is rejected, and two places with no authority are not** |
 | `test/emothe/places/authority/wikidata_test.exs` | parsing a checked-in `test/fixtures/wikidata/Q220.json` — `P625`, `P17`, `P31`, labels — plus 404, malformed-body and timeout paths, all through `Req.Test` |
-| `test/emothe_web/live/admin/place_list_live_test.exs` | create, edit, search, delete blocked with its flash |
+| `test/emothe_web/live/admin/place_list_live_test.exs` | create, edit, search, delete blocked with its flash, name collision warns and offers the existing place |
 | `test/emothe_web/live/admin/play_places_live_test.exs` | link, role change, reorder, unlink, create-and-link inline, tab renders in the context bar |
 | `test/emothe_web/live/play_show_live_test.exs` | section absent when the play has no places; breadcrumb, note and fictional marker when it does |
 | `test/emothe/export/tei_xml_test.exs` | nesting, `<geo>`, `<idno>`, `<setting>` refs, `@ana`, note, historical name type |
@@ -473,21 +550,27 @@ Phase 2 and beyond, listed so the boundary is explicit:
 - `play_sources.pub_place` becoming a place link
 - **Any FileMaker code.** The `pub_LugAccion` import is the next slice and this one ships without it
 
+## Decided since first draft
+
+- **`:manage_places` is researcher-level**, with the `play_count <= 1` narrowing recorded as the
+  upgrade and its tripwire named. See Authorization above.
+- **`port` is not a type**, on the one-axis rule. `forest`, `province` and `district` are in;
+  `forest` on the evidence of the design's own worked example.
+- **`(authority, authority_id)` is uniquely indexed**, so one authority entity cannot become two place
+  rows, and a slug collision warns instead of silently suffixing.
+
 ## Open questions
 
 Flagged rather than silently decided. None blocks the implementation plan; each has a stated default.
 
-1. **Should `:manage_places` be researcher-level or admin-only?** Default: researcher, matching every
-   other content action. But the gazetteer is corpus-global — one researcher renaming `Roma` changes
-   twelve plays' display. This is the only genuine authorization question in the slice.
-2. **The `type` vocabulary.** The eleven terms above are a developer's list and want a researcher's
-   eye before they are baked into a migration.
-3. **Which languages the name-language select offers.** Default: the five corpus languages plus a
+1. **The `type` vocabulary's fourteen terms** still want a researcher's eye before the migration bakes
+   them in — specifically whether `province` and `region` are distinct enough to keep both, and
+   whether an early-modern kingdom such as Naples is a `country`, a `region` or a `province`. The
+   one-axis and geographic-kinds rules above are what any addition has to satisfy.
+2. **Which languages the name-language select offers.** Default: the five corpus languages plus a
    blank for language-neutral. Free text is the alternative.
-4. **Is `setting` / `mentioned` enough for `role`?**
-5. **Slug collisions.** Two different `Woods` in two plays. Default: auto-suffix `woods-2`, editable
-   by the curator.
-6. **Fictional places on the public page** — marked as such, or rendered indistinguishably?
+3. **Is `setting` / `mentioned` enough for `role`?**
+4. **Fictional places on the public page** — marked as such, or rendered indistinguishably?
 
 ## Done when
 

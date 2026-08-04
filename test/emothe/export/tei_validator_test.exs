@@ -1,6 +1,10 @@
 defmodule Emothe.Export.TeiValidatorTest do
   use Emothe.DataCase, async: true
 
+  # Each test shells out to xmllint with the TEI RelaxNG schema: ~15s apiece,
+  # 60% of the whole suite's wall clock. Excluded by default, see test_helper.exs.
+  @moduletag :slow
+
   alias Emothe.Export.TeiValidator
   alias Emothe.Import.TeiParser
   alias Emothe.Export.TeiXml

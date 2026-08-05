@@ -63,9 +63,17 @@ defmodule Mix.Tasks.Emothe.Import.Filemaker do
       )
     end)
 
+    Enum.each(plan.skipped, fn skipped ->
+      Mix.shell().info(
+        "#{skipped.code}  #{skipped.title}\n" <>
+          "    dating not imported (#{skipped.reason}): #{inspect(skipped.value)}"
+      )
+    end)
+
     Mix.shell().info(
       "\n#{length(plan.changes)} to change, #{length(plan.conflicts)} conflicting, " <>
-        "#{length(plan.unchanged)} already correct, #{length(plan.missing)} not in the index"
+        "#{length(plan.unchanged)} already correct, #{length(plan.missing)} not in the index, " <>
+        "#{length(plan.skipped)} dating(s) skipped"
     )
 
     if plan.conflicts != [] and !opts[:force] do

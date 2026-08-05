@@ -216,6 +216,27 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
     end
   end
 
+  describe "datings the parse refused" do
+    test "given a header with no year then it is listed and nothing is offered to tick",
+         %{conn: conn} do
+      %{p38: p38} = corpus()
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+
+      upload_and_preview(lv, "test/fixtures/filemaker/index_dating_refused.ndjson")
+
+      skipped = lv |> element("#skipped") |> render()
+      assert skipped =~ t("%{count} dating(s) not imported", count: 1)
+      assert skipped =~ "EMOTHE0038"
+
+      # A refused dating is read-only: it must not arrive as a tickable conflict, and
+      # nothing may be written for it.
+      refute has_element?(lv, ~s(#conflicts input[phx-value-field="composition_date_from"]))
+
+      lv |> element("#sync-actions button", t("Apply")) |> render_click()
+      assert is_nil(Catalogue.get_play!(p38.id).composition_date_from)
+    end
+  end
+
   describe "a file that is not the export" do
     test "given a file with no FileMaker records then nothing is planned or written",
          %{conn: conn} do

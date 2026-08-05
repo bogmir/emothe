@@ -10,13 +10,17 @@ defmodule Emothe.Import.FilemakerSync do
     * **Derived fields** — `language`, `relationship_type`, `parent_play_id`. The
       published index is authoritative, so a difference is an error in our data and
       gets overwritten.
-    * **Curated fields** — `historical_time`, `historical_time_note`. A researcher is
-      expected to edit these in the admin form, so the export is a bootstrap: a blank
-      column is filled, a disagreement is reported under `:conflicts` and left alone,
-      and only `force: true` overwrites it.
+    * **Curated fields** — `historical_time`, `historical_time_note` and the three
+      `composition_date_*` columns. A researcher is expected to edit these in the admin
+      form, so the export is a bootstrap: a blank column is filled, a disagreement is
+      reported under `:conflicts` and left alone, and only `force: true` overwrites it.
 
   Nothing here ever creates a play. Codes with no index entry — every Artelope play,
   and anything the project never published — come back under `:missing`.
+
+  A dating the export carries but the parse refused comes back under `:skipped`, which
+  is read-only: `apply_plan/2` ignores it, and unlike a conflict there is nothing to
+  tick, because the whole point is that the value is not fit to write.
   """
 
   import Ecto.Query
@@ -28,7 +32,16 @@ defmodule Emothe.Import.FilemakerSync do
 
   @keep :keep
   @languages ~w(es en fr it pt)
-  @curated [:historical_time, :historical_time_note]
+  @curated [
+    :historical_time,
+    :historical_time_note,
+    :composition_date_from,
+    :composition_date_to,
+    :composition_date_note
+  ]
+
+  # The columns of a dating the index carries but the version record does not.
+  @index_curated [:composition_date_from, :composition_date_to, :composition_date_note]
 
   @doc "The FileMaker code hiding at the front of a play code."
   def base_code(code), do: code |> String.split("_") |> List.first()
@@ -41,12 +54,12 @@ defmodule Emothe.Import.FilemakerSync do
   @doc "Diffs the export against the given plays. Writes nothing."
   def plan(index, plays, versions \\ %{}) do
     by_code = Map.new(plays, &{base_code(&1.code), &1})
-    empty = %{changes: [], unchanged: [], missing: [], conflicts: []}
+    empty = %{changes: [], unchanged: [], missing: [], conflicts: [], skipped: []}
 
     plays
     |> Enum.reduce(empty, fn play, acc ->
       code = base_code(play.code)
-      curated = Map.get(versions, code, %{})
+      indexed = Map.get(index, code, %{})
 
       # The two sources are independent. A play absent from the published index is
       # still reported as missing, but it can have a T01 research record — EMOTHE0341
@@ -57,8 +70,21 @@ defmodule Emothe.Import.FilemakerSync do
           {:ok, version} -> {changes_for(play, version, by_code), acc}
         end
 
+      # The composition dating splits across both sources: the index header carries the
+      # accepted years, T01 the competing datings. T01's note wins, but only when it has
+      # one — a plain merge would let its nils erase the header fallback.
+      curated =
+        indexed
+        |> Map.take(@index_curated)
+        |> Map.merge(reject_blank(Map.get(versions, code, %{})))
+
       sets = Map.merge(derived, fills_for(play, curated))
-      acc = %{acc | conflicts: conflicts_for(play, curated, code) ++ acc.conflicts}
+
+      acc = %{
+        acc
+        | conflicts: conflicts_for(play, curated, code) ++ acc.conflicts,
+          skipped: skipped_for(indexed, play, code) ++ acc.skipped
+      }
 
       cond do
         map_size(sets) > 0 ->
@@ -182,6 +208,21 @@ defmodule Emothe.Import.FilemakerSync do
       }
     end
   end
+
+  # T01 supplies a note for a handful of plays and nil for the rest. Those nils must not
+  # win the merge against the index header.
+  defp reject_blank(curated) do
+    Map.reject(curated, fn {_key, value} -> blank?(value) end)
+  end
+
+  # A dating the parse refused — too wide a span, or a header with no year. Its own
+  # bucket rather than :conflicts, because a conflict is tickable in /admin/filemaker and
+  # force-writing a bad span is exactly what the guard exists to prevent.
+  defp skipped_for(%{composition_date_skipped: {reason, value}}, play, code) do
+    [%{play_id: play.id, code: code, title: play.title, reason: reason, value: value}]
+  end
+
+  defp skipped_for(_indexed, _play, _code), do: []
 
   defp blank?(nil), do: true
   defp blank?(""), do: true

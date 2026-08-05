@@ -18,7 +18,10 @@ defmodule Emothe.Import.FilemakerSyncTest do
         role: :editor,
         work: "24",
         xml: "textosXML/EMOTHE0038_AntonyAndCleopatra.xml",
-        family: family
+        family: family,
+        composition_date_from: 1606,
+        composition_date_to: 1607,
+        composition_date_note: "=1606 - =1607"
       },
       "EMOTHE0052" => %{
         code: "EMOTHE0052",
@@ -37,12 +40,27 @@ defmodule Emothe.Import.FilemakerSyncTest do
     play_fixture(Map.merge(%{"code" => code, "language" => "es"}, attrs))
   end
 
+  # The dating index/0 would fill, already stored. A test whose subject is not the dating
+  # merges this in so the fill is a no-op and its assertions stay about the field it
+  # names. The note argument is whichever source wins for that test: the index header
+  # when it calls plan/2, T01's when it passes versions/0.
+  defp dated(note \\ "=1606 - =1607") do
+    %{
+      "composition_date_from" => 1606,
+      "composition_date_to" => 1607,
+      "composition_date_note" => note
+    }
+  end
+
+  defp t01_note, do: "desde o posterior 1605 y anterior o hasta 1607; 1606"
+
   defp versions do
     %{
       "EMOTHE0038" => %{
         code: "EMOTHE0038",
         historical_time: "antiguedad_clasica",
-        historical_time_note: "First century BC."
+        historical_time_note: "First century BC.",
+        composition_date_note: t01_note()
       }
     }
   end
@@ -58,7 +76,9 @@ defmodule Emothe.Import.FilemakerSyncTest do
   end
 
   test "marks a translation and links it to the original in the database" do
-    original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+    original =
+      play("EMOTHE0038_AntonyAndCleopatra", Map.put(dated(), "language", "en"))
+
     translation = play("EMOTHE0052_AntonioYCleopatra")
 
     plan = FilemakerSync.plan(index(), [original, translation])
@@ -105,7 +125,8 @@ defmodule Emothe.Import.FilemakerSyncTest do
   end
 
   test "a second pass over an already-synced play changes nothing" do
-    original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+    original =
+      play("EMOTHE0038_AntonyAndCleopatra", Map.put(dated(), "language", "en"))
 
     translation =
       play("EMOTHE0052_AntonioYCleopatra", %{
@@ -170,11 +191,14 @@ defmodule Emothe.Import.FilemakerSyncTest do
 
     test "leaves an equal value alone" do
       original =
-        play("EMOTHE0038_AntonyAndCleopatra", %{
-          "language" => "en",
-          "historical_time" => "antiguedad_clasica",
-          "historical_time_note" => "First century BC."
-        })
+        play(
+          "EMOTHE0038_AntonyAndCleopatra",
+          Map.merge(dated(t01_note()), %{
+            "language" => "en",
+            "historical_time" => "antiguedad_clasica",
+            "historical_time_note" => "First century BC."
+          })
+        )
 
       plan = FilemakerSync.plan(index(), [original], versions())
 
@@ -185,10 +209,13 @@ defmodule Emothe.Import.FilemakerSyncTest do
 
     test "reports a curated value that disagrees, and does not write it" do
       original =
-        play("EMOTHE0038_AntonyAndCleopatra", %{
-          "language" => "en",
-          "historical_time" => "edad_media"
-        })
+        play(
+          "EMOTHE0038_AntonyAndCleopatra",
+          Map.merge(dated(t01_note()), %{
+            "language" => "en",
+            "historical_time" => "edad_media"
+          })
+        )
 
       plan = FilemakerSync.plan(index(), [original], versions())
 
@@ -202,10 +229,13 @@ defmodule Emothe.Import.FilemakerSyncTest do
 
     test "never blanks a curated column the export has nothing for" do
       original =
-        play("EMOTHE0038_AntonyAndCleopatra", %{
-          "language" => "en",
-          "historical_time" => "edad_media"
-        })
+        play(
+          "EMOTHE0038_AntonyAndCleopatra",
+          Map.merge(dated(), %{
+            "language" => "en",
+            "historical_time" => "edad_media"
+          })
+        )
 
       plan = FilemakerSync.plan(index(), [original], %{})
 
@@ -266,6 +296,103 @@ defmodule Emothe.Import.FilemakerSyncTest do
       index() |> FilemakerSync.plan([original], versions()) |> FilemakerSync.apply_plan()
 
       assert Emothe.Catalogue.get_play!(original.id).historical_time == "edad_media"
+    end
+  end
+
+  describe "composition date" do
+    test "fills blank columns from the index, with T01's note winning" do
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+
+      assert [%{code: "EMOTHE0038", sets: sets}] = plan.changes
+      assert sets.composition_date_from == 1606
+      assert sets.composition_date_to == 1607
+      assert sets.composition_date_note == "desde o posterior 1605 y anterior o hasta 1607; 1606"
+    end
+
+    test "falls back to the header note when T01 has none" do
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+
+      plan = FilemakerSync.plan(index(), [original], %{})
+
+      assert [%{sets: sets}] = plan.changes
+      assert sets.composition_date_note == "=1606 - =1607"
+    end
+
+    test "a translation gets no dating" do
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+      translation = play("EMOTHE0052_AntonioYCleopatra")
+
+      plan = FilemakerSync.plan(index(), [original, translation], versions())
+
+      change = Enum.find(plan.changes, &(&1.code == "EMOTHE0052"))
+      refute Map.has_key?(change.sets, :composition_date_from)
+    end
+
+    test "a typed dating that disagrees is a conflict, not a write" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "composition_date_from" => 1600,
+          "composition_date_to" => 1601
+        })
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+
+      assert Enum.any?(
+               plan.conflicts,
+               &(&1.field == :composition_date_from and &1.current == 1600)
+             )
+
+      assert Enum.all?(plan.changes, &(not Map.has_key?(&1.sets, :composition_date_from)))
+    end
+
+    test "force writes the conflicting dating" do
+      original =
+        play("EMOTHE0038_AntonyAndCleopatra", %{
+          "language" => "en",
+          "composition_date_from" => 1600,
+          "composition_date_to" => 1601
+        })
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+      assert [{:ok, "EMOTHE0038"}] = FilemakerSync.apply_plan(plan, force: true)
+
+      assert Emothe.Catalogue.get_play!(original.id).composition_date_from == 1606
+    end
+
+    test "a skipped dating is reported and never written" do
+      # The index entry as Task 5 leaves it when the parse refuses: no years, no note,
+      # only the reason and the text it refused.
+      refused =
+        index()
+        |> put_in(
+          ["EMOTHE0038"],
+          index()["EMOTHE0038"]
+          |> Map.drop([:composition_date_from, :composition_date_to, :composition_date_note])
+          |> Map.put(:composition_date_skipped, {:span, "¿1694? y ¿1605?"})
+        )
+
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+
+      plan = FilemakerSync.plan(refused, [original], %{})
+
+      assert [%{code: "EMOTHE0038", reason: :span, value: "¿1694? y ¿1605?"}] = plan.skipped
+      assert Enum.all?(plan.changes, &(not Map.has_key?(&1.sets, :composition_date_from)))
+    end
+
+    test "running twice changes nothing the second time" do
+      original = play("EMOTHE0038_AntonyAndCleopatra", %{"language" => "en"})
+
+      plan = FilemakerSync.plan(index(), [original], versions())
+      FilemakerSync.apply_plan(plan)
+
+      second =
+        FilemakerSync.plan(index(), [Emothe.Catalogue.get_play!(original.id)], versions())
+
+      assert second.changes == []
+      assert second.conflicts == []
     end
   end
 end

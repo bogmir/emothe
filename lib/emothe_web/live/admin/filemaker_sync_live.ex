@@ -231,7 +231,7 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
       </div>
 
       <div
-        :if={@plan && (@plan.unchanged != [] or @plan.missing != [])}
+        :if={@plan && (@plan.unchanged != [] or @plan.missing != [] or @plan.skipped != [])}
         id="counts"
         class="card mb-6 border border-base-300 bg-base-100 shadow-sm"
       >
@@ -259,6 +259,20 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
             <p class="mt-1 font-mono text-xs text-base-content/70">
               {Enum.join(@plan.missing, ", ")}
             </p>
+          </details>
+
+          <details :if={@plan.skipped != []} id="skipped">
+            <summary class="cursor-pointer text-sm">
+              {gettext("%{count} dating(s) not imported", count: length(@plan.skipped))}
+            </summary>
+            <p class="mt-2 text-xs text-base-content/70">
+              {gettext(
+                "The export gives no usable years for these — an implausible span, or a header with no date in it. Nothing is written and there is nothing to tick: enter the dating by hand if you have it."
+              )}
+            </p>
+            <ul class="mt-1 space-y-1 font-mono text-xs text-base-content/70">
+              <li :for={skipped <- @plan.skipped}>{skipped.code}: {skipped.value}</li>
+            </ul>
           </details>
         </div>
       </div>

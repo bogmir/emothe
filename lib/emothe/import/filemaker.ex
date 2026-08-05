@@ -47,8 +47,9 @@ defmodule Emothe.Import.Filemaker do
   # is precisely what this guard exists to prevent.
   @max_composition_span 40
 
-  # <li>Antigüedad clásica<br/>Note: First century BC.…</li>
-  @first_item ~r|<li>(.*?)</li>|s
+  # <li>Antigüedad clásica<br/>Note: First century BC.…</li> — one item of a rendered
+  # list. Used with Regex.run for the first item and Regex.scan for all of them.
+  @list_item ~r|<li>(.*?)</li>|s
 
   def default_path, do: @default_path
 
@@ -103,7 +104,8 @@ defmodule Emothe.Import.Filemaker do
     %{
       code: version_code(fields),
       historical_time: historical_time(fields),
-      historical_time_note: historical_time_note(fields)
+      historical_time_note: historical_time_note(fields),
+      composition_date_note: composition_date_note(fields)
     }
   end
 
@@ -128,7 +130,7 @@ defmodule Emothe.Import.Filemaker do
   end
 
   defp historical_time_note(fields) do
-    with [_all, item] <- Regex.run(@first_item, field(fields, "pub_TiemHistorico")),
+    with [_all, item] <- Regex.run(@list_item, field(fields, "pub_TiemHistorico")),
          [_label, note] <- String.split(item, ~r|<br\s*/?>\s*Note:|, parts: 2) do
       case strip_tags(note) do
         "" -> nil
@@ -136,6 +138,21 @@ defmodule Emothe.Import.Filemaker do
       end
     else
       _ -> nil
+    end
+  end
+
+  # Every <li> is a *competing* dating, unattributed. All of them verbatim, so a curator
+  # reads the disagreement; the years come from the index header, which carries the
+  # accepted dating rather than the union of the competing ones.
+  defp composition_date_note(fields) do
+    @list_item
+    |> Regex.scan(field(fields, "pub_datacion"))
+    |> Enum.map(fn [_all, item] -> strip_tags(item) end)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.join("; ")
+    |> case do
+      "" -> nil
+      note -> note
     end
   end
 

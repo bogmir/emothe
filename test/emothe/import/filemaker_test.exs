@@ -176,5 +176,14 @@ defmodule Emothe.Import.FilemakerTest do
     test "returns an error for a missing file" do
       assert {:error, :enoent} = Filemaker.load_versions("test/fixtures/filemaker/nope.ndjson")
     end
+
+    test "joins the competing datings into the note", %{versions: versions} do
+      assert versions["EMOTHE0038"].composition_date_note ==
+               "desde o posterior 1605 y anterior o hasta 1607; 1606"
+    end
+
+    test "no pub_datacion means no note", %{versions: versions} do
+      assert versions["EMOTHE0211"].composition_date_note == nil
+    end
   end
 end

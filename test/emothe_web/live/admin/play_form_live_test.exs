@@ -132,5 +132,16 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
       html = render(view)
       assert html =~ "must be given together with the end year"
     end
+
+    test "renders the composition date inputs", %{conn: conn} do
+      conn = log_in_admin(conn)
+      play = TestFixtures.play_fixture()
+
+      {:ok, _view, html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
+
+      assert html =~ ~s(name="play[composition_date_from]")
+      assert html =~ ~s(name="play[composition_date_to]")
+      assert html =~ ~s(name="play[composition_date_note]")
+    end
   end
 end

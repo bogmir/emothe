@@ -27,7 +27,10 @@ defmodule Emothe.Import.TeiParser do
     :parent_play_id,
     :is_complete,
     :historical_time,
-    :historical_time_note
+    :historical_time_note,
+    :composition_date_from,
+    :composition_date_to,
+    :composition_date_note
   ]
 
   @title_small_words MapSet.new([

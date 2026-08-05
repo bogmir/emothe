@@ -43,6 +43,44 @@ defmodule Emothe.Import.TeiReimportTest do
     %{path: path}
   end
 
+  defp write_tei(xml) do
+    path = Path.join(System.tmp_dir!(), "tei-import-#{System.unique_integer([:positive])}.xml")
+    File.write!(path, xml)
+    on_exit(fn -> File.rm(path) end)
+    path
+  end
+
+  defp minimal_tei(opts) do
+    title = Keyword.get(opts, :title, "Test Play")
+    code = Keyword.get(opts, :code, "TEST#{System.unique_integer([:positive])}")
+    author = Keyword.get(opts, :author, "")
+    front = Keyword.get(opts, :front, "")
+    body = Keyword.get(opts, :body, "")
+
+    author_el = if author != "", do: "<author>#{author}</author>", else: ""
+
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title>#{title}</title>
+            #{author_el}
+          </titleStmt>
+          <publicationStmt>
+            <idno>#{code}</idno>
+          </publicationStmt>
+        </fileDesc>
+      </teiHeader>
+      <text>
+        <front>#{front}</front>
+        <body>#{body}</body>
+      </text>
+    </TEI>
+    """
+  end
+
   test "re-importing the same code updates the same row", %{path: path} do
     assert {:ok, first} = TeiParser.import_file(path)
     {:ok, _} = Catalogue.update_play(first, %{language: "en", relationship_type: "traduccion"})
@@ -83,6 +121,26 @@ defmodule Emothe.Import.TeiReimportTest do
 
     assert counts(play.id) == before
     assert before.divisions > 0 and before.characters > 0 and before.sources > 0
+  end
+
+  test "a re-import does not overwrite a curated composition date" do
+    path = write_tei(minimal_tei(code: "REIMP-CD", title: "Dated Play"))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    {:ok, _edited} =
+      Catalogue.update_play(play, %{
+        "composition_date_from" => 1606,
+        "composition_date_to" => 1607,
+        "composition_date_note" => "typed by a curator"
+      })
+
+    assert {:ok, reimported} = TeiParser.import_file(path)
+
+    assert reimported.id == play.id
+    assert reimported.composition_date_from == 1606
+    assert reimported.composition_date_to == 1607
+    assert reimported.composition_date_note == "typed by a curator"
   end
 
   defp counts(play_id) do

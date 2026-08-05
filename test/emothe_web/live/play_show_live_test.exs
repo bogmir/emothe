@@ -75,6 +75,55 @@ defmodule EmotheWeb.PlayShowLiveTest do
     refute has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
   end
 
+  test "shows the composition date range", %{conn: conn} do
+    play =
+      TestFixtures.play_fixture(%{
+        "code" => "CDPUB1",
+        "composition_date_from" => 1606,
+        "composition_date_to" => 1607,
+        "composition_date_note" => "1606; 1607"
+      })
+
+    {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+
+    assert html =~ "1606–1607"
+    assert html =~ "1606; 1607"
+
+    # Pin the row: the dash-joined value must appear inside #meta-study, right after
+    # the "Composition" label, not merely somewhere on the page (e.g. a code or line number).
+    [_, after_meta_study] = String.split(html, ~s(id="meta-study"), parts: 2)
+    assert after_meta_study =~ ~r/Composition.*?1606–1607/s
+  end
+
+  test "collapses a single year", %{conn: conn} do
+    play =
+      TestFixtures.play_fixture(%{
+        "code" => "CDPUB2",
+        "composition_date_from" => 1614,
+        "composition_date_to" => 1614
+      })
+
+    {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+
+    assert html =~ "1614"
+    refute html =~ "1614–1614"
+  end
+
+  test "the study section appears for a dating alone", %{conn: conn} do
+    play =
+      TestFixtures.play_fixture(%{
+        "code" => "CDPUB3",
+        "composition_date_from" => 1614,
+        "composition_date_to" => 1614
+      })
+
+    {:ok, view, html} = live(conn, ~p"/plays/#{play.code}")
+
+    assert html =~ ~s(id="meta-study")
+    assert has_element?(view, "#meta-study")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
+  end
+
   describe "the places panel" do
     defp t(msgid), do: Gettext.gettext(EmotheWeb.Gettext, msgid)
 

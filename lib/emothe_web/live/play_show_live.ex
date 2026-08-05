@@ -328,16 +328,28 @@ defmodule EmotheWeb.PlayShowLive do
 
           <%!-- Research metadata --%>
           <section
-            :if={@play.historical_time}
+            :if={@play.historical_time || @play.composition_date_from}
             id="meta-study"
             class="mb-8 max-w-2xl mx-auto scroll-mt-20 text-sm"
           >
             <dl class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1">
-              <dt class="text-base-content/50">{gettext("Historical time")}</dt>
-              <dd>
+              <dt :if={@play.historical_time} class="text-base-content/50">
+                {gettext("Historical time")}
+              </dt>
+              <dd :if={@play.historical_time}>
                 {PlayLabels.historical_time_label(@play.historical_time)}
                 <p :if={@play.historical_time_note} class="mt-1 text-xs text-base-content/60">
                   {@play.historical_time_note}
+                </p>
+              </dd>
+
+              <dt :if={@play.composition_date_from} class="text-base-content/50">
+                {gettext("Composition")}
+              </dt>
+              <dd :if={@play.composition_date_from}>
+                {composition_date(@play)}
+                <p :if={@play.composition_date_note} class="mt-1 text-xs text-base-content/60">
+                  {@play.composition_date_note}
                 </p>
               </dd>
             </dl>
@@ -425,7 +437,11 @@ defmodule EmotheWeb.PlayShowLive do
     base = [%{id: "meta-overview", label: gettext("Overview")}]
 
     base
-    |> maybe_add_section(play.historical_time != nil, "meta-study", gettext("Study"))
+    |> maybe_add_section(
+      play.historical_time != nil or play.composition_date_from != nil,
+      "meta-study",
+      gettext("Study")
+    )
     |> maybe_add_section(play.play_places != [], "meta-places", gettext("Places"))
     |> maybe_add_section(play.sources != [], "meta-sources", gettext("Source"))
     |> maybe_add_section(play.editors != [], "meta-editors", gettext("Editors"))
@@ -434,6 +450,13 @@ defmodule EmotheWeb.PlayShowLive do
 
   defp maybe_add_section(sections, true, id, label), do: sections ++ [%{id: id, label: label}]
   defp maybe_add_section(sections, false, _id, _label), do: sections
+
+  # An en dash, collapsing when the dating is a single year.
+  defp composition_date(%{composition_date_from: from, composition_date_to: to}) when from == to,
+    do: to_string(from)
+
+  defp composition_date(%{composition_date_from: from, composition_date_to: to}),
+    do: "#{from}–#{to}"
 
   # Settings first, then mentions, each keeping its own curated order.
   defp sorted_places(play_places) do

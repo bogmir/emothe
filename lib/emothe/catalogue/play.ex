@@ -34,6 +34,9 @@ defmodule Emothe.Catalogue.Play do
     field :is_complete, :boolean, default: false
     field :historical_time, :string
     field :historical_time_note, :string
+    field :composition_date_from, :integer
+    field :composition_date_to, :integer
+    field :composition_date_note, :string
 
     # Set only through Catalogue.delete_play/1 and restore_play/1 — deliberately absent
     # from every cast list so no form can archive a play.
@@ -111,14 +114,51 @@ defmodule Emothe.Catalogue.Play do
       :edition_title,
       :is_complete,
       :historical_time,
-      :historical_time_note
+      :historical_time_note,
+      :composition_date_from,
+      :composition_date_to,
+      :composition_date_note
     ])
     |> validate_required([:title, :code])
     |> validate_inclusion(:language, @valid_languages)
     |> validate_number(:verse_count, greater_than_or_equal_to: 0)
     |> validate_inclusion(:relationship_type, ~w(traduccion adaptacion refundicion))
     |> validate_inclusion(:historical_time, @historical_times)
+    |> validate_number(:composition_date_from,
+      greater_than_or_equal_to: 1000,
+      less_than_or_equal_to: 2100
+    )
+    |> validate_number(:composition_date_to,
+      greater_than_or_equal_to: 1000,
+      less_than_or_equal_to: 2100
+    )
+    |> validate_composition_date_span()
     |> unique_constraint(:code)
+  end
+
+  # Both endpoints or neither: a lone year is a half-filled form, not a dating. The
+  # bounds on each year are deliberately wide — the corpus is 16th–17th century, but the
+  # column is a year and a curator fixing a typo should not fight the validator.
+  defp validate_composition_date_span(changeset) do
+    from = get_field(changeset, :composition_date_from)
+    to = get_field(changeset, :composition_date_to)
+
+    cond do
+      is_nil(from) and is_nil(to) ->
+        changeset
+
+      is_nil(to) ->
+        add_error(changeset, :composition_date_from, "must be given together with the end year")
+
+      is_nil(from) ->
+        add_error(changeset, :composition_date_to, "must be given together with the start year")
+
+      from > to ->
+        add_error(changeset, :composition_date_to, "must not be before the start year")
+
+      true ->
+        changeset
+    end
   end
 
   @doc """

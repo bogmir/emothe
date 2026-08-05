@@ -91,8 +91,11 @@ defmodule EmotheWeb.PlayShowLiveTest do
 
     # Pin the row: the dash-joined value must appear inside #meta-study, right after
     # the "Composition" label, not merely somewhere on the page (e.g. a code or line number).
+    # This suite runs in Spanish (see the "no puede estar en blanco" assertion above), and
+    # Task 10 added the "Composition" -> "Datación" translation, so the label renders
+    # translated, not as the msgid.
     [_, after_meta_study] = String.split(html, ~s(id="meta-study"), parts: 2)
-    assert after_meta_study =~ ~r/Composition.*?1606–1607/s
+    assert after_meta_study =~ ~r/Datación.*?1606–1607/s
   end
 
   test "collapses a single year", %{conn: conn} do

@@ -88,5 +88,49 @@ defmodule EmotheWeb.Admin.PlayFormLiveTest do
       assert updated.historical_time == "siglo_xvii"
       assert updated.historical_time_note == "Contemporary. Reign of Philip IV."
     end
+
+    test "saves a composition date", %{conn: conn} do
+      conn = log_in_admin(conn)
+      play = TestFixtures.play_fixture()
+
+      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
+
+      view
+      |> element("form[phx-submit]")
+      |> render_submit(%{
+        "play" => %{
+          "title" => play.title,
+          "code" => play.code,
+          "composition_date_from" => "1606",
+          "composition_date_to" => "1607",
+          "composition_date_note" => "1606; 1607"
+        }
+      })
+
+      updated = Catalogue.get_play!(play.id)
+      assert updated.composition_date_from == 1606
+      assert updated.composition_date_to == 1607
+      assert updated.composition_date_note == "1606; 1607"
+    end
+
+    test "rejects a lone start year", %{conn: conn} do
+      conn = log_in_admin(conn)
+      play = TestFixtures.play_fixture()
+
+      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
+
+      view
+      |> element("form[phx-submit]")
+      |> render_submit(%{
+        "play" => %{
+          "title" => play.title,
+          "code" => play.code,
+          "composition_date_from" => "1606"
+        }
+      })
+
+      html = render(view)
+      assert html =~ "must be given together with the end year"
+    end
   end
 end

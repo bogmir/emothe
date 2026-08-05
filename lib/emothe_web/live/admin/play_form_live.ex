@@ -718,6 +718,34 @@ defmodule EmotheWeb.Admin.PlayFormLive do
               placeholder={gettext("When the action is set, and the evidence for it")}
             />
           </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Composition Date")}</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <.input
+                field={@form[:composition_date_from]}
+                type="number"
+                placeholder={gettext("From")}
+              />
+              <span class="text-base-content/50">–</span>
+              <.input
+                field={@form[:composition_date_to]}
+                type="number"
+                placeholder={gettext("To")}
+              />
+            </div>
+          </div>
+          <div>
+            <label class="label">
+              <span class="label-text font-medium">{gettext("Composition Date Note")}</span>
+            </label>
+            <.input
+              field={@form[:composition_date_note]}
+              type="textarea"
+              placeholder={gettext("Competing datings, and the evidence for each")}
+            />
+          </div>
         </div>
 
         <div class="space-y-3 rounded-box border border-base-300 bg-base-50 p-4">

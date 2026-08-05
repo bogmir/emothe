@@ -8,8 +8,8 @@
 | S0b — soft delete, re-importable plays | **done** — `archive/README.md` |
 | S1 — work families and language | **done** — `archive/README.md` |
 | Admin sync page (`/admin/filemaker`) | **done** — see below |
-| S2 — version metadata | **in progress**, one field at a time; S2a done — `archive/README.md` |
-| S2c, S2d | scoped below, **both waiting on a question to the project** |
+| S2 — version metadata | **in progress**, one field at a time; S2a, S2c done — `archive/README.md`, `../specs/2026-08-05-s2c-composition-date-design.md` |
+| S2d | scoped below, **waiting on a question to the project** |
 | S2e — `legacy_url` | **dropped** — derivable from code + filename, see below |
 | S2f — titles | **dropped as an import** — nothing to import, folded into S7's cross-check |
 | S3–S8 | scoped below, each gets its own plan when it comes up |
@@ -164,12 +164,14 @@ The research metadata that has no home in TEI. Taken **field by field**: each su
 migration, import, admin control and row in the panel, and ships before the next starts. The first
 one builds the panel; the rest add rows to it.
 
-Everything here is capped at the 22 plays with a `T01` record.
+Everything drawing on `T01` is capped at the 22 plays with a `T01` record. S2c is the exception:
+its from/to come from the published *index*, which covers all 203 index records, so it reaches
+plays no `T01` row mentions.
 
-| | Field | Source | Coverage (of 22) | State |
+| | Field | Source | Coverage | State |
 |---|---|---|---|---|
-| **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 4 with a note | **done** — `archive/README.md` |
-| S2c | `composition_date_from/_to` + note | `pub_datacion` | 6 | proposal below, **needs sign-off** on attribution |
+| **S2a** | `historical_time` + `historical_time_note` | `bus_tiemHistorico` + `pub_TiemHistorico` | 11 coded, 4 with a note (of 22) | **done** — `archive/README.md` |
+| **S2c** | `composition_date_from/_to` + note | index header + `pub_datacion` | 7 of 82 today; 64 dated headers corpus-wide, 60 with a family head | **done** — `../specs/2026-08-05-s2c-composition-date-design.md` |
 | S2d | `collection` | `bus_coleccion` | 22 | labels decoded below, **blocked** on whether the field is still wanted |
 | ~~S2b~~ | `place_of_action` | `pub_LugAccion` | 6 | **split out** — toponym-based, now **S9**; the import is **S9b** |
 | ~~S2e~~ | `legacy_url` | `pub_edicionWeb` href | 13 | **dropped** — derivable, see below |
@@ -192,12 +194,12 @@ code against the rendered label across all 439 rows: 1 Tiempo indeterminado, 2 A
 5 Edad Media, 6 Siglo XV, 7 Siglo XVI, 8 Siglo XVII, 9 Tiempo maravilloso (intemporal),
 10 Antigüedad clásica, 11 Tiempo alegórico. Codes 3 and 4 do not occur.
 
-- **Done when:** S2c and S2d have landed or been dropped — the panel renders on `/plays/:code` for
-  the plays that have data, and admins can edit every field it shows. As of 2026-08-04 S2a has
-  landed, S2b is now S9, S2e and S2f are dropped, so those two are all that is left of S2 and both
-  are waiting on an answer from the project.
+- **Done when:** S2d has landed or been dropped — the panel renders on `/plays/:code` for
+  the plays that have data, and admins can edit every field it shows. As of 2026-08-05 S2a and S2c
+  have landed, S2b is now S9, S2e and S2f are dropped, so S2d is all that is left of S2 and it is
+  waiting on an answer from the project.
 
-#### S2c — composition date *(proposal, needs sign-off)*
+#### S2c — composition date *(done, 2026-08-05 — see below for what shipped differently)*
 
 6 of our 22 plays, 97 of the 439 export rows. Each `<li>` is a **competing dating**, and
 `bus_datacion` is the expanded year union — a search index, not a source:
@@ -238,6 +240,24 @@ S3-sized slice rather than an afternoon.
 
 Known parse edge, export-wide but outside our 22: EMOTHE0178 is `desde 1587 y hasta 92` — a
 two-digit end year, so min/max yields 1587–1587. Acceptable; the note keeps the truth.
+
+**What actually shipped diverges from the proposal above in two ways** — spec:
+`../specs/2026-08-05-s2c-composition-date-design.md`, both worth carrying forward since S7 will
+re-read the same header:
+
+- **The from/to source is the index header, not `pub_datacion`.** `pub_datacion`'s min/max is the
+  union of *competing* datings, which is wider than the accepted one — EMOTHE0038 is the case that
+  proves it: `pub_datacion` spans 1605–1607 (a rejected dating starts a year earlier) but the index
+  header says `=1606 - =1607`, the accepted range. `pub_datacion` becomes the note instead, falling
+  back to the header verbatim when blank.
+- **Head-only: a translation does not inherit its original's dating.** The index dating is per
+  *work*, so writing it to every version in the family would put 1606 on a translation composed
+  decades later. Written only where `relationship_type` is nil (the family head) — 7 of 82 plays
+  today, not the 18 a naive per-version write would touch.
+
+Applied to `emothe_dev`: `updated 7, failed 0` (EMOTHE0010, 0038, 0281, 0337, 0346, 0777 from the
+index, plus EMOTHE0341 note-only), zero conflicts, idempotent on a second run. Answered without
+waiting on the attribution question below — see open question 2.
 
 #### S2d — collection *(blocked on a question to the project)*
 
@@ -616,8 +636,11 @@ Ordered by what is actually blocking work.
 
 1. **Is `collection` still wanted, and what separates code `1` from `3`?** Blocks S2d, and the
    answer may delete it. See S2d for the decoded label table and the one suspect row.
-2. **Do competing composition datings need per-dating attribution?** Blocks the *shape* of S2c:
-   three columns if no, a child table with admin CRUD if yes. See S2c.
+2. **Do competing datings need per-dating attribution?** Closed for S2c, open for whatever comes
+   next. S2c shipped as three columns without answering it: the export attributes none of its 97
+   `pub_datacion` rows, so there is nothing to attribute yet, and `play_datings(from, to, note,
+   source, position)` stays an additive migration if attribution ever arrives. The question now
+   applies to a future dating source, not this one. See S2c.
 3. ~~**Place of action requirements** — S9.~~ **Closed 2026-08-04** by building it: S9 Phase 1
    shipped the gazetteer. The import is S9b, scoped and buildable — 6 plays, 9 links — and waits on
    the `bus_lugAccion` request in (4) so it can load the historical polities in one pass.
@@ -644,15 +667,16 @@ Ordered by what is actually blocking work.
    manual `xml_id` fix on a character is lost. Protecting those needs per-character identity
    matching — bigger than S0b, not scoped anywhere. Blocks nothing in S2–S5; blocks S6.
 8. **Multi-`<li>` historical times.** S2a takes the first `<li>` and logs; two of 439 export rows
-   carry two historical periods. If S2c settles on a child table for datings, revisit whether S2a
-   should follow it.
+   carry two historical periods. S2c shipped as three columns, not a child table, so this stays
+   open on its own; revisit if a future dating source forces `play_datings` into existence (see
+   question 2).
 9. **21 unlinked translations.** They carry an `original_title` but no `parent_play_id`, and none of
    their originals is a play we hold, so neither FileMaker nor our own data can close the family.
    Either those originals get imported (see question 5) or work families stay partial and the UI has
    to say so. Found while dropping S2f.
 
-Closed since 2026-08-01: the multi-valued `pub_datacion` shape is now a written proposal (S2c) rather
-than an open question; `legacy_url` (S2e) and the title import (S2f) are dropped outright; and the
+Closed since 2026-08-01: the multi-valued `pub_datacion` shape shipped as S2c, three columns, no
+attribution (2); `legacy_url` (S2e) and the title import (S2f) are dropped outright; and the
 place-of-action question (3) is closed by S9 Phase 1 shipping, with the import scoped as S9b.
 
 **A measurement trap, recorded because it cost a wrong verdict on 2026-08-04.** Nine of the 22

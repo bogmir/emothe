@@ -1177,4 +1177,53 @@ defmodule Emothe.Export.TeiXmlTest do
       refute setting_desc =~ "<idno"
     end
   end
+
+  describe "composition date" do
+    test "a single year exports as @when" do
+      play =
+        play_fixture(%{
+          "code" => "CDEXP1",
+          "composition_date_from" => 1614,
+          "composition_date_to" => 1614
+        })
+
+      xml = TeiXml.generate(Catalogue.get_play_with_all!(play.id))
+
+      assert xml =~ "<creation>"
+      assert xml =~ ~s(<date when="1614")
+      refute xml =~ "notBefore"
+    end
+
+    test "a range exports as @notBefore/@notAfter with the note as text" do
+      play =
+        play_fixture(%{
+          "code" => "CDEXP2",
+          "composition_date_from" => 1600,
+          "composition_date_to" => 1601,
+          "composition_date_note" => "¿1600? y ¿1601?; alrededor de 1601"
+        })
+
+      xml = TeiXml.generate(Catalogue.get_play_with_all!(play.id))
+
+      assert xml =~ ~s(notBefore="1600")
+      assert xml =~ ~s(notAfter="1601")
+      assert xml =~ "¿1600? y ¿1601?; alrededor de 1601"
+    end
+
+    test "no creation element when there is no dating" do
+      play = play_fixture(%{"code" => "CDEXP3"})
+
+      xml = TeiXml.generate(Catalogue.get_play_with_all!(play.id))
+
+      refute xml =~ "<creation>"
+    end
+
+    test "a note without years does not produce a creation element" do
+      play = play_fixture(%{"code" => "CDEXP4", "composition_date_note" => "sin fecha"})
+
+      xml = TeiXml.generate(Catalogue.get_play_with_all!(play.id))
+
+      refute xml =~ "<creation>"
+    end
+  end
 end

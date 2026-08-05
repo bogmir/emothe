@@ -288,11 +288,37 @@ defmodule Emothe.Export.TeiXml do
   defp build_profile_desc(play) do
     {ident, label} = Map.get(@language_ident_labels, play.language || "es", {"es-ES", "Español"})
 
-    children = [
-      element(:langUsage, [element(:language, %{ident: ident}, label)])
-    ]
+    children =
+      build_creation(play) ++
+        [element(:langUsage, [element(:language, %{ident: ident}, label)])]
 
     element(:profileDesc, children ++ build_setting_desc(play))
+  end
+
+  # <creation> is where TEI records when the text *in this file* was composed. Emitted
+  # only when we hold machine-readable years, so a note with no dating stays out of the
+  # XML rather than arriving as an undated <date>. The note is the element's text — the
+  # human-readable form of the machine attributes.
+  defp build_creation(%{composition_date_from: nil}), do: []
+
+  defp build_creation(play) do
+    attrs =
+      if play.composition_date_from == play.composition_date_to do
+        %{when: to_string(play.composition_date_from)}
+      else
+        %{
+          notBefore: to_string(play.composition_date_from),
+          notAfter: to_string(play.composition_date_to)
+        }
+      end
+
+    date =
+      case play.composition_date_note do
+        nil -> element(:date, attrs)
+        note -> element(:date, attrs, note)
+      end
+
+    [element(:creation, [date])]
   end
 
   # Two elements, on purpose. `listPlace` nests every place the play needs *plus every

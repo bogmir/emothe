@@ -45,6 +45,86 @@ defmodule Emothe.Import.FilemakerTest do
     assert index["HIE0393"].role == :translator
   end
 
+  test "reads the work dating from the index header", %{index: index} do
+    assert index["EMOTHE0038"].composition_date_from == 1606
+    assert index["EMOTHE0038"].composition_date_to == 1607
+    assert index["EMOTHE0038"].composition_date_note == "=1606 - =1607"
+  end
+
+  test "the dating goes to the original, never to a translation", %{index: index} do
+    refute Map.has_key?(index["EMOTHE0052"], :composition_date_from)
+    refute Map.has_key?(index["EMOTHE0052"], :composition_date_note)
+  end
+
+  test "a work with no header dating gains no dating keys", %{index: index} do
+    refute Map.has_key?(index["HIE0393"], :composition_date_from)
+  end
+
+  describe "dating forms" do
+    defp dating(header) do
+      html =
+        ~s(<div><i>T</i>. A<span style="x">#{header}</span></div>\n<ul>\n) <>
+          ~s(<li><span style="font-size: x-small">[EN] </span>) <>
+          ~s(<a href="textosEMOTHE/EMOTHE9001_T.php"><i>T</i></a>) <>
+          ~s(<span>Someone, ed.</span></li>\n</ul>)
+
+      line =
+        Jason.encode!(%{
+          "fields" => %{
+            "_kp_IdIndiceEM" => ["1"],
+            "_IdIndiceCtce" => ["1"],
+            "pub_listaObras" => [html]
+          }
+        })
+
+      meta = Jason.encode!(%{"_meta" => %{"layout" => "T00_indiceEM"}})
+      path = Path.join(System.tmp_dir!(), "fm-#{System.unique_integer([:positive])}.ndjson")
+      File.write!(path, meta <> "\n" <> line <> "\n")
+      on_exit(fn -> File.rm(path) end)
+
+      {:ok, index} = Filemaker.load_index(path)
+      index["EMOTHE9001"]
+    end
+
+    test "exact range" do
+      assert %{composition_date_from: 1606, composition_date_to: 1607} = dating("=1606 - =1607")
+    end
+
+    test "single year" do
+      assert %{composition_date_from: 1610, composition_date_to: 1610} = dating("=1610")
+    end
+
+    test "open-ended range" do
+      assert %{composition_date_from: 1598, composition_date_to: 1600} = dating("≥1598 - ≤1600")
+    end
+
+    test "conjectural" do
+      assert %{composition_date_from: 1600, composition_date_to: 1601} = dating("1600? - 1601?")
+    end
+
+    test "circa" do
+      assert %{composition_date_from: 1562, composition_date_to: 1562} = dating("≈1562")
+    end
+
+    test "two-digit tail collapses to the start year, and the note keeps the truth" do
+      assert %{
+               composition_date_from: 1587,
+               composition_date_to: 1587,
+               composition_date_note: "=1587 - =92"
+             } = dating("=1587 - =92")
+    end
+
+    test "a header with no year is skipped, not guessed" do
+      assert %{composition_date_skipped: {:unparseable, "="}} = dating("=")
+      refute Map.has_key?(dating("="), :composition_date_from)
+    end
+
+    test "an implausibly wide span is skipped" do
+      assert %{composition_date_skipped: {:span, "¿1694? y ¿1605?"}} = dating("¿1694? y ¿1605?")
+      refute Map.has_key?(dating("¿1694? y ¿1605?"), :composition_date_from)
+    end
+  end
+
   test "returns an error for a missing file" do
     assert {:error, :enoent} = Filemaker.load_index("test/fixtures/filemaker/nope.ndjson")
   end

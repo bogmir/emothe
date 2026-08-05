@@ -35,6 +35,18 @@ defmodule Emothe.Import.Filemaker do
   # <a href='../biblioteca/textosEMOTHE/EMOTHE0038_AntonyAndCleopatra.php' …>
   @web_edition ~r|textosEMOTHE/([A-Za-z0-9]+)_|
 
+  # The work header: <div><i>TITLE</i>. Author<span …>=1606 - =1607</span></div>. The
+  # sigils (= ≥ ≤ ≈ ?) are qualifiers we deliberately do not model — the years are what
+  # we store, and the string itself becomes the note.
+  @work_dating ~r|<div>.*?<span[^>]*>([^<]*)</span>\s*</div>|s
+  @four_digit_year ~r|\b(1[0-9]{3})\b|
+
+  # Wider than this is a data-entry error in the export, not a dating: the widest real
+  # header is 13 years (=1612 - =1625). Skipped rather than reported as a conflict,
+  # because a conflict is tickable in /admin/filemaker and a force-write of a bad span
+  # is precisely what this guard exists to prevent.
+  @max_composition_span 40
+
   # <li>Antigüedad clásica<br/>Note: First century BC.…</li>
   @first_item ~r|<li>(.*?)</li>|s
 
@@ -142,12 +154,61 @@ defmodule Emothe.Import.Filemaker do
 
   defp add_work(index, fields) do
     work = field(fields, "_IdIndiceCtce")
-    versions = parse_versions(field(fields, "pub_listaObras"), work)
+    html = field(fields, "pub_listaObras")
+    versions = parse_versions(html, work)
     family = Enum.map(versions, &Map.take(&1, [:code, :role]))
+    dating = parse_dating(html)
 
     Enum.reduce(versions, index, fn version, acc ->
-      Map.put(acc, version.code, Map.put(version, :family, family))
+      version =
+        version
+        |> Map.put(:family, family)
+        |> Map.merge(dating_for(version, dating))
+
+      Map.put(acc, version.code, version)
     end)
+  end
+
+  # The header dating belongs to the *work*, so it is the composition date of the
+  # original. A translation was composed centuries later and the export does not say
+  # when, so it gets nothing. A work with no `ed.` version gets nothing anywhere: we
+  # cannot tell whose composition it is.
+  defp dating_for(%{role: :editor}, dating), do: dating
+  defp dating_for(_version, _dating), do: %{}
+
+  defp parse_dating(html) do
+    case Regex.run(@work_dating, html) do
+      [_all, text] -> dating_from(String.trim(text))
+      _ -> %{}
+    end
+  end
+
+  defp dating_from(""), do: %{}
+
+  defp dating_from(text) do
+    years =
+      @four_digit_year
+      |> Regex.scan(text)
+      |> Enum.map(fn [_all, year] -> String.to_integer(year) end)
+
+    case years do
+      [] ->
+        %{composition_date_skipped: {:unparseable, text}}
+
+      years ->
+        from = Enum.min(years)
+        to = Enum.max(years)
+
+        if to - from > @max_composition_span do
+          %{composition_date_skipped: {:span, text}}
+        else
+          %{
+            composition_date_from: from,
+            composition_date_to: to,
+            composition_date_note: text
+          }
+        end
+    end
   end
 
   defp parse_versions(html, work) do

@@ -1225,5 +1225,25 @@ defmodule Emothe.Export.TeiXmlTest do
 
       refute xml =~ "<creation>"
     end
+
+    test "round-trips through export and import" do
+      play =
+        play_fixture(%{
+          "code" => "CDRT01",
+          "composition_date_from" => 1605,
+          "composition_date_to" => 1607,
+          "composition_date_note" => "desde o posterior 1605 y anterior o hasta 1607; 1606"
+        })
+
+      xml = TeiXml.generate(Catalogue.get_play_with_all!(play.id))
+      path = write_tei(String.replace(xml, "CDRT01", "CDRT02"))
+
+      assert {:ok, imported} = TeiParser.import_file(path)
+      assert imported.composition_date_from == 1605
+      assert imported.composition_date_to == 1607
+
+      assert imported.composition_date_note ==
+               "desde o posterior 1605 y anterior o hasta 1607; 1606"
+    end
   end
 end

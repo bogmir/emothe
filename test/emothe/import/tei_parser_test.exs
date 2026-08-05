@@ -18,6 +18,7 @@ defmodule Emothe.Import.TeiParserTest do
     author = Keyword.get(opts, :author, "")
     front = Keyword.get(opts, :front, "")
     body = Keyword.get(opts, :body, "")
+    profile = Keyword.get(opts, :profile, "")
 
     author_el = if author != "", do: "<author>#{author}</author>", else: ""
 
@@ -34,6 +35,7 @@ defmodule Emothe.Import.TeiParserTest do
             <idno>#{code}</idno>
           </publicationStmt>
         </fileDesc>
+        #{profile}
       </teiHeader>
       <text>
         <front>#{front}</front>
@@ -1377,6 +1379,73 @@ defmodule Emothe.Import.TeiParserTest do
 
       assert Emothe.Places.list_play_places(play.id) == []
       assert Emothe.Places.list_places() == []
+    end
+  end
+
+  describe "composition date" do
+    test "reads @when as a single year" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP1",
+            profile: "<profileDesc><creation><date when=\"1614\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == 1614
+      assert play.composition_date_to == 1614
+    end
+
+    test "reads @notBefore/@notAfter and the note text" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP2",
+            profile:
+              "<profileDesc><creation><date notBefore=\"1600\" notAfter=\"1601\">¿1600? y ¿1601?</date></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == 1600
+      assert play.composition_date_to == 1601
+      assert play.composition_date_note == "¿1600? y ¿1601?"
+    end
+
+    test "a date with no usable attribute imports as no dating and does not raise" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP3",
+            profile: "<profileDesc><creation><date>c. 1600</date></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "a lone endpoint is not stored — the changeset forbids half a range" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP4",
+            profile: "<profileDesc><creation><date notAfter=\"1601\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "no creation element leaves the columns nil" do
+      path = write_tei(minimal_tei(code: "CDIMP5"))
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
     end
   end
 end

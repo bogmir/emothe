@@ -387,6 +387,8 @@ defmodule Emothe.Import.TeiParser do
     # Extract play language from profileDesc/langUsage/language[@ident]
     language = extract_language_code(profile_desc)
 
+    {composition_from, composition_to, composition_note} = extract_creation(profile_desc)
+
     attribution =
       if main_author do
         attr_value(elem(main_author, 1), "ana")
@@ -416,7 +418,10 @@ defmodule Emothe.Import.TeiParser do
       editorial_declaration: editorial_decl,
       edition_title: safe_text(edition_title_el),
       relationship_type: relationship_type,
-      language: language || "es"
+      language: language || "es",
+      composition_date_from: composition_from,
+      composition_date_to: composition_to,
+      composition_date_note: composition_note
     }
   end
 
@@ -433,6 +438,48 @@ defmodule Emothe.Import.TeiParser do
       code
     else
       _ -> nil
+    end
+  end
+
+  # profileDesc/creation/date. @when is a single year; @notBefore + @notAfter a range.
+  # A lone endpoint is dropped rather than mirrored: the changeset forbids half a range,
+  # and inventing the missing year would assert a precision the file does not carry.
+  defp extract_creation(nil), do: {nil, nil, nil}
+
+  defp extract_creation({_name, _attrs, children}) do
+    with creation when not is_nil(creation) <- find_child(children, "creation"),
+         date when not is_nil(date) <- find_child(elem(creation, 2), "date"),
+         {from, to} when not is_nil(from) and not is_nil(to) <- creation_years(elem(date, 1)) do
+      {from, to, creation_note(date)}
+    else
+      _ -> {nil, nil, nil}
+    end
+  end
+
+  defp creation_years(attrs) do
+    case creation_year(attr_value(attrs, "when")) do
+      nil ->
+        {creation_year(attr_value(attrs, "notBefore")),
+         creation_year(attr_value(attrs, "notAfter"))}
+
+      exact ->
+        {exact, exact}
+    end
+  end
+
+  defp creation_year(nil), do: nil
+
+  defp creation_year(value) do
+    case Integer.parse(String.trim(value)) do
+      {year, _rest} -> year
+      :error -> nil
+    end
+  end
+
+  defp creation_note(date) do
+    case date |> text_content() |> String.trim() do
+      "" -> nil
+      text -> text
     end
   end
 

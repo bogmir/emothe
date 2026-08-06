@@ -84,6 +84,14 @@ defmodule Emothe.Catalogue.Play do
 
   def historical_times, do: @historical_times
 
+  # The bounds on each composition year, deliberately wide — the corpus is 16th–17th
+  # century, but the column is a year and a curator fixing a typo should not fight the
+  # validator. Public so the TEI importer can reject an out-of-range attribute before
+  # it reaches the changeset, where the failure would roll back the whole play.
+  @composition_year_range 1000..2100
+
+  def composition_year_range, do: @composition_year_range
+
   def changeset(play, attrs) do
     play
     |> cast(attrs, [
@@ -125,20 +133,18 @@ defmodule Emothe.Catalogue.Play do
     |> validate_inclusion(:relationship_type, ~w(traduccion adaptacion refundicion))
     |> validate_inclusion(:historical_time, @historical_times)
     |> validate_number(:composition_date_from,
-      greater_than_or_equal_to: 1000,
-      less_than_or_equal_to: 2100
+      greater_than_or_equal_to: @composition_year_range.first,
+      less_than_or_equal_to: @composition_year_range.last
     )
     |> validate_number(:composition_date_to,
-      greater_than_or_equal_to: 1000,
-      less_than_or_equal_to: 2100
+      greater_than_or_equal_to: @composition_year_range.first,
+      less_than_or_equal_to: @composition_year_range.last
     )
     |> validate_composition_date_span()
     |> unique_constraint(:code)
   end
 
-  # Both endpoints or neither: a lone year is a half-filled form, not a dating. The
-  # bounds on each year are deliberately wide — the corpus is 16th–17th century, but the
-  # column is a year and a curator fixing a typo should not fight the validator.
+  # Both endpoints or neither: a lone year is a half-filled form, not a dating.
   defp validate_composition_date_span(changeset) do
     from = get_field(changeset, :composition_date_from)
     to = get_field(changeset, :composition_date_to)

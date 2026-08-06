@@ -442,18 +442,29 @@ defmodule Emothe.Import.TeiParser do
   end
 
   # profileDesc/creation/date. @when is a single year; @notBefore + @notAfter a range.
-  # A lone endpoint is dropped rather than mirrored: the changeset forbids half a range,
-  # and inventing the missing year would assert a precision the file does not carry.
+  #
+  # Anything the changeset would reject is dropped here instead — a lone endpoint, an
+  # inverted range, a year outside `Play.composition_year_range/0`. The changeset's
+  # strictness is right for curator input, but an unusable attribute in a TEI file must
+  # not roll back the import: `import_tree` rollbacks discard the text, the characters
+  # and the acts too. Per the S2c spec, a file that carries no machine dating is the
+  # file's problem, not an import failure.
   defp extract_creation(nil), do: {nil, nil, nil}
 
   defp extract_creation({_name, _attrs, children}) do
     with creation when not is_nil(creation) <- find_child(children, "creation"),
          date when not is_nil(date) <- find_child(elem(creation, 2), "date"),
-         {from, to} when not is_nil(from) and not is_nil(to) <- creation_years(elem(date, 1)) do
+         {from, to} <- creation_years(elem(date, 1)),
+         true <- usable_creation_years?(from, to) do
       {from, to, creation_note(date)}
     else
       _ -> {nil, nil, nil}
     end
+  end
+
+  defp usable_creation_years?(from, to) do
+    range = Play.composition_year_range()
+    from in range and to in range and from <= to
   end
 
   defp creation_years(attrs) do

@@ -328,7 +328,7 @@ defmodule EmotheWeb.PlayShowLive do
 
           <%!-- Research metadata --%>
           <section
-            :if={@play.historical_time || @play.composition_date_from}
+            :if={@play.historical_time || @play.composition_date_from || @play.composition_date_note}
             id="meta-study"
             class="mb-8 max-w-2xl mx-auto scroll-mt-20 text-sm"
           >
@@ -343,10 +343,13 @@ defmodule EmotheWeb.PlayShowLive do
                 </p>
               </dd>
 
-              <dt :if={@play.composition_date_from} class="text-base-content/50">
+              <dt
+                :if={@play.composition_date_from || @play.composition_date_note}
+                class="text-base-content/50"
+              >
                 {gettext("Composition")}
               </dt>
-              <dd :if={@play.composition_date_from}>
+              <dd :if={@play.composition_date_from || @play.composition_date_note}>
                 {composition_date(@play)}
                 <p :if={@play.composition_date_note} class="mt-1 text-xs text-base-content/60">
                   {@play.composition_date_note}
@@ -438,7 +441,8 @@ defmodule EmotheWeb.PlayShowLive do
 
     base
     |> maybe_add_section(
-      play.historical_time != nil or play.composition_date_from != nil,
+      play.historical_time != nil or play.composition_date_from != nil or
+        play.composition_date_note != nil,
       "meta-study",
       gettext("Study")
     )
@@ -451,7 +455,10 @@ defmodule EmotheWeb.PlayShowLive do
   defp maybe_add_section(sections, true, id, label), do: sections ++ [%{id: id, label: label}]
   defp maybe_add_section(sections, false, _id, _label), do: sections
 
-  # An en dash, collapsing when the dating is a single year.
+  # An en dash, collapsing when the dating is a single year. A note with no years is a
+  # permitted state, and yields nothing here — the note below the value carries it.
+  defp composition_date(%{composition_date_from: nil}), do: ""
+
   defp composition_date(%{composition_date_from: from, composition_date_to: to}) when from == to,
     do: to_string(from)
 

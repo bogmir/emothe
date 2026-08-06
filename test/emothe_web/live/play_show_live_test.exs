@@ -127,6 +127,25 @@ defmodule EmotheWeb.PlayShowLiveTest do
     assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
   end
 
+  # The changeset permits a note with no years, and the FileMaker sync writes exactly
+  # that (EMOTHE0341_EastwardHo). Without this the value is invisible to every reader.
+  test "a note with no years still renders, with its own section and sidebar entry", %{conn: conn} do
+    play =
+      TestFixtures.play_fixture(%{
+        "code" => "CDPUB4",
+        "composition_date_note" => "¿1694? y ¿1605?"
+      })
+
+    {:ok, view, html} = live(conn, ~p"/plays/#{play.code}")
+
+    assert has_element?(view, "#meta-study")
+    assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
+    assert html =~ "¿1694? y ¿1605?"
+
+    [_, after_meta_study] = String.split(html, ~s(id="meta-study"), parts: 2)
+    assert after_meta_study =~ ~r/Datación.*?¿1694\? y ¿1605\?/s
+  end
+
   describe "the places panel" do
     defp t(msgid), do: Gettext.gettext(EmotheWeb.Gettext, msgid)
 

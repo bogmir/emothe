@@ -1447,5 +1447,51 @@ defmodule Emothe.Import.TeiParserTest do
       assert {:ok, play} = TeiParser.import_file(path)
       assert play.composition_date_from == nil
     end
+
+    # An unusable *present* attribute is the file's problem, not an import failure: the
+    # whole play — text, characters, acts — must still import. The extraction drops the
+    # dating for the same reason it drops a lone endpoint.
+    test "an inverted range imports as no dating" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP6",
+            profile:
+              "<profileDesc><creation><date notBefore=\"1607\" notAfter=\"1606\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "a year below the validated bound imports as no dating" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP7",
+            profile: "<profileDesc><creation><date when=\"850\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "a BCE date imports as no dating" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP8",
+            profile: "<profileDesc><creation><date when=\"-0044\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
   end
 end

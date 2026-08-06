@@ -331,11 +331,20 @@ defmodule EmotheWeb.Admin.FilemakerSyncLiveTest do
   end
 
   # A field with no field_label/1 clause of its own must still render. This is
-  # what makes S2b--S2f (place_of_action, composition_date, …) land on this page
-  # with no edit to it.
+  # what makes the remaining FileMaker slices land on this page with no edit to it.
+  # The fields a shipped slice writes do get a clause, so an admin reading a
+  # conflict list in Spanish reads Spanish.
   describe "field labels" do
     test "given an unknown field then the catch-all renders it readably" do
       assert EmotheWeb.Admin.FilemakerSyncLive.field_label(:place_of_action) == "place of action"
+    end
+
+    test "given a composition date field then it is translated, not fallen through" do
+      for field <- [:composition_date_from, :composition_date_to, :composition_date_note] do
+        label = EmotheWeb.Admin.FilemakerSyncLive.field_label(field)
+        refute label =~ "composition date"
+        assert String.downcase(label) =~ "dataci"
+      end
     end
 
     test "given an unknown field then its value renders as text" do

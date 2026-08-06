@@ -344,7 +344,7 @@ msgid "Edit metadata"
 msgstr ""
 
 #: lib/emothe_web/live/admin/play_content_editor_live.ex:2520
-#: lib/emothe_web/live/play_show_live.ex:473
+#: lib/emothe_web/live/play_show_live.ex:480
 #, elixir-autogen, elixir-format
 msgid "Editorial Note"
 msgstr ""
@@ -352,7 +352,7 @@ msgstr ""
 #: lib/emothe_web/components/layouts.ex:135
 #: lib/emothe_web/live/admin/play_detail_live.ex:428
 #: lib/emothe_web/live/admin/play_editors_live.ex:15
-#: lib/emothe_web/live/play_show_live.ex:447
+#: lib/emothe_web/live/play_show_live.ex:451
 #, elixir-autogen, elixir-format
 msgid "Editors"
 msgstr ""
@@ -675,7 +675,7 @@ msgid "Oops, something went wrong! Please check the errors below."
 msgstr ""
 
 #: lib/emothe_web/components/layouts.ex:123
-#: lib/emothe_web/live/play_show_live.ex:437
+#: lib/emothe_web/live/play_show_live.ex:440
 #, elixir-autogen, elixir-format
 msgid "Overview"
 msgstr ""
@@ -911,7 +911,7 @@ msgstr ""
 msgid "Something went wrong!"
 msgstr ""
 
-#: lib/emothe_web/live/play_show_live.ex:446
+#: lib/emothe_web/live/play_show_live.ex:450
 #, elixir-autogen, elixir-format
 msgid "Source"
 msgstr ""
@@ -1252,7 +1252,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_detail_live.ex:138
 #: lib/emothe_web/live/admin/play_editors_live.ex:154
 #: lib/emothe_web/live/admin/play_editors_live.ex:163
-#: lib/emothe_web/live/play_show_live.ex:507
+#: lib/emothe_web/live/play_show_live.ex:514
 #, elixir-autogen, elixir-format
 msgid "Digital editor"
 msgstr ""
@@ -1277,7 +1277,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_editors_live.ex:162
 #: lib/emothe_web/live/admin/play_sources_live.ex:199
 #: lib/emothe_web/live/admin/play_sources_live.ex:287
-#: lib/emothe_web/live/play_show_live.ex:506
+#: lib/emothe_web/live/play_show_live.ex:513
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Editor"
 msgstr ""
@@ -1379,7 +1379,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_detail_live.ex:134
 #: lib/emothe_web/live/admin/play_editors_live.ex:150
 #: lib/emothe_web/live/admin/play_editors_live.ex:159
-#: lib/emothe_web/live/play_show_live.ex:503
+#: lib/emothe_web/live/play_show_live.ex:510
 #, elixir-autogen, elixir-format
 msgid "Principal investigator"
 msgstr ""
@@ -1417,7 +1417,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_editors_live.ex:152
 #: lib/emothe_web/live/admin/play_editors_live.ex:161
 #: lib/emothe_web/live/admin/user_list_live.ex:241
-#: lib/emothe_web/live/play_show_live.ex:505
+#: lib/emothe_web/live/play_show_live.ex:512
 #, elixir-autogen, elixir-format
 msgid "Researcher"
 msgstr ""
@@ -1425,7 +1425,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_detail_live.ex:139
 #: lib/emothe_web/live/admin/play_editors_live.ex:155
 #: lib/emothe_web/live/admin/play_editors_live.ex:164
-#: lib/emothe_web/live/play_show_live.ex:508
+#: lib/emothe_web/live/play_show_live.ex:515
 #, elixir-autogen, elixir-format
 msgid "Reviewer"
 msgstr ""
@@ -1491,7 +1491,7 @@ msgstr ""
 #: lib/emothe_web/live/admin/play_detail_live.ex:135
 #: lib/emothe_web/live/admin/play_editors_live.ex:151
 #: lib/emothe_web/live/admin/play_editors_live.ex:160
-#: lib/emothe_web/live/play_show_live.ex:504
+#: lib/emothe_web/live/play_show_live.ex:511
 #, elixir-autogen, elixir-format
 msgid "Translator"
 msgstr ""
@@ -1574,7 +1574,7 @@ msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:125
 #: lib/emothe_web/live/admin/play_form_live.ex:282
-#: lib/emothe_web/live/play_show_live.ex:499
+#: lib/emothe_web/live/play_show_live.ex:506
 #, elixir-autogen, elixir-format
 msgid "Adaptation"
 msgstr ""
@@ -1811,7 +1811,7 @@ msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:126
 #: lib/emothe_web/live/admin/play_form_live.ex:283
-#: lib/emothe_web/live/play_show_live.ex:500
+#: lib/emothe_web/live/play_show_live.ex:507
 #, elixir-autogen, elixir-format
 msgid "Reworking"
 msgstr ""
@@ -1866,7 +1866,7 @@ msgstr ""
 
 #: lib/emothe_web/live/admin/play_detail_live.ex:124
 #: lib/emothe_web/live/admin/play_form_live.ex:281
-#: lib/emothe_web/live/play_show_live.ex:498
+#: lib/emothe_web/live/play_show_live.ex:505
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Translation"
 msgstr ""
@@ -2930,7 +2930,7 @@ msgstr ""
 msgid "Research Metadata"
 msgstr ""
 
-#: lib/emothe_web/live/play_show_live.ex:443
+#: lib/emothe_web/live/play_show_live.ex:447
 #, elixir-autogen, elixir-format
 msgid "Study"
 msgstr ""
@@ -3233,7 +3233,7 @@ msgstr ""
 msgid "%{count} value(s) already set by a researcher"
 msgstr ""
 
-#: lib/emothe_web/live/admin/filemaker_sync_live.ex:370
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:375
 #, elixir-autogen, elixir-format
 msgid "(blank)"
 msgstr ""
@@ -3415,7 +3415,7 @@ msgid "Edit place"
 msgstr ""
 
 #: lib/emothe_web/live/admin/place_list_live.ex:152
-#: lib/emothe_web/live/play_show_live.ex:374
+#: lib/emothe_web/live/play_show_live.ex:377
 #, elixir-autogen, elixir-format
 msgid "Fictional"
 msgstr ""
@@ -3543,8 +3543,8 @@ msgstr ""
 #: lib/emothe_web/live/admin/place_list_live.ex:94
 #: lib/emothe_web/live/admin/play_places_live.ex:17
 #: lib/emothe_web/live/admin/play_places_live.ex:181
-#: lib/emothe_web/live/play_show_live.ex:365
-#: lib/emothe_web/live/play_show_live.ex:445
+#: lib/emothe_web/live/play_show_live.ex:368
+#: lib/emothe_web/live/play_show_live.ex:449
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Places"
 msgstr ""
@@ -3676,7 +3676,7 @@ msgstr ""
 msgid "Competing datings, and the evidence for each"
 msgstr ""
 
-#: lib/emothe_web/live/play_show_live.ex:347
+#: lib/emothe_web/live/play_show_live.ex:350
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Composition"
 msgstr ""
@@ -3686,6 +3686,7 @@ msgstr ""
 msgid "Composition Date"
 msgstr ""
 
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:367
 #: lib/emothe_web/live/admin/play_form_live.ex:741
 #, elixir-autogen, elixir-format
 msgid "Composition Date Note"
@@ -3694,4 +3695,14 @@ msgstr ""
 #: lib/emothe_web/live/admin/filemaker_sync_live.ex:269
 #, elixir-autogen, elixir-format
 msgid "The export gives no usable years for these — an implausible span, or a header with no date in it. Nothing is written and there is nothing to tick: enter the dating by hand if you have it."
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:363
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Composition Date (from)"
+msgstr ""
+
+#: lib/emothe_web/live/admin/filemaker_sync_live.ex:364
+#, elixir-autogen, elixir-format, fuzzy
+msgid "Composition Date (to)"
 msgstr ""

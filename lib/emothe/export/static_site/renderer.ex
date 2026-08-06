@@ -518,21 +518,53 @@ defmodule Emothe.Export.StaticSite.Renderer do
   # The archival artifact must not change language with whichever locale the admin
   # running the export happened to have (Ruling 3) — historical_time_label/1 and
   # place_type_label/1 go through gettext, so this is pinned to English explicitly.
-  defp render_study(%{historical_time: nil}), do: ""
+  defp render_study(%{
+         historical_time: nil,
+         composition_date_from: nil,
+         composition_date_note: nil
+       }),
+       do: ""
 
   defp render_study(play) do
     Gettext.with_locale(EmotheWeb.Gettext, "en", fn ->
-      note =
-        if play.historical_time_note,
-          do: "<p class=\"meta-note\">#{escape(play.historical_time_note)}</p>",
-          else: ""
-
-      """
-            <p class="historical-time">Historical time: #{escape(EmotheWeb.PlayLabels.historical_time_label(play.historical_time))}</p>
-      #{note}
-      """
+      [render_historical_time(play), render_composition_date(play)]
+      |> Enum.reject(&(&1 == ""))
+      |> Enum.join()
     end)
   end
+
+  defp render_historical_time(%{historical_time: nil}), do: ""
+
+  defp render_historical_time(play) do
+    """
+          <p class="historical-time">Historical time: #{escape(EmotheWeb.PlayLabels.historical_time_label(play.historical_time))}</p>
+    #{meta_note(play.historical_time_note)}
+    """
+  end
+
+  # A note with no years is a real state: the changeset permits it and the FileMaker
+  # sync writes it, so the note alone must still reach the archive.
+  defp render_composition_date(%{composition_date_from: nil, composition_date_note: nil}), do: ""
+
+  defp render_composition_date(play) do
+    """
+          <p class="composition-date">Composition#{composition_years(play)}</p>
+    #{meta_note(play.composition_date_note)}
+    """
+  end
+
+  # An en dash, collapsing when the dating is a single year, as on the public page.
+  # With no years the label stands alone rather than trailing an empty ": ".
+  defp composition_years(%{composition_date_from: nil}), do: ""
+
+  defp composition_years(%{composition_date_from: from, composition_date_to: to}) when from == to,
+    do: ": #{from}"
+
+  defp composition_years(%{composition_date_from: from, composition_date_to: to}),
+    do: ": #{from}–#{to}"
+
+  defp meta_note(nil), do: ""
+  defp meta_note(text), do: "<p class=\"meta-note\">#{escape(text)}</p>"
 
   defp render_places(%{play_places: []}), do: ""
 

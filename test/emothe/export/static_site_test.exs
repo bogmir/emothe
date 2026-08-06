@@ -38,6 +38,50 @@ defmodule Emothe.Export.StaticSiteTest do
     refute html =~ "Siglo XVII"
   end
 
+  test "a play page carries its composition date range and note" do
+    play =
+      Emothe.TestFixtures.play_fixture(%{
+        "is_complete" => true,
+        "composition_date_from" => 1606,
+        "composition_date_to" => 1607,
+        "composition_date_note" => "1606; 1607"
+      })
+
+    play = Emothe.Catalogue.get_play_with_all!(play.id)
+    html = Renderer.play_page(play, [], [], nil, [])
+
+    assert html =~ "1606–1607"
+    assert html =~ "1606; 1607"
+  end
+
+  test "a play page collapses a single-year composition date" do
+    play =
+      Emothe.TestFixtures.play_fixture(%{
+        "is_complete" => true,
+        "composition_date_from" => 1614,
+        "composition_date_to" => 1614
+      })
+
+    play = Emothe.Catalogue.get_play_with_all!(play.id)
+    html = Renderer.play_page(play, [], [], nil, [])
+
+    assert html =~ "1614"
+    refute html =~ "1614–1614"
+  end
+
+  test "a play page carries a composition note with no years" do
+    play =
+      Emothe.TestFixtures.play_fixture(%{
+        "is_complete" => true,
+        "composition_date_note" => "¿1694? y ¿1605?"
+      })
+
+    play = Emothe.Catalogue.get_play_with_all!(play.id)
+    html = Renderer.play_page(play, [], [], nil, [])
+
+    assert html =~ "¿1694? y ¿1605?"
+  end
+
   test "a play page with no places renders no places section" do
     play = Emothe.TestFixtures.play_fixture(%{"is_complete" => true})
     play = Emothe.Catalogue.get_play_with_all!(play.id)

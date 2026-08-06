@@ -360,6 +360,11 @@ defmodule EmotheWeb.Admin.FilemakerSyncLive do
   def field_label(:parent_play_id), do: gettext("Parent play")
   def field_label(:historical_time), do: gettext("Historical time")
   def field_label(:historical_time_note), do: gettext("Historical time note")
+  def field_label(:composition_date_from), do: gettext("Composition Date (from)")
+  def field_label(:composition_date_to), do: gettext("Composition Date (to)")
+  # The admin form already translates this msgid; reuse it rather than add a second
+  # msgid with the same msgstr.
+  def field_label(:composition_date_note), do: gettext("Composition Date Note")
   def field_label(other), do: other |> to_string() |> String.replace("_", " ")
 
   @doc "The display value of a field, given the plays keyed by id."

@@ -572,6 +572,9 @@ defmodule Emothe.RoundtripTest do
     EMOTHE0775_TheCoffer.xml
   )
 
+  # Unused when the corpus directory is absent (fresh clone), same as @fields above.
+  _ = @passing_files
+
   if File.dir?(@fixtures_dir) do
     for file <-
           @fixtures_dir
@@ -737,15 +740,19 @@ defmodule Emothe.RoundtripTest do
     defp settings(xml), do: Regex.scan(~r/ref="#([^"]+)" ana="([^"]+)"/, xml)
     defp place_ids(xml), do: Regex.scan(~r/<place xml:id="([^"]+)"/, xml)
 
-    test "the real fixtures still produce no places" do
-      # Every corpus fixture predates <settingDesc>, so importing one must leave the
-      # gazetteer empty. This is the guard against the new parser branch firing on a
-      # file that has no places in it.
-      fixture = Path.join(@fixtures_dir, "AL0514_ElAusenteEnElLugar.xml")
+    @places_fixture Path.join(@fixtures_dir, "AL0514_ElAusenteEnElLugar.xml")
 
-      {:ok, _play} = Emothe.Import.TeiParser.import_file(fixture)
+    # Guarded like the generated roundtrips above: test/fixtures/tei_files/ is git-ignored,
+    # so on a fresh clone the corpus is absent and this test would fail on :enoent.
+    if File.exists?(@places_fixture) do
+      test "the real fixtures still produce no places" do
+        # Every corpus fixture predates <settingDesc>, so importing one must leave the
+        # gazetteer empty. This is the guard against the new parser branch firing on a
+        # file that has no places in it.
+        {:ok, _play} = Emothe.Import.TeiParser.import_file(@places_fixture)
 
-      assert Emothe.Places.list_places() == []
+        assert Emothe.Places.list_places() == []
+      end
     end
   end
 end

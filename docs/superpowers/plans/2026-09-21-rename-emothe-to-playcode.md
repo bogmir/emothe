@@ -437,10 +437,21 @@ Expected: `POSTGRES_DB: playcode_test`, the CI `DATABASE_URL` ending `/playcode_
 The only check that proves `mix release` and both Dockerfiles agree on the path.
 
 ```bash
-MIX_ENV=prod mix release --overwrite 2>&1 | tail -5
+MIX_TARGET=host MIX_ENV=prod mix release --overwrite 2>&1 | tail -4
 ls -l _build/prod/rel/playcode/bin/playcode
+_build/prod/rel/playcode/bin/playcode version
 grep -n 'rel/playcode\|bin/playcode' Dockerfile Dockerfile.render entrypoint.sh
 ```
+
+**`MIX_TARGET=host` is not optional on this machine.** `~/.bashrc:441` exports
+`MIX_TARGET=rpi0` globally, for Nerves. Whenever `MIX_TARGET` is set to anything other than
+`host`, Mix builds into `_build/<target>_<env>/` rather than `_build/<env>/`, so a plain
+`MIX_ENV=prod mix release` lands in `_build/rpi0_prod/rel/playcode` and the path this step
+checks does not exist. Nothing is broken by that — Docker and CI have no `MIX_TARGET`, so
+the image builds `_build/prod/rel/playcode`, which is what `Dockerfile:49` copies — but the
+local check has to ask for the same target the image uses. Worth scoping that export to the
+Nerves project with direnv rather than leaving it global, since it silently redirects every
+Elixir build on the machine.
 
 Expected: the release builds, the binary exists at exactly that path, and every reference in the three files points at it.
 

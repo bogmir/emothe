@@ -36,8 +36,8 @@ Two further traps found by measurement:
 | 2. The code rename | **done** `68959d4` | 219 files, 549 tests 0 failures. **Task 3's mechanical file edits were folded in here**, because the guard checks the final state and would have left Task 2 red. `fly.emothe.toml` exists; `fly.toml` describes the playcode app. A fourth preserved token was discovered mid-task: `emothe-static`. |
 | 3. Deployment | **runbook only** | The file edits are already committed in Task 2. What remains is the operator runbook at the end of that task — create the Fly app, move the secrets, deploy, cut over. Needs `flyctl` and account credentials. |
 | 4. Development database | **done** | `ALTER DATABASE emothe_dev RENAME TO playcode_dev`, orphaned `emothe_test` dropped. Row counts identical to baseline; 64 EMOTHE + 19 AL codes intact, zero corrupted; `/plays` and a play page both serve 200. No tracked files changed. |
-| 5. Documentation | pending | |
-| 6. Tooling settings and final verification | pending | |
+| 5. Documentation | **done** `16b79d7` | Six live docs; archive verified untouched. Also corrected the stale "Fly deployment pending" claim and removed the asdf PATH export that contradicted Running Commands. |
+| 6. Tooling settings and final verification | **done** | `mix format --check-formatted` clean, `--warnings-as-errors` clean, 549 tests 0 failures, all 4 mix tasks registered and `playcode.import.tei --dry-run` exercised end to end. Full-diff corpus scan: no `EMOTHE####` or `emothe.uv.es` lost, no `PLAYCODE####` introduced. |
 | 7. Rename the repository | pending | Optional, last, after the Fly cutover. |
 
 ## Global Constraints

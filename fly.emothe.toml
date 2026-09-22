@@ -3,8 +3,8 @@
 # The app is still called 'emothe' because a Fly app cannot be renamed; the
 # release binary is 'playcode' because that follows the code, which was renamed.
 #
-# CI does NOT deploy this file — .github/workflows/deploy-fly.yml deploys
-# fly.toml (the playcode app). Deploy this one by hand only:
+# CI does NOT deploy this file — .github/workflows/deploy-fly.yml deploys fly.toml
+# (the playcode app). Deploy this one by hand only:
 #
 #     fly deploy --config fly.emothe.toml
 #

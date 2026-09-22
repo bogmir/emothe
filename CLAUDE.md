@@ -1,8 +1,20 @@
-# EMOTHE - Digital Theatre Play Management System
+# Playcode - Digital Theatre Play Management System
 
-Web application for managing, cataloguing, and presenting digitized early modern European theatre plays (16th-17th century). Allows humanities researchers to input play data, export to TEI-XML/PDF/HTML, and provides public presentation pages with statistics. Based on the existing EMOTHE project at https://emothe.uv.es.
+The backend behind the EMOTHE and ARTELOPE public sites. It manages, catalogues and presents digitized early modern European theatre plays (16th-17th century): humanities researchers input play data, export to TEI-XML/PDF/HTML, and it generates the static pages those sites publish, with statistics.
+
+EMOTHE and ARTELOPE stay the public brands; Playcode is the internal platform they both run on. Reference site: https://emothe.uv.es
 
 ## How To Work In This Repo
+
+**Naming.** The application was renamed `Emothe` -> `Playcode` on 2026-09-21, because a
+backend serving both EMOTHE and ARTELOPE should not be named after one of them. Upper-case
+`EMOTHE` is *never* the application: it is a play code (`EMOTHE0010`), the corpus, or the
+public brand. Four lower-case tokens are also not the application and must survive any future
+search-and-replace - `emothe.uv.es`, `plays.emothe_id`, `w3emothe` (the FileMaker export's
+database, including the real path `doc/w3emothe_T01_tituloEM.ndjson`) and `emothe-static` (the
+published site's repo and .zip). `test/rename_guard_test.exs` enforces all of this; read it
+before running any bulk rename. Plans and specs under `docs/superpowers/` written before that
+date use the old namespace and are left as written - they record work done, not instructions.
 
 **Test-driven development is required.** Every feature and every bugfix follows the same loop, in this order:
 
@@ -16,12 +28,12 @@ Rules that follow from this:
 
 - **Never claim "done", "fixed" or "working" without the command output that proves it.** Evidence first, assertion second.
 - **A failing test is information, not an obstacle.** If a test fails, read the failure before changing anything. If the failure means the *test's* expectation was wrong, fix the test and say so — but check the implementation first.
-- **An existing test that contradicts a deliberate behaviour change gets updated, with a comment saying why.** See `test/emothe/import/tei_parser_test.exs` — "returns error when play code already exists" became "updates the existing play" when re-imports became non-destructive.
+- **An existing test that contradicts a deliberate behaviour change gets updated, with a comment saying why.** See `test/playcode/import/tei_parser_test.exs` — "returns error when play code already exists" became "updates the existing play" when re-imports became non-destructive.
 - **Bugfixes get a regression test** that fails before the fix.
 - **`mix format` after every task.** The repo is formatted; a noisy diff hides the real change.
 - **`mix compile --warnings-as-errors` before committing.**
 
-Where the tests live: `test/emothe/` for contexts, importers and exporters; `test/emothe_web/live/` for LiveViews; `test/support/fixtures.ex` for `play_fixture/1` and friends; `test/fixtures/` for TEI and FileMaker sample files.
+Where the tests live: `test/playcode/` for contexts, importers and exporters; `test/playcode_web/live/` for LiveViews; `test/support/fixtures.ex` for `play_fixture/1` and friends; `test/fixtures/` for TEI and FileMaker sample files.
 
 ## Tech Stack
 
@@ -37,7 +49,7 @@ Where the tests live: `test/emothe/` for contexts, importers and exporters; `tes
 
 ```
 lib/
-├── emothe/
+├── playcode/
 │   ├── catalogue.ex                  # Play CRUD, search, listing context
 │   ├── catalogue/
 │   │   ├── play.ex                   # Core play schema (UUID PK)
@@ -76,7 +88,7 @@ lib/
 │           ├── renderer.ex           # HTML/CSS page templates
 │           ├── search.ex             # Client-side search index + JS
 │           └── deployer.ex           # GitHub Pages deployment
-└── emothe_web/
+└── playcode_web/
     ├── router.ex
     ├── user_auth.ex                  # Auth plugs & LiveView on_mount hooks (delegates to Authz)
     ├── play_labels.ex                # Translated play metadata vocabularies (historical_time, …)
@@ -127,8 +139,8 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
 
 - `plays.deleted_at` — archiving, not deletion. `Catalogue.delete_play/1` sets it, `restore_play/1` clears it, `purge_play/1` is the destructive path (wired to no button). Every Catalogue read hides archived plays; pass `include_deleted: true` for both or `archived: true` for only the archived ones. The unique index on `plays.code` is deliberately global, so an archived play keeps its code reserved.
 - `play_editors.origin`, `play_sources.origin`, `play_editorial_notes.origin` — `"tei" | "manual" | "filemaker"`, default `"manual"`. A TEI re-import deletes only its own `"tei"` rows, so hand-entered records survive.
-- **Re-importing a TEI file whose code exists updates that play in place** (same `id`, same history, un-archived). It does *not* write `language`, `relationship_type`, `parent_play_id`, `is_complete`, `historical_time`, `historical_time_note`, `composition_date_from`, `composition_date_to` or `composition_date_note` — those are `@platform_owned` in `lib/emothe/import/tei_parser.ex`. Any new curated column must be added to that list: for a column the TEI parser emits, the list is what stops the re-import overwriting it; for one it does not emit, the list is what makes the import preview report it as preserved.
-- `TeiParser.preview_import/1` reports what an import would replace and keep, without writing. Used by the admin import page and `mix emothe.import.tei --dry-run`.
+- **Re-importing a TEI file whose code exists updates that play in place** (same `id`, same history, un-archived). It does *not* write `language`, `relationship_type`, `parent_play_id`, `is_complete`, `historical_time`, `historical_time_note`, `composition_date_from`, `composition_date_to` or `composition_date_note` — those are `@platform_owned` in `lib/playcode/import/tei_parser.ex`. Any new curated column must be added to that list: for a column the TEI parser emits, the list is what stops the re-import overwriting it; for one it does not emit, the list is what makes the import preview report it as preserved.
+- `TeiParser.preview_import/1` reports what an import would replace and keep, without writing. Used by the admin import page and `mix playcode.import.tei --dry-run`.
 
 ### Access control
 
@@ -136,13 +148,13 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
   creates a password-less row plus a 7-day `"invite"` token; accepting sets the password
   and `confirmed_at` in one transaction, because clicking the emailed link already proves
   the mailbox. Re-inviting invalidates the previous link.
-- **`ADMIN_EMAILS`** is the source of truth for who is an admin. `Emothe.Accounts.AdminBootstrap`
+- **`ADMIN_EMAILS`** is the source of truth for who is an admin. `Playcode.Accounts.AdminBootstrap`
   reconciles it at boot: unknown addresses get an invited admin plus mail, non-admins get
   promoted, deactivated ones get reactivated. Those accounts cannot be demoted, deactivated
   or deleted from `/admin/users` — `Accounts.protected_admin?/1` refuses in the handler.
-  **Unset in production means zero admins.** Break-glass: `mix emothe.invite EMAIL --admin --print-url`,
-  or `Emothe.Release.invite_url/1` from `fly ssh console`, both of which bypass SMTP.
-- **`Emothe.Authz.can?(user, action, resource \\ nil)` is the only authorization predicate.**
+  **Unset in production means zero admins.** Break-glass: `mix playcode.invite EMAIL --admin --print-url`,
+  or `Playcode.Release.invite_url/1` from `fly ssh console`, both of which bypass SMTP.
+- **`Playcode.Authz.can?(user, action, resource \\ nil)` is the only authorization predicate.**
   The router, the LiveView mount hooks and the admin sidebar all call it, which is what keeps
   the nav and the routes from drifting — `/admin/users` was previously reachable but unlinked.
   Never write `role == :admin` outside that module for an access decision. Because
@@ -154,7 +166,7 @@ Division types: `acto`, `escena`, `prologo`, `argumento`, `dedicatoria`, `elenco
   deploy, the dashboard and the FileMaker sync (`:import_filemaker`).
 - **Per-play scoping is a planned extension**, not a rewrite: `can?/3` already takes the
   resource, so restricting researchers to assigned plays is one new clause plus a
-  `play_assignments` table. See the `@moduledoc` in `lib/emothe/authz.ex`.
+  `play_assignments` table. See the `@moduledoc` in `lib/playcode/authz.ex`.
 - **A password reset confirms an unconfirmed account.** The link was mailed to that
   address, so following it proves the mailbox — the same argument as accepting an invite.
   Without this, an invited user who reaches for "forgot password" instead of their invite
@@ -224,10 +236,10 @@ Generates an Endings Project-compliant static website — pure HTML/CSS/JS, no s
 
 ### Architecture
 
-- `Emothe.Export.StaticSite` — orchestrator: loads plays, writes assets, delegates to Renderer/Search
-- `Emothe.Export.StaticSite.Renderer` — generates HTML pages (catalogue index + per-play pages) with embedded CSS
-- `Emothe.Export.StaticSite.Search` — builds a JSON search index and client-side JS for filtering
-- `Emothe.Export.StaticSite.Deployer` — pushes `_site/` to a GitHub Pages `gh-pages` branch
+- `Playcode.Export.StaticSite` — orchestrator: loads plays, writes assets, delegates to Renderer/Search
+- `Playcode.Export.StaticSite.Renderer` — generates HTML pages (catalogue index + per-play pages) with embedded CSS
+- `Playcode.Export.StaticSite.Search` — builds a JSON search index and client-side JS for filtering
+- `Playcode.Export.StaticSite.Deployer` — pushes `_site/` to a GitHub Pages `gh-pages` branch
 
 ### Output structure
 
@@ -246,15 +258,15 @@ _site/
 
 ### Usage
 
-**Admin UI**: `GET /admin/export` (`EmotheWeb.Admin.ExportSiteLive`) — configure version, base URL, GitHub repo; generate with progress bar; download as .zip or deploy to GitHub Pages.
+**Admin UI**: `GET /admin/export` (`PlaycodeWeb.Admin.ExportSiteLive`) — configure version, base URL, GitHub repo; generate with progress bar; download as .zip or deploy to GitHub Pages.
 
 **Mix task**:
 ```bash
-mix emothe.export.site                              # complete plays → _site/
-mix emothe.export.site -o /tmp/archive              # custom output dir
-mix emothe.export.site --plays AL0001,AL0002        # specific plays only
-mix emothe.export.site --all                        # include incomplete plays
-mix emothe.export.site --base-url /emothe/ --version 2.0
+mix playcode.export.site                              # complete plays → _site/
+mix playcode.export.site -o /tmp/archive              # custom output dir
+mix playcode.export.site --plays AL0001,AL0002        # specific plays only
+mix playcode.export.site --all                        # include incomplete plays
+mix playcode.export.site --base-url /playcode/ --version 2.0
 ```
 
 ### Completeness gate
@@ -298,8 +310,7 @@ comm -23 /tmp/code_strings.txt /tmp/po_strings.txt
 ## Getting Started
 
 ```bash
-cd ~/Projects/emothe
-export PATH="/home/bogdan/.asdf/installs/erlang/28.1/bin:/home/bogdan/.asdf/installs/elixir/1.19.5-otp-28/bin:/usr/bin:/usr/local/bin:/bin:$PATH"
+cd ~/Projects/emothe   # the directory is still named emothe; see Task 7 of the rename plan
 mix deps.get
 mix ecto.create
 mix ecto.migrate
@@ -310,9 +321,9 @@ mix phx.server
 Load the corpus (82 TEI files under `test/fixtures/`):
 
 ```bash
-mix emothe.import.tei             # skip codes already imported
-mix emothe.import.tei --dry-run   # report what would happen, write nothing
-mix emothe.import.tei --force     # re-import every file, updating in place
+mix playcode.import.tei             # skip codes already imported
+mix playcode.import.tei --dry-run   # report what would happen, write nothing
+mix playcode.import.tei --force     # re-import every file, updating in place
 ```
 
 Correct `language`, `relationship_type` and `parent_play_id` from the FileMaker published index,
@@ -320,9 +331,9 @@ and bootstrap `historical_time`/`historical_time_note` from the version records
 (`doc/w3emothe_T01_tituloEM.ndjson`, git-ignored):
 
 ```bash
-mix emothe.import.filemaker --dry-run   # print the changes, write nothing
-mix emothe.import.filemaker             # apply them
-mix emothe.import.filemaker --force     # also overwrite curated conflicts
+mix playcode.import.filemaker --dry-run   # print the changes, write nothing
+mix playcode.import.filemaker             # apply them
+mix playcode.import.filemaker --force     # also overwrite curated conflicts
 ```
 
 The derived fields (`language`, `relationship_type`, `parent_play_id`) overwrite unconditionally —
@@ -345,19 +356,19 @@ Then visit:
 - [x] OpenTelemetry configuration (Phoenix, Ecto, Bandit auto-instrumentation)
 - [x] 7 database migrations (plays, editors, sources, notes, characters, divisions, elements, statistics)
 - [x] All Ecto schemas with changesets and associations
-- [x] `Emothe.Catalogue` context - play CRUD with search (title, author, code)
-- [x] `Emothe.PlayContent` context - characters, divisions, elements; full content tree loading
-- [x] `Emothe.Statistics` context - computes acts, scenes, verse distribution, split verses, prose fragments, stage directions, asides, character appearances; caches as JSONB
-- [x] `Emothe.Import.TeiParser` - parses UTF-16 TEI-XML files into DB (handles BOM, encoding detection, full TEI structure mapping)
-- [x] `Emothe.Export.TeiXml` - reconstructs TEI-XML from DB using xml_builder
-- [x] `Emothe.Export.Html` - standalone HTML document with CSS styling
-- [x] `Emothe.Export.Pdf` - PDF generation via ChromicPDF (reuses HTML export)
-- [x] `Emothe.Export.Epub` - EPUB 3 generation via BUPE (chapters per division, embedded CSS)
-- [x] `Emothe.Export.CompareHtml` - standalone comparison HTML with synchronized scrolling between panels
-- [x] `Emothe.Export.StaticSite` - generates Endings Project-compliant static website from DB (pure HTML/CSS/JS, no server needed)
-- [x] `Emothe.Export.StaticSite.Renderer` - HTML/CSS templates for static site pages
-- [x] `Emothe.Export.StaticSite.Search` - client-side search index (JSON) and JS
-- [x] `Emothe.Export.StaticSite.Deployer` - GitHub Pages deployment via git push
+- [x] `Playcode.Catalogue` context - play CRUD with search (title, author, code)
+- [x] `Playcode.PlayContent` context - characters, divisions, elements; full content tree loading
+- [x] `Playcode.Statistics` context - computes acts, scenes, verse distribution, split verses, prose fragments, stage directions, asides, character appearances; caches as JSONB
+- [x] `Playcode.Import.TeiParser` - parses UTF-16 TEI-XML files into DB (handles BOM, encoding detection, full TEI structure mapping)
+- [x] `Playcode.Export.TeiXml` - reconstructs TEI-XML from DB using xml_builder
+- [x] `Playcode.Export.Html` - standalone HTML document with CSS styling
+- [x] `Playcode.Export.Pdf` - PDF generation via ChromicPDF (reuses HTML export)
+- [x] `Playcode.Export.Epub` - EPUB 3 generation via BUPE (chapters per division, embedded CSS)
+- [x] `Playcode.Export.CompareHtml` - standalone comparison HTML with synchronized scrolling between panels
+- [x] `Playcode.Export.StaticSite` - generates Endings Project-compliant static website from DB (pure HTML/CSS/JS, no server needed)
+- [x] `Playcode.Export.StaticSite.Renderer` - HTML/CSS templates for static site pages
+- [x] `Playcode.Export.StaticSite.Search` - client-side search index (JSON) and JS
+- [x] `Playcode.Export.StaticSite.Deployer` - GitHub Pages deployment via git push
 - [x] Public catalogue page (`/plays`) with search
 - [x] Public play presentation page (`/plays/:code`) with Text/Characters/Statistics tabs, line number and stage direction toggles
 - [x] Statistics panel with modern cards and CSS bar charts
@@ -367,9 +378,9 @@ Then visit:
 - [x] Admin TEI import page (file upload)
 - [x] Export controller (TEI-XML, HTML, PDF download endpoints)
 - [x] Authentication with bcrypt (invite-only accounts, login, password reset). Public registration and the account-confirmation flow are deleted; accepting an invitation is what sets `confirmed_at`
-- [x] `Emothe.Authz.can?/3` - single authorization predicate consulted by the router, the LiveView mount hooks and the admin sidebar
+- [x] `Playcode.Authz.can?/3` - single authorization predicate consulted by the router, the LiveView mount hooks and the admin sidebar
 - [x] Account state enforced - the three auth gates require `confirmed_at` set and `deactivated_at` nil. This is the claim that was previously false in this file
-- [x] `ADMIN_EMAILS` reconciled at boot by `Emothe.Accounts.AdminBootstrap`; those admins are protected from UI demotion/deactivation
+- [x] `ADMIN_EMAILS` reconciled at boot by `Playcode.Accounts.AdminBootstrap`; those admins are protected from UI demotion/deactivation
 - [x] Visible, revocable sessions - `/users/settings` lists IP and browser per session, revokes one or all others; 30-day tokens; admins force logout from `/admin/users`
 - [x] Self-service email change removed - the address identifies the invited account, so `/users/settings` shows it read-only. `change_user_email/2`, `apply_user_email/3`, `update_user_email/2`, `User.email_changeset/3`, `User.confirm_changeset/1` and the `change:` token context are all deleted
 - [x] Admin sidebar shell - three permission-filtered groups, collapsible at every breakpoint, hidden by default on play pages; breadcrumbs removed from the admin layout
@@ -389,7 +400,7 @@ Then visit:
 - [x] Play text visual markers in sidebar: line numbers, stage directions, asides, split verses, verse type toggles
 - [x] i18n: full Spanish translations for all UI strings (public + admin); `mix gettext.extract/merge` workflow established
 - [x] Statistics panel act label i18n fix - stores raw division type (`"acto"`, `"jornada"`) and translates at display time
-- [x] `Emothe.Places` — corpus-global gazetteer on a three-layer model: `places` (referent, self-referencing containment, coordinates, one authority link), `place_names` (surface forms, one preferred per language), `play_places` (per-play index with `role`, `position`, `note`, `origin`). `/admin/places` for the gazetteer, `/admin/plays/:id/places` as a peer context-bar tab, `#meta-places` on `/plays/:code`, and TEI `<settingDesc>` with nested `<listPlace>` plus `<setting>` in both directions. Wikidata behind a swappable `Places.Authority` behaviour, stubbed in test so no test touches the network. Spec: `docs/superpowers/specs/2026-08-04-s9-places-design.md`
+- [x] `Playcode.Places` — corpus-global gazetteer on a three-layer model: `places` (referent, self-referencing containment, coordinates, one authority link), `place_names` (surface forms, one preferred per language), `play_places` (per-play index with `role`, `position`, `note`, `origin`). `/admin/places` for the gazetteer, `/admin/plays/:id/places` as a peer context-bar tab, `#meta-places` on `/plays/:code`, and TEI `<settingDesc>` with nested `<listPlace>` plus `<setting>` in both directions. Wikidata behind a swappable `Places.Authority` behaviour, stubbed in test so no test touches the network. Spec: `docs/superpowers/specs/2026-08-04-s9-places-design.md`
 
   **Testing gotcha:** `places.slug` is unique across the whole corpus, so two async tests
   creating a place with the same name take the same index lock inside their own
@@ -402,11 +413,12 @@ Then visit:
 ## What Still Needs To Be Done
 
 ### High Priority
-- [x] **Create initial admin user** - set `ADMIN_EMAILS` (comma-separated); `Emothe.Accounts.AdminBootstrap` reconciles it at boot and mails each address an invitation. Break-glass with SMTP down: `mix emothe.invite EMAIL --admin --print-url`
-- [ ] **Fly.io deployment** — `Dockerfile`, `fly.toml` and the `:prod` block of `config/runtime.exs` are written; `[deploy] release_command` runs `Emothe.Release.migrate`. What is left is setting the secrets and running `fly deploy`. Required secrets: `DATABASE_URL`, `SECRET_KEY_BASE`, `ADMIN_EMAILS` (**unset means zero admins**), `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`. With `SMTP_HOST` unset the mailer falls back to the Local adapter and **every invitation is silently dropped** — use `bin/emothe rpc 'Emothe.Release.invite_url("...")'` to get the link instead
+- [x] **Create initial admin user** - set `ADMIN_EMAILS` (comma-separated); `Playcode.Accounts.AdminBootstrap` reconciles it at boot and mails each address an invitation. Break-glass with SMTP down: `mix playcode.invite EMAIL --admin --print-url`
+- [x] **Fly.io deployment** — live. `fly.toml` deploys the `playcode` app (`playcode.fly.dev`) and `.github/workflows/deploy-fly.yml` deploys it on every green CI run on `main`. The pre-rename app survives as `fly.emothe.toml` (`emothe.fly.dev`), hand-deployed only (`fly deploy --config fly.emothe.toml`) and switched off with `fly scale count 0 -a emothe`. Both configs run `/app/bin/playcode` — the release binary follows the code, not the app name. Secrets required per app: `DATABASE_URL`, `SECRET_KEY_BASE`, `ADMIN_EMAILS` (**unset means zero admins**), `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`. With `SMTP_HOST` unset the mailer falls back to the Local adapter and **every invitation is silently dropped** — use `bin/playcode rpc 'Playcode.Release.invite_url("...")'` to get the link instead. Fly secrets cannot be read back: `fly secrets list` shows names only
+- [ ] **Render** — `render.yaml` and `Dockerfile.render` exist but the blueprint has never been applied
 - [x] **Email delivery** - SMTP adapter via `gen_smtp`; configure `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` (+ optional `SMTP_PORT`, `MAIL_FROM`) as Fly.io secrets
 - [x] **Account state enforced** - `require_authenticated_user`, `require_permission` and the `{:ensure_can, action}` LiveView hook all require `Accounts.active?/1` (confirmed and not deactivated); an inactive session is destroyed with an explanatory flash rather than looping
-- [x] **Login rate limiting** - 20/minute per IP plus 10/15 minutes per email address via ETS-backed `EmotheWeb.RateLimit`; a successful login calls `RateLimit.reset/1` so only failures consume the email budget
+- [x] **Login rate limiting** - 20/minute per IP plus 10/15 minutes per email address via ETS-backed `PlaycodeWeb.RateLimit`; a successful login calls `RateLimit.reset/1` so only failures consume the email budget
 - [x] **User management admin UI** - `/admin/users` invites by email with a role, resends invitations, deactivates, reactivates, forces logout and changes roles; state badges are Protected/Deactivated/Invited/Active
 
 ### Medium Priority
@@ -415,7 +427,7 @@ Then visit:
 - [x] **Pagination** on catalogue pages (25/page public, 50/page admin) with URL-based navigation (`?page=N&search=query`); parent play field is now an autocomplete combobox
 - [x] ~~Install Typst~~ PDF export now uses ChromicPDF (requires Chrome/Chromium on the system)
 - [ ] **Stage direction navigator** (`« N / M »`) - client-side JS hook to scroll between stage directions in play text
-- [x] **Recompute statistics** - stats cache is invalidated automatically on every content change via `broadcast_content_changed/1` (lazy recompute on next access); one-time refresh: `Emothe.Repo.all(Emothe.Catalogue.Play) |> Enum.each(&Emothe.Statistics.recompute(&1.id))`
+- [x] **Recompute statistics** - stats cache is invalidated automatically on every content change via `broadcast_content_changed/1` (lazy recompute on next access); one-time refresh: `Playcode.Repo.all(Playcode.Catalogue.Play) |> Enum.each(&Playcode.Statistics.recompute(&1.id))`
 
 ### Known Roundtrip Gaps
 - [x] **`Play.language` imported** from `<profileDesc><langUsage><language ident="xx-XX">` (e.g. "it-IT" → "it"); exported back as `<profileDesc><langUsage><language ident="...">` with label. Note: `xml:lang` on the root `<TEI>` element is always "es" in EMOTHE files (editorial platform language), NOT the play language — the play language lives in `profileDesc/langUsage`.
@@ -430,11 +442,11 @@ Then visit:
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.
 - [x] **Soft delete & re-importable plays (S0b)** — `plays.deleted_at`, `origin` on the three mixed-ownership child tables, re-import updates in place, import preview + `--dry-run`, admin archive filter and restore. Archived plan: `docs/superpowers/plans/archive/README.md`
 - [ ] **Places Phase 2** — in-text mentions (`<placeName ref>` in the body, an `element_places` table and the tagging UI), map rendering from the stored coordinates, catalogue browse-by-place, multiple authority links per place, and the FileMaker `pub_LugAccion` import
-- [ ] **FileMaker version metadata (S2)** — taken one field at a time, each its own migration + import + admin control + row in the public panel. **S2a `historical_time` and S2c `composition_date` are done** (see below). One sub-slice is left, **blocked on a question to the project**: S2d `collection` (needs to know whether the field is still wanted and what separates its codes `1` and `3`). S2b `place_of_action` was split out as **S9** — it is a toponym gazetteer, not a text column; Phase 1 is done, see `Emothe.Places` above. S2e `legacy_url` and S2f `original_title`/`title_sort` are **dropped**: the first is derivable from code + filename, and the second is already imported from TEI on 82/82 plays. Anything drawing on `T01` is capped at the 22 plays with such a record; S2c is the exception, since its from/to come from the published index instead. The admin sync page at `/admin/filemaker` renders whatever `sets` and `conflicts` contain, so each of these slices needs no change to it
-- [x] **FileMaker historical time (S2a)** — `plays.historical_time` (nine-term vocabulary, `Play.historical_times/0`) and `plays.historical_time_note`. `Filemaker.load_versions/1` reads the `T01_tituloEM` layout keyed by the code in the `pub_edicionWeb` href; `FilemakerSync` writes curated fields **fill-only** — blank columns filled, disagreements reported under `:conflicts` and left alone, overwritten only with `mix emothe.import.filemaker --force` or, per conflict, from `/admin/filemaker`. Edited in the admin form's Research Metadata fieldset, shown in the `#meta-study` section on `/plays/:code`. Labels live in `EmotheWeb.PlayLabels`. Applied to `emothe_dev`: 11 plays, 4 with a note. Archived plan: `docs/superpowers/plans/archive/README.md`
-- [x] **FileMaker composition date (S2c)** — `plays.composition_date_from`/`_to`/`_note`. From/to come from `T00_indiceEM`'s index header (the *accepted* dating), the note from `pub_datacion`'s competing datings joined with `"; "`, falling back to the header verbatim when blank. Written only to the family head (`relationship_type` nil) — a translation does not inherit the original's composition date. Round-trips through TEI's `<profileDesc><creation><date>` (`when` or `notBefore`/`notAfter`), fill-only sync, same Research Metadata fieldset and `#meta-study` section as S2a. Spec: `docs/superpowers/specs/2026-08-05-s2c-composition-date-design.md`. Applied to `emothe_dev`: `updated 7, failed 0` — EMOTHE0010, 0038, 0281, 0337, 0346, 0777 from the index plus EMOTHE0341 note-only (no index entry, so from/to stayed nil); zero conflicts; a second run reports `0 to change`.
+- [ ] **FileMaker version metadata (S2)** — taken one field at a time, each its own migration + import + admin control + row in the public panel. **S2a `historical_time` and S2c `composition_date` are done** (see below). One sub-slice is left, **blocked on a question to the project**: S2d `collection` (needs to know whether the field is still wanted and what separates its codes `1` and `3`). S2b `place_of_action` was split out as **S9** — it is a toponym gazetteer, not a text column; Phase 1 is done, see `Playcode.Places` above. S2e `legacy_url` and S2f `original_title`/`title_sort` are **dropped**: the first is derivable from code + filename, and the second is already imported from TEI on 82/82 plays. Anything drawing on `T01` is capped at the 22 plays with such a record; S2c is the exception, since its from/to come from the published index instead. The admin sync page at `/admin/filemaker` renders whatever `sets` and `conflicts` contain, so each of these slices needs no change to it
+- [x] **FileMaker historical time (S2a)** — `plays.historical_time` (nine-term vocabulary, `Play.historical_times/0`) and `plays.historical_time_note`. `Filemaker.load_versions/1` reads the `T01_tituloEM` layout keyed by the code in the `pub_edicionWeb` href; `FilemakerSync` writes curated fields **fill-only** — blank columns filled, disagreements reported under `:conflicts` and left alone, overwritten only with `mix playcode.import.filemaker --force` or, per conflict, from `/admin/filemaker`. Edited in the admin form's Research Metadata fieldset, shown in the `#meta-study` section on `/plays/:code`. Labels live in `PlaycodeWeb.PlayLabels`. Applied to `playcode_dev`: 11 plays, 4 with a note. Archived plan: `docs/superpowers/plans/archive/README.md`
+- [x] **FileMaker composition date (S2c)** — `plays.composition_date_from`/`_to`/`_note`. From/to come from `T00_indiceEM`'s index header (the *accepted* dating), the note from `pub_datacion`'s competing datings joined with `"; "`, falling back to the header verbatim when blank. Written only to the family head (`relationship_type` nil) — a translation does not inherit the original's composition date. Round-trips through TEI's `<profileDesc><creation><date>` (`when` or `notBefore`/`notAfter`), fill-only sync, same Research Metadata fieldset and `#meta-study` section as S2a. Spec: `docs/superpowers/specs/2026-08-05-s2c-composition-date-design.md`. Applied to `playcode_dev`: `updated 7, failed 0` — EMOTHE0010, 0038, 0281, 0337, 0346, 0777 from the index plus EMOTHE0341 note-only (no index entry, so from/to stayed nil); zero conflicts; a second run reports `0 to change`.
 - [ ] **FileMaker import (S3-S8)** — witnesses, bibliography, historical performances, character reconciliation, credits, genre. Roadmap: `docs/superpowers/plans/2026-08-01-filemaker-import-slices.md`. Governing rule: the export is a bootstrap, not a dependency — every field it carries gets a permanent column *and* an admin form. As with S2, `/admin/filemaker` needs no change for these — it already renders whatever `sets` and `conflicts` contain
-- [x] **FileMaker work families and language (S1)** — `Emothe.Import.Filemaker` parses the published index out of the NDJSON export; `Emothe.Import.FilemakerSync` diffs it against the database and writes `language`, `relationship_type` and `parent_play_id`. `mix emothe.import.filemaker [--dry-run] [--path ...]`. Creates nothing; codes absent from the index (every `AL####`) are reported, not failed. Applied to `emothe_dev`: 15 plays corrected, 11 work families linked. Archived plan: `docs/superpowers/plans/archive/README.md`
+- [x] **FileMaker work families and language (S1)** — `Playcode.Import.Filemaker` parses the published index out of the NDJSON export; `Playcode.Import.FilemakerSync` diffs it against the database and writes `language`, `relationship_type` and `parent_play_id`. `mix playcode.import.filemaker [--dry-run] [--path ...]`. Creates nothing; codes absent from the index (every `AL####`) are reported, not failed. Applied to `playcode_dev`: 15 plays corrected, 11 work families linked. Archived plan: `docs/superpowers/plans/archive/README.md`
 - [ ] **TEI import improvements** - handle more TEI variants, better error reporting
 - [ ] **Full-text search** with PostgreSQL tsvector
 - [x] **Activity log** - `activity_logs` table tracks all admin actions (create/update/delete/import/export/role_change) with user, play, resource type, changes, and metadata; admin UI at `/admin/activity-log` with filters (action, resource, user, date range) and pagination
@@ -457,5 +469,5 @@ Then visit:
 - **JSONB statistics**: Cached stats stored as a JSON blob, recomputed on demand
 - **Self-referencing trees**: Both divisions and elements use `parent_id` for hierarchy
 - **bcrypt authentication**: Standard Phoenix auth pattern with session tokens and password reset; accounts arrive by invitation, so accepting the invite replaces a separate confirmation step
-- **One authorization seam**: two roles (`:admin`, `:researcher`) but every access decision goes through `Emothe.Authz.can?/3`, which already takes the resource — per-play scoping becomes one extra clause instead of a rewrite
+- **One authorization seam**: two roles (`:admin`, `:researcher`) but every access decision goes through `Playcode.Authz.can?/3`, which already takes the resource — per-play scoping becomes one extra clause instead of a rewrite
 - **Admin identity in config, not the UI**: `ADMIN_EMAILS` is reconciled at boot, so a compromised admin session cannot strip its co-admins or lock the owner out

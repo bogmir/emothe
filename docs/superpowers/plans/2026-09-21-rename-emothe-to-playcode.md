@@ -829,8 +829,11 @@ Expected: full green, matching the counts in `rename-baseline.txt`.
 
 ```bash
 perl -pi -e 's{/home/bogdan/Projects/emothe}{/home/bogdan/Projects/playcode}g' .claude/settings.json
-grep -n 'Projects/' .claude/settings.json
+perl -pi -e 's{cd ~/Projects/emothe.*}{cd ~/Projects/playcode}' CLAUDE.md
+grep -n 'Projects/' .claude/settings.json CLAUDE.md
 ```
+
+`CLAUDE.md`'s Getting Started block deliberately still says `cd ~/Projects/emothe`, with a comment pointing here, because until this task runs that is the directory that exists.
 
 Expected: every path now reads `Projects/playcode`.
 

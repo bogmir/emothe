@@ -46,10 +46,10 @@ This document covers everything needed to deploy EMOTHE on a self-managed bare m
 ### 2.3 Reverse Proxy (nginx)
 
 - [ ] Install nginx: `apt install nginx`
-- [ ] Create site config `/etc/nginx/sites-available/emothe`:
+- [ ] Create site config `/etc/nginx/sites-available/playcode`:
 
 ```nginx
-upstream emothe {
+upstream playcode {
     server 127.0.0.1:4000;
 }
 
@@ -70,7 +70,7 @@ server {
 
     # WebSocket support (LiveView)
     location /live/websocket {
-        proxy_pass http://emothe;
+        proxy_pass http://playcode;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -82,7 +82,7 @@ server {
     }
 
     location / {
-        proxy_pass http://emothe;
+        proxy_pass http://playcode;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -93,7 +93,7 @@ server {
 }
 ```
 
-- [ ] Enable site: `ln -s /etc/nginx/sites-available/emothe /etc/nginx/sites-enabled/`
+- [ ] Enable site: `ln -s /etc/nginx/sites-available/playcode /etc/nginx/sites-enabled/`
 - [ ] Test and reload: `nginx -t && systemctl reload nginx`
 - [ ] Add certbot post-renewal hook: `/etc/letsencrypt/renewal-hooks/post/reload-nginx.sh`
 
@@ -116,15 +116,15 @@ systemctl reload nginx
 - [ ] Create database and user:
 
 ```sql
-CREATE USER emothe WITH PASSWORD '<strong-password>';
-CREATE DATABASE emothe_prod OWNER emothe;
-ALTER DATABASE emothe_prod SET timezone TO 'UTC';
+CREATE USER playcode WITH PASSWORD '<strong-password>';
+CREATE DATABASE playcode_prod OWNER playcode;
+ALTER DATABASE playcode_prod SET timezone TO 'UTC';
 ```
 
 - [ ] Enable `uuid-ossp` extension (needed for UUID PKs):
 
 ```sql
-\c emothe_prod
+\c playcode_prod
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 ```
 
@@ -136,8 +136,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 - [ ] Restrict connections to localhost in `pg_hba.conf`:
 
 ```
-local   all   emothe   scram-sha-256
-host    all   emothe   127.0.0.1/32   scram-sha-256
+local   all   playcode   scram-sha-256
+host    all   playcode   127.0.0.1/32   scram-sha-256
 ```
 
 ### 3.3 Backups
@@ -145,17 +145,17 @@ host    all   emothe   127.0.0.1/32   scram-sha-256
 - [ ] Set up daily `pg_dump` via cron:
 
 ```bash
-# /etc/cron.d/emothe-backup
-0 3 * * * postgres pg_dump -Fc emothe_prod > /var/backups/emothe/emothe_$(date +\%Y\%m\%d).dump
+# /etc/cron.d/playcode-backup
+0 3 * * * postgres pg_dump -Fc playcode_prod > /var/backups/playcode/playcode_$(date +\%Y\%m\%d).dump
 ```
 
 - [ ] Retention policy: keep last 30 daily + 12 monthly dumps
-- [ ] Add cleanup cron: `find /var/backups/emothe -name "*.dump" -mtime +30 -delete`
+- [ ] Add cleanup cron: `find /var/backups/playcode -name "*.dump" -mtime +30 -delete`
 - [ ] Off-site backup: rsync/rclone dumps to S3, B2, or another server
 - [ ] Test restore procedure at least once:
 
 ```bash
-pg_restore -d emothe_prod_test /var/backups/emothe/emothe_YYYYMMDD.dump
+pg_restore -d playcode_prod_test /var/backups/playcode/playcode_YYYYMMDD.dump
 ```
 
 ---
@@ -178,7 +178,7 @@ asdf install elixir 1.19.5-otp-28
 - [ ] Clone repo, build release:
 
 ```bash
-cd /opt/emothe
+cd /opt/playcode
 git pull
 export MIX_ENV=prod
 mix deps.get --only prod
@@ -190,7 +190,7 @@ mix release
 ### 4.2 Option B: Build Elsewhere, Deploy Release Tarball (recommended)
 
 - [ ] Build the release on a CI server or local machine (same OS/arch)
-- [ ] Transfer tarball to server: `scp _build/prod/rel/emothe-*.tar.gz deploy@server:/opt/emothe/`
+- [ ] Transfer tarball to server: `scp _build/prod/rel/playcode-*.tar.gz deploy@server:/opt/playcode/`
 - [ ] Unpack and run — no Elixir/Erlang needed on server
 - [ ] Runtime dependencies still required on server:
 
@@ -209,7 +209,7 @@ apt install libstdc++6 openssl libncurses6 chromium locales ca-certificates
 
 ### 5.1 Service Unit
 
-- [ ] Create `/etc/systemd/system/emothe.service`:
+- [ ] Create `/etc/systemd/system/playcode.service`:
 
 ```ini
 [Unit]
@@ -221,28 +221,28 @@ Requires=postgresql.service
 Type=exec
 User=deploy
 Group=deploy
-WorkingDirectory=/opt/emothe
-ExecStart=/opt/emothe/bin/emothe start
-ExecStop=/opt/emothe/bin/emothe stop
+WorkingDirectory=/opt/playcode
+ExecStart=/opt/playcode/bin/playcode start
+ExecStop=/opt/playcode/bin/playcode stop
 Restart=on-failure
 RestartSec=5
-SyslogIdentifier=emothe
+SyslogIdentifier=playcode
 
 # Environment
 Environment=PHX_SERVER=true
 Environment=PHX_HOST=emothe.uv.es
 Environment=PORT=4000
-Environment=DATABASE_URL=ecto://emothe:<password>@localhost/emothe_prod
+Environment=DATABASE_URL=ecto://playcode:<password>@localhost/playcode_prod
 Environment=POOL_SIZE=10
 Environment=LANG=en_US.UTF-8
 
 # Load secrets from a protected file
-EnvironmentFile=/etc/emothe/env
+EnvironmentFile=/etc/playcode/env
 
 # Security hardening
 NoNewPrivileges=true
 ProtectSystem=strict
-ReadWritePaths=/opt/emothe
+ReadWritePaths=/opt/playcode
 PrivateTmp=true
 
 [Install]
@@ -251,7 +251,7 @@ WantedBy=multi-user.target
 
 ### 5.2 Secrets File
 
-- [ ] Create `/etc/emothe/env` (owned by root, mode 0600):
+- [ ] Create `/etc/playcode/env` (owned by root, mode 0600):
 
 ```bash
 SECRET_KEY_BASE=<generate-with-mix-phx.gen.secret>
@@ -264,10 +264,10 @@ MAIL_FROM=noreply@emothe.uv.es
 ### 5.3 Enable and Start
 
 - [ ] `systemctl daemon-reload`
-- [ ] `systemctl enable emothe`
-- [ ] `systemctl start emothe`
-- [ ] Run migrations: `/opt/emothe/bin/emothe eval "Emothe.Release.migrate()"`
-- [ ] Verify: `systemctl status emothe` and `curl -I http://localhost:4000`
+- [ ] `systemctl enable playcode`
+- [ ] `systemctl start playcode`
+- [ ] Run migrations: `/opt/playcode/bin/playcode eval "Playcode.Release.migrate()"`
+- [ ] Verify: `systemctl status playcode` and `curl -I http://localhost:4000`
 
 ---
 
@@ -275,14 +275,14 @@ MAIL_FROM=noreply@emothe.uv.es
 
 ### 6.1 Deployment Script
 
-- [ ] Create `/opt/emothe/deploy.sh`:
+- [ ] Create `/opt/playcode/deploy.sh`:
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-REPO_DIR=/opt/emothe/repo
-RELEASE_DIR=/opt/emothe
+REPO_DIR=/opt/playcode/repo
+RELEASE_DIR=/opt/playcode
 
 cd "$REPO_DIR"
 git fetch origin main
@@ -295,10 +295,10 @@ mix assets.deploy
 mix release --overwrite
 
 # Run migrations
-"$RELEASE_DIR/_build/prod/rel/emothe/bin/emothe" eval "Emothe.Release.migrate()"
+"$RELEASE_DIR/_build/prod/rel/playcode/bin/playcode" eval "Playcode.Release.migrate()"
 
 # Restart
-sudo systemctl restart emothe
+sudo systemctl restart playcode
 
 echo "Deploy complete."
 ```
@@ -324,7 +324,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /opt/emothe/deploy.sh
+          script: /opt/playcode/deploy.sh
 ```
 
 - [ ] Add `SERVER_HOST` and `SSH_PRIVATE_KEY` to GitHub repository secrets
@@ -342,7 +342,7 @@ jobs:
 
 ### 7.1 Application Logs
 
-- [ ] journald captures stdout/stderr automatically: `journalctl -u emothe -f`
+- [ ] journald captures stdout/stderr automatically: `journalctl -u playcode -f`
 - [ ] Optional: forward to a log aggregation service (Loki, Papertrail, etc.)
 - [ ] Configure log rotation in journald (`/etc/systemd/journald.conf`):
 
@@ -409,7 +409,7 @@ MaxRetentionSec=30day
 
 | Task | How |
 |------|-----|
-| Review logs for errors | `journalctl -u emothe -p err --since "1 week ago"` |
+| Review logs for errors | `journalctl -u playcode -p err --since "1 week ago"` |
 | Check disk usage | `df -h` |
 | Review fail2ban bans | `fail2ban-client status sshd` |
 
@@ -464,7 +464,7 @@ Notes:
 
 | Variable | Required | Example |
 |----------|----------|---------|
-| `DATABASE_URL` | Yes | `ecto://emothe:pass@localhost/emothe_prod` |
+| `DATABASE_URL` | Yes | `ecto://playcode:pass@localhost/playcode_prod` |
 | `SECRET_KEY_BASE` | Yes | 64+ char random string |
 | `PHX_HOST` | Yes | `emothe.uv.es` |
 | `PHX_SERVER` | Yes | `true` |

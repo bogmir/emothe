@@ -1,4 +1,4 @@
-# Emothe
+# Playcode
 
 To start your Phoenix server:
 

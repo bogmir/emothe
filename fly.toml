@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for emothe on 2026-02-13T23:19:23+01:00
+# fly.toml app configuration file generated for playcode on 2026-02-13T23:19:23+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'emothe'
+app = 'playcode'
 primary_region = 'cdg'
 kill_signal = 'SIGTERM'
 kill_timeout = '30s'
@@ -12,10 +12,10 @@ kill_timeout = '30s'
   dockerfile = 'Dockerfile'
 
 [deploy]
-  release_command = '/app/bin/emothe eval Emothe.Release.migrate'
+  release_command = '/app/bin/playcode eval Playcode.Release.migrate'
 
 [env]
-  PHX_HOST = 'emothe.fly.dev'
+  PHX_HOST = 'playcode.fly.dev'
   PHX_SERVER = 'true'
   POOL_SIZE = '10'
   PORT = '8080'

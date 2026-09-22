@@ -22,7 +22,7 @@ import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
-import {hooks as colocatedHooks} from "phoenix-colocated/emothe"
+import {hooks as colocatedHooks} from "phoenix-colocated/playcode"
 import topbar from "../vendor/topbar"
 
 // ScrollSpy hook: highlights the sidebar link matching the currently visible section

@@ -1,0 +1,1502 @@
+defmodule Playcode.Import.TeiParserTest do
+  use Playcode.DataCase, async: true
+
+  alias Playcode.Import.TeiParser
+  alias Playcode.Catalogue
+  alias Playcode.PlayContent
+
+  defp write_tei(xml) do
+    path = Path.join(System.tmp_dir!(), "tei-import-#{System.unique_integer([:positive])}.xml")
+    File.write!(path, xml)
+    on_exit(fn -> File.rm(path) end)
+    path
+  end
+
+  defp minimal_tei(opts) do
+    title = Keyword.get(opts, :title, "Test Play")
+    code = Keyword.get(opts, :code, "TEST#{System.unique_integer([:positive])}")
+    author = Keyword.get(opts, :author, "")
+    front = Keyword.get(opts, :front, "")
+    body = Keyword.get(opts, :body, "")
+    profile = Keyword.get(opts, :profile, "")
+
+    author_el = if author != "", do: "<author>#{author}</author>", else: ""
+
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title>#{title}</title>
+            #{author_el}
+          </titleStmt>
+          <publicationStmt>
+            <idno>#{code}</idno>
+          </publicationStmt>
+        </fileDesc>
+        #{profile}
+      </teiHeader>
+      <text>
+        <front>#{front}</front>
+        <body>#{body}</body>
+      </text>
+    </TEI>
+    """
+  end
+
+  # --- Metadata ---
+
+  test "import_file/1 normalizes all-uppercase play titles" do
+    path = write_tei(minimal_tei(title: "LOS RAMILLETES DE MADRID", code: "AL0606"))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.code == "AL0606"
+    assert play.title == "Los Ramilletes de Madrid"
+  end
+
+  test "import_file/1 preserves mixed-case titles" do
+    path = write_tei(minimal_tei(title: "La Dama Boba", code: "DAMA01"))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.title == "La Dama Boba"
+  end
+
+  test "import_file/1 extracts author name" do
+    path = write_tei(minimal_tei(author: "Lope de Vega", code: "LOPE01"))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.author_name == "Lope de Vega"
+  end
+
+  test "import_file/1 returns error for non-existent file" do
+    assert {:error, :enoent} = TeiParser.import_file("/nonexistent/file.xml")
+  end
+
+  test "import_file/1 returns error for invalid XML" do
+    path = write_tei("<not valid xml>>>")
+
+    assert {:error, {:xml_parse_error, _}} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 updates the existing play when the code is already present" do
+    code = "DUP01"
+    path = write_tei(minimal_tei(title: "Duplicate", code: code))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.code == code
+
+    # Re-importing is an update of the same row, not a failure — see
+    # docs/superpowers/plans/2026-08-01-soft-delete-and-reimport.md
+    assert {:ok, reimported} = TeiParser.import_file(path)
+    assert reimported.id == play.id
+  end
+
+  test "import_file/1 does not erase a curated historical time on re-import" do
+    code = "HT9001"
+    path = write_tei(minimal_tei(title: "Curated", code: code))
+
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    {:ok, _} =
+      Playcode.Catalogue.update_play(play, %{
+        "historical_time" => "edad_media",
+        "historical_time_note" => "Reinado de Juan I de Portugal (1385-1433)"
+      })
+
+    # The TEI file owns the text; the platform owns curated research metadata.
+    # See @platform_owned in lib/playcode/import/tei_parser.ex and
+    # docs/superpowers/plans/archive/README.md, S0b.
+    assert {:ok, reimported} = TeiParser.import_file(path)
+    assert reimported.id == play.id
+    assert reimported.historical_time == "edad_media"
+    assert reimported.historical_time_note == "Reinado de Juan I de Portugal (1385-1433)"
+  end
+
+  test "import_file/1 returns error for valid XML without teiHeader" do
+    path = write_tei("<TEI><text><body></body></text></TEI>")
+
+    assert {:error, :missing_tei_header} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 returns error for non-TEI XML" do
+    path = write_tei("<html><body><p>Hello</p></body></html>")
+
+    assert {:error, :missing_tei_header} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 returns error for empty teiHeader (no fileDesc)" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader></teiHeader>
+      <text><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    # No fileDesc means no title → changeset validation fails
+    assert {:error, %Ecto.Changeset{}} = TeiParser.import_file(path)
+  end
+
+  test "import_file/1 succeeds with teiHeader-only TEI (no <text>)" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Header Only</title></titleStmt>
+          <publicationStmt><idno>HEADERONLY01</idno></publicationStmt>
+        </fileDesc>
+      </teiHeader>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.title == "Header Only"
+    assert play.code == "HEADERONLY01"
+  end
+
+  # --- Cast list ---
+
+  test "import_file/1 imports characters from cast list" do
+    front = """
+    <div type="elenco">
+      <head>Personas</head>
+      <castList>
+        <castItem>
+          <role xml:id="DONA">Dona Ana</role>
+          <roleDesc>una dama</roleDesc>
+        </castItem>
+        <castItem>
+          <role xml:id="DON">Don Juan</role>
+          <roleDesc>un caballero</roleDesc>
+        </castItem>
+        <castItem ana="oculto">
+          <role xml:id="CRIADO">Criado</role>
+        </castItem>
+      </castList>
+    </div>
+    """
+
+    path = write_tei(minimal_tei(front: front))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    characters = PlayContent.list_characters(play.id)
+    assert length(characters) == 3
+
+    dona = Enum.find(characters, &(&1.xml_id == "DONA"))
+    assert dona.name == "Dona Ana"
+    assert dona.description == "una dama"
+    assert dona.is_hidden == false
+
+    criado = Enum.find(characters, &(&1.xml_id == "CRIADO"))
+    assert criado.is_hidden == true
+  end
+
+  test "import_file/1 handles duplicate character xml_ids gracefully" do
+    front = """
+    <div type="elenco">
+      <castList>
+        <castItem>
+          <role xml:id="HERO">Hero Original</role>
+        </castItem>
+        <castItem>
+          <role xml:id="HERO">Hero Duplicate</role>
+        </castItem>
+        <castItem>
+          <role xml:id="OTHER">Other</role>
+        </castItem>
+      </castList>
+    </div>
+    """
+
+    path = write_tei(minimal_tei(front: front))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    characters = PlayContent.list_characters(play.id)
+    assert length(characters) == 3
+
+    hero = Enum.find(characters, &(&1.xml_id == "HERO"))
+    assert hero.name == "Hero Original"
+
+    hero_dup = Enum.find(characters, &(&1.xml_id == "HERO_2"))
+    assert hero_dup.name == "Hero Duplicate"
+  end
+
+  # --- Body structure (acts, scenes, speeches, verses) ---
+
+  test "import_file/1 imports acts and scenes" do
+    body = """
+    <div1 type="acto" n="1">
+      <head>ACTO PRIMERO</head>
+      <div2 type="escena" n="1">
+        <head>ESCENA I</head>
+      </div2>
+      <div2 type="escena" n="2">
+        <head>ESCENA II</head>
+      </div2>
+    </div1>
+    <div1 type="acto" n="2">
+      <head>ACTO SEGUNDO</head>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    divisions = PlayContent.list_top_divisions(play.id)
+    assert length(divisions) == 2
+
+    [act1, act2] = divisions
+    assert act1.type == "acto"
+    assert act1.number == 1
+    assert act1.title == "ACTO PRIMERO"
+    assert length(act1.children) == 2
+
+    [scene1, scene2] = act1.children
+    assert scene1.type == "escena"
+    assert scene1.number == 1
+    assert scene2.number == 2
+
+    assert act2.number == 2
+    assert act2.children == []
+  end
+
+  test "import_file/1 imports speeches with character references" do
+    front = """
+    <div type="elenco">
+      <castList>
+        <castItem>
+          <role xml:id="ANA">ANA</role>
+        </castItem>
+      </castList>
+    </div>
+    """
+
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp who="#ANA">
+          <speaker>ANA</speaker>
+          <lg type="redondilla">
+            <l n="1">First verse line</l>
+            <l n="2">Second verse line</l>
+          </lg>
+        </sp>
+        <stage>Sale ANA por la puerta</stage>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(front: front, body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    act =
+      play.id
+      |> PlayContent.list_top_divisions()
+      |> Enum.find(&(&1.type == "acto"))
+
+    assert act
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+
+    # Should have a speech and a stage direction at top level
+    speech = Enum.find(elements, &(&1.type == "speech"))
+    stage_dir = Enum.find(elements, &(&1.type == "stage_direction"))
+
+    assert speech
+    assert speech.speaker_label == "ANA"
+    assert Playcode.PlayContent.Element.characters(speech) != []
+
+    assert stage_dir
+    assert stage_dir.content == "Sale ANA por la puerta"
+
+    # Speech should contain a line_group with 2 verse lines
+    [line_group] = speech.children
+    assert line_group.type == "line_group"
+    assert line_group.verse_type == "redondilla"
+
+    verse_lines = line_group.children
+    assert length(verse_lines) == 2
+    [v1, v2] = verse_lines
+    assert v1.type == "verse_line"
+    assert v1.content == "First verse line"
+    assert v1.line_number == 1
+    assert v2.line_number == 2
+  end
+
+  test "import_file/1 imports prose elements" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>NARRADOR</speaker>
+          <p>A prose paragraph in the play.</p>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+
+    [speech] = elements
+    prose = Enum.find(speech.children, &(&1.type == "prose"))
+    assert prose
+    assert prose.content == "A prose paragraph in the play."
+  end
+
+  # --- Asides ---
+
+  test "import_file/1 detects aside verse lines via stage type=delivery" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>ANA</speaker>
+          <lg type="redondilla">
+            <l n="1">Normal verse line</l>
+            <l n="2">
+              <stage type="delivery">[Aparte.]</stage>
+              <seg type="aside">An aside line</seg>
+            </l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+
+    [speech] = Enum.filter(elements, &(&1.type == "speech"))
+    [line_group] = speech.children
+    verse_lines = Enum.sort_by(line_group.children, & &1.line_number)
+
+    assert length(verse_lines) == 2
+    [normal_line, aside_line] = verse_lines
+
+    assert normal_line.is_aside == false
+    assert normal_line.content == "Normal verse line"
+
+    assert aside_line.is_aside == true
+    assert aside_line.content == "An aside line"
+  end
+
+  test "import_file/1 detects aside with variant Aparte notation" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>REY</speaker>
+          <lg type="decima">
+            <l n="1">
+              <stage type="delivery">(Aparte.)</stage>
+              <seg type="aside">Spoken aside</seg>
+            </l>
+            <l n="2">
+              <stage type="delivery">Aparte</stage>
+              <seg type="aside">Another aside</seg>
+            </l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = elements
+    [line_group] = speech.children
+    verse_lines = Enum.sort_by(line_group.children, & &1.line_number)
+
+    assert Enum.all?(verse_lines, & &1.is_aside)
+    assert Enum.map(verse_lines, & &1.content) == ["Spoken aside", "Another aside"]
+  end
+
+  test "import_file/1 does not mark stage-only aparte as verse aside" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <stage>Hablan los dos aparte.</stage>
+        <sp>
+          <speaker>REY</speaker>
+          <lg type="redondilla">
+            <l n="1">A normal line</l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = Enum.filter(elements, &(&1.type == "speech"))
+    [line_group] = speech.children
+    [verse_line] = line_group.children
+
+    assert verse_line.is_aside == false
+    assert verse_line.content == "A normal line"
+  end
+
+  # --- Editorial notes ---
+
+  test "import_file/1 imports front matter editorial notes" do
+    front = """
+    <div type="dedicatoria">
+      <head>Dedicatoria</head>
+      <p>Al muy ilustre senor...</p>
+      <p>Con todo respeto...</p>
+    </div>
+    """
+
+    path = write_tei(minimal_tei(front: front))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [note] = play_full.editorial_notes
+    assert note.section_type == "dedicatoria"
+    assert note.heading == "Dedicatoria"
+    assert note.content =~ "Al muy ilustre senor"
+    assert note.content =~ "Con todo respeto"
+  end
+
+  # --- Extended metadata ---
+
+  defp rich_tei(opts) do
+    code = Keyword.get(opts, :code, "RICH#{System.unique_integer([:positive])}")
+    front = Keyword.get(opts, :front, "")
+    body = Keyword.get(opts, :body, "")
+
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title type="traduccion">Ricardo III</title>
+            <title type="original">The Tragedy of Richard III</title>
+            <editor role="translator"><persName>Sanderson, John D.</persName></editor>
+            <author ana="fiable">William Shakespeare</author>
+            <sponsor><orgName>Plan Nacional de I+D+i</orgName></sponsor>
+            <funder><orgName>Ministerio de Ciencia e Innovación</orgName></funder>
+            <respStmt>
+              <resp>Electronic edition</resp>
+              <persName>Amelang, David J.</persName>
+            </respStmt>
+            <principal>Joan Oleza Simó</principal>
+          </titleStmt>
+          <publicationStmt>
+            <publisher><orgName>ARTELOPE/EMOTHE, Universitat de València</orgName></publisher>
+            <authority><orgName>Universitat de València - Estudi General</orgName></authority>
+            <idno>#{code}</idno>
+            <idno type="EMOTHE">0703</idno>
+            <availability>
+              <p>Some general availability text.</p>
+              <licence target="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">CC BY-NC-ND 4.0</licence>
+            </availability>
+            <pubPlace>Valencia</pubPlace>
+            <date>2023</date>
+          </publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>La tragedia del rey Ricardo III</title>
+              <author>Shakespeare, William</author>
+              <editor role="traductor">Sanderson, John D.</editor>
+              <lang>Español</lang>
+              <note>Notas de la fuente.</note>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text>
+        <front>#{front}</front>
+        <body>#{body}</body>
+      </text>
+    </TEI>
+    """
+  end
+
+  test "import_file/1 extracts original_title from <title type=\"original\">" do
+    path = write_tei(rich_tei(code: "ORIG01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.original_title == "The Tragedy of Richard III"
+  end
+
+  test "import_file/1 imports translator role editor from titleStmt" do
+    path = write_tei(rich_tei(code: "TRANS01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    translator = Enum.find(play_full.editors, &(&1.role == "translator"))
+    assert translator != nil
+    assert translator.person_name =~ "Sanderson"
+  end
+
+  test "import_file/1 extracts emothe_id from <idno type=\"EMOTHE\">" do
+    path = write_tei(rich_tei(code: "IDNO01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.emothe_id == "0703"
+  end
+
+  test "import_file/1 extracts licence_url from <licence target>" do
+    path = write_tei(rich_tei(code: "LIC01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.licence_url == "https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es"
+  end
+
+  test "import_file/1 extracts licence_text from <licence> text content" do
+    path = write_tei(rich_tei(code: "LIC02"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.licence_text == "CC BY-NC-ND 4.0"
+  end
+
+  test "import_file/1 extracts source language from <bibl><lang>" do
+    path = write_tei(rich_tei(code: "LANG01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.language == "Español"
+  end
+
+  test "import_file/1 extracts editor role from <bibl><editor role=...>" do
+    path = write_tei(rich_tei(code: "EDRL01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.editor == "Sanderson, John D."
+    assert source.editor_role == "traductor"
+  end
+
+  test "import_file/1 extracts sponsor from <sponsor><orgName>" do
+    path = write_tei(rich_tei(code: "SPON01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.sponsor == "Plan Nacional de I+D+i"
+  end
+
+  test "import_file/1 extracts funder from <funder><orgName>" do
+    path = write_tei(rich_tei(code: "FUND01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.funder =~ "Ministerio de Ciencia"
+  end
+
+  test "import_file/1 extracts authority from <authority><orgName>" do
+    path = write_tei(rich_tei(code: "AUTH01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.authority == "Universitat de València - Estudi General"
+  end
+
+  test "import_file/1 extracts publisher from <publisher><orgName>" do
+    path = write_tei(rich_tei(code: "PUB01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.publisher =~ "ARTELOPE/EMOTHE"
+  end
+
+  # --- Split verses, line_id, rend ---
+
+  test "import_file/1 imports split verse part markers (I/M/F)" do
+    front = """
+    <div type="elenco">
+      <castList>
+        <castItem><role xml:id="ANA">ANA</role></castItem>
+        <castItem><role xml:id="DON">DON</role></castItem>
+      </castList>
+    </div>
+    """
+
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp who="#ANA">
+          <speaker>ANA</speaker>
+          <lg type="redondilla">
+            <l n="1" part="I">First part of split</l>
+          </lg>
+        </sp>
+        <sp who="#DON">
+          <speaker>DON</speaker>
+          <lg type="redondilla">
+            <l n="1" part="F">Second part of split</l>
+            <l n="2">A full line</l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(front: front, body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    act = PlayContent.list_top_divisions(play.id) |> Enum.find(&(&1.type == "acto"))
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+
+    speeches = Enum.filter(elements, &(&1.type == "speech"))
+    assert length(speeches) == 2
+
+    [sp1, sp2] = speeches
+    [lg1] = sp1.children
+    [line_i] = lg1.children
+    assert line_i.part == "I"
+    assert line_i.line_number == 1
+    assert line_i.content == "First part of split"
+
+    [lg2] = sp2.children
+    [line_f, line_full] = Enum.sort_by(lg2.children, & &1.position)
+    assert line_f.part == "F"
+    assert line_f.line_number == 1
+    assert line_full.part == nil
+    assert line_full.line_number == 2
+  end
+
+  test "import_file/1 imports xml:id as line_id on verse lines" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>REY</speaker>
+          <lg type="romance">
+            <l n="1" xml:id="v001">A verse with ID</l>
+            <l n="2">A verse without ID</l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = elements
+    [lg] = speech.children
+    lines = Enum.sort_by(lg.children, & &1.line_number)
+
+    [l1, l2] = lines
+    assert l1.line_id == "v001"
+    assert l2.line_id == nil
+  end
+
+  test "import_file/1 imports rend attribute on verse lines" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>DAMA</speaker>
+          <lg type="redondilla">
+            <l n="1" rend="indent">An indented line</l>
+            <l n="2">A normal line</l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = elements
+    [lg] = speech.children
+    lines = Enum.sort_by(lg.children, & &1.line_number)
+
+    [l1, l2] = lines
+    assert l1.rend == "indent"
+    assert l2.rend == nil
+  end
+
+  # --- Source fields (title, author, note) ---
+
+  test "import_file/1 extracts source title from <bibl><title>" do
+    path = write_tei(rich_tei(code: "SRCTIT01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.title == "La tragedia del rey Ricardo III"
+  end
+
+  test "import_file/1 extracts source author from <bibl><author>" do
+    path = write_tei(rich_tei(code: "SRCAUT01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.author == "Shakespeare, William"
+  end
+
+  test "import_file/1 extracts source note from <bibl><note>" do
+    path = write_tei(rich_tei(code: "SRCNOT01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.note == "Notas de la fuente."
+  end
+
+  # --- Metadata: pub_place, publication_date, availability_note ---
+
+  test "import_file/1 extracts pub_place from <pubPlace>" do
+    path = write_tei(rich_tei(code: "PUBPL01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.pub_place == "Valencia"
+  end
+
+  test "import_file/1 extracts publication_date from <date>" do
+    path = write_tei(rich_tei(code: "PUBDT01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.publication_date == "2023"
+  end
+
+  test "import_file/1 extracts availability_note from <availability><p>" do
+    path = write_tei(rich_tei(code: "AVAIL01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.availability_note == "Some general availability text."
+  end
+
+  # --- Language: profileDesc/langUsage/language[@ident] ---
+
+  test "import_file/1 extracts language code from <profileDesc><langUsage>" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Amleto</title></titleStmt>
+          <publicationStmt><idno>LANG01</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="it-IT">Italiano</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "it"
+  end
+
+  test "import_file/1 extracts French language from <language ident=\"fr-FR\">" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Le Cid</title></titleStmt>
+          <publicationStmt><idno>LANG02</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="fr-FR">Français</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "fr"
+  end
+
+  test "import_file/1 defaults to nil language when profileDesc is absent" do
+    path = write_tei(minimal_tei(code: "LANG03"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    # language defaults to "es" from schema when nil is given
+    assert play.language == "es"
+  end
+
+  test "import_file/1 extracts English from <language ident=\"en-EN\">" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>The Coffer</title></titleStmt>
+          <publicationStmt><idno>LANG04</idno></publicationStmt>
+        </fileDesc>
+        <profileDesc>
+          <langUsage>
+            <language ident="en-EN">English</language>
+          </langUsage>
+        </profileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.language == "en"
+  end
+
+  # --- Medium priority: respStmt, principal, edition_title, author_attribution ---
+
+  test "import_file/1 creates principal editor from <principal>" do
+    path = write_tei(rich_tei(code: "PRINC01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    principal = Enum.find(play_full.editors, &(&1.role == "principal"))
+    assert principal != nil
+    assert principal.person_name == "Joan Oleza Simó"
+  end
+
+  test "import_file/1 creates digital_editor from respStmt in titleStmt" do
+    path = write_tei(rich_tei(code: "RESP01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    de = Enum.find(play_full.editors, &(&1.role == "digital_editor"))
+    assert de != nil
+    assert de.person_name == "Amelang, David J."
+    assert de.position >= 100
+  end
+
+  test "import_file/1 maps respStmt resp text to correct editor roles" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title>Role Test</title>
+            <respStmt>
+              <resp>Edición electrónica</resp>
+              <persName>Editor Person</persName>
+            </respStmt>
+            <respStmt>
+              <resp>Revisión del texto</resp>
+              <persName>Reviewer Person</persName>
+            </respStmt>
+          </titleStmt>
+          <publicationStmt><idno>ROLE01</idno></publicationStmt>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    editor = Enum.find(play_full.editors, &(&1.person_name == "Editor Person"))
+    reviewer = Enum.find(play_full.editors, &(&1.person_name == "Reviewer Person"))
+
+    assert editor.role == "editor"
+    assert reviewer.role == "reviewer"
+  end
+
+  test "import_file/1 imports respStmt from editionStmt with position >= 200" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title>Edition Stmt Test</title>
+          </titleStmt>
+          <editionStmt>
+            <respStmt>
+              <resp>Edición crítica</resp>
+              <persName>Edition Editor</persName>
+              <orgName>University Lab</orgName>
+            </respStmt>
+          </editionStmt>
+          <publicationStmt><idno>EDST01</idno></publicationStmt>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    editor = Enum.find(play_full.editors, &(&1.person_name == "Edition Editor"))
+    assert editor != nil
+    assert editor.role == "editor"
+    assert editor.position >= 200
+    assert editor.organization == "University Lab"
+  end
+
+  test "import_file/1 extracts author_attribution from <author ana=...>" do
+    path = write_tei(rich_tei(code: "ATTR01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.author_attribution == "fiable"
+  end
+
+  test "import_file/1 extracts edition_title from <title type=\"edicion\">" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt>
+            <title>Main Title</title>
+            <title type="edicion">Edición crítica 2023</title>
+          </titleStmt>
+          <publicationStmt><idno>EDIT01</idno></publicationStmt>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.edition_title == "Edición crítica 2023"
+  end
+
+  test "import_file/1 derives is_verse from extent" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Verse Play</title></titleStmt>
+          <extent>3500 versos</extent>
+          <publicationStmt><idno>VERSE01</idno></publicationStmt>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.is_verse == true
+    assert play.verse_count == 3500
+  end
+
+  test "import_file/1 sets is_verse to false without extent" do
+    path = write_tei(minimal_tei(title: "Prose Play", code: "PROSE01"))
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.is_verse == false
+  end
+
+  # --- Medium priority: lg part, prose aside, multiple sources ---
+
+  test "import_file/1 imports part attribute on line groups" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>ANA</speaker>
+          <lg type="redondilla" part="I">
+            <l n="1">A verse in split lg</l>
+          </lg>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = elements
+    [lg] = speech.children
+    assert lg.type == "line_group"
+    assert lg.part == "I"
+  end
+
+  test "import_file/1 imports prose aside with seg type=aside" do
+    body = """
+    <div1 type="acto" n="1">
+      <div2 type="escena" n="1">
+        <sp>
+          <speaker>REY</speaker>
+          <p><seg type="aside">An aside in prose</seg></p>
+          <p>Normal prose text.</p>
+        </sp>
+      </div2>
+    </div1>
+    """
+
+    path = write_tei(minimal_tei(body: body))
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    [act] = PlayContent.list_top_divisions(play.id)
+    [scene] = act.children
+    elements = PlayContent.list_elements_for_division(scene.id)
+    [speech] = elements
+    prose_elements = Enum.filter(speech.children, &(&1.type == "prose"))
+    assert length(prose_elements) == 2
+
+    aside = Enum.find(prose_elements, &(&1.is_aside == true))
+    normal = Enum.find(prose_elements, &(&1.is_aside == false))
+
+    assert aside != nil
+    assert aside.content == "An aside in prose"
+    assert normal.content == "Normal prose text."
+  end
+
+  test "import_file/1 imports multiple bibl sources in order" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Multi Source</title></titleStmt>
+          <publicationStmt><idno>MSRC01</idno></publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>First Source</title>
+              <author>Author One</author>
+            </bibl>
+            <bibl>
+              <title>Second Source</title>
+              <author>Author Two</author>
+              <note>A note on second source.</note>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    sources = Enum.sort_by(play_full.sources, & &1.position)
+    assert length(sources) == 2
+
+    [s1, s2] = sources
+    assert s1.title == "First Source"
+    assert s1.author == "Author One"
+    assert s1.position == 0
+
+    assert s2.title == "Second Source"
+    assert s2.author == "Author Two"
+    assert s2.note == "A note on second source."
+    assert s2.position == 1
+  end
+
+  test "import_file/1 imports bibl sources from listBibl wrapper" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>ListBibl Test</title></titleStmt>
+          <publicationStmt><idno>LBIB01</idno></publicationStmt>
+          <sourceDesc>
+            <listBibl>
+              <bibl><title>Source A</title></bibl>
+              <bibl><title>Source B</title></bibl>
+            </listBibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    sources = Enum.sort_by(play_full.sources, & &1.position)
+    assert length(sources) == 2
+    assert Enum.map(sources, & &1.title) == ["Source A", "Source B"]
+  end
+
+  test "import_file/1 extracts publisher, pub_place, pub_date from <bibl>" do
+    xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI>
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>El Rey Lear</title></titleStmt>
+          <publicationStmt><idno>BIBPUB01</idno></publicationStmt>
+          <sourceDesc>
+            <bibl>
+              <title>El Rey Lear</title>
+              <author>Shakespeare, William</author>
+              <publisher>Miguel Seguí</publisher>
+              <pubPlace>Barcelona</pubPlace>
+              <date>1908</date>
+            </bibl>
+          </sourceDesc>
+        </fileDesc>
+      </teiHeader>
+      <text><front></front><body></body></text>
+    </TEI>
+    """
+
+    path = write_tei(xml)
+    assert {:ok, play} = TeiParser.import_file(path)
+
+    play_full = Catalogue.get_play_with_all!(play.id)
+    [source] = play_full.sources
+    assert source.publisher == "Miguel Seguí"
+    assert source.pub_place == "Barcelona"
+    assert source.pub_date == "1908"
+  end
+
+  # --- Encoding ---
+
+  test "import_file/1 handles UTF-16 LE encoded files" do
+    xml = minimal_tei(title: "UTF16 Test", code: "UTF16LE")
+    # Encode as UTF-16 LE with BOM
+    utf16 = <<0xFF, 0xFE>> <> :unicode.characters_to_binary(xml, :utf8, {:utf16, :little})
+
+    path = Path.join(System.tmp_dir!(), "tei-utf16-#{System.unique_integer([:positive])}.xml")
+    File.write!(path, utf16)
+    on_exit(fn -> File.rm(path) end)
+
+    assert {:ok, play} = TeiParser.import_file(path)
+    assert play.code == "UTF16LE"
+    assert play.title == "UTF16 Test"
+  end
+
+  describe "places" do
+    @places_tei """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="es">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Play With Places</title><title key="archivo">PLACES0001</title></titleStmt>
+          <publicationStmt><p/></publicationStmt>
+          <sourceDesc><p/></sourceDesc>
+        </fileDesc>
+        <profileDesc>
+          <langUsage><language ident="es-ES">Español</language></langUsage>
+          <settingDesc>
+            <listPlace>
+              <place xml:id="italia" type="country">
+                <placeName xml:lang="es">Italia</placeName>
+                <place xml:id="roma" type="city">
+                  <placeName xml:lang="es">Roma</placeName>
+                  <placeName xml:lang="en">Rome</placeName>
+                  <placeName xml:lang="la" type="historical">Roma Aeterna</placeName>
+                  <location><geo>41.9028 12.4964</geo></location>
+                  <idno type="wikidata">Q220</idno>
+                </place>
+                <place xml:id="miseno" type="town">
+                  <placeName xml:lang="it">Miseno</placeName>
+                </place>
+              </place>
+            </listPlace>
+            <setting>
+              <placeName ref="#roma" ana="setting"/>
+              <placeName ref="#miseno" ana="mentioned"><note>Named, not staged.</note></placeName>
+            </setting>
+          </settingDesc>
+        </profileDesc>
+      </teiHeader>
+      <text><body><div1 type="acto" n="1"><head>Acto I</head></div1></body></text>
+    </TEI>
+    """
+
+    defp import_places_tei(xml \\ @places_tei) do
+      TeiParser.import_file(write_tei(xml))
+    end
+
+    test "creates the places, their names and the containment" do
+      {:ok, play} = import_places_tei()
+
+      roma = Playcode.Repo.get_by!(Playcode.Places.Place, slug: "roma")
+      roma = Playcode.Places.get_place!(roma.id)
+
+      assert roma.type == "city"
+      assert roma.latitude == 41.9028
+      assert roma.longitude == 12.4964
+      assert roma.authority == "wikidata"
+      assert roma.authority_id == "Q220"
+      assert roma.parent.slug == "italia"
+
+      names = Map.new(roma.names, &{&1.language, &1})
+      assert names["es"].name == "Roma"
+      assert names["en"].name == "Rome"
+      assert names["la"].is_historical
+
+      assert play.code == "PLACES0001"
+    end
+
+    @deep_places_tei """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="es">
+      <teiHeader>
+        <fileDesc>
+          <titleStmt><title>Play With Deep Places</title><title key="archivo">PLACESDEEP1</title></titleStmt>
+          <publicationStmt><p/></publicationStmt>
+          <sourceDesc><p/></sourceDesc>
+        </fileDesc>
+        <profileDesc>
+          <langUsage><language ident="es-ES">Español</language></langUsage>
+          <settingDesc>
+            <listPlace>
+              <place xml:id="europa" type="continent">
+                <placeName xml:lang="es">Europa</placeName>
+                <place xml:id="italia" type="country">
+                  <placeName xml:lang="es">Italia</placeName>
+                  <place xml:id="roma" type="city">
+                    <placeName xml:lang="es">Roma</placeName>
+                  </place>
+                </place>
+              </place>
+            </listPlace>
+            <setting>
+              <placeName ref="#roma" ana="setting"/>
+            </setting>
+          </settingDesc>
+        </profileDesc>
+      </teiHeader>
+      <text><body><div1 type="acto" n="1"><head>Acto I</head></div1></body></text>
+    </TEI>
+    """
+
+    test "a parent chain deeper than two levels resolves at every level" do
+      {:ok, _play} = import_places_tei(@deep_places_tei)
+
+      europa = Playcode.Repo.get_by!(Playcode.Places.Place, slug: "europa")
+      italia = Playcode.Repo.get_by!(Playcode.Places.Place, slug: "italia")
+
+      roma =
+        Playcode.Places.get_place!(Playcode.Repo.get_by!(Playcode.Places.Place, slug: "roma").id)
+
+      assert italia.parent_place_id == europa.id
+      assert roma.parent_place_id == italia.id
+      assert roma.parent.slug == "italia"
+
+      gazetteer = Playcode.Places.gazetteer()
+      ancestor_slugs = Playcode.Places.ancestors(roma, gazetteer) |> Enum.map(& &1.slug)
+      assert ancestor_slugs == ["europa", "italia"]
+    end
+
+    test "only the places named in setting become play links" do
+      {:ok, play} = import_places_tei()
+
+      links = Playcode.Places.list_play_places(play.id)
+
+      assert Enum.map(links, & &1.place.slug) == ["roma", "miseno"]
+      assert Enum.map(links, & &1.role) == ["setting", "mentioned"]
+      assert Enum.map(links, & &1.origin) == ["tei", "tei"]
+      assert Enum.at(links, 1).note == "Named, not staged."
+
+      # italia is a container, not a setting
+      refute "italia" in Enum.map(links, & &1.place.slug)
+    end
+
+    test "a re-import replaces its own links and leaves a hand-entered one alone" do
+      {:ok, play} = import_places_tei()
+
+      extra = Playcode.TestFixtures.place_fixture(%{"name" => "Atenas"})
+      Playcode.TestFixtures.play_place_fixture(play, extra, %{"origin" => "manual"})
+
+      {:ok, _play} = import_places_tei()
+
+      slugs = Playcode.Places.list_play_places(play.id) |> Enum.map(& &1.place.slug)
+      assert "roma" in slugs
+      assert extra.slug in slugs
+      assert length(slugs) == 3
+    end
+
+    test "a re-import leaves a hand-entered link to a place the file also names alone" do
+      {:ok, play} = import_places_tei()
+
+      # The hand-entered link is to "roma" — a place this very file names in <setting>,
+      # so the import hits the collision branch rather than a blind insert. The Atenas
+      # case above only proves the origin filter in reset_tei_content.
+      roma = Playcode.Repo.get_by!(Playcode.Places.Place, slug: "roma")
+
+      tei_link =
+        Playcode.Repo.get_by!(Playcode.Places.PlayPlace, play_id: play.id, place_id: roma.id)
+
+      {:ok, _} = Playcode.Repo.delete(tei_link)
+
+      {:ok, manual} =
+        Playcode.Places.link_place(play.id, roma.id, %{
+          "role" => "mentioned",
+          "note" => "Hand-entered.",
+          "origin" => "manual"
+        })
+
+      {:ok, _play} = import_places_tei()
+
+      reloaded = Playcode.Repo.get(Playcode.Places.PlayPlace, manual.id)
+      assert reloaded, "the curated link was deleted by the re-import"
+      assert reloaded.origin == "manual"
+      assert reloaded.note == "Hand-entered."
+
+      # And it still survives a second re-import, which is where an origin flipped to
+      # "tei" would be swept away by reset_tei_content.
+      {:ok, _play} = import_places_tei()
+      assert Playcode.Repo.get(Playcode.Places.PlayPlace, manual.id)
+    end
+
+    test "an existing place is left alone, not overwritten" do
+      curated =
+        Playcode.TestFixtures.place_fixture(%{
+          "name" => "Roma",
+          "slug" => "roma",
+          "type" => "region",
+          "note" => "Curated"
+        })
+
+      {:ok, _play} = import_places_tei()
+
+      reloaded = Playcode.Places.get_place!(curated.id)
+      assert reloaded.type == "region"
+      assert reloaded.note == "Curated"
+    end
+
+    test "a file with no settingDesc creates no places" do
+      xml = String.replace(@places_tei, ~r|<settingDesc>.*</settingDesc>|s, "")
+      {:ok, play} = import_places_tei(xml)
+
+      assert Playcode.Places.list_play_places(play.id) == []
+      assert Playcode.Places.list_places() == []
+    end
+  end
+
+  describe "composition date" do
+    test "reads @when as a single year" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP1",
+            profile: "<profileDesc><creation><date when=\"1614\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == 1614
+      assert play.composition_date_to == 1614
+    end
+
+    test "reads @notBefore/@notAfter and the note text" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP2",
+            profile:
+              "<profileDesc><creation><date notBefore=\"1600\" notAfter=\"1601\">¿1600? y ¿1601?</date></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == 1600
+      assert play.composition_date_to == 1601
+      assert play.composition_date_note == "¿1600? y ¿1601?"
+    end
+
+    test "a date with no usable attribute imports as no dating and does not raise" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP3",
+            profile: "<profileDesc><creation><date>c. 1600</date></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "a lone endpoint is not stored — the changeset forbids half a range" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP4",
+            profile: "<profileDesc><creation><date notAfter=\"1601\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "no creation element leaves the columns nil" do
+      path = write_tei(minimal_tei(code: "CDIMP5"))
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+    end
+
+    # An unusable *present* attribute is the file's problem, not an import failure: the
+    # whole play — text, characters, acts — must still import. The extraction drops the
+    # dating for the same reason it drops a lone endpoint.
+    test "an inverted range imports as no dating" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP6",
+            profile:
+              "<profileDesc><creation><date notBefore=\"1607\" notAfter=\"1606\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "a year below the validated bound imports as no dating" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP7",
+            profile: "<profileDesc><creation><date when=\"850\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+
+    test "a BCE date imports as no dating" do
+      path =
+        write_tei(
+          minimal_tei(
+            code: "CDIMP8",
+            profile: "<profileDesc><creation><date when=\"-0044\"/></creation></profileDesc>"
+          )
+        )
+
+      assert {:ok, play} = TeiParser.import_file(path)
+      assert play.composition_date_from == nil
+      assert play.composition_date_to == nil
+    end
+  end
+end

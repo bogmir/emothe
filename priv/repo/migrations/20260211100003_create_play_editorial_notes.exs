@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.CreatePlayEditorialNotes do
+defmodule Playcode.Repo.Migrations.CreatePlayEditorialNotes do
   use Ecto.Migration
 
   def change do

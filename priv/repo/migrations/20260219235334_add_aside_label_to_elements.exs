@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddAsideLabelToElements do
+defmodule Playcode.Repo.Migrations.AddAsideLabelToElements do
   use Ecto.Migration
 
   def change do

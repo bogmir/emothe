@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddSponsorFunderFields do
+defmodule Playcode.Repo.Migrations.AddSponsorFunderFields do
   use Ecto.Migration
 
   def change do

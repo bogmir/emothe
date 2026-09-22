@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddDeletedAtToPlays do
+defmodule Playcode.Repo.Migrations.AddDeletedAtToPlays do
   use Ecto.Migration
 
   def change do

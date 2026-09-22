@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.CreatePlayStatistics do
+defmodule Playcode.Repo.Migrations.CreatePlayStatistics do
   use Ecto.Migration
 
   def change do

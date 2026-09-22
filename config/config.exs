@@ -7,30 +7,30 @@
 # General application configuration
 import Config
 
-config :emothe,
-  ecto_repos: [Emothe.Repo],
+config :playcode,
+  ecto_repos: [Playcode.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-config :emothe, EmotheWeb.Gettext,
+config :playcode, PlaycodeWeb.Gettext,
   default_locale: "es",
   locales: ~w(es en)
 
 # .ndjson has no registered MIME type by default; the FileMaker sync upload
-# (lib/emothe_web/live/admin/filemaker_sync_live.ex) needs it for allow_upload's
+# (lib/playcode_web/live/admin/filemaker_sync_live.ex) needs it for allow_upload's
 # accept list.
 config :mime, :types, %{
   "application/x-ndjson" => ["ndjson"]
 }
 
 # Configure the endpoint
-config :emothe, EmotheWeb.Endpoint,
+config :playcode, PlaycodeWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: EmotheWeb.ErrorHTML, json: EmotheWeb.ErrorJSON],
+    formats: [html: PlaycodeWeb.ErrorHTML, json: PlaycodeWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Emothe.PubSub,
+  pubsub_server: Playcode.PubSub,
   live_view: [signing_salt: "HIhLQD3H"]
 
 # Configure the mailer
@@ -40,14 +40,14 @@ config :emothe, EmotheWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :emothe, Emothe.Mailer, adapter: Swoosh.Adapters.Local
+config :playcode, Playcode.Mailer, adapter: Swoosh.Adapters.Local
 
-config :emothe, :place_authority, Emothe.Places.Authority.Wikidata
+config :playcode, :place_authority, Playcode.Places.Authority.Wikidata
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.25.4",
-  emothe: [
+  playcode: [
     args:
       ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/* --alias:@=.),
     cd: Path.expand("../assets", __DIR__),
@@ -57,7 +57,7 @@ config :esbuild,
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "4.1.12",
-  emothe: [
+  playcode: [
     args: ~w(
       --input=assets/css/app.css
       --output=priv/static/assets/css/app.css

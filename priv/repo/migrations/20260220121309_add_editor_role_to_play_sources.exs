@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddEditorRoleToPlaySources do
+defmodule Playcode.Repo.Migrations.AddEditorRoleToPlaySources do
   use Ecto.Migration
 
   def change do

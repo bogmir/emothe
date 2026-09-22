@@ -46,7 +46,7 @@ ENV LC_ALL=en_US.UTF-8
 
 WORKDIR /app
 
-COPY --from=build /app/_build/prod/rel/emothe ./
+COPY --from=build /app/_build/prod/rel/playcode ./
 
 RUN chown -R nobody:nogroup /app
 USER nobody:nogroup
@@ -55,4 +55,4 @@ ENV HOME=/app
 ENV PHX_SERVER=true
 EXPOSE 8080
 
-CMD ["/app/bin/emothe", "start"]
+CMD ["/app/bin/playcode", "start"]

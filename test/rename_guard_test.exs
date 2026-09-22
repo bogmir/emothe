@@ -164,7 +164,10 @@ defmodule RenameGuardTest do
       #   emothe_id / emothe_idno      plays.emothe_id, a real column holding
       #                                the EMOTHE identifier for a play
       #   emothe_project_description   the EMOTHE project's own blurb
-      assert git_grep(~S{(?<!w3)emothe(?!\.uv\.es|_id|_project_description)}) == []
+      #   emothe-static                the published EMOTHE site: the example
+      #                                GitHub repo in the deploy form and the
+      #                                name of the .zip a researcher downloads
+      assert git_grep(~S{(?<!w3)emothe(?!\.uv\.es|_id|_project_description|-static)}) == []
     end
   end
 

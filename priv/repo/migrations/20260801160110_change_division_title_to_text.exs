@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.ChangeDivisionTitleToText do
+defmodule Playcode.Repo.Migrations.ChangeDivisionTitleToText do
   use Ecto.Migration
 
   def change do

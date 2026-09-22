@@ -46,7 +46,7 @@ ENV LC_ALL=en_US.UTF-8
 
 WORKDIR /app
 
-COPY --from=build /app/_build/prod/rel/emothe ./
+COPY --from=build /app/_build/prod/rel/playcode ./
 COPY entrypoint.sh /app/entrypoint.sh
 
 RUN chmod +x /app/entrypoint.sh && chown -R nobody:nogroup /app

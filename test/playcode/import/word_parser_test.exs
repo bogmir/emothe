@@ -72,6 +72,47 @@ defmodule Playcode.Import.WordParserTest do
                ["I", "M", "F"]
     end
 
+    # {m} used to create an empty line group and then drop every verse after it.
+    test "{m} opens a new stanza that holds the verses after it" do
+      xml =
+        import_word([
+          "{e}Escena 1",
+          "{p}FEBO  {v}uno",
+          "{v}dos",
+          "{m}",
+          "{v}tres",
+          "{v}cuatro",
+          "{p}ANA  {v}cinco",
+          "{m}",
+          "{v}seis"
+        ])
+
+      assert xml_texts(xml, "l") == ~w(uno dos tres cuatro cinco seis)
+      assert xml_texts(xml, "lg") == ["tres cuatro", "seis"]
+      assert speeches(xml) == ["FEBO uno dos tres cuatro", "ANA cinco seis"]
+    end
+
+    test "{m} with no speaker open still keeps its verses" do
+      xml = import_word(["{e}Escena 1", "{m}", "{v}sin hablante", "{v}todavía"])
+
+      assert xml_texts(xml, "l", within: "lg") == ["sin hablante", "todavía"]
+    end
+
+    # {ap} used to be parsed and then ignored.
+    test "{ap} marks that paragraph's verse or prose as an aside" do
+      xml =
+        import_word([
+          "{e}Escena 1",
+          "{p}ANA {ap} {pr} aparte en prosa",
+          "{p}REY  {v}en voz alta",
+          "{ap} {v}aparte en verso"
+        ])
+
+      assert xml_texts(xml, "seg") == ["aparte en prosa", "aparte en verso"]
+      assert Enum.all?(xml_elements(xml, "seg"), &match?({%{"type" => "aside"}, _}, &1))
+      assert "en voz alta" in xml_texts(xml, "l")
+    end
+
     test "verse lines are numbered in order" do
       xml = import_word(["{e}Escena 1", "{p}FEBO  {v}Uno.", "{v}Dos.", "{p}ANA {v}Tres."])
 

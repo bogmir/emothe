@@ -409,9 +409,15 @@ defmodule Playcode.Import.WordParser do
           {acts, state}
 
         [{:stanza, _}] ->
-          el = %{type: "line_group", content: ""}
-          acts = append_element(acts, el)
-          {acts, state}
+          stanza = %{type: "line_group", children: []}
+
+          if state.current_speech == :open do
+            {append_children_to_last_speech(acts, [stanza]), state}
+          else
+            # No speech to hold it: the stanza sits in the scene and takes the verses
+            # that follow, exactly as an open speech would.
+            {append_element(acts, stanza), %{state | current_speech: :open}}
+          end
 
         _ ->
           # Add as children to current speech if one is open
@@ -430,15 +436,18 @@ defmodule Playcode.Import.WordParser do
     end
   end
 
+  # {ap} anywhere in the paragraph makes its verse and prose asides.
   defp build_children(segments) do
+    aside? = has_tag?(segments, :aside)
+
     segments
     |> Enum.reject(fn {tag, _} -> tag in [:speaker, :scene, :aside, :stanza, :text, :act] end)
     |> Enum.map(fn
-      {:verse, text} -> %{type: "verse_line", content: text, part: nil}
-      {:verse_initial, text} -> %{type: "verse_line", content: text, part: "I"}
-      {:verse_middle, text} -> %{type: "verse_line", content: text, part: "M"}
-      {:verse_final, text} -> %{type: "verse_line", content: text, part: "F"}
-      {:prose, text} -> %{type: "prose", content: text}
+      {:verse, text} -> %{type: "verse_line", content: text, part: nil, is_aside: aside?}
+      {:verse_initial, text} -> %{type: "verse_line", content: text, part: "I", is_aside: aside?}
+      {:verse_middle, text} -> %{type: "verse_line", content: text, part: "M", is_aside: aside?}
+      {:verse_final, text} -> %{type: "verse_line", content: text, part: "F", is_aside: aside?}
+      {:prose, text} -> %{type: "prose", content: text, is_aside: aside?}
       {:stage_direction, text} -> %{type: "stage_direction", content: text}
       {_other, text} -> %{type: "text", content: text}
     end)
@@ -491,9 +500,13 @@ defmodule Playcode.Import.WordParser do
           {acts, state}
 
         [{:stanza, _}] ->
-          el = %{type: "line_group", content: ""}
-          acts = append_direct_element(acts, el)
-          {acts, state}
+          stanza = %{type: "line_group", children: []}
+
+          if state.current_speech == :open_direct do
+            {append_children_to_last_direct_speech(acts, [stanza]), state}
+          else
+            {append_direct_element(acts, stanza), %{state | current_speech: :open_direct}}
+          end
 
         _ ->
           children = build_children(segments)
@@ -515,9 +528,8 @@ defmodule Playcode.Import.WordParser do
     direct = Map.get(act, :_direct_elements, [])
 
     case List.last(direct) do
-      %{type: "speech"} = speech ->
-        updated = %{speech | children: speech.children ++ children}
-        updated_direct = List.replace_at(direct, -1, updated)
+      %{type: type} = parent when type in ["speech", "line_group"] ->
+        updated_direct = List.replace_at(direct, -1, add_children(parent, children))
         List.replace_at(acts, -1, %{act | _direct_elements: updated_direct})
 
       _ ->
@@ -525,14 +537,29 @@ defmodule Playcode.Import.WordParser do
     end
   end
 
+  # Verse and stage directions go into the parent's open stanza, when its last child is
+  # a line group opened by {m}; anything else, including the next {m}, follows it.
+  defp add_children(parent, children) do
+    Enum.reduce(children, parent, fn child, acc ->
+      case {child, List.last(acc.children)} do
+        {%{type: type}, %{type: "line_group"} = stanza}
+        when type in ["verse_line", "stage_direction"] ->
+          stanza = %{stanza | children: stanza.children ++ [child]}
+          %{acc | children: List.replace_at(acc.children, -1, stanza)}
+
+        _ ->
+          %{acc | children: acc.children ++ [child]}
+      end
+    end)
+  end
+
   defp append_children_to_last_speech(acts, children) do
     update_last_scene(acts, fn scene ->
       elements = scene.elements
 
       case List.last(elements) do
-        %{type: "speech"} = speech ->
-          updated = %{speech | children: speech.children ++ children}
-          %{scene | elements: List.replace_at(elements, -1, updated)}
+        %{type: type} = parent when type in ["speech", "line_group"] ->
+          %{scene | elements: List.replace_at(elements, -1, add_children(parent, children))}
 
         _ ->
           scene
@@ -757,13 +784,7 @@ defmodule Playcode.Import.WordParser do
           })
 
         %{type: "line_group"} ->
-          PlayContent.create_element(%{
-            play_id: play_id,
-            division_id: division_id,
-            parent_id: parent_id,
-            type: "line_group",
-            position: pos
-          })
+          create_stanza(element, play_id, division_id, parent_id, pos, verse_counter)
 
         %{type: "unrecognized"} ->
           PlayContent.create_element(%{
@@ -787,6 +808,7 @@ defmodule Playcode.Import.WordParser do
             content: element.content,
             part: element[:part],
             line_number: line_num,
+            is_aside: element[:is_aside] || false,
             position: pos
           })
 
@@ -797,6 +819,7 @@ defmodule Playcode.Import.WordParser do
             parent_id: parent_id,
             type: "prose",
             content: element.content,
+            is_aside: element[:is_aside] || false,
             position: pos
           })
 
@@ -825,6 +848,7 @@ defmodule Playcode.Import.WordParser do
             content: element.content,
             part: element[:part],
             line_number: line_num,
+            is_aside: element[:is_aside] || false,
             position: pos
           })
 
@@ -835,6 +859,7 @@ defmodule Playcode.Import.WordParser do
             parent_id: parent_id,
             type: "prose",
             content: element.content,
+            is_aside: element[:is_aside] || false,
             position: pos
           })
 
@@ -848,9 +873,25 @@ defmodule Playcode.Import.WordParser do
             position: pos
           })
 
+        %{type: "line_group"} ->
+          create_stanza(element, play_id, division_id, parent_id, pos, verse_counter)
+
         _ ->
           :ok
       end
     end)
+  end
+
+  defp create_stanza(stanza, play_id, division_id, parent_id, pos, verse_counter) do
+    {:ok, group} =
+      Playcode.PlayContent.create_element(%{
+        play_id: play_id,
+        division_id: division_id,
+        parent_id: parent_id,
+        type: "line_group",
+        position: pos
+      })
+
+    create_children(Map.get(stanza, :children, []), play_id, division_id, group.id, verse_counter)
   end
 end

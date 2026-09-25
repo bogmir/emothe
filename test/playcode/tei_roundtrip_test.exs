@@ -515,4 +515,39 @@ defmodule Playcode.TeiRoundtripTest do
       assert xml_elements(xml, "extent") == [{%{"ana" => "verso"}, "2 versos"}]
     end
   end
+
+  # Exporting used to write a titleStmt respStmt editor into editionStmt as well, and
+  # re-importing that copy made a second editor: one more per round trip.
+  test "exporting, re-importing and exporting again changes nothing" do
+    body = """
+    <div1 type="acto" n="1"><head>ACTO I</head><div2 type="escena" n="1"><head>ESCENA I</head>
+      <stage>Salen</stage>
+      <sp who="#ANA"><speaker>ANA</speaker>
+        <lg type="redondilla"><l n="1" part="I" xml:id="v1">Uno</l></lg></sp>
+      <sp who="#DON"><speaker>DON</speaker>
+        <lg type="redondilla"><l n="1" part="F">dos</l><l n="2" rend="indent"><seg type="aside">tres</seg></l></lg>
+        <p>Prosa con <emph>énfasis</emph>.</p></sp>
+    </div2></div1>
+    """
+
+    front = """
+    <div type="dedicatoria"><head>Dedicatoria</head><p>Al lector.</p></div>
+    <div type="elenco"><castList>
+      <castItem><role xml:id="ANA">Ana</role><roleDesc>dama</roleDesc></castItem>
+      <castItem ana="oculto"><role xml:id="DON">Don</role></castItem>
+    </castList></div>
+    """
+
+    profile =
+      ~s(<langUsage><language ident="it-IT">Italiano</language></langUsage>) <>
+        ~s(<creation><date notBefore="1605" notAfter="1607">hacia 1606</date></creation>)
+
+    first =
+      tei(@rich_header ++ [code: "FIX1", front: front, body: body, profile_desc: profile])
+      |> roundtrip()
+
+    second = first |> String.replace("FIX1", "FIX2") |> roundtrip()
+
+    assert String.replace(second, "FIX2", "FIX1") == first
+  end
 end

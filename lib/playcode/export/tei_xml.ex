@@ -147,9 +147,12 @@ defmodule Playcode.Export.TeiXml do
   end
 
   defp build_edition_stmt(play) do
+    # Positions 100..199 are titleStmt's respStmts, already written there by
+    # build_title_stmt/1. Writing them here too made a re-import create each one twice.
     editors =
       play.editors
       |> Enum.filter(&(&1.role in ["editor", "digital_editor", "reviewer"]))
+      |> Enum.reject(&(&1.position in 100..199))
       |> Enum.map(fn e ->
         resp_label =
           case e.role do

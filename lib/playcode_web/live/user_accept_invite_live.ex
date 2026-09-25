@@ -18,7 +18,7 @@ defmodule PlaycodeWeb.UserAcceptInviteLive do
     ~H"""
     <div class="mx-auto max-w-sm">
       <.header class="text-center">
-        {gettext("Welcome to EMOTHE")}
+        {gettext("Welcome to Playcode")}
         <:subtitle>{gettext("Choose a password for %{email}", email: @user.email)}</:subtitle>
       </.header>
 

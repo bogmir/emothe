@@ -101,18 +101,19 @@ defmodule RenameGuardTest do
     end
 
     test "the public EMOTHE brand is still in the Spanish UI copy" do
+      # This used to count exactly 12 EMOTHE lines and require "Biblioteca
+      # Digital EMOTHE". On 2026-09-25 the app's own chrome (headings, login,
+      # welcome) deliberately became Playcode, so the count dropped and that
+      # heading went. What must survive is EMOTHE where it names the corpus or
+      # the library, not a number of lines — see test/playcode_web/branding_test.exs
+      # for the other side of the line.
       po = File.read!(Path.join(@repo_root, "priv/gettext/es/LC_MESSAGES/default.po"))
 
-      brand_strings =
-        po
-        |> String.split("\n")
-        |> Enum.filter(&(String.starts_with?(&1, "msgid ") or String.starts_with?(&1, "msgstr ")))
-        |> Enum.filter(&String.contains?(&1, "EMOTHE"))
+      assert po =~ ~s(msgstr "ID EMOTHE"), "the EMOTHE ID label names the corpus identifier"
 
-      assert length(brand_strings) == 12,
-             "expected 12 EMOTHE brand strings in the Spanish catalogue, found #{length(brand_strings)}"
-
-      assert po =~ ~s(msgstr "Biblioteca Digital EMOTHE")
+      assert po =~
+               ~s(msgstr "La plataforma editorial de las bibliotecas digitales EMOTHE y ARTELOPE"),
+             "the home page tagline names the EMOTHE library"
     end
 
     test "emothe.uv.es is untouched" do

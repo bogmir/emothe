@@ -1,6 +1,6 @@
 # FileMaker Import — Feature Slices (roadmap)
 
-**Status:** written 2026-08-01, revised 2026-08-04.
+**Status:** written 2026-08-01, revised 2026-09-25.
 
 | Slice | State |
 |---|---|
@@ -12,7 +12,8 @@
 | S2d | scoped below, **waiting on a question to the project** |
 | S2e — `legacy_url` | **dropped** — derivable from code + filename, see below |
 | S2f — titles | **dropped as an import** — nothing to import, folded into S7's cross-check |
-| S3–S8 | scoped below, each gets its own plan when it comes up |
+| S3, S5–S8 | scoped below, each gets its own plan when it comes up |
+| S4 — bibliography | **researched 2026-09-25**, waiting on questions — `../specs/2026-09-25-s4-bibliography-research.md` |
 | S9 — places | **Phase 1 done** (the app, no FileMaker code) — `CLAUDE.md` |
 | S9b — `pub_LugAccion` import | **scoped, build it** — 138 links / ~94 places at full corpus; after the ~300 import |
 
@@ -352,19 +353,44 @@ Two findings from that check that outlive S2f:
   the source
 - **Done when:** witnesses appear in the existing sources admin page and on the public page
 
-### S4 — Bibliography
+### S4 — Bibliography *(researched 2026-09-25, waiting on questions)*
+
+**Research: `../specs/2026-09-25-s4-bibliography-research.md`** — measurements, loss list, parse
+traps, TEI mapping and the proposed table. Headlines:
 
 - **From:** `T01.pub_EdModernas`, `pub_BibSelectaCritica`, `pub_BibSelectaTraduccion` (nested: the
-  outer `<li>` is a language header `FR:` / `EN:` / `IT:` / `DE:`), `pub_BibSelectaAdaptacion`
-- **Into:** new `play_bibliography` table with `kind` (`modern_edition`, `criticism`,
-  `translation`, `adaptation`), `citation`, `language`, `position`
-- **Scale:** 7 plays, ~326 citations **today; ~120 plays and over 3000 citations** once the ~300
-  land — criticism alone goes 198 → 2003. **This is the largest remaining slice**, and at that size
-  the grouped-by-kind rendering and the reorder UI both need to work against hundreds of rows per
-  play, not a dozen. Build it after that import (question 5)
+  outer `<li>` is a language header `ES:` / `FR:` / `IT:` / `DE:` / `EN:` — the flat `@list_item`
+  regex swallows the header into the first item), `pub_BibSelectaAdaptacion`
+- **The strings are template output, and the export gives us only the strings.** FileMaker renders
+  each citation from a structured record; `{Falta nombre editorial}` (318) and
+  `{Falta nombre ciudad}` (254) are its empty-field markers, on 14% of items. Lost:
+  - field boundaries, publication type, per-record language and record identity
+  - **~690 criticism records linked in FileMaker but never rendered**: 40 versions have
+    years in `bus_criticaAnyo` and an empty `pub_BibSelectaCritica`
+
+  Asking for the bibliography table itself is the one request that changes the design
+  (question 4).
+- **Order is computed, not curated** — year descending on 135 of 139 rows. `position` and the
+  reorder UI are dropped from the proposal.
+- **Into (proposed):** `play_bibliography` with these columns:
+  - `kind` (`modern_edition`, `criticism`, `translation`, `adaptation`)
+  - `citation` (verbatim; `<i>` is the only markup kept)
+  - `year` (for sorting), `language`, `url`, `origin`
+
+  Structured columns are an additive migration if the table export arrives. The sync is
+  fill-only **per play and kind**, because matching rows on citation text re-adds every
+  citation a curator corrects or deletes.
+- **TEI:** none of the 96 fixtures has a secondary bibliography. Its home is
+  `text/back/div[@type="bibliografia"]/listBibl`, **not** `sourceDesc`: the parser already reads
+  `sourceDesc/listBibl/bibl` into `play_sources`. The parser ignores `<back>` today, which also
+  silently drops the two fixtures' `epilogo` divs.
+- **Scale:** 7 plays, 318 citations **today; ~120 plays and 3063 citations** once the ~300 land —
+  criticism alone goes 198 → 2003. **This is the largest remaining slice**, and the admin page
+  needs a filter: Hamlet alone has 62 criticism items. Build it after that import (question 5)
 - **Done when:** a bibliography section renders per play grouped by kind, **and** admins can add,
-  edit, reorder and delete citations without an import
-- **S0b:** the new table stays outside the importer's reach, so a TEI re-import never touches it
+  edit and delete citations without an import
+- **S0b:** the table carries `origin`. A TEI re-import replaces only that play's `tei` rows, and
+  skips a bibl whose citation already exists under another origin — S9's leave-alone rule
 
 ### S5 — Historical performances
 
@@ -644,8 +670,11 @@ Ordered by what is actually blocking work.
 3. ~~**Place of action requirements** — S9.~~ **Closed 2026-08-04** by building it: S9 Phase 1
    shipped the gazetteer. The import is S9b, scoped and buildable — 6 plays, 9 links — and waits on
    the `bus_lugAccion` request in (4) so it can load the historical polities in one pass.
-4. **Genre value lists, and a language-tagged `bus_lugAccion`** — S8 and S9b tier 2. The only
-   outstanding requests to the FileMaker side; one message should carry both.
+4. **Genre value lists, a language-tagged `bus_lugAccion`, and the bibliography table** — S8,
+   S9b tier 2 and S4. The only outstanding requests to the FileMaker side; one message should carry
+   all three. The S4 part is four questions: the table itself with record IDs, what decides
+   whether a record is rendered, the language code `5`, and the record-type value list — see the
+   S4 research doc.
 5. **Importing the other ~300 plays.** *Intended as of 2026-08-05 — a "when", not an "if", and now
    the sequencing constraint for most of what is left.* The index gives a download path for every
    published play (`textosXML/<code>_<Name>.xml`). Still needs permission and a fetch rate from the

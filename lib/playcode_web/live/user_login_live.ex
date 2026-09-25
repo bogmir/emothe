@@ -5,7 +5,7 @@ defmodule PlaycodeWeb.UserLoginLive do
     ~H"""
     <div class="mx-auto max-w-sm">
       <.header class="text-center">
-        {gettext("Log in to EMOTHE")}
+        {gettext("Log in to Playcode")}
         <:subtitle>
           {gettext("Access is by invitation. Contact an administrator to request an account.")}
         </:subtitle>

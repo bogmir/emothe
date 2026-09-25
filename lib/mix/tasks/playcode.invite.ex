@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Playcode.Invite do
   @shortdoc "Invites a user, optionally printing the link instead of mailing it"
 
   @moduledoc """
-  Invites a user to EMOTHE.
+  Invites a user to Playcode.
 
       mix playcode.invite ana@uv.es
       mix playcode.invite ana@uv.es --admin

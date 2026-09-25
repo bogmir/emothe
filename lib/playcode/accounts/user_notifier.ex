@@ -6,7 +6,7 @@ defmodule Playcode.Accounts.UserNotifier do
   alias Playcode.Mailer
 
   defp from_address do
-    {"EMOTHE", Application.get_env(:playcode, :mail_from, "noreply@emothe.uv.es")}
+    {"Playcode", Application.get_env(:playcode, :mail_from, "noreply@emothe.uv.es")}
   end
 
   # Delivers the email using the application mailer.
@@ -33,17 +33,18 @@ defmodule Playcode.Accounts.UserNotifier do
   end
 
   @doc """
-  Deliver an invitation to join EMOTHE.
+  Deliver an invitation to join Playcode.
   """
   def deliver_invite_instructions(user, url) do
-    deliver(user.email, "You have been invited to EMOTHE", """
+    deliver(user.email, "You have been invited to Playcode", """
 
     ==============================
 
     Hi #{user.email},
 
-    You have been invited to the EMOTHE platform. Set your password by
-    visiting the URL below:
+    You have been invited to Playcode, the editorial platform behind the
+    EMOTHE and ARTELOPE digital libraries. Set your password by visiting
+    the URL below:
 
     #{url}
 

@@ -39,6 +39,7 @@ npm-debug.log
 /docs/screenshots/
 
 /.claude/
+/.superpowers/
 
 # Static site export output
 /_site/

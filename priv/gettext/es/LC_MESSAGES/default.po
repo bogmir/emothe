@@ -136,7 +136,7 @@ msgstr "Explorar el catálogo"
 msgid "Browse, edit, and curate imported plays."
 msgstr "Explorar, editar y gestionar las obras importadas."
 
-#: lib/playcode_web/live/admin/import_live.ex:326
+#: lib/playcode_web/live/admin/import_live.ex:329
 #: lib/playcode_web/live/admin/place_form_component.ex:346
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:1841
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:2560
@@ -150,7 +150,7 @@ msgstr "Explorar, editar y gestionar las obras importadas."
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: lib/playcode_web/live/admin/import_live.ex:89
+#: lib/playcode_web/live/admin/import_live.ex:92
 #, elixir-autogen, elixir-format
 msgid "Cannot read directory"
 msgstr "No se puede leer el directorio"
@@ -205,13 +205,13 @@ msgstr "Personaje guardado."
 msgid "Characters"
 msgstr "Personajes"
 
-#: lib/playcode_web/live/admin/import_live.ex:236
+#: lib/playcode_web/live/admin/import_live.ex:239
 #, elixir-autogen, elixir-format
 msgid "Choose one or more TEI-XML files from your computer."
 msgstr "Seleccione uno o más archivos TEI-XML de su ordenador."
 
 #: lib/playcode_web/live/admin/filemaker_sync_live.ex:158
-#: lib/playcode_web/live/admin/import_live.ex:365
+#: lib/playcode_web/live/admin/import_live.ex:368
 #: lib/playcode_web/live/admin/play_form_live.ex:429
 #: lib/playcode_web/live/admin/play_list_live.ex:182
 #, elixir-autogen, elixir-format
@@ -286,11 +286,6 @@ msgstr "¿Eliminar esta escena y todo su contenido?"
 msgid "Description"
 msgstr "Descripción"
 
-#: lib/playcode_web/controllers/page_html/home.html.heex:10
-#, elixir-autogen, elixir-format
-msgid "Digital editions and catalogue of early modern European theatre plays (16th-17th century)"
-msgstr "Ediciones digitales y catálogo de obras teatrales europeas de la edad moderna (siglos XVI-XVII)"
-
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:2610
 #, elixir-autogen, elixir-format
 msgid "Division"
@@ -305,11 +300,6 @@ msgstr "División eliminada."
 #, elixir-autogen, elixir-format
 msgid "Division saved."
 msgstr "División guardada."
-
-#: lib/playcode_web/live/play_catalogue_live.ex:65
-#, elixir-autogen, elixir-format
-msgid "EMOTHE Digital Library"
-msgstr "Biblioteca Digital EMOTHE"
 
 #: lib/playcode_web/live/admin/place_list_live.ex:171
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:1036
@@ -330,7 +320,7 @@ msgstr "Editar"
 msgid "Edit Content"
 msgstr "Editar contenido"
 
-#: lib/playcode_web/live/admin/import_live.ex:402
+#: lib/playcode_web/live/admin/import_live.ex:405
 #: lib/playcode_web/live/play_show_live.ex:233
 #, elixir-autogen, elixir-format
 msgid "Edit in Admin"
@@ -380,20 +370,10 @@ msgid "English"
 msgstr "Inglés"
 
 #: lib/playcode_web/live/admin/filemaker_sync_live.ex:325
-#: lib/playcode_web/live/admin/import_live.ex:441
+#: lib/playcode_web/live/admin/import_live.ex:444
 #, elixir-autogen, elixir-format
 msgid "Error"
 msgstr "Error"
-
-#: lib/playcode_web/controllers/page_html/home.html.heex:7
-#, elixir-autogen, elixir-format
-msgid "European Modernities in Theatre and Performance"
-msgstr "Modernidades Europeas en Teatro y Representación"
-
-#: lib/playcode_web/live/play_catalogue_live.ex:67
-#, elixir-autogen, elixir-format
-msgid "European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions"
-msgstr "Teatro Europeo de los siglos XVI y XVII: Patrimonio y Ediciones Digitales"
 
 #: lib/playcode_web/components/layouts.ex:299
 #: lib/playcode_web/live/admin/export_site_live.ex:332
@@ -418,13 +398,13 @@ msgstr "Exportar PDF"
 msgid "Export TEI-XML"
 msgstr "Exportar TEI-XML"
 
-#: lib/playcode_web/live/admin/import_live.ex:363
+#: lib/playcode_web/live/admin/import_live.ex:366
 #, elixir-autogen, elixir-format
 msgid "File"
 msgstr "Archivo"
 
 #: lib/playcode_web/live/admin/filemaker_sync_live.ex:322
-#: lib/playcode_web/live/admin/import_live.ex:438
+#: lib/playcode_web/live/admin/import_live.ex:441
 #, elixir-autogen, elixir-format
 msgid "File is too large (max 20MB)"
 msgstr "El archivo es demasiado grande (máx. 20MB)"
@@ -461,7 +441,7 @@ msgstr "Si su correo está en nuestro sistema, recibirá instrucciones para rest
 msgid "Import"
 msgstr "Importar"
 
-#: lib/playcode_web/live/admin/import_live.ex:271
+#: lib/playcode_web/live/admin/import_live.ex:274
 #, elixir-autogen, elixir-format
 msgid "Import %{count} file(s)"
 msgstr "Importar %{count} archivo(s)"
@@ -472,7 +452,7 @@ msgstr "Importar %{count} archivo(s)"
 msgid "Import TEI-XML"
 msgstr "Importar TEI-XML"
 
-#: lib/playcode_web/live/admin/import_live.ex:224
+#: lib/playcode_web/live/admin/import_live.ex:227
 #, elixir-autogen, elixir-format
 msgid "Import TEI-XML Files"
 msgstr "Importar archivos TEI-XML"
@@ -482,17 +462,17 @@ msgstr "Importar archivos TEI-XML"
 msgid "Import and export scholarly editions in TEI P5 format"
 msgstr "Importar y exportar ediciones académicas en formato TEI P5"
 
-#: lib/playcode_web/live/admin/import_live.ex:146
+#: lib/playcode_web/live/admin/import_live.ex:149
 #, elixir-autogen, elixir-format
 msgid "Import errors"
 msgstr "Errores de importación"
 
-#: lib/playcode_web/live/admin/import_live.ex:227
+#: lib/playcode_web/live/admin/import_live.ex:230
 #, elixir-autogen, elixir-format
 msgid "Import one or many TEI files and review successful ingestions."
 msgstr "Importe uno o varios archivos TEI y verifique que se hayan importado correctamente."
 
-#: lib/playcode_web/live/admin/import_live.ex:358
+#: lib/playcode_web/live/admin/import_live.ex:361
 #, elixir-autogen, elixir-format
 msgid "Imported Plays"
 msgstr "Obras importadas"
@@ -563,11 +543,6 @@ msgstr "Números de verso"
 msgid "Log in"
 msgstr "Iniciar sesión"
 
-#: lib/playcode_web/live/user_login_live.ex:8
-#, elixir-autogen, elixir-format
-msgid "Log in to EMOTHE"
-msgstr "Iniciar sesión en EMOTHE"
-
 #: lib/playcode_web/components/layouts.ex:209
 #, elixir-autogen, elixir-format
 msgid "Log out"
@@ -619,12 +594,12 @@ msgstr "Nueva contraseña"
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:1768
 #: lib/playcode_web/live/admin/play_list_live.ex:294
 #: lib/playcode_web/live/admin/user_list_live.ex:392
-#: lib/playcode_web/live/play_catalogue_live.ex:151
+#: lib/playcode_web/live/play_catalogue_live.ex:153
 #, elixir-autogen, elixir-format
 msgid "Next"
 msgstr "Siguiente"
 
-#: lib/playcode_web/live/admin/import_live.ex:74
+#: lib/playcode_web/live/admin/import_live.ex:77
 #, elixir-autogen, elixir-format
 msgid "No .xml files found in %{dir}"
 msgstr "No se encontraron archivos .xml en %{dir}"
@@ -649,7 +624,7 @@ msgstr "Aún no hay contenido para previsualizar."
 msgid "No content yet. Add a speech, stage direction, or prose."
 msgstr "Aún no hay contenido. Añada un parlamento, acotación o prosa."
 
-#: lib/playcode_web/live/play_catalogue_live.ex:130
+#: lib/playcode_web/live/play_catalogue_live.ex:132
 #, elixir-autogen, elixir-format
 msgid "No plays found. Try a different search term."
 msgstr "No se encontraron obras. Pruebe con otro término de búsqueda."
@@ -664,7 +639,7 @@ msgstr "Aún no hay obras. Importe un archivo TEI-XML o cree una nueva obra."
 msgid "Number"
 msgstr "Número"
 
-#: lib/playcode_web/live/admin/import_live.ex:439
+#: lib/playcode_web/live/admin/import_live.ex:442
 #, elixir-autogen, elixir-format
 msgid "Only .xml files are accepted"
 msgstr "Solo se aceptan archivos .xml"
@@ -708,6 +683,7 @@ msgid "Password updated successfully!"
 msgstr "¡Contraseña actualizada correctamente!"
 
 #: lib/playcode_web/live/play_catalogue_live.ex:12
+#: lib/playcode_web/live/play_catalogue_live.ex:65
 #, elixir-autogen, elixir-format
 msgid "Play Catalogue"
 msgstr "Catálogo de obras"
@@ -737,7 +713,7 @@ msgstr "Obra creada correctamente."
 msgid "Play updated successfully."
 msgstr "Obra actualizada correctamente."
 
-#: lib/playcode_web/live/admin/import_live.ex:214
+#: lib/playcode_web/live/admin/import_live.ex:217
 #, elixir-autogen, elixir-format
 msgid "Play with code %{code} already exists"
 msgstr "Ya existe una obra con el código %{code}"
@@ -760,7 +736,7 @@ msgstr "Portugués"
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:1759
 #: lib/playcode_web/live/admin/play_list_live.ex:284
 #: lib/playcode_web/live/admin/user_list_live.ex:382
-#: lib/playcode_web/live/play_catalogue_live.ex:141
+#: lib/playcode_web/live/play_catalogue_live.ex:143
 #, elixir-autogen, elixir-format
 msgid "Previous"
 msgstr "Anterior"
@@ -809,7 +785,7 @@ msgid "Recompute"
 msgstr "Recalcular"
 
 #: lib/playcode_web/live/admin/export_site_live.ex:317
-#: lib/playcode_web/live/admin/import_live.ex:256
+#: lib/playcode_web/live/admin/import_live.ex:259
 #: lib/playcode_web/live/admin/place_form_component.ex:282
 #: lib/playcode_web/live/admin/play_compare_live.ex:158
 #: lib/playcode_web/live/admin/play_places_live.ex:326
@@ -866,7 +842,7 @@ msgstr "Escenas por"
 msgid "Search"
 msgstr "Buscar"
 
-#: lib/playcode_web/live/play_catalogue_live.ex:75
+#: lib/playcode_web/live/play_catalogue_live.ex:77
 #, elixir-autogen, elixir-format
 msgid "Search by title, author, or code..."
 msgstr "Buscar por título, autor o código..."
@@ -881,7 +857,7 @@ msgstr "Buscar obras..."
 msgid "Sections"
 msgstr "Secciones"
 
-#: lib/playcode_web/live/admin/import_live.ex:234
+#: lib/playcode_web/live/admin/import_live.ex:237
 #, elixir-autogen, elixir-format
 msgid "Select Files"
 msgstr "Seleccionar archivos"
@@ -983,7 +959,7 @@ msgstr "Estadísticas recalculadas."
 msgid "Structure"
 msgstr "Estructura"
 
-#: lib/playcode_web/live/admin/import_live.ex:158
+#: lib/playcode_web/live/admin/import_live.ex:161
 #, elixir-autogen, elixir-format
 msgid "Successfully imported %{count} play(s)."
 msgstr "Se importaron %{count} obra(s) correctamente."
@@ -999,7 +975,7 @@ msgid "Text"
 msgstr "Texto"
 
 #: lib/playcode_web/live/admin/filemaker_sync_live.ex:159
-#: lib/playcode_web/live/admin/import_live.ex:364
+#: lib/playcode_web/live/admin/import_live.ex:367
 #: lib/playcode_web/live/admin/play_content_editor_live.ex:2627
 #: lib/playcode_web/live/admin/play_form_live.ex:351
 #: lib/playcode_web/live/admin/play_list_live.ex:183
@@ -1009,7 +985,7 @@ msgstr "Texto"
 msgid "Title"
 msgstr "Título"
 
-#: lib/playcode_web/live/admin/import_live.ex:440
+#: lib/playcode_web/live/admin/import_live.ex:443
 #, elixir-autogen, elixir-format
 msgid "Too many files (max 20)"
 msgstr "Demasiados archivos (máx. 20)"
@@ -1067,12 +1043,12 @@ msgstr "Obra en verso"
 msgid "Verses"
 msgstr "Versos"
 
-#: lib/playcode_web/live/admin/import_live.ex:421
+#: lib/playcode_web/live/admin/import_live.ex:424
 #, elixir-autogen, elixir-format
 msgid "View all plays"
 msgstr "Ver todas las obras"
 
-#: lib/playcode_web/live/admin/import_live.ex:410
+#: lib/playcode_web/live/admin/import_live.ex:413
 #: lib/playcode_web/live/admin/play_list_live.ex:236
 #, elixir-autogen, elixir-format
 msgid "View public page"
@@ -1784,7 +1760,7 @@ msgstr "Otro"
 #: lib/playcode_web/live/admin/activity_log_live.ex:327
 #: lib/playcode_web/live/admin/play_list_live.ex:287
 #: lib/playcode_web/live/admin/user_list_live.ex:385
-#: lib/playcode_web/live/play_catalogue_live.ex:144
+#: lib/playcode_web/live/play_catalogue_live.ex:146
 #, elixir-autogen, elixir-format
 msgid "Page %{page} of %{total}"
 msgstr "Página %{page} de %{total}"
@@ -1914,7 +1890,7 @@ msgstr "de"
 msgid "— (Original / standalone)"
 msgstr "— (Original / independiente)"
 
-#: lib/playcode_web/live/admin/import_live.ex:338
+#: lib/playcode_web/live/admin/import_live.ex:341
 #, elixir-autogen, elixir-format
 msgid "Importing file %{done} of %{total}..."
 msgstr "Importando archivo %{done} de %{total}..."
@@ -1954,22 +1930,22 @@ msgstr "Validar TEI-XML"
 msgid "xmllint is not installed. Cannot validate."
 msgstr "xmllint no está instalado. No se puede validar."
 
-#: lib/playcode_web/live/admin/import_live.ex:387
+#: lib/playcode_web/live/admin/import_live.ex:390
 #, elixir-autogen, elixir-format
 msgid "%{count} warning(s)"
 msgstr "%{count} advertencia(s)"
 
-#: lib/playcode_web/live/admin/import_live.ex:366
+#: lib/playcode_web/live/admin/import_live.ex:369
 #, elixir-autogen, elixir-format
 msgid "Schema"
 msgstr "Esquema"
 
-#: lib/playcode_web/live/admin/import_live.ex:381
+#: lib/playcode_web/live/admin/import_live.ex:384
 #, elixir-autogen, elixir-format
 msgid "Valid"
 msgstr "Válido"
 
-#: lib/playcode_web/live/admin/import_live.ex:392
+#: lib/playcode_web/live/admin/import_live.ex:395
 #, elixir-autogen, elixir-format
 msgid "and %{count} more"
 msgstr "y %{count} más"
@@ -2542,7 +2518,7 @@ msgstr "actualizar"
 msgid "user"
 msgstr "usuario"
 
-#: lib/playcode_web/live/play_catalogue_live.ex:98
+#: lib/playcode_web/live/play_catalogue_live.ex:100
 #, elixir-autogen, elixir-format
 msgid "Compare"
 msgstr "Comparar"
@@ -2557,7 +2533,7 @@ msgstr "Volver a la obra"
 msgid "%{complete} of %{total} plays marked as complete"
 msgstr ""
 
-#: lib/playcode_web/live/admin/import_live.ex:282
+#: lib/playcode_web/live/admin/import_live.ex:285
 #, elixir-autogen, elixir-format
 msgid "%{count} of these plays already exist"
 msgstr "%{count} de estas obras ya existen"
@@ -2709,17 +2685,17 @@ msgstr ""
 msgid "GitHub Repository (for deploy)"
 msgstr ""
 
-#: lib/playcode_web/live/admin/import_live.ex:285
+#: lib/playcode_web/live/admin/import_live.ex:288
 #, elixir-autogen, elixir-format
 msgid "Importing replaces the text and the records that came from TEI. Anything entered by hand is kept."
 msgstr "La importación reemplaza el texto y los registros procedentes del TEI. Todo lo introducido a mano se conserva."
 
-#: lib/playcode_web/live/admin/import_live.ex:309
+#: lib/playcode_web/live/admin/import_live.ex:312
 #, elixir-autogen, elixir-format
 msgid "Keeps %{count} record(s) you entered by hand."
 msgstr "Conserva %{count} registro(s) introducido(s) a mano."
 
-#: lib/playcode_web/live/admin/import_live.ex:314
+#: lib/playcode_web/live/admin/import_live.ex:317
 #, elixir-autogen, elixir-format
 msgid "Keeps: %{fields}"
 msgstr "Conserva: %{fields}"
@@ -2774,12 +2750,12 @@ msgstr ""
 msgid "Removed %{code} from static site."
 msgstr ""
 
-#: lib/playcode_web/live/admin/import_live.ex:323
+#: lib/playcode_web/live/admin/import_live.ex:326
 #, elixir-autogen, elixir-format
 msgid "Replace and import"
 msgstr "Reemplazar e importar"
 
-#: lib/playcode_web/live/admin/import_live.ex:300
+#: lib/playcode_web/live/admin/import_live.ex:303
 #, elixir-autogen, elixir-format
 msgid "Replaces %{divisions} division(s), %{elements} element(s), %{characters} character(s) and %{tei} record(s) imported from TEI."
 msgstr "Reemplaza %{divisions} división(es), %{elements} elemento(s), %{characters} personaje(s) y %{tei} registro(s) importado(s) del TEI."
@@ -2829,12 +2805,12 @@ msgstr ""
 msgid "Your static site is live at:"
 msgstr ""
 
-#: lib/playcode_web/live/admin/import_live.ex:296
+#: lib/playcode_web/live/admin/import_live.ex:299
 #, elixir-autogen, elixir-format
 msgid "archived — will be restored"
 msgstr "archivada — se restaurará"
 
-#: lib/playcode_web/live/admin/import_live.ex:436
+#: lib/playcode_web/live/admin/import_live.ex:439
 #, elixir-autogen, elixir-format
 msgid "completeness"
 msgstr "estado de completitud"
@@ -2844,17 +2820,17 @@ msgstr "estado de completitud"
 msgid "e.g. username/emothe-static — leave empty to skip deploy"
 msgstr ""
 
-#: lib/playcode_web/live/admin/import_live.ex:433
+#: lib/playcode_web/live/admin/import_live.ex:436
 #, elixir-autogen, elixir-format
 msgid "language"
 msgstr "idioma"
 
-#: lib/playcode_web/live/admin/import_live.ex:435
+#: lib/playcode_web/live/admin/import_live.ex:438
 #, elixir-autogen, elixir-format
 msgid "parent play"
 msgstr "obra original"
 
-#: lib/playcode_web/live/admin/import_live.ex:434
+#: lib/playcode_web/live/admin/import_live.ex:437
 #, elixir-autogen, elixir-format
 msgid "relationship"
 msgstr "relación"
@@ -2971,16 +2947,6 @@ msgstr "Establecer contraseña e iniciar sesión"
 #, elixir-autogen, elixir-format
 msgid "This invitation is no longer valid"
 msgstr "Esta invitación ya no es válida"
-
-#: lib/playcode_web/live/user_accept_invite_live.ex:21
-#, elixir-autogen, elixir-format
-msgid "Welcome to EMOTHE"
-msgstr "Bienvenido a EMOTHE"
-
-#: lib/playcode_web/controllers/user_session_controller.ex:8
-#, elixir-autogen, elixir-format
-msgid "Welcome to EMOTHE!"
-msgstr "¡Bienvenido a EMOTHE!"
 
 #: lib/playcode_web/user_auth.ex:269
 #, elixir-autogen, elixir-format
@@ -3712,3 +3678,33 @@ msgstr "Datación (desde)"
 #, elixir-autogen, elixir-format
 msgid "Composition Date (to)"
 msgstr "Datación (hasta)"
+
+#: lib/playcode_web/controllers/page_html/home.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "Catalogue, edit and publish early modern European plays (16th–17th century), from TEI-XML editions to the libraries' websites"
+msgstr "Catalogar, editar y publicar obras del teatro europeo de los siglos XVI y XVII, desde las ediciones TEI-XML hasta los sitios web de las bibliotecas"
+
+#: lib/playcode_web/live/play_catalogue_live.ex:67
+#, elixir-autogen, elixir-format
+msgid "Early modern European theatre (16th–17th century) from the EMOTHE and ARTELOPE collections"
+msgstr "Teatro europeo de los siglos XVI y XVII de las colecciones EMOTHE y ARTELOPE"
+
+#: lib/playcode_web/live/user_login_live.ex:8
+#, elixir-autogen, elixir-format
+msgid "Log in to Playcode"
+msgstr "Iniciar sesión en Playcode"
+
+#: lib/playcode_web/controllers/page_html/home.html.heex:7
+#, elixir-autogen, elixir-format
+msgid "The editorial platform behind the EMOTHE and ARTELOPE digital libraries"
+msgstr "La plataforma editorial de las bibliotecas digitales EMOTHE y ARTELOPE"
+
+#: lib/playcode_web/live/user_accept_invite_live.ex:21
+#, elixir-autogen, elixir-format
+msgid "Welcome to Playcode"
+msgstr "Bienvenido a Playcode"
+
+#: lib/playcode_web/controllers/user_session_controller.ex:8
+#, elixir-autogen, elixir-format
+msgid "Welcome to Playcode!"
+msgstr "¡Bienvenido a Playcode!"

@@ -5,7 +5,7 @@ defmodule PlaycodeWeb.UserSessionController do
   alias PlaycodeWeb.UserAuth
 
   def create(conn, %{"_action" => "invited"} = params) do
-    create(conn, params, gettext("Welcome to EMOTHE!"))
+    create(conn, params, gettext("Welcome to Playcode!"))
   end
 
   def create(conn, %{"_action" => "password_updated"} = params) do

@@ -62,9 +62,11 @@ defmodule PlaycodeWeb.PlayCatalogueLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-6xl mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-base-content mb-2">{gettext("EMOTHE Digital Library")}</h1>
+      <h1 class="text-3xl font-bold text-base-content mb-2">{gettext("Play Catalogue")}</h1>
       <p class="text-base-content/70 mb-8">
-        {gettext("European Theatre of the 16th and 17th Centuries: Heritage and Digital Editions")}
+        {gettext(
+          "Early modern European theatre (16th–17th century) from the EMOTHE and ARTELOPE collections"
+        )}
       </p>
 
       <form phx-change="search" phx-submit="search" class="mb-8">

@@ -6,7 +6,7 @@ defmodule Playcode.Export.TeiXml do
   alias Playcode.PlayContent
   import XmlBuilder
 
-  @body_types ~w(acto jornada prologo argumento act acte play prologue epilogue)
+  @body_types ~w(acto jornada prologo argumento act acte play prologue induction epilogue)
 
   def generate(play) do
     play =

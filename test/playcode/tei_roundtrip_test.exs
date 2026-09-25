@@ -315,6 +315,22 @@ defmodule Playcode.TeiRoundtripTest do
                ["ACTO PRIMERO", "ESCENA I", "ESCENA II", "ACTO SEGUNDO"]
     end
 
+    # EMOTHE0346 (Bartholomew Fair) opens with an induction; the export used to drop
+    # it, speeches and all, because its type was missing from the body whitelist.
+    test "every kind of top-level division the corpus uses survives, with its content" do
+      types = ~w(acto jornada act prologue induction epilogue play)
+
+      body =
+        Enum.map_join(types, fn type ->
+          ~s(<div1 type="#{type}" n="1"><sp><speaker>X</speaker><p>#{type} text</p></sp></div1>)
+        end)
+
+      xml = roundtrip(tei(body: body))
+
+      assert Enum.map(xml_elements(xml, "div1"), fn {attrs, _} -> attrs["type"] end) == types
+      assert xml_texts(xml, "p", within: "div1") == Enum.map(types, &"#{&1} text")
+    end
+
     test "a speech keeps its speaker, who it is, and its verse" do
       xml =
         roundtrip(

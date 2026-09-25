@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :emothe, Emothe.Repo,
+config :playcode, Playcode.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "emothe_dev",
+  database: "playcode_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :emothe, Emothe.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :emothe, EmotheWeb.Endpoint,
+config :playcode, PlaycodeWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}],
@@ -25,8 +25,8 @@ config :emothe, EmotheWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "hKDfVTD/Tl7Pw9OEfq+2NSgF9rhcUghyjWNEqVnKLd3SPjM2yTBg0psI+UfdJ1Ze",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:emothe, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:emothe, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:playcode, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:playcode, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -53,7 +53,7 @@ config :emothe, EmotheWeb.Endpoint,
 # different ports.
 
 # Reload browser tabs when matching files change.
-config :emothe, EmotheWeb.Endpoint,
+config :playcode, PlaycodeWeb.Endpoint,
   live_reload: [
     web_console_logger: true,
     patterns: [
@@ -62,13 +62,13 @@ config :emothe, EmotheWeb.Endpoint,
       # Gettext translations
       ~r"priv/gettext/.*\.po$"E,
       # Router, Controllers, LiveViews and LiveComponents
-      ~r"lib/emothe_web/router\.ex$"E,
-      ~r"lib/emothe_web/(controllers|live|components)/.*\.(ex|heex)$"E
+      ~r"lib/playcode_web/router\.ex$"E,
+      ~r"lib/playcode_web/(controllers|live|components)/.*\.(ex|heex)$"E
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :emothe, dev_routes: true
+config :playcode, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter, format: "[$level] $message\n"

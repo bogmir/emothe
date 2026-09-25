@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.ChangeSpeakerLabelToText do
+defmodule Playcode.Repo.Migrations.ChangeSpeakerLabelToText do
   use Ecto.Migration
 
   def change do

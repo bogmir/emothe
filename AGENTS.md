@@ -13,19 +13,19 @@ This is a web application written using the Phoenix web framework.
 
 - Fly app status:
 
-  flyctl status --app emothe
+  flyctl status --app playcode
 
 - Fly machines state:
 
-  flyctl machine list --app emothe
+  flyctl machine list --app playcode
 
 - Recent deployment history:
 
-  flyctl releases --app emothe
+  flyctl releases --app playcode
 
 - Public endpoint reachability:
 
-  curl -I -m 20 https://emothe.fly.dev
+  curl -I -m 20 https://playcode.fly.dev
 
 Notes:
 - `stopped` machines on Fly can be expected when `auto_stop_machines = 'stop'` and `min_machines_running = 0` are enabled.

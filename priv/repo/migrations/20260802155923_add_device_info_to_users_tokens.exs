@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddDeviceInfoToUsersTokens do
+defmodule Playcode.Repo.Migrations.AddDeviceInfoToUsersTokens do
   use Ecto.Migration
 
   def change do

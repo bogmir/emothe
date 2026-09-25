@@ -53,7 +53,7 @@ apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 ### 2.2 Docker Compose File
 
-- [ ] Create `/opt/emothe/docker-compose.yml`:
+- [ ] Create `/opt/playcode/docker-compose.yml`:
 
 ```yaml
 services:
@@ -61,7 +61,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: emothe:latest
+    image: playcode:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:4000:8080"
@@ -71,7 +71,7 @@ services:
     env_file:
       - .env.prod
     environment:
-      DATABASE_URL: ecto://emothe:${POSTGRES_PASSWORD}@db/emothe_prod
+      DATABASE_URL: ecto://playcode:${POSTGRES_PASSWORD}@db/playcode_prod
       PHX_SERVER: "true"
       PHX_HOST: "${PHX_HOST:-emothe.uv.es}"
       PORT: "8080"
@@ -83,11 +83,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: emothe
+      POSTGRES_USER: playcode
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: emothe_prod
+      POSTGRES_DB: playcode_prod
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U emothe -d emothe_prod"]
+      test: ["CMD-SHELL", "pg_isready -U playcode -d playcode_prod"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -97,15 +97,15 @@ services:
 
   # Run migrations as a one-shot job
   migrate:
-    image: emothe:latest
+    image: playcode:latest
     depends_on:
       db:
         condition: service_healthy
     env_file:
       - .env.prod
     environment:
-      DATABASE_URL: ecto://emothe:${POSTGRES_PASSWORD}@db/emothe_prod
-    command: /app/bin/emothe eval "Emothe.Release.migrate()"
+      DATABASE_URL: ecto://playcode:${POSTGRES_PASSWORD}@db/playcode_prod
+    command: /app/bin/playcode eval "Playcode.Release.migrate()"
     restart: "no"
     profiles:
       - migrate
@@ -116,7 +116,7 @@ volumes:
 
 ### 2.3 Environment File
 
-- [ ] Create `/opt/emothe/.env.prod` (mode 0600, owned by `deploy`):
+- [ ] Create `/opt/playcode/.env.prod` (mode 0600, owned by `deploy`):
 
 ```bash
 # Required
@@ -159,10 +159,10 @@ OTEL_TRACES_EXPORTER=none
 nginx runs on the host (not in Docker) to handle TLS termination and proxy to the app container.
 
 - [ ] Install nginx on host: `apt install nginx`
-- [ ] Create `/etc/nginx/sites-available/emothe`:
+- [ ] Create `/etc/nginx/sites-available/playcode`:
 
 ```nginx
-upstream emothe {
+upstream playcode {
     server 127.0.0.1:4000;
 }
 
@@ -184,7 +184,7 @@ server {
 
     # WebSocket support (LiveView)
     location /live/websocket {
-        proxy_pass http://emothe;
+        proxy_pass http://playcode;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -196,7 +196,7 @@ server {
     }
 
     location / {
-        proxy_pass http://emothe;
+        proxy_pass http://playcode;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -207,7 +207,7 @@ server {
 }
 ```
 
-- [ ] Enable site: `ln -s /etc/nginx/sites-available/emothe /etc/nginx/sites-enabled/`
+- [ ] Enable site: `ln -s /etc/nginx/sites-available/playcode /etc/nginx/sites-enabled/`
 - [ ] Remove default site: `rm /etc/nginx/sites-enabled/default`
 - [ ] Test and reload: `nginx -t && systemctl reload nginx`
 - [ ] Create certbot post-renewal hook `/etc/letsencrypt/renewal-hooks/post/reload-nginx.sh`:
@@ -226,8 +226,8 @@ systemctl reload nginx
 ### 4.1 Initial Setup
 
 ```bash
-cd /opt/emothe
-git clone https://github.com/<your-org>/emothe.git .
+cd /opt/playcode
+git clone https://github.com/<your-org>/playcode.git .
 
 # Create and edit .env.prod (see section 2.3)
 
@@ -251,11 +251,11 @@ docker compose up -d
 ### 4.3 Create Initial Admin User
 
 ```bash
-docker compose exec app /app/bin/emothe remote
+docker compose exec app /app/bin/playcode remote
 # In the IEx shell:
-Emothe.Accounts.get_user_by_email("admin@example.com")
-|> Emothe.Accounts.User.role_changeset(%{role: "admin"})
-|> Emothe.Repo.update()
+Playcode.Accounts.get_user_by_email("admin@example.com")
+|> Playcode.Accounts.User.role_changeset(%{role: "admin"})
+|> Playcode.Repo.update()
 ```
 
 ---
@@ -264,13 +264,13 @@ Emothe.Accounts.get_user_by_email("admin@example.com")
 
 ### 5.1 Deployment Script
 
-- [ ] Create `/opt/emothe/deploy.sh`:
+- [ ] Create `/opt/playcode/deploy.sh`:
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-cd /opt/emothe
+cd /opt/playcode
 
 # Pull latest code
 git fetch origin main
@@ -291,7 +291,7 @@ docker image prune -f
 echo "Deploy complete at $(date)"
 ```
 
-- [ ] `chmod +x /opt/emothe/deploy.sh`
+- [ ] `chmod +x /opt/playcode/deploy.sh`
 
 ### 5.2 CI/CD (GitHub Actions)
 
@@ -315,7 +315,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: deploy
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /opt/emothe/deploy.sh
+          script: /opt/playcode/deploy.sh
 ```
 
 - [ ] Add `SERVER_HOST` and `SSH_PRIVATE_KEY` to GitHub repository secrets
@@ -323,9 +323,9 @@ jobs:
 
 ### 5.3 Rollback Strategy
 
-- [ ] Tag images before deploying: `docker tag emothe:latest emothe:prev`
-- [ ] Rollback: `docker tag emothe:prev emothe:latest && docker compose up -d --force-recreate app`
-- [ ] For database rollbacks: `docker compose exec app /app/bin/emothe eval "Emothe.Release.rollback(Emothe.Repo, <version>)"`
+- [ ] Tag images before deploying: `docker tag playcode:latest playcode:prev`
+- [ ] Rollback: `docker tag playcode:prev playcode:latest && docker compose up -d --force-recreate app`
+- [ ] For database rollbacks: `docker compose exec app /app/bin/playcode eval "Playcode.Release.rollback(Playcode.Repo, <version>)"`
 
 ---
 
@@ -333,17 +333,17 @@ jobs:
 
 ### 6.1 Backups
 
-- [ ] Create backup script `/opt/emothe/backup.sh`:
+- [ ] Create backup script `/opt/playcode/backup.sh`:
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-BACKUP_DIR=/var/backups/emothe
+BACKUP_DIR=/var/backups/playcode
 mkdir -p "$BACKUP_DIR"
 
-docker compose exec -T db pg_dump -U emothe -Fc emothe_prod \
-  > "$BACKUP_DIR/emothe_$(date +%Y%m%d_%H%M%S).dump"
+docker compose exec -T db pg_dump -U playcode -Fc playcode_prod \
+  > "$BACKUP_DIR/playcode_$(date +%Y%m%d_%H%M%S).dump"
 
 # Keep last 30 days
 find "$BACKUP_DIR" -name "*.dump" -mtime +30 -delete
@@ -351,14 +351,14 @@ find "$BACKUP_DIR" -name "*.dump" -mtime +30 -delete
 echo "Backup complete: $(ls -t $BACKUP_DIR/*.dump | head -1)"
 ```
 
-- [ ] Add to cron: `0 3 * * * /opt/emothe/backup.sh >> /var/log/emothe-backup.log 2>&1`
+- [ ] Add to cron: `0 3 * * * /opt/playcode/backup.sh >> /var/log/playcode-backup.log 2>&1`
 - [ ] Off-site backup: rsync/rclone dumps to S3, B2, or another server
 - [ ] Test restore procedure:
 
 ```bash
 # Create a throwaway container to test restore
-docker compose exec -T db pg_restore -U emothe -d emothe_test --create \
-  < /var/backups/emothe/emothe_YYYYMMDD.dump
+docker compose exec -T db pg_restore -U playcode -d playcode_test --create \
+  < /var/backups/playcode/playcode_YYYYMMDD.dump
 ```
 
 ### 6.2 PostgreSQL Tuning

@@ -1,7 +1,7 @@
-defmodule Emothe.TestFixtures do
-  alias Emothe.Catalogue
-  alias Emothe.PlayContent
-  alias Emothe.Places
+defmodule Playcode.TestFixtures do
+  alias Playcode.Catalogue
+  alias Playcode.PlayContent
+  alias Playcode.Places
 
   def unique_code, do: "PLAY-#{System.unique_integer([:positive])}"
 
@@ -184,16 +184,16 @@ defmodule Emothe.TestFixtures do
   def user_fixture(attrs \\ %{}) do
     attrs = Enum.into(attrs, %{})
 
-    %Emothe.Accounts.User{
+    %Playcode.Accounts.User{
       email: Map.get(attrs, :email, "user-#{System.unique_integer([:positive])}@example.com"),
       role: Map.get(attrs, :role, :researcher),
       confirmed_at: Map.get(attrs, :confirmed_at, DateTime.utc_now(:second)),
       deactivated_at: Map.get(attrs, :deactivated_at)
     }
-    |> Emothe.Accounts.User.password_changeset(%{
+    |> Playcode.Accounts.User.password_changeset(%{
       password: Map.get(attrs, :password, @valid_user_password)
     })
-    |> Emothe.Repo.insert!()
+    |> Playcode.Repo.insert!()
   end
 
   def admin_fixture(attrs \\ %{}) do
@@ -210,7 +210,7 @@ defmodule Emothe.TestFixtures do
     email = Map.get(attrs, :email, "invited-#{System.unique_integer([:positive])}@example.com")
     role = Map.get(attrs, :role, :researcher)
 
-    {:ok, user, token} = Emothe.Accounts.invite_user(email, role, nil)
+    {:ok, user, token} = Playcode.Accounts.invite_user(email, role, nil)
     {user, token}
   end
 

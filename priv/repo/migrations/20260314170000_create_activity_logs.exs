@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.CreateActivityLogs do
+defmodule Playcode.Repo.Migrations.CreateActivityLogs do
   use Ecto.Migration
 
   def change do

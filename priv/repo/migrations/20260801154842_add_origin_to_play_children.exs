@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddOriginToPlayChildren do
+defmodule Playcode.Repo.Migrations.AddOriginToPlayChildren do
   use Ecto.Migration
 
   @tables [:play_editors, :play_sources, :play_editorial_notes]

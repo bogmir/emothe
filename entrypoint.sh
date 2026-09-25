@@ -4,7 +4,7 @@
 set -e
 
 echo "Running database migrations..."
-/app/bin/emothe eval Emothe.Release.migrate
+/app/bin/playcode eval Playcode.Release.migrate
 
 echo "Starting Phoenix application..."
-exec /app/bin/emothe start
+exec /app/bin/playcode start

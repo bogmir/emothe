@@ -35,4 +35,4 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Check app health endpoint
-        run: curl -fsSIL --retry 10 --retry-delay 3 https://emothe.fly.dev
+        run: curl -fsSIL --retry 10 --retry-delay 3 https://playcode.fly.dev

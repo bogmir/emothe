@@ -25,8 +25,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NDJSON = os.path.join(ROOT, "doc", "w3emothe_T01_tituloEM.ndjson")
 OUT = os.path.join(ROOT, "doc", "filemaker-import-analysis.html")
 
-# Plays already imported into emothe_dev. Refresh with:
-#   psql -U postgres -h localhost -d emothe_dev -tAc \
+# Plays already imported into playcode_dev. Refresh with:
+#   psql -U postgres -h localhost -d playcode_dev -tAc \
 #     "select split_part(code,'_',1)||' '||language||' '||coalesce(relationship_type,'-') from plays"
 DB_PLAYS = {
     "EMOTHE0010": ("es", "adaptacion"),
@@ -522,7 +522,7 @@ TEMPLATE = r"""<!doctype html>
   </section>
 
   <section class="panel" id="panel-fix" hidden>
-    <p>The 8 plays currently in <code>emothe_dev</code>, checked against the published index. Three of them are wrong today: the TEI header's <code>xml:lang</code> is always <code>es</code> in EMOTHE files (it marks the editorial platform, not the play), so the importer stored Hamlet's English original as Spanish.</p>
+    <p>The 8 plays currently in <code>playcode_dev</code>, checked against the published index. Three of them are wrong today: the TEI header's <code>xml:lang</code> is always <code>es</code> in EMOTHE files (it marks the editorial platform, not the play), so the importer stored Hamlet's English original as Spanish.</p>
     <div id="fix"></div>
     <p class="note">Everything else in the corpus — the other 54 indexed plays — gets its language and relationship set on first import rather than corrected.</p>
   </section>
@@ -556,7 +556,7 @@ TEMPLATE = r"""<!doctype html>
     <p class="note" id="wmore"></p>
   </section>
 
-  <footer>Counts computed from the NDJSON export, <code>test/fixtures/**/*.xml</code> and the play list in <code>emothe_dev</code>. Plans: <code>docs/superpowers/plans/</code>.</footer>
+  <footer>Counts computed from the NDJSON export, <code>test/fixtures/**/*.xml</code> and the play list in <code>playcode_dev</code>. Plans: <code>docs/superpowers/plans/</code>.</footer>
 </div>
 
 <script id="data" type="application/json">__DATA__</script>

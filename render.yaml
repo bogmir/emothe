@@ -1,18 +1,18 @@
 databases:
-  - name: emothe-db
-    databaseName: emothe
-    user: emothe
+  - name: playcode-db
+    databaseName: playcode
+    user: playcode
     plan: free
 
 services:
   - type: web
-    name: emothe-web
+    name: playcode-web
     runtime: docker
     dockerfilePath: ./Dockerfile.render
     plan: free
     healthCheckPath: /
     autoDeploy: true
-    preDeployCommand: /app/bin/emothe eval Emothe.Release.migrate
+    preDeployCommand: /app/bin/playcode eval Playcode.Release.migrate
     envVars:
       - key: PHX_SERVER
         value: "true"
@@ -22,7 +22,7 @@ services:
         value: "10"
       - key: DATABASE_URL
         fromDatabase:
-          name: emothe-db
+          name: playcode-db
           property: connectionString
       - key: SECRET_KEY_BASE
         generateValue: true

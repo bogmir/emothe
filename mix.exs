@@ -1,9 +1,9 @@
-defmodule Emothe.MixProject do
+defmodule Playcode.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :emothe,
+      app: :playcode,
       version: "0.1.0",
       elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -20,7 +20,7 @@ defmodule Emothe.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Emothe.Application, []},
+      mod: {Playcode.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -104,10 +104,10 @@ defmodule Emothe.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind emothe", "esbuild emothe"],
+      "assets.build": ["compile", "tailwind playcode", "esbuild playcode"],
       "assets.deploy": [
-        "tailwind emothe --minify",
-        "esbuild emothe --minify",
+        "tailwind playcode --minify",
+        "esbuild playcode --minify",
         "phx.digest"
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]

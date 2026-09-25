@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddHistoricalTimeToPlays do
+defmodule Playcode.Repo.Migrations.AddHistoricalTimeToPlays do
   use Ecto.Migration
 
   def change do

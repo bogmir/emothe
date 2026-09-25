@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.CreateUsersAuthTables do
+defmodule Playcode.Repo.Migrations.CreateUsersAuthTables do
   use Ecto.Migration
 
   def change do

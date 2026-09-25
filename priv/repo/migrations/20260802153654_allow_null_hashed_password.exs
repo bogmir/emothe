@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AllowNullHashedPassword do
+defmodule Playcode.Repo.Migrations.AllowNullHashedPassword do
   use Ecto.Migration
 
   def change do

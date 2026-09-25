@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.DropDigitalPublicationDate do
+defmodule Playcode.Repo.Migrations.DropDigitalPublicationDate do
   use Ecto.Migration
 
   def change do

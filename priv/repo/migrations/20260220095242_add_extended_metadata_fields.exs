@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddExtendedMetadataFields do
+defmodule Playcode.Repo.Migrations.AddExtendedMetadataFields do
   use Ecto.Migration
 
   def change do

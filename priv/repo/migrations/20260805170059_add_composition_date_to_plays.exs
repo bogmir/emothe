@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddCompositionDateToPlays do
+defmodule Playcode.Repo.Migrations.AddCompositionDateToPlays do
   use Ecto.Migration
 
   def change do

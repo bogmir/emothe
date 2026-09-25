@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddDeactivatedAtToUsers do
+defmodule Playcode.Repo.Migrations.AddDeactivatedAtToUsers do
   use Ecto.Migration
 
   def change do

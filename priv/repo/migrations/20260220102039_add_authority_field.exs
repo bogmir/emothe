@@ -1,4 +1,4 @@
-defmodule Emothe.Repo.Migrations.AddAuthorityField do
+defmodule Playcode.Repo.Migrations.AddAuthorityField do
   use Ecto.Migration
 
   def change do

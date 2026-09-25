@@ -36,7 +36,7 @@ defmodule PlaycodeWeb.Admin.PlaceListLiveTest do
     # The component notifies the parent via send(self(), :place_saved), which the
     # LiveView processes in its own handle_info — a second, separate round trip
     # from render_submit's own reply. render/1 re-reads the view after that
-    # message has landed. See the report for why this differs from the brief text.
+    # message has landed.
     html = render(view)
 
     assert html =~ "Roma"
@@ -44,6 +44,13 @@ defmodule PlaycodeWeb.Admin.PlaceListLiveTest do
     assert [place] = Places.list_places()
     assert place.slug == "roma"
     assert place.play_count == 0
+
+    # Regression: "place" was missing from the log's resource types, so this write
+    # was silently not logged.
+    assert [%{action: "create", resource_id: id}] =
+             Playcode.ActivityLog.list_entries(resource_type: "place")
+
+    assert id == place.id
   end
 
   test "searching matches a non-preferred name variant", %{conn: conn} do

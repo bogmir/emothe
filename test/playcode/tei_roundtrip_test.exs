@@ -225,7 +225,7 @@ defmodule Playcode.TeiRoundtripTest do
                xml_elements(xml, "castItem")
     end
 
-    test "a repeated character id is kept apart, not merged" do
+    test "a repeated id with a different name is kept apart; an exact repeat is one character" do
       xml =
         roundtrip(
           tei(
@@ -233,6 +233,7 @@ defmodule Playcode.TeiRoundtripTest do
             <div type="elenco"><castList>
               <castItem><role xml:id="HERO">Hero Original</role></castItem>
               <castItem><role xml:id="HERO">Hero Duplicate</role></castItem>
+              <castItem><role xml:id="HERO">Hero Original</role></castItem>
             </castList></div>
             """
           )

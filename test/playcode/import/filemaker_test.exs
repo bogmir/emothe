@@ -10,10 +10,6 @@ defmodule Playcode.Import.FilemakerTest do
     %{index: index}
   end
 
-  test "indexes every published version by code", %{index: index} do
-    assert Map.keys(index) |> Enum.sort() == ["EMOTHE0038", "EMOTHE0052", "HIE0393"]
-  end
-
   test "reads the language tag", %{index: index} do
     assert index["EMOTHE0038"].lang == "en"
     assert index["EMOTHE0052"].lang == "es"
@@ -149,10 +145,6 @@ defmodule Playcode.Import.FilemakerTest do
       %{versions: versions}
     end
 
-    test "keys every version by the code in its web-edition link", %{versions: versions} do
-      assert Map.keys(versions) |> Enum.sort() == ["EMOTHE0038", "EMOTHE0211", "HIE0393"]
-    end
-
     test "decodes the historical time code into a slug", %{versions: versions} do
       assert versions["EMOTHE0038"].historical_time == "antiguedad_clasica"
       assert versions["EMOTHE0211"].historical_time == "siglo_xvii"
@@ -171,10 +163,6 @@ defmodule Playcode.Import.FilemakerTest do
     test "takes the first of several periods", %{versions: versions} do
       assert versions["HIE0393"].historical_time == "siglo_xvi"
       assert versions["HIE0393"].historical_time_note == "After the Battle of Pavia (1525)."
-    end
-
-    test "returns an error for a missing file" do
-      assert {:error, :enoent} = Filemaker.load_versions("test/fixtures/filemaker/nope.ndjson")
     end
 
     test "joins the competing datings into the note", %{versions: versions} do

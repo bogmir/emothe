@@ -36,7 +36,9 @@ defmodule PlaycodeWeb.Admin.UserListLiveTest do
   end
 
   test "given a protected admin then demotion is refused", %{conn: conn} do
-    Application.put_env(:playcode, :admin_emails, ["jefa@uv.es"])
+    # Configured in different case from the account: ADMIN_EMAILS is matched
+    # case-insensitively.
+    Application.put_env(:playcode, :admin_emails, ["Jefa@UV.es"])
     on_exit(fn -> Application.put_env(:playcode, :admin_emails, []) end)
 
     protected = user_fixture(email: "jefa@uv.es", role: :admin)

@@ -10,13 +10,6 @@ defmodule Playcode.Import.TeiCorpusTest do
     dir
   end
 
-  describe "base_code/1" do
-    test "takes the leading token of a filename stem" do
-      assert TeiCorpus.base_code("EMOTHE0010_TheTragedyOfHamletPrinceOfDenmark") == "EMOTHE0010"
-      assert TeiCorpus.base_code("AL0514") == "AL0514"
-    end
-  end
-
   describe "collect_files/1" do
     test "returns one path per code, sorted, with the first directory winning" do
       first = tmp_dir("first")

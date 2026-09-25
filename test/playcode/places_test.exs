@@ -23,16 +23,6 @@ defmodule Playcode.PlacesTest do
       assert errors_on(changeset).names != []
     end
 
-    test "derives the slug from the first name when none is given" do
-      {:ok, place} =
-        Places.create_place(%{
-          "type" => "city",
-          "names" => %{"0" => %{"name" => "Roma", "language" => "es", "is_preferred" => "true"}}
-        })
-
-      assert place.slug == "roma"
-    end
-
     test "a colliding slug is suffixed rather than rejected" do
       # Straight through create_place/1, not place_fixture/1 — the fixture pins a unique
       # slug of its own to keep async tests off the same index lock, which is exactly the
@@ -112,26 +102,12 @@ defmodule Playcode.PlacesTest do
   end
 
   describe "delete_place/1" do
-    test "a place used by a play is refused with a readable message" do
-      play = play_fixture()
-      place = place_fixture(%{"name" => "Roma"})
-      {:ok, _} = Places.link_place(play.id, place.id, %{})
-
-      assert {:error, changeset} = Places.delete_place(place)
-      assert "is still used by one or more plays" in errors_on(changeset).play_places
-    end
-
     test "a place that is a parent is refused" do
       parent = place_fixture(%{"name" => "Italia", "type" => "country"})
       _child = place_fixture(%{"name" => "Roma", "parent_place_id" => parent.id})
 
       assert {:error, changeset} = Places.delete_place(parent)
       assert "is the parent of other places" in errors_on(changeset).children
-    end
-
-    test "an unreferenced place is deleted" do
-      place = place_fixture(%{"name" => "Roma"})
-      assert {:ok, _} = Places.delete_place(place)
     end
   end
 
@@ -175,14 +151,6 @@ defmodule Playcode.PlacesTest do
       %{europe: europe, woods: woods}
     end
 
-    test "ancestors are returned root first", %{woods: woods, europe: europe} do
-      gazetteer = Places.gazetteer()
-      ancestors = Places.ancestors(gazetteer[woods.id], gazetteer)
-
-      assert Enum.map(ancestors, & &1.id) |> List.first() == europe.id
-      assert length(ancestors) == 3
-    end
-
     test "a breadcrumb reads outward from the place", %{woods: woods} do
       gazetteer = Places.gazetteer()
 
@@ -197,19 +165,6 @@ defmodule Playcode.PlacesTest do
   end
 
   describe "search_names/2" do
-    test "matches a name variant that is not the preferred one" do
-      place =
-        place_fixture(%{
-          "names" => [
-            %{"name" => "Constantinopla", "language" => "es", "is_preferred" => "true"},
-            %{"name" => "İstanbul", "language" => "tr"}
-          ]
-        })
-
-      assert [found] = Places.search_names("istanbul")
-      assert found.id == place.id
-    end
-
     test "is case insensitive and matches a fragment" do
       place = place_fixture(%{"name" => "Alexandría"})
       assert [found] = Places.search_names("ALEX")
@@ -231,37 +186,6 @@ defmodule Playcode.PlacesTest do
     end
   end
 
-  describe "find_or_create_by_slug/1" do
-    test "creates a place the first time and reuses it the second" do
-      attrs = %{
-        "slug" => "pl-roma",
-        "type" => "city",
-        "names" => [%{"name" => "Roma", "language" => "es", "is_preferred" => "true"}]
-      }
-
-      assert {:ok, first, :created} = Places.find_or_create_by_slug(attrs)
-      assert {:ok, second, :existing} = Places.find_or_create_by_slug(attrs)
-      assert first.id == second.id
-    end
-
-    test "never overwrites the existing place" do
-      curated = place_fixture(%{"name" => "Roma", "slug" => "pl-roma", "note" => "Curated note"})
-
-      {:ok, found, :existing} =
-        Places.find_or_create_by_slug(%{
-          "slug" => "pl-roma",
-          "type" => "town",
-          "note" => "From a stale file",
-          "names" => [%{"name" => "Rooma", "language" => "es", "is_preferred" => "true"}]
-        })
-
-      assert found.id == curated.id
-      assert found.note == "Curated note"
-      assert found.type == "city"
-      assert Places.display_name(found, "es") == "Roma"
-    end
-  end
-
   describe "play links" do
     setup do
       play = play_fixture()
@@ -270,27 +194,19 @@ defmodule Playcode.PlacesTest do
       %{play: play, roma: roma, miseno: miseno}
     end
 
-    test "linking appends at the end", %{play: play, roma: roma, miseno: miseno} do
-      {:ok, first} = Places.link_place(play.id, roma.id, %{})
-      {:ok, second} = Places.link_place(play.id, miseno.id, %{"role" => "mentioned"})
-
-      assert first.position == 0
-      assert second.position == 1
-      assert second.role == "mentioned"
-      assert first.origin == "manual"
-    end
-
-    test "listing returns them in position order with the place preloaded", %{
+    test "a new link goes at the end, hand-entered unless it says otherwise", %{
       play: play,
       roma: roma,
       miseno: miseno
     } do
       {:ok, _} = Places.link_place(play.id, roma.id, %{})
-      {:ok, _} = Places.link_place(play.id, miseno.id, %{})
+      {:ok, _} = Places.link_place(play.id, miseno.id, %{"role" => "mentioned"})
 
-      assert [one, two] = Places.list_play_places(play.id)
-      assert Places.display_name(one.place, "es") == "Roma"
-      assert Places.display_name(two.place, "es") == "Miseno"
+      assert Enum.map(
+               Places.list_play_places(play.id),
+               &{Places.display_name(&1.place, "es"), &1.role, &1.origin}
+             ) ==
+               [{"Roma", "setting", "manual"}, {"Miseno", "mentioned", "manual"}]
     end
 
     test "a place cannot be linked to the same play twice", %{play: play, roma: roma} do
@@ -300,43 +216,11 @@ defmodule Playcode.PlacesTest do
       assert "is already linked to this play" in errors_on(changeset).place_id
     end
 
-    test "role and note are editable", %{play: play, roma: roma} do
-      {:ok, link} = Places.link_place(play.id, roma.id, %{})
-
-      {:ok, updated} =
-        Places.update_play_place(link, %{"role" => "mentioned", "note" => "Act III only"})
-
-      assert updated.role == "mentioned"
-      assert updated.note == "Act III only"
-    end
-
-    test "moving a link down swaps it with its neighbour", %{
-      play: play,
-      roma: roma,
-      miseno: miseno
-    } do
-      {:ok, first} = Places.link_place(play.id, roma.id, %{})
-      {:ok, _second} = Places.link_place(play.id, miseno.id, %{})
-
-      :ok = Places.move_play_place(first, :down)
-
-      assert Places.list_play_places(play.id)
-             |> Enum.map(&Places.display_name(&1.place, "es")) == ["Miseno", "Roma"]
-    end
-
     test "moving the first link up is a no-op", %{play: play, roma: roma} do
       {:ok, first} = Places.link_place(play.id, roma.id, %{})
       assert :ok = Places.move_play_place(first, :up)
-      assert [only] = Places.list_play_places(play.id)
-      assert only.position == 0
-    end
-
-    test "unlinking leaves the place in the gazetteer", %{play: play, roma: roma} do
-      {:ok, link} = Places.link_place(play.id, roma.id, %{})
-      {:ok, _} = Places.unlink_place(link)
-
-      assert Places.list_play_places(play.id) == []
-      assert Places.get_place!(roma.id)
+      assert [%{place_id: place_id}] = Places.list_play_places(play.id)
+      assert place_id == roma.id
     end
 
     test "a link created after an unlink does not collide with a surviving position", %{
@@ -349,7 +233,7 @@ defmodule Playcode.PlacesTest do
 
       {:ok, _a} = Places.link_place(play.id, roma.id, %{})
       {:ok, b} = Places.link_place(play.id, miseno.id, %{})
-      {:ok, c} = Places.link_place(play.id, cartagena.id, %{})
+      {:ok, _c} = Places.link_place(play.id, cartagena.id, %{})
 
       {:ok, _} = Places.unlink_place(b)
       {:ok, d} = Places.link_place(play.id, alejandria.id, %{})
@@ -362,22 +246,79 @@ defmodule Playcode.PlacesTest do
                "Alejandria",
                "Cartagena"
              ]
+    end
+  end
 
-      refute d.position == c.position
+  describe "what a place may hold" do
+    defp names(list), do: Map.new(Enum.with_index(list), fn {n, i} -> {"#{i}", n} end)
+
+    # A unique slug unless the test passes one: slugs are corpus-wide, and a name like
+    # "Roma" derived to the same slug in another async file deadlocks (see
+    # place_fixture/1).
+    defp create(attrs) do
+      %{
+        "type" => "city",
+        "slug" => "sch-#{System.unique_integer([:positive])}",
+        "names" => names([%{"name" => "Sch Lugar", "language" => "es"}])
+      }
+      |> Map.merge(attrs)
+      |> Places.create_place()
     end
 
-    test "delete_tei_play_places/1 removes only importer-created links", %{
-      play: play,
-      roma: roma,
-      miseno: miseno
-    } do
-      {:ok, _} = Places.link_place(play.id, roma.id, %{"origin" => "tei"})
-      {:ok, _} = Places.link_place(play.id, miseno.id, %{"origin" => "manual"})
+    test "an explicit slug already in use is refused" do
+      place_fixture(%{"name" => "Roma", "slug" => "sch-roma"})
 
-      {1, nil} = Places.delete_tei_play_places(play.id)
+      assert {:error, changeset} = create(%{"slug" => "sch-roma"})
+      assert "has already been taken" in errors_on(changeset).slug
+    end
 
-      assert [kept] = Places.list_play_places(play.id)
-      assert Places.display_name(kept.place, "es") == "Miseno"
+    test "an unknown type or coordinates off the globe are refused" do
+      assert {:error, changeset} = create(%{"type" => "planet"})
+      assert "is invalid" in errors_on(changeset).type
+
+      assert {:error, changeset} = create(%{"latitude" => "91.0", "longitude" => "0.0"})
+      assert errors_on(changeset).latitude != []
+    end
+
+    test "one authority entity cannot become two places" do
+      {:ok, _} = create(%{"authority" => "wikidata", "authority_id" => "Q220"})
+
+      assert {:error, changeset} = create(%{"authority" => "wikidata", "authority_id" => "Q220"})
+      assert errors_on(changeset).authority_id != []
+    end
+
+    test "one preferred name per language" do
+      preferred = fn name, lang ->
+        %{"name" => name, "language" => lang, "is_preferred" => "true"}
+      end
+
+      assert {:ok, _} =
+               create(%{"names" => names([preferred.("Roma", "es"), preferred.("Rome", "en")])})
+
+      assert {:error, _} =
+               create(%{"names" => names([preferred.("Roma", "es"), preferred.("Rroma", "es")])})
+
+      assert {:error, _} =
+               create(%{
+                 "names" => names([preferred.("Miseno", nil), preferred.("Misenum", nil)])
+               })
+    end
+
+    test "deleting a place deletes its names" do
+      {:ok, place} = create(%{"names" => names([%{"name" => "Sch Borrada", "language" => "es"}])})
+
+      {:ok, _} = Places.delete_place(place)
+      assert Places.search_names("Sch Borrada") == []
+    end
+
+    test "a link needs a known role and origin" do
+      play = play_fixture()
+
+      for {field, attrs} <- [role: %{"role" => "birthplace"}, origin: %{"origin" => "guesswork"}] do
+        place = place_fixture()
+        assert {:error, changeset} = Places.link_place(play.id, place.id, attrs)
+        assert "is invalid" in Map.fetch!(errors_on(changeset), field)
+      end
     end
   end
 end

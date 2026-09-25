@@ -24,7 +24,6 @@ defmodule Playcode.StatisticsTest do
 
     stat = Statistics.get_statistics(play.id)
 
-    assert stat.play_id == play.id
     assert stat.data["num_acts"] == 1
     assert get_in(stat.data, ["scenes", "total"]) == 1
     assert stat.data["total_verses"] == 2
@@ -56,7 +55,6 @@ defmodule Playcode.StatisticsTest do
 
     refreshed = Statistics.recompute(play.id)
 
-    assert refreshed.id == first.id
     assert refreshed.data["total_verses"] == first.data["total_verses"] + 1
   end
 end

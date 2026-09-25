@@ -36,6 +36,10 @@ defmodule PlaycodeWeb.Admin.PlayPlacesLiveTest do
     assert [link] = Places.list_play_places(play.id)
     assert link.role == "setting"
     assert link.origin == "manual"
+
+    # Regression: "play_place" was missing from the log's resource types.
+    assert [%{play_id: play_id}] = Playcode.ActivityLog.list_entries(resource_type: "play_place")
+    assert play_id == play.id
   end
 
   test "role and note are editable in place", %{conn: conn} do

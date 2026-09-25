@@ -1,100 +1,113 @@
 defmodule Playcode.CatalogueTest do
   use Playcode.DataCase, async: true
 
+  import Playcode.TestFixtures
+
   alias Playcode.Catalogue
-  alias Playcode.TestFixtures
 
-  test "create_play/1 and update_play/2 persist valid data" do
-    {:ok, play} =
-      Catalogue.create_play(%{"title" => "La vida", "code" => TestFixtures.unique_code()})
+  describe "finding plays" do
+    test "search matches title, author and code" do
+      play = play_fixture(%{"title" => "Comedia nueva", "author_name" => "Lope"})
+      _other = play_fixture(%{"title" => "Otra obra", "author_name" => "Calderón"})
 
-    assert play.title == "La vida"
-
-    {:ok, updated} = Catalogue.update_play(play, %{"author_name" => "Calderón"})
-    assert updated.author_name == "Calderón"
-  end
-
-  test "create_play/1 rejects invalid data" do
-    assert {:error, changeset} = Catalogue.create_play(%{"code" => TestFixtures.unique_code()})
-    assert %{title: ["can't be blank"]} = errors_on(changeset)
-  end
-
-  test "list_plays/1 supports search by title, author and code" do
-    play_a = TestFixtures.play_fixture(%{"title" => "Comedia nueva", "author_name" => "Lope"})
-    _play_b = TestFixtures.play_fixture(%{"title" => "Otra obra", "author_name" => "Calderón"})
-
-    assert [found_by_title] = Catalogue.list_plays(search: "Comedia")
-    assert found_by_title.id == play_a.id
-
-    assert [found_by_author] = Catalogue.list_plays(search: "Lope")
-    assert found_by_author.id == play_a.id
-
-    assert [found_by_code] = Catalogue.list_plays(search: play_a.code)
-    assert found_by_code.id == play_a.id
-  end
-
-  test "list_plays/1 sorts by code when requested" do
-    first = TestFixtures.play_fixture(%{"code" => "AAA-1", "title" => "A"})
-    second = TestFixtures.play_fixture(%{"code" => "ZZZ-1", "title" => "Z"})
-
-    [play_one, play_two | _] = Catalogue.list_plays(sort: :code)
-
-    assert play_one.id == first.id
-    assert play_two.id == second.id
-  end
-
-  test "get_play_by_code_with_all!/1 includes metadata associations" do
-    play = TestFixtures.play_with_metadata_fixture()
-
-    loaded = Catalogue.get_play_by_code_with_all!(play.code)
-
-    assert length(loaded.sources) == 1
-    assert length(loaded.editors) == 1
-    assert length(loaded.editorial_notes) == 1
-  end
-
-  test "delete_play/1 removes the play" do
-    play = TestFixtures.play_fixture()
-
-    assert {:ok, _} = Catalogue.delete_play(play)
-    assert_raise Ecto.NoResultsError, fn -> Catalogue.get_play!(play.id) end
-  end
-
-  describe "historical_time" do
-    test "accepts a slug from the vocabulary" do
-      assert {:ok, play} =
-               Playcode.Catalogue.create_play(%{
-                 "title" => "A Play",
-                 "code" => "HT0001",
-                 "historical_time" => "siglo_xvii",
-                 "historical_time_note" => "Contemporary. Reign of Philip IV."
-               })
-
-      assert play.historical_time == "siglo_xvii"
-      assert play.historical_time_note == "Contemporary. Reign of Philip IV."
+      for term <- ["Comedia", "Lope", play.code] do
+        assert Enum.map(Catalogue.list_plays(search: term), & &1.id) == [play.id], term
+      end
     end
 
-    test "rejects a slug outside the vocabulary" do
-      assert {:error, changeset} =
-               Playcode.Catalogue.create_play(%{
-                 "title" => "A Play",
-                 "code" => "HT0002",
-                 "historical_time" => "siglo_xxi"
-               })
+    test "plays can be listed by code" do
+      first = play_fixture(%{"code" => "AAA-1", "title" => "Z"})
+      second = play_fixture(%{"code" => "ZZZ-1", "title" => "A"})
 
-      assert %{historical_time: ["is invalid"]} = errors_on(changeset)
+      assert [%{id: id1}, %{id: id2} | _] = Catalogue.list_plays(sort: :code)
+      assert {id1, id2} == {first.id, second.id}
+    end
+  end
+
+  describe "archiving" do
+    test "an archived play disappears from every read, and its code stays reserved" do
+      play = play_fixture(%{"code" => "EMOTHE9101_Archived"})
+
+      assert {:ok, archived} = Catalogue.delete_play(play)
+      assert archived.deleted_at
+
+      assert Catalogue.list_plays() == []
+      assert Catalogue.count_plays() == 0
+      assert_raise Ecto.NoResultsError, fn -> Catalogue.get_play!(play.id) end
+      assert_raise Ecto.NoResultsError, fn -> Catalogue.get_play_by_code!(play.code) end
+
+      assert Enum.map(Catalogue.list_plays(include_deleted: true), & &1.id) == [play.id]
+      assert Catalogue.get_play!(play.id, include_deleted: true).id == play.id
+
+      assert {:error, changeset} = Catalogue.create_play(%{"code" => play.code, "title" => "x"})
+      assert %{code: _} = errors_on(changeset)
     end
 
-    test "accepts nil" do
-      assert {:ok, play} =
-               Playcode.Catalogue.create_play(%{"title" => "A Play", "code" => "HT0003"})
+    test "restoring brings it back" do
+      {:ok, archived} = Catalogue.delete_play(play_fixture())
 
-      assert play.historical_time == nil
+      assert {:ok, restored} = Catalogue.restore_play(archived)
+      refute restored.deleted_at
+      assert Enum.map(Catalogue.list_plays(), & &1.id) == [archived.id]
     end
 
-    test "historical_times/0 lists the nine terms" do
-      assert length(Playcode.Catalogue.Play.historical_times()) == 9
-      assert "antiguedad_clasica" in Playcode.Catalogue.Play.historical_times()
+    # The destructive path, deliberately wired to no button (see CLAUDE.md).
+    test "purging destroys it" do
+      play = play_fixture()
+
+      assert {:ok, _} = Catalogue.purge_play(play)
+      assert Catalogue.list_plays(include_deleted: true) == []
+    end
+
+    test "archived plays are excluded from the complete count" do
+      play = play_fixture(%{"is_complete" => true})
+      assert Catalogue.count_complete_plays() == 1
+
+      {:ok, _} = Catalogue.delete_play(play)
+      assert Catalogue.count_complete_plays() == 0
+    end
+  end
+
+  describe "what a play may hold" do
+    # {what, attributes, the field it is refused on (nil = accepted)}
+    @rules [
+      {"no title", %{"title" => nil}, :title},
+      {"a historical time outside the vocabulary", %{"historical_time" => "siglo_xxi"},
+       :historical_time},
+      {"a composition year range",
+       %{"composition_date_from" => "1606", "composition_date_to" => "1607"}, nil},
+      {"a single composition year",
+       %{"composition_date_from" => "1614", "composition_date_to" => "1614"}, nil},
+      {"a dating note with no years", %{"composition_date_note" => "alrededor de 1601"}, nil},
+      {"a lone start year", %{"composition_date_from" => "1606"}, :composition_date_from},
+      {"a lone end year", %{"composition_date_to" => "1607"}, :composition_date_to},
+      {"an end year before the start year",
+       %{"composition_date_from" => "1607", "composition_date_to" => "1606"},
+       :composition_date_to},
+      {"a year outside the plausible range",
+       %{"composition_date_from" => "160", "composition_date_to" => "160"},
+       :composition_date_from}
+    ]
+
+    for {what, attrs, refused_on} <- @rules do
+      @attrs attrs
+      @refused_on refused_on
+
+      test "#{what} is #{if refused_on, do: "refused", else: "accepted"}" do
+        result =
+          Catalogue.create_play(
+            Map.merge(%{"title" => "A Play", "code" => unique_code()}, @attrs)
+          )
+
+        case @refused_on do
+          nil ->
+            assert {:ok, _} = result
+
+          field ->
+            assert {:error, changeset} = result
+            assert Map.has_key?(errors_on(changeset), field)
+        end
+      end
     end
   end
 end

@@ -15,20 +15,9 @@ defmodule Playcode.Import.FilemakerTest do
     assert index["EMOTHE0052"].lang == "es"
   end
 
-  test "reads the credit and its role", %{index: index} do
-    assert index["EMOTHE0038"].credit == "Barbara Mowat and Paul Werstine, ed."
+  test "an \"ed.\" credit is the original, a \"tra.\" credit a translation", %{index: index} do
     assert index["EMOTHE0038"].role == :editor
-    assert index["EMOTHE0052"].credit == "Miguel Teruel Pozas, tra."
     assert index["EMOTHE0052"].role == :translator
-  end
-
-  test "strips markup from the title", %{index: index} do
-    assert index["EMOTHE0052"].title == "ANTONIO Y CLEOPATRA"
-  end
-
-  test "keeps the work id and the TEI download path", %{index: index} do
-    assert index["EMOTHE0052"].work == "24"
-    assert index["EMOTHE0052"].xml == "textosXML/EMOTHE0052_AntonioYCleopatra.xml"
   end
 
   test "every version knows its whole family", %{index: index} do

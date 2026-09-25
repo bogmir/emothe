@@ -31,11 +31,14 @@ defmodule RenameGuardTest do
   @repo_root Path.expand("..", __DIR__)
   @bulk_fixtures Path.expand("fixtures/tei_files", __DIR__)
 
-  # Ours. Must be clean of the old application identity.
-  @scanned ~w(
+  # Ours. Must be clean of the old application identity. The top-level docs are
+  # live reference, unlike docs/superpowers/, which records work done under the
+  # old name. `:(glob)` stops `*` from crossing `/` into that archive.
+  @scanned ~w[
     lib test config mix.exs assets priv/repo priv/gettext
     .github Dockerfile Dockerfile.render fly.toml render.yaml entrypoint.sh
-  )
+    README.md AGENTS.md :(glob)docs/*.md docs/build_import_analysis.py
+  ]
 
   # Corpus data, third-party samples, the legacy Fly config that is *supposed*
   # to still say "emothe", and this test, which names the old identity on

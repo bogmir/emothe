@@ -8,7 +8,7 @@ This guide is the fast path for a managed, deployable POC using Fly.io + GitHub 
 - Production container image: [Dockerfile](Dockerfile)
 - Docker context exclusions: [.dockerignore](.dockerignore)
 - GitHub Actions deploy workflow: [.github/workflows/deploy-fly.yml](.github/workflows/deploy-fly.yml)
-- Release migrations via: `Emothe.Release.migrate`
+- Release migrations via: `Playcode.Release.migrate`
 
 ## Prerequisites
 
@@ -31,14 +31,14 @@ git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin git@github.com:<your-user-or-org>/emothe.git
+git remote add origin git@github.com:<your-user-or-org>/playcode.git
 git push -u origin main
 ```
 
 If you use GitHub CLI (`gh`):
 
 ```bash
-gh repo create <your-user-or-org>/emothe --private --source=. --remote=origin --push
+gh repo create <your-user-or-org>/playcode --private --source=. --remote=origin --push
 ```
 
 ## 2) Create Fly app and managed Postgres
@@ -131,7 +131,7 @@ Deploy behavior:
 
 `fly.toml` includes:
 
-- `release_command = "/app/bin/emothe eval Emothe.Release.migrate"`
+- `release_command = "/app/bin/playcode eval Playcode.Release.migrate"`
 
 This runs DB migrations automatically at deploy time.
 

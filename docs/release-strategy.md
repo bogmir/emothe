@@ -12,7 +12,7 @@ The repository currently includes a complete Fly.io POC path:
 - Fly deploy workflow: [.github/workflows/deploy-fly.yml](.github/workflows/deploy-fly.yml)
 - Fly app config: [fly.toml](fly.toml)
 - Container build config: [Dockerfile](Dockerfile)
-- Release migration module: [lib/emothe/release.ex](lib/emothe/release.ex)
+- Release migration module: [lib/playcode/release.ex](lib/playcode/release.ex)
 - Step-by-step setup: [docs/fly-poc-deployment.md](docs/fly-poc-deployment.md)
 
 ## How the Fly POC flow works
@@ -23,7 +23,7 @@ On push to `main` (or manual dispatch):
 
 1. GitHub Actions runs Fly deploy workflow
 2. Fly builds/deploys using [fly.toml](fly.toml) and [Dockerfile](Dockerfile)
-3. Release command runs migrations: `Emothe.Release.migrate`
+3. Release command runs migrations: `Playcode.Release.migrate`
 4. App becomes available via Fly-managed runtime and networking
 
 ### Runtime responsibilities

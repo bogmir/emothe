@@ -8,8 +8,6 @@ defmodule Playcode.Places.Authority do
   `Stub` the test environment uses, which is what keeps the suite off the network.
   """
 
-  alias Playcode.Places.Place
-
   @callback search(term :: String.t(), opts :: keyword()) ::
               {:ok, [%{id: String.t(), label: String.t(), description: String.t() | nil}]}
               | {:error, atom()}
@@ -48,12 +46,6 @@ defmodule Playcode.Places.Authority do
       module: nil
     }
   }
-
-  def registry do
-    Enum.map(Place.authorities(), fn slug ->
-      @registry |> Map.fetch!(slug) |> Map.put(:slug, slug)
-    end)
-  end
 
   @doc "The searchable implementation for the current environment."
   def impl do

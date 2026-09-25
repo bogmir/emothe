@@ -100,9 +100,11 @@ defmodule Playcode.Places.Authority.WikidataTest do
   end
 
   describe "the registry" do
-    test "lists every authority slug the schema allows" do
-      slugs = Enum.map(Authority.registry(), & &1.slug)
-      assert Enum.sort(slugs) == Enum.sort(Playcode.Places.Place.authorities())
+    test "every authority the schema allows has a label and a link" do
+      for slug <- Playcode.Places.Place.authorities() do
+        assert Authority.label(slug) != "", slug
+        assert Authority.url(slug, "X1"), slug
+      end
     end
 
     test "builds an outbound URL for a linked place" do

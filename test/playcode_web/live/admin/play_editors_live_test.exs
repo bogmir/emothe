@@ -1,0 +1,53 @@
+defmodule PlaycodeWeb.Admin.PlayEditorsLiveTest do
+  use PlaycodeWeb.ConnCase, async: true
+
+  import Phoenix.LiveViewTest
+  import Playcode.TestFixtures
+  import Playcode.ImportHelpers
+
+  setup %{conn: conn} do
+    %{conn: log_in_user(conn, user_fixture(role: :researcher)), play: play_fixture()}
+  end
+
+  defp translators(play), do: xml_texts(export_tei(play), "editor", within: "titleStmt")
+
+  test "an editor added, renamed and removed here is what the play's TEI credits",
+       %{conn: conn, play: play} do
+    {:ok, lv, _html} = live(conn, ~p"/admin/plays/#{play.id}/editors")
+
+    lv |> element("button", t("Add editor")) |> render_click()
+
+    lv
+    |> form("#editor-form",
+      play_editor: %{"person_name" => "Sanderson, John D.", "role" => "translator"}
+    )
+    |> render_submit()
+
+    assert translators(play) == ["Sanderson, John D."]
+
+    [editor] = Playcode.Catalogue.get_play_with_all!(play.id).editors
+    lv |> element("#editor-#{editor.id} button", t("Edit")) |> render_click()
+
+    lv
+    |> form("#editor-form", play_editor: %{"person_name" => "Sanderson, J. D."})
+    |> render_submit()
+
+    assert translators(play) == ["Sanderson, J. D."]
+
+    lv |> element("#editor-#{editor.id} button", t("Delete")) |> render_click()
+    assert translators(play) == []
+  end
+
+  test "a nameless editor is refused", %{conn: conn, play: play} do
+    {:ok, lv, _html} = live(conn, ~p"/admin/plays/#{play.id}/editors")
+    lv |> element("button", t("Add editor")) |> render_click()
+
+    html =
+      lv
+      |> form("#editor-form", play_editor: %{"person_name" => "", "role" => "translator"})
+      |> render_submit()
+
+    assert html =~ Gettext.dgettext(PlaycodeWeb.Gettext, "errors", "can't be blank")
+    assert Playcode.Catalogue.get_play_with_all!(play.id).editors == []
+  end
+end

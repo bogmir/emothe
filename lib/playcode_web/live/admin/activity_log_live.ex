@@ -200,7 +200,7 @@ defmodule PlaycodeWeb.Admin.ActivityLogLive do
         </p>
       </div>
 
-      <form phx-change="filter" phx-submit="filter" class="mb-5">
+      <form id="activity-filters" phx-change="filter" phx-submit="filter" class="mb-5">
         <div class="flex flex-wrap gap-3 items-end">
           <div class="form-control">
             <label class="label"><span class="label-text text-xs">{gettext("Action")}</span></label>

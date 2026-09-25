@@ -73,10 +73,21 @@ defmodule Playcode.AccountsTest do
     end
 
     test "keeps the original confirmation time of a confirmed account" do
-      user = user_fixture(confirmed_at: ~U[2020-01-01 00:00:00Z])
+      user = user_fixture()
 
-      assert {:ok, reset} = Accounts.reset_user_password(user, %{password: valid_user_password()})
-      assert reset.confirmed_at == ~U[2020-01-01 00:00:00Z]
+      # Time travel: confirmed long ago, so a reset that re-stamped it would show.
+      import Ecto.Query
+      confirmed = ~U[2020-01-01 00:00:00Z]
+
+      from(u in Playcode.Accounts.User, where: u.id == ^user.id)
+      |> Playcode.Repo.update_all(set: [confirmed_at: confirmed])
+
+      user = Accounts.get_user!(user.id)
+
+      assert {:ok, reset} =
+               Accounts.reset_user_password(user, %{password: "a different password"})
+
+      assert reset.confirmed_at == confirmed
     end
 
     test "does not let a deactivated account back in" do

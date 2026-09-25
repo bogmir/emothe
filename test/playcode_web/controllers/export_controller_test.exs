@@ -2,7 +2,6 @@ defmodule PlaycodeWeb.ExportControllerTest do
   @moduledoc "The public downloads at /export/:id/*, open to anyone."
   use PlaycodeWeb.ConnCase, async: true
 
-  import Playcode.TestFixtures
   import Playcode.ImportHelpers
 
   setup do

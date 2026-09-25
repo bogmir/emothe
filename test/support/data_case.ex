@@ -16,13 +16,11 @@ defmodule Playcode.DataCase do
 
   use ExUnit.CaseTemplate
 
+  # Deliberately no Repo alias or Ecto.Query import: tests read through the
+  # contexts' public functions. The rare test that has to reach past them (ageing a
+  # token, say) aliases what it needs where it needs it, and says why.
   using do
     quote do
-      alias Playcode.Repo
-
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query
       import Playcode.DataCase
     end
   end

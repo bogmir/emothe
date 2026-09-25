@@ -30,12 +30,47 @@ Rules that follow from this:
 
 - **Never claim "done", "fixed" or "working" without the command output that proves it.** Evidence first, assertion second.
 - **A failing test is information, not an obstacle.** If a test fails, read the failure before changing anything. If the failure means the *test's* expectation was wrong, fix the test and say so — but check the implementation first.
-- **An existing test that contradicts a deliberate behaviour change gets updated, with a comment saying why.** See `test/playcode/import/tei_parser_test.exs` — "returns error when play code already exists" became "updates the existing play" when re-imports became non-destructive.
+- **An existing test that contradicts a deliberate behaviour change gets updated, with a comment saying why.** See `test/playcode/import/tei_parser_test.exs`, "the play it returns is the play as stored": it used to assert the stale value `import_file/1` returned.
 - **Bugfixes get a regression test** that fails before the fix.
 - **`mix format` after every task.** The repo is formatted; a noisy diff hides the real change.
 - **`mix compile --warnings-as-errors` before committing.**
 
-Where the tests live: `test/playcode/` for contexts, importers and exporters; `test/playcode_web/live/` for LiveViews; `test/support/fixtures.ex` for `play_fixture/1` and friends; `test/fixtures/` for TEI and FileMaker sample files.
+**Test behaviour through the outermost API** (Saša Jurić's rule). A user journey is
+tested through its route: a LiveView with `live/2`, `form/3` and `render_submit/1`, a
+controller with `get`/`post`, a mix task with `Mix.Task.rerun/2`. Test an internal only
+where the outer path is much slower or clumsier to set up: the TEI and Word importers
+through `TeiParser.import_file/1` / `WordParser.import_content/2`, the FileMaker sync
+rules through `FilemakerSync.plan/3`, the account token rules through `Accounts`. Even
+then, assert on what someone outside can observe, never on how rows are stored:
+
+- **Import and export are asserted as round trips.** Import a TEI snippet, export it,
+  query the XML: `roundtrip/1`, `xml_elements/3`, `xml_texts/3`, `outline/1` and
+  `docx/1` in `test/support/import_helpers.ex`. Not `parent_id`, `position` or element
+  types.
+- **Read back through a context's public functions**, not `Repo`. `DataCase` does not
+  import `Repo` or `Ecto.Query`; the rare test that must reach past the contexts (ageing
+  a token, say) aliases them in place and says why.
+- **Select by what the user sees or by a stable id**: `element(lv, "#user-#{id} button",
+  t("Reactivate"))`, an `aria-label` on an icon-only button, `aria-current` in the
+  sidebar. Not `phx-click` attributes, CSS classes or regexes over markup. `t/2` in
+  ConnCase gives the Spanish text the page renders.
+- **Prove a new test bites.** A test written for code that already works passes at
+  once, which proves nothing. Break the line it covers, watch it go red, put it back,
+  and say so in the commit.
+- **Delete a test only when you can name what still covers its behaviour.**
+- **Who may open which page** is `test/playcode_web/authorization_test.exs`, a
+  route-by-persona table written by hand. Add a row for every new gated route.
+
+Where the tests live: `test/playcode/` for contexts, importers and exporters
+(`tei_roundtrip_test.exs` for everything a TEI file carries); `test/playcode_web/` for
+routes, LiveViews and controllers; `test/mix/tasks_test.exs` for the mix tasks;
+`test/support/fixtures.ex` for `play_fixture/1` and friends (users are made through the
+invite flow); `test/fixtures/` for TEI, Word and FileMaker sample files.
+
+`mix test --include slow` adds the TEI schema validation and the full corpus sweep in
+`test/playcode/roundtrip_test.exs`: every tracked `test/fixtures/*.xml` plus the
+git-ignored `test/fixtures/tei_files/`, a few minutes. The default run covers two of those
+files.
 
 ## Tech Stack
 
@@ -386,9 +421,9 @@ Then visit:
 - [x] Self-service email change removed - the address identifies the invited account, so `/users/settings` shows it read-only. `change_user_email/2`, `apply_user_email/3`, `update_user_email/2`, `User.email_changeset/3`, `User.confirm_changeset/1` and the `change:` token context are all deleted
 - [x] Admin sidebar shell - three permission-filtered groups, collapsible at every breakpoint, hidden by default on play pages; breadcrumbs removed from the admin layout
 - [x] Compile & fix errors (all modules compile cleanly)
-- [x] TEI parser test suite - metadata, cast list, duplicate characters, acts/scenes, speeches/verses, prose, editorial notes, UTF-16 encoding, split verse parts, line_id, rend, source fields, principal/respStmt editors, author_attribution, edition_title, is_verse, lg part, prose asides, multiple bibl sources, listBibl wrapper
-- [x] TEI XML export test suite - full roundtrip coverage: split verses, xml:id, rend, source bibl fields, pub_place/publication_date, availability_note, principal, respStmt roles, author_attribution, edition_title, hidden characters, division heads, lg part, prose asides, multiple sources, extent
-- [x] Real-fixture roundtrip test (`RoundtripTest`) - imports real TEI files, exports, and verifies: 12 structural count fields (acts, scenes, characters, speeches, verses, line_groups, stage_dirs, asides, split_parts, verse_type_attrs, hidden_chars, heads), ordering preservation (characters, sources, verse line attrs), metadata fidelity (title, author, code, original_title, pub_place, publication_date, licence_url, edition_title, author_attribution, editors, principals, sponsor, funder, sources), derived fields (verse_count, is_verse, extent), and warn-only speaker_refs (multi-character `who` limitation) Two tracked fixtures (`EMOTHE0746`, verse; `EMOTHE0776`, prose) run on every `mix test`; `mix test --include slow` sweeps every tracked `test/fixtures/*.xml` plus the git-ignored `test/fixtures/tei_files/` (a few minutes). The sweep is not green yet - see the open items it reports
+- [x] TEI round-trip test suite (`tei_roundtrip_test.exs`) - every feature a TEI file carries, imported and exported: header fields, language, composition date, cast list, front-matter notes, divisions, speeches (including multi-character `who`), split verses, asides, emphasis, stage directions and their types, extent, and an export → import → export fixpoint. `tei_parser_test.exs` keeps what the export cannot show: failure modes, encodings, the gazetteer rules
+- [x] TEI XML export test suite (`tei_xml_test.exs`) - exports of data no TEI import produces: gazetteer-built places and a dating note with no years
+- [x] Real-fixture roundtrip test (`RoundtripTest`) - imports real TEI files, exports, and verifies: 12 structural count fields (acts, scenes, characters, speeches, verses, line_groups, stage_dirs, asides, split_parts, verse_type_attrs, hidden_chars, heads), ordering preservation (characters, sources, verse line attrs), metadata fidelity (title, author, code, original_title, pub_place, publication_date, licence_url, edition_title, author_attribution, editors, principals, sponsor, funder, sources), derived fields (verse_count, is_verse, extent), and warn-only speaker_refs (multi-character `who` limitation) Two tracked fixtures (`EMOTHE0746`, verse; `EMOTHE0776`, prose) run on every `mix test`; `mix test --include slow` sweeps every tracked `test/fixtures/*.xml` plus the git-ignored `test/fixtures/tei_files/` (a few minutes). The sweep is green apart from a broken local copy of EMOTHE0053 (a stray backtick before `<TEI>`)
 - [x] Duplicate character xml_id handling in TEI importer (`create_character_unless_exists`)
 - [x] Manual play content editor at `/admin/plays/:id/content` - characters, divisions, elements with modal forms
 - [x] Navigation overhaul: two layouts (public app + admin sidebar shell), play context bar for admin play pages; breadcrumbs remain on public pages only
@@ -438,6 +473,17 @@ Then visit:
 - [x] **`front_notes` roundtrip check** — roundtrip test now verifies that front-matter `<div>` elements (prologo/dedicatoria/introduccion_editor/argumento/nota with non-empty `<p>` content) survive import→export
 - [ ] **`project_description`/`editorial_declaration`** — imported and exported but no admin UI to edit
 - [x] **Multi-character `who` attrs** (`who="#ALB #COR"`) — replaced single `character_id` FK with `element_characters` join table (many-to-many). Parser splits space-separated `who` refs and resolves each independently. Export reconstructs multi-character `who` attribute. Character Review UI supports multi-select assignment. `speaker_refs` promoted to strict roundtrip assertion.
+
+### Found by the test rework (2026-09-26)
+Each is pinned by a test as it behaves today, not endorsed.
+- [ ] **`ImportLive` `import_directory`** - no form sends it, but any researcher's socket can push the event and make the server read and import every `.xml` under any path (`import_live.ex`, pinned in `import_live_test.exs`)
+- [ ] **Drafts are public** - an incomplete play is hidden from `/plays` but served by `/plays/:code`, `/api/v1` and `/export/:id/*` (sequential ids); pinned in `play_catalogue_live_test.exs`
+- [ ] **Inline `<stage>` is flattened** - a plain `<stage>` inside a verse line or prose paragraph (~2,500 in the corpus) becomes part of the line's text on import; the corpus sweep does not count these
+- [ ] **Activity-log order is unstable within one second** - `desc inserted_at` has second precision, then `desc id` on UUIDs
+- [ ] **`ExportSiteLive` hardcodes `_site`** and a shared temporary zip path, so its generate button cannot be tested; `StaticSite.generate/1` is tested instead
+- [ ] **"must be given together with the end year"** (`play.ex`) has no Spanish translation
+- [ ] **`mix playcode.import.filemaker` includes archived plays**; `/admin/filemaker` excludes them
+- [ ] **`Places.Authority.Stub` ships in `lib/`**
 
 ### Low Priority / Future
 - [ ] **"Review character in text" UI** — admin page to review and assign/reassign `character_id` (the `who` attribute) on speeches across an entire play. Researchers need to: (1) define character identifiers (`xml_id`, the "acrónimo" e.g. `don_diego`) in the dramatis personae, (2) associate each `<speaker>` with a character to generate `<sp who="#don_diego">`, and (3) bulk-review all speech-character associations throughout the play. Character CRUD and import-time `who` resolution already exist; what's missing is the review/bulk-assign UI.

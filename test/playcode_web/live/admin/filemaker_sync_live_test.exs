@@ -81,6 +81,8 @@ defmodule PlaycodeWeb.Admin.FilemakerSyncLiveTest do
       assert changes =~ "HIE0393"
       refute changes =~ "AL0001"
 
+      assert changes =~ t("Language")
+
       assert lv |> element("#unchanged") |> render() =~ "EMOTHE0052"
 
       missing = lv |> element("#missing") |> render()
@@ -330,27 +332,27 @@ defmodule PlaycodeWeb.Admin.FilemakerSyncLiveTest do
     end
   end
 
-  # A field with no field_label/1 clause of its own must still render. This is
-  # what makes the remaining FileMaker slices land on this page with no edit to it.
-  # The fields a shipped slice writes do get a clause, so an admin reading a
-  # conflict list in Spanish reads Spanish.
-  describe "field labels" do
-    test "given an unknown field then the catch-all renders it readably" do
-      assert PlaycodeWeb.Admin.FilemakerSyncLive.field_label(:place_of_action) ==
-               "place of action"
+  # Every field a shipped slice writes is named in the page's language, not by its
+  # column name.
+  test "a composition date conflict names its fields in Spanish", %{conn: conn} do
+    play_fixture(%{
+      "code" => "EMOTHE0038",
+      "language" => "en",
+      "composition_date_from" => 1600,
+      "composition_date_to" => 1601,
+      "composition_date_note" => "otra"
+    })
+
+    {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/filemaker")
+    upload_and_preview(lv, "test/fixtures/filemaker/index_sample.ndjson")
+
+    conflicts = lv |> element("#conflicts") |> render()
+
+    for label <- ["Composition Date (from)", "Composition Date (to)", "Composition Date Note"] do
+      assert conflicts =~ t(label)
     end
 
-    test "given a composition date field then it is translated, not fallen through" do
-      for field <- [:composition_date_from, :composition_date_to, :composition_date_note] do
-        label = PlaycodeWeb.Admin.FilemakerSyncLive.field_label(field)
-        refute label =~ "composition date"
-        assert String.downcase(label) =~ "dataci"
-      end
-    end
-
-    test "given an unknown field then its value renders as text" do
-      assert PlaycodeWeb.Admin.FilemakerSyncLive.value_label(:place_of_action, "Roma", %{}) ==
-               "Roma"
-    end
+    # What the catch-all would print for a field with no label of its own.
+    refute conflicts =~ "composition date"
   end
 end

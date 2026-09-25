@@ -241,6 +241,7 @@ defmodule PlaycodeWeb.Layouts do
               <.link
                 navigate={item.to}
                 class={if sidebar_active?(@current_path, item.to, @groups), do: "active", else: ""}
+                aria-current={if sidebar_active?(@current_path, item.to, @groups), do: "page"}
               >
                 <.icon name={item.icon} class="size-4" />
                 {item.label}

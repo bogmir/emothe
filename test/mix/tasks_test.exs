@@ -135,4 +135,20 @@ defmodule Mix.Tasks.PlaycodeTasksTest do
       end
     end
   end
+
+  describe "playcode.export.site" do
+    test "publishes complete plays into the given directory, and drafts only with --all" do
+      complete = play_fixture(%{"is_complete" => true})
+      draft = play_fixture()
+      dir = tmp_dir()
+      page = fn play -> File.exists?(Path.join([dir, "plays", "#{play.code}.html"])) end
+
+      run("playcode.export.site", ["-o", dir])
+      assert page.(complete)
+      refute page.(draft)
+
+      run("playcode.export.site", ["-o", dir, "--all"])
+      assert page.(draft)
+    end
+  end
 end

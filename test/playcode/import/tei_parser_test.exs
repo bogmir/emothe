@@ -979,7 +979,11 @@ defmodule Playcode.Import.TeiParserTest do
     assert play.edition_title == "Edición crítica 2023"
   end
 
-  test "import_file/1 derives is_verse from extent" do
+  # import_file/1 used to return the play as it stood before the verse count was
+  # recomputed from the imported lines, so this test passed on the header's stale
+  # <extent> (3500) while the database held the real count (0). It now checks the
+  # returned play against the stored one.
+  test "import_file/1 returns the play as stored, verse count recomputed from the lines" do
     xml = """
     <?xml version="1.0" encoding="UTF-8"?>
     <TEI>
@@ -995,9 +999,11 @@ defmodule Playcode.Import.TeiParserTest do
     """
 
     path = write_tei(xml)
-    assert {:ok, play} = TeiParser.import_file(path)
-    assert play.is_verse == true
-    assert play.verse_count == 3500
+    assert {:ok, returned} = TeiParser.import_file(path)
+    stored = Catalogue.get_play!(returned.id)
+
+    assert {returned.verse_count, returned.is_verse} == {stored.verse_count, stored.is_verse}
+    assert {stored.verse_count, stored.is_verse} == {0, false}
   end
 
   test "import_file/1 sets is_verse to false without extent" do

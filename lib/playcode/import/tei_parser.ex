@@ -251,9 +251,9 @@ defmodule Playcode.Import.TeiParser do
     end
 
     # Recompute verse_count from actual verse_line elements (the TEI header
-    # <extent> value is often inaccurate or includes non-verse lines)
-    Playcode.Catalogue.update_verse_count(play.id)
-
+    # <extent> value is often inaccurate or includes non-verse lines), and return
+    # the play as that left it rather than the stale struct from before.
+    {:ok, play} = Playcode.Catalogue.update_verse_count(play.id)
     play
   end
 

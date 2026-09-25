@@ -86,14 +86,26 @@ defmodule Playcode.RoundtripTest do
     Regex.scan(~r/<l\s[^>]*part="[IMF]"/, body) |> length()
   end
 
-  # Count <sp> elements with a who attribute (speaker references)
-  defp count_who_attrs(body) do
-    Regex.scan(~r/<sp\s[^>]*who="/, body) |> length()
+  # Count <sp> elements whose who attribute names at least one character in the cast
+  # list. A reference to an id the file never defines (EMOTHE0732's who="#L’OMBRE",
+  # whose castItem is xml:id="OMBRE") points at nobody and is rightly not exported.
+  defp count_who_attrs(body, front) do
+    cast_ids =
+      Regex.scan(~r/<role\b[^>]*xml:id="([^"]+)"/, front, capture: :all_but_first)
+      |> List.flatten()
+      # Ids like xml:id="WASP\n" (EMOTHE0346) are trimmed on import, so trim here too.
+      |> MapSet.new(&String.trim/1)
+
+    Regex.scan(~r/<sp\s[^>]*who="([^"]*)"/, body, capture: :all_but_first)
+    |> Enum.count(fn [who] ->
+      who |> String.split() |> Enum.any?(&MapSet.member?(cast_ids, String.trim_leading(&1, "#")))
+    end)
   end
 
-  # Count <lg> elements with a type attribute (verse type annotations)
+  # Count <lg> elements with a non-empty type attribute (verse type annotations);
+  # AL0644's lone type="" says nothing and is rightly not exported.
   defp count_verse_type_attrs(body) do
-    Regex.scan(~r/<lg\s[^>]*type="/, body) |> length()
+    Regex.scan(~r/<lg\s[^>]*type="[^"]/, body) |> length()
   end
 
   # Count <castItem> elements with ana="oculto" (hidden characters)
@@ -158,8 +170,10 @@ defmodule Playcode.RoundtripTest do
 
   defp count_head_children({_name, _attrs, children}) do
     Enum.reduce(children, 0, fn
-      {"head", _, _}, acc ->
-        acc + 1
+      # An empty <head></head> (EMOTHE0075, 0341, 0733) carries nothing, and the
+      # export rightly omits it.
+      {"head", _, _} = head, acc ->
+        if text_of(head) == "", do: acc, else: acc + 1
 
       {tag, _, _} = el, acc when tag in ~w(root div1 div2) ->
         acc + count_head_children(el)
@@ -183,7 +197,7 @@ defmodule Playcode.RoundtripTest do
       characters: count_tag(front, "castItem"),
       asides: count_aside_elements(body),
       split_parts: count_part_attrs(body),
-      speaker_refs: count_who_attrs(body),
+      speaker_refs: count_who_attrs(body, front),
       verse_type_attrs: count_verse_type_attrs(body),
       hidden_chars: count_hidden_chars(front),
       heads: count_heads_in_body(body),
@@ -248,10 +262,38 @@ defmodule Playcode.RoundtripTest do
     |> String.trim()
   end
 
+  # Entities are decoded so that D'ATHALIE in the source equals D&apos;ATHALIE in the
+  # export (EMOTHE0033, 0752): the same text, spelled two ways.
   defp strip_tags(text) when is_binary(text) do
     text
     |> then(fn t -> Regex.replace(~r/<[^>]+>/u, t, "") end)
+    |> decode_entities()
     |> normalize_ws()
+  end
+
+  defp decode_entities(text) do
+    text
+    |> String.replace(~w(&apos; &quot; &lt; &gt;), fn
+      "&apos;" -> "'"
+      "&quot;" -> "\""
+      "&lt;" -> "<"
+      "&gt;" -> ">"
+    end)
+    |> then(
+      &Regex.replace(~r/&#(x?)([0-9a-fA-F]+);/, &1, fn _, hex, n ->
+        <<String.to_integer(n, if(hex == "x", do: 16, else: 10))::utf8>>
+      end)
+    )
+    |> String.replace("&amp;", "&")
+  end
+
+  defp text_of({_name, _attrs, children}) do
+    children
+    |> Enum.map_join(fn
+      t when is_binary(t) -> t
+      el -> text_of(el)
+    end)
+    |> String.trim()
   end
 
   defp extract_between(xml, open_tag, close_tag) do

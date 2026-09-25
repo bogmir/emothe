@@ -170,9 +170,8 @@ defmodule Playcode.Import.Filemaker do
   end
 
   defp add_work(index, fields) do
-    work = field(fields, "_IdIndiceCtce")
     html = field(fields, "pub_listaObras")
-    versions = parse_versions(html, work)
+    versions = parse_versions(html)
     family = Enum.map(versions, &Map.take(&1, [:code, :role]))
     dating = parse_dating(html)
 
@@ -228,21 +227,13 @@ defmodule Playcode.Import.Filemaker do
     end
   end
 
-  defp parse_versions(html, work) do
+  defp parse_versions(html) do
     @version
     |> Regex.scan(html)
-    |> Enum.map(fn [_all, lang, code, file, title, rest] ->
+    |> Enum.map(fn [_all, lang, code, _file, _title, rest] ->
       credit = rest |> strip_tags() |> String.replace("[xml]", "") |> String.trim()
 
-      %{
-        code: code,
-        lang: Map.get(@languages, lang, ""),
-        title: strip_tags(title),
-        credit: credit,
-        role: role(credit),
-        work: work,
-        xml: "textosXML/#{code}_#{file}.xml"
-      }
+      %{code: code, lang: Map.get(@languages, lang, ""), role: role(credit)}
     end)
   end
 

@@ -1,93 +1,82 @@
 defmodule Playcode.Export.StaticSiteTest do
+  @moduledoc """
+  The published site, generated with `StaticSite.generate/1` into a temp
+  directory and read back as the files a visitor would get.
+  """
   use Playcode.DataCase, async: true
 
-  alias Playcode.Export.StaticSite.Renderer
+  import Playcode.TestFixtures
 
-  test "a play page carries its places and its historical time" do
-    play =
-      Playcode.TestFixtures.play_fixture(%{
-        "is_complete" => true,
-        "historical_time" => "siglo_xvii"
-      })
+  alias Playcode.Export.StaticSite
 
-    place = Playcode.TestFixtures.place_fixture(%{"name" => "Roma"})
-    Playcode.TestFixtures.play_place_fixture(play, place)
+  defp generate!(plays, opts \\ []) do
+    dir = Path.join(System.tmp_dir!(), "site-#{System.unique_integer([:positive])}")
+    on_exit(fn -> File.rm_rf(dir) end)
 
-    play = Playcode.Catalogue.get_play_with_all!(play.id)
-    html = Renderer.play_page(play, [], [], nil, [])
-
-    assert html =~ "Roma"
-    assert html =~ "17th century"
+    opts = Keyword.merge([output_dir: dir, play_codes: Enum.map(plays, & &1.code)], opts)
+    assert {:ok, %{output_dir: ^dir}} = StaticSite.generate(opts)
+    dir
   end
 
-  test "the static site is English regardless of the ambient locale" do
-    play =
-      Playcode.TestFixtures.play_fixture(%{
-        "is_complete" => true,
-        "historical_time" => "siglo_xvii"
-      })
+  defp page(dir, play), do: File.read!(Path.join([dir, "plays", "#{play.code}.html"]))
 
-    play = Playcode.Catalogue.get_play_with_all!(play.id)
+  defp complete_play(attrs \\ %{}), do: play_fixture(Map.put(attrs, "is_complete", true))
 
-    html =
-      Gettext.with_locale(PlaycodeWeb.Gettext, "es", fn ->
-        Renderer.play_page(play, [], [], nil, [])
-      end)
+  test "only complete plays are published, and only they are in the catalogue" do
+    complete = complete_play(%{"title" => "Obra terminada"})
+    draft = play_fixture(%{"title" => "Obra en curso"})
 
+    dir = generate!([complete, draft])
+
+    assert File.exists?(Path.join([dir, "plays", "#{complete.code}.html"]))
+    assert File.exists?(Path.join([dir, "plays", "#{complete.code}.xml"]))
+    refute File.exists?(Path.join([dir, "plays", "#{draft.code}.html"]))
+
+    index = File.read!(Path.join(dir, "index.html"))
+    assert index =~ "Obra terminada"
+    refute index =~ "Obra en curso"
+  end
+
+  test "with nothing complete to publish, nothing is generated" do
+    assert {:error, _} =
+             StaticSite.generate(output_dir: "/nonexistent", play_codes: [play_fixture().code])
+  end
+
+  test "a play page carries its places and its historical time, in English whatever the locale" do
+    play = complete_play(%{"historical_time" => "siglo_xvii"})
+    play_place_fixture(play, place_fixture(%{"name" => "Roma"}))
+
+    dir = Gettext.with_locale(PlaycodeWeb.Gettext, "es", fn -> generate!([play]) end)
+    html = page(dir, play)
+
+    assert html =~ "Roma"
     assert html =~ "17th century"
     refute html =~ "Siglo XVII"
   end
 
-  test "a play page carries its composition date range and note" do
-    play =
-      Playcode.TestFixtures.play_fixture(%{
-        "is_complete" => true,
+  test "a play with no places has no places section" do
+    play = complete_play()
+
+    refute page(generate!([play]), play) =~ ~s(<p class="places-label">)
+  end
+
+  test "a composition date shows as a range, a single year, or the note alone" do
+    range =
+      complete_play(%{
         "composition_date_from" => 1606,
         "composition_date_to" => 1607,
         "composition_date_note" => "1606; 1607"
       })
 
-    play = Playcode.Catalogue.get_play_with_all!(play.id)
-    html = Renderer.play_page(play, [], [], nil, [])
+    single = complete_play(%{"composition_date_from" => 1614, "composition_date_to" => 1614})
+    note_only = complete_play(%{"composition_date_note" => "¿1694? y ¿1605?"})
 
-    assert html =~ "1606–1607"
-    assert html =~ "1606; 1607"
-  end
+    dir = generate!([range, single, note_only])
 
-  test "a play page collapses a single-year composition date" do
-    play =
-      Playcode.TestFixtures.play_fixture(%{
-        "is_complete" => true,
-        "composition_date_from" => 1614,
-        "composition_date_to" => 1614
-      })
-
-    play = Playcode.Catalogue.get_play_with_all!(play.id)
-    html = Renderer.play_page(play, [], [], nil, [])
-
-    assert html =~ "1614"
-    refute html =~ "1614–1614"
-  end
-
-  test "a play page carries a composition note with no years" do
-    play =
-      Playcode.TestFixtures.play_fixture(%{
-        "is_complete" => true,
-        "composition_date_note" => "¿1694? y ¿1605?"
-      })
-
-    play = Playcode.Catalogue.get_play_with_all!(play.id)
-    html = Renderer.play_page(play, [], [], nil, [])
-
-    assert html =~ "¿1694? y ¿1605?"
-  end
-
-  test "a play page with no places renders no places section" do
-    play = Playcode.TestFixtures.play_fixture(%{"is_complete" => true})
-    play = Playcode.Catalogue.get_play_with_all!(play.id)
-
-    html = Renderer.play_page(play, [], [], nil, [])
-
-    refute html =~ "places-label"
+    assert page(dir, range) =~ "1606–1607"
+    assert page(dir, range) =~ "1606; 1607"
+    assert page(dir, single) =~ "1614"
+    refute page(dir, single) =~ "1614–1614"
+    assert page(dir, note_only) =~ "¿1694? y ¿1605?"
   end
 end

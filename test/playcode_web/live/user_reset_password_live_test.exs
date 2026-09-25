@@ -1,35 +1,81 @@
 defmodule PlaycodeWeb.UserResetPasswordLiveTest do
+  @moduledoc """
+  Forgot password, as the user lives it: ask for a link, read the email, follow
+  it, set a password, log in with it.
+  """
   use PlaycodeWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
+  import Swoosh.TestAssertions
   import Playcode.TestFixtures
 
   alias Playcode.Accounts
 
-  defp reset_token(user) do
-    Accounts.deliver_user_reset_password_instructions(user, fn token ->
-      send(self(), {:reset_token, token})
-      "http://localhost/users/reset-password/#{token}"
-    end)
+  @new_password "newverysecure123"
 
-    assert_receive {:reset_token, token}
-    token
+  defp request_link(conn, email) do
+    {:ok, lv, _html} = live(conn, ~p"/users/reset-password")
+
+    lv
+    |> form("#reset_password_form", user: %{"email" => email})
+    |> render_submit()
   end
 
-  test "given a valid token then the password is reset", %{conn: conn} do
+  defp emailed_path(email_address) do
+    assert_email_sent(fn email ->
+      assert email.to == [{"", email_address}]
+      assert [url] = Regex.run(~r{https?://\S+/users/reset-password/\S+}, email.text_body)
+      send(self(), {:reset_path, URI.parse(url).path})
+    end)
+
+    assert_received {:reset_path, path}
+    path
+  end
+
+  defp set_password(conn, path) do
+    {:ok, lv, _html} = live(conn, path)
+
+    lv
+    |> form("#reset_password_form",
+      user: %{"password" => @new_password, "password_confirmation" => @new_password}
+    )
+    |> render_submit()
+  end
+
+  test "the emailed link sets a new password that then logs in", %{conn: conn} do
     user = user_fixture()
 
-    {:ok, lv, _html} = live(conn, ~p"/users/reset-password/#{reset_token(user)}")
+    assert {:error, {:redirect, %{to: "/"}}} = request_link(conn, user.email)
+    path = emailed_path(user.email)
 
-    result =
-      lv
-      |> form("#reset_password_form",
-        user: %{"password" => "newverysecure123", "password_confirmation" => "newverysecure123"}
-      )
-      |> render_submit()
+    assert {:error, {:redirect, %{to: "/users/log-in"}}} = set_password(conn, path)
 
-    assert {:error, {:redirect, %{to: "/users/log-in"}}} = result
-    assert Accounts.get_user_by_email_and_password(user.email, "newverysecure123")
+    conn =
+      post(conn, ~p"/users/log-in", user: %{"email" => user.email, "password" => @new_password})
+
+    assert get_session(conn, :user_token)
+  end
+
+  test "an unknown address gets the same answer as a known one, and no email", %{conn: conn} do
+    known = user_fixture()
+
+    for email <- [known.email, "nobody@uv.es"] do
+      assert {:ok, home} = conn |> request_link(email) |> follow_redirect(conn)
+
+      assert Phoenix.Flash.get(home.assigns.flash, :info) ==
+               t(
+                 "If your email is in our system, you will receive instructions to reset your password shortly."
+               )
+    end
+
+    assert_email_sent(to: known.email)
+
+    refute_email_sent()
+  end
+
+  test "a link that was never sent opens no form", %{conn: conn} do
+    assert {:error, {:redirect, %{to: to}}} = live(conn, ~p"/users/reset-password/not-a-token")
+    assert to == ~p"/"
   end
 
   # Regression: the route sat behind redirect_if_user_is_authenticated, so a
@@ -37,20 +83,15 @@ defmodule PlaycodeWeb.UserResetPasswordLiveTest do
   # explanation. An unconfirmed account can log in but is refused everywhere
   # else, so the reset link was the only way out — and holding a session was
   # exactly what swallowed it.
-  test "given an existing session then the reset page still opens", %{conn: conn} do
+  test "the link works for an account still holding a session, and activates it",
+       %{conn: conn} do
     user = user_fixture(confirmed_at: nil)
 
-    conn = log_in_user(conn, user)
-    {:ok, lv, html} = live(conn, ~p"/users/reset-password/#{reset_token(user)}")
+    request_link(conn, user.email)
+    path = emailed_path(user.email)
 
-    assert html =~ "reset_password_form"
+    set_password(log_in_user(conn, user), path)
 
-    lv
-    |> form("#reset_password_form",
-      user: %{"password" => "newverysecure123", "password_confirmation" => "newverysecure123"}
-    )
-    |> render_submit()
-
-    assert Accounts.active?(Playcode.Repo.reload!(user))
+    assert Accounts.active?(Accounts.get_user!(user.id))
   end
 end

@@ -1,110 +1,39 @@
 defmodule Playcode.Import.TeiReimportTest do
+  @moduledoc """
+  Importing a file whose code already exists updates that play in place: the
+  file owns the text, the platform owns what was curated or typed by hand.
+  """
   use Playcode.DataCase, async: true
+
+  import Playcode.ImportHelpers
 
   alias Playcode.Catalogue
   alias Playcode.Import.TeiParser
-  alias Playcode.PlayContent
 
-  @tei """
-  <?xml version="1.0" encoding="UTF-8"?>
-  <TEI>
-    <teiHeader>
-      <fileDesc>
-        <titleStmt>
-          <title key="archivo">EMOTHE9301_ReimportPlay</title>
-          <title>Reimport Play</title>
-        </titleStmt>
-        <publicationStmt><idno>EMOTHE9301</idno></publicationStmt>
-        <sourceDesc>
-          <bibl><title>Primera parte</title><author>Lope de Vega</author></bibl>
-        </sourceDesc>
-      </fileDesc>
-    </teiHeader>
-    <text>
-      <front>
-        <div type="elenco">
-          <castList><castItem><role xml:id="REY">EL REY</role></castItem></castList>
-        </div>
-      </front>
-      <body>
-        <div1 type="acto" n="1">
-          <head>Acto primero</head>
-          <sp who="#REY"><speaker>EL REY</speaker><l>Conde, entregad la espada.</l></sp>
-        </div1>
-      </body>
-    </text>
-  </TEI>
-  """
+  @tei tei(
+         code: "EMOTHE9301",
+         title: "Reimport Play",
+         title_stmt: "<principal>Teresa Ferrer</principal>",
+         source_desc: "<bibl><title>Primera parte</title><author>Lope de Vega</author></bibl>",
+         front: """
+         <div type="dedicatoria"><head>Dedicatoria</head><p>Al lector.</p></div>
+         <div type="elenco">
+           <castList><castItem><role xml:id="REY">EL REY</role></castItem></castList>
+         </div>
+         """,
+         body: """
+         <div1 type="acto" n="1">
+           <head>Acto primero</head>
+           <sp who="#REY"><speaker>EL REY</speaker><l n="1">Conde, entregad la espada.</l></sp>
+         </div1>
+         """
+       )
 
   setup do
-    path = Path.join(System.tmp_dir!(), "reimport-#{System.unique_integer([:positive])}.xml")
-    File.write!(path, @tei)
-    on_exit(fn -> File.rm(path) end)
-    %{path: path}
+    %{path: write_tmp!(@tei)}
   end
 
-  defp write_tei(xml) do
-    path = Path.join(System.tmp_dir!(), "tei-import-#{System.unique_integer([:positive])}.xml")
-    File.write!(path, xml)
-    on_exit(fn -> File.rm(path) end)
-    path
-  end
-
-  defp minimal_tei(opts) do
-    title = Keyword.get(opts, :title, "Test Play")
-    code = Keyword.get(opts, :code, "TEST#{System.unique_integer([:positive])}")
-    author = Keyword.get(opts, :author, "")
-    front = Keyword.get(opts, :front, "")
-    body = Keyword.get(opts, :body, "")
-
-    author_el = if author != "", do: "<author>#{author}</author>", else: ""
-
-    """
-    <?xml version="1.0" encoding="UTF-8"?>
-    <TEI>
-      <teiHeader>
-        <fileDesc>
-          <titleStmt>
-            <title>#{title}</title>
-            #{author_el}
-          </titleStmt>
-          <publicationStmt>
-            <idno>#{code}</idno>
-          </publicationStmt>
-        </fileDesc>
-      </teiHeader>
-      <text>
-        <front>#{front}</front>
-        <body>#{body}</body>
-      </text>
-    </TEI>
-    """
-  end
-
-  test "re-importing the same code updates the same row", %{path: path} do
-    assert {:ok, first} = TeiParser.import_file(path)
-    {:ok, _} = Catalogue.update_play(first, %{language: "en", relationship_type: "traduccion"})
-
-    assert {:ok, second} = TeiParser.import_file(path)
-    assert second.id == first.id
-
-    reloaded = Catalogue.get_play!(first.id)
-    assert reloaded.language == "en", "TEI must not clobber the FileMaker-derived language"
-    assert reloaded.relationship_type == "traduccion"
-  end
-
-  test "hand-entered records survive a re-import", %{path: path} do
-    {:ok, play} = TeiParser.import_file(path)
-    {:ok, typed} = Catalogue.create_play_source(%{play_id: play.id, title: "Typed by hand"})
-
-    {:ok, _} = TeiParser.import_file(path)
-
-    sources = Catalogue.list_play_sources(play.id)
-    assert typed.id in Enum.map(sources, & &1.id)
-    assert Enum.count(sources, &(&1.origin == "tei")) == 1
-  end
-
-  test "re-importing an archived play restores it", %{path: path} do
+  test "re-importing updates the same play, and brings an archived one back", %{path: path} do
     {:ok, play} = TeiParser.import_file(path)
     {:ok, _} = Catalogue.delete_play(play)
 
@@ -113,41 +42,66 @@ defmodule Playcode.Import.TeiReimportTest do
     refute Catalogue.get_play!(play.id).deleted_at
   end
 
-  test "content is replaced, not duplicated", %{path: path} do
+  test "re-importing the same file changes nothing a reader can see", %{path: path} do
     {:ok, play} = TeiParser.import_file(path)
-    before = counts(play.id)
+    before = export_tei(play)
 
     {:ok, _} = TeiParser.import_file(path)
 
-    assert counts(play.id) == before
-    assert before.divisions > 0 and before.characters > 0 and before.sources > 0
+    assert export_tei(play) == before
   end
 
-  test "a re-import does not overwrite a curated composition date" do
-    path = write_tei(minimal_tei(code: "REIMP-CD", title: "Dated Play"))
+  # The platform-owned columns in lib/playcode/import/tei_parser.ex (@platform_owned).
+  test "curated columns survive a re-import", %{path: path} do
+    {:ok, play} = TeiParser.import_file(path)
 
-    assert {:ok, play} = TeiParser.import_file(path)
+    curated = %{
+      language: "en",
+      relationship_type: "traduccion",
+      historical_time: "edad_media",
+      historical_time_note: "Reinado de Juan I de Portugal (1385-1433)",
+      composition_date_from: 1606,
+      composition_date_to: 1607,
+      composition_date_note: "typed by a curator"
+    }
 
-    {:ok, _edited} =
-      Catalogue.update_play(play, %{
-        "composition_date_from" => 1606,
-        "composition_date_to" => 1607,
-        "composition_date_note" => "typed by a curator"
+    {:ok, _} = Catalogue.update_play(play, curated)
+    {:ok, _} = TeiParser.import_file(path)
+
+    assert Map.take(Catalogue.get_play!(play.id), Map.keys(curated)) == curated
+  end
+
+  test "hand-entered sources, editors and notes survive; the file's own are replaced",
+       %{path: path} do
+    {:ok, play} = TeiParser.import_file(path)
+
+    {:ok, _} = Catalogue.create_play_source(%{play_id: play.id, title: "Typed by hand"})
+
+    {:ok, _} =
+      Catalogue.create_play_editor(%{
+        play_id: play.id,
+        person_name: "A Researcher",
+        role: "researcher"
       })
 
-    assert {:ok, reimported} = TeiParser.import_file(path)
+    {:ok, _} =
+      Catalogue.create_play_editorial_note(%{
+        play_id: play.id,
+        section_type: "nota",
+        content: "Typed"
+      })
 
-    assert reimported.id == play.id
-    assert reimported.composition_date_from == 1606
-    assert reimported.composition_date_to == 1607
-    assert reimported.composition_date_note == "typed by a curator"
-  end
+    {:ok, _} = TeiParser.import_file(path)
+    play = Catalogue.get_play_with_all!(play.id)
 
-  defp counts(play_id) do
-    %{
-      divisions: length(PlayContent.list_divisions(play_id)),
-      characters: length(PlayContent.list_characters(play_id)),
-      sources: length(Catalogue.list_play_sources(play_id))
-    }
+    assert Enum.map(play.sources, & &1.title) |> Enum.sort() == ["Primera parte", "Typed by hand"]
+
+    assert Enum.map(play.editors, & &1.person_name) |> Enum.sort() == [
+             "A Researcher",
+             "Teresa Ferrer"
+           ]
+
+    assert Enum.map(play.editorial_notes, &{&1.section_type, &1.content}) |> Enum.sort() ==
+             [{"dedicatoria", "Al lector."}, {"nota", "Typed"}]
   end
 end

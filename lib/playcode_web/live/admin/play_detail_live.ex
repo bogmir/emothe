@@ -265,7 +265,12 @@ defmodule PlaycodeWeb.Admin.PlayDetailLive do
               "Upload a premarcado .docx file to import play content (divisions, speeches, verses, stage directions). Existing content will be replaced."
             )}
           </p>
-          <form phx-submit="import_docx" phx-change="validate_upload" class="flex items-end gap-3">
+          <form
+            id="docx-upload-form"
+            phx-submit="import_docx"
+            phx-change="validate_upload"
+            class="flex items-end gap-3"
+          >
             <div class="flex-1">
               <.live_file_input
                 upload={@uploads.docx}

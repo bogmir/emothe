@@ -52,13 +52,6 @@ defmodule Playcode.Catalogue do
     |> Repo.aggregate(:count, :id)
   end
 
-  def count_complete_plays(opts \\ []) do
-    Play
-    |> scope(opts)
-    |> where([p], p.is_complete == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
   def get_play!(id, opts \\ []) do
     Play |> scope(opts) |> Repo.get!(id)
   end

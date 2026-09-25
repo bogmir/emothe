@@ -33,11 +33,6 @@ defmodule Playcode.Authz do
                       view_dashboard import_filemaker)a
 
   @doc """
-  Every action this system knows about. Useful for exhaustive tests.
-  """
-  def actions, do: @admin_actions
-
-  @doc """
   Returns true when `user` may perform `action`, optionally on `resource`.
 
   Inactive accounts — unconfirmed or deactivated — are denied everything.

@@ -6,7 +6,7 @@ defmodule Playcode.Export.TeiXml do
   alias Playcode.PlayContent
   import XmlBuilder
 
-  @body_types ~w(acto jornada prologo argumento act acte play prologue epilogue)
+  @body_types ~w(acto jornada prologo argumento act acte play prologue induction epilogue)
 
   def generate(play) do
     play =
@@ -147,9 +147,12 @@ defmodule Playcode.Export.TeiXml do
   end
 
   defp build_edition_stmt(play) do
+    # Positions 100..199 are titleStmt's respStmts, already written there by
+    # build_title_stmt/1. Writing them here too made a re-import create each one twice.
     editors =
       play.editors
       |> Enum.filter(&(&1.role in ["editor", "digital_editor", "reviewer"]))
+      |> Enum.reject(&(&1.position in 100..199))
       |> Enum.map(fn e ->
         resp_label =
           case e.role do
@@ -586,7 +589,8 @@ defmodule Playcode.Export.TeiXml do
   end
 
   defp build_element(%{type: "stage_direction"} = el) do
-    element(:stage, build_inline_content(el.content))
+    attrs = if el.stage_type, do: %{type: el.stage_type}, else: %{}
+    element(:stage, attrs, build_inline_content(el.content))
   end
 
   defp build_element(%{type: "prose"} = el) do

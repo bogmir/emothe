@@ -1,147 +1,80 @@
 defmodule PlaycodeWeb.Admin.PlayFormLiveTest do
+  # form/3 fails when a field is missing from the page, so every test here also checks
+  # that the inputs it fills are really on the form.
   use PlaycodeWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
+  import Playcode.TestFixtures
 
   alias Playcode.Catalogue
-  alias Playcode.TestFixtures
 
-  defp log_in_admin(conn) do
-    log_in_user(conn, Playcode.TestFixtures.admin_fixture())
+  setup %{conn: conn} do
+    %{conn: log_in_user(conn, user_fixture(role: :researcher))}
   end
 
-  describe "Play form behaviors" do
-    test "given valid data when creating a play then user is redirected to detail", %{conn: conn} do
-      conn = log_in_admin(conn)
-      code = TestFixtures.unique_code()
+  defp error(msg), do: Gettext.dgettext(PlaycodeWeb.Gettext, "errors", msg)
 
-      {:ok, view, _html} = live(conn, ~p"/admin/plays/new")
+  defp save(view, fields), do: view |> form("#play-form", play: fields) |> render_submit()
 
-      params = %{
-        "play" => %{
-          "title" => "BDD Play",
-          "code" => code,
-          "author_name" => "Behavior Author",
-          "language" => "es",
-          "is_verse" => "true"
-        }
-      }
+  test "a new play is saved and opens on its detail page", %{conn: conn} do
+    code = "FORM#{System.unique_integer([:positive])}"
+    {:ok, view, _html} = live(conn, ~p"/admin/plays/new")
 
-      view
-      |> element("form[phx-submit]")
-      |> render_submit(params)
+    save(view, %{"title" => "BDD Play", "code" => code, "author_name" => "Behavior Author"})
 
-      created = Catalogue.get_play_by_code!(code)
-      assert_redirect(view, ~p"/admin/plays/#{created.id}")
-    end
+    created = Catalogue.get_play_by_code!(code)
+    assert created.author_name == "Behavior Author"
+    assert_redirect(view, ~p"/admin/plays/#{created.id}")
+  end
 
-    test "given invalid data when creating a play then errors are shown and no redirect", %{
-      conn: conn
-    } do
-      conn = log_in_admin(conn)
-      {:ok, view, _html} = live(conn, ~p"/admin/plays/new")
+  test "a play without a title is not saved, and the form says why", %{conn: conn} do
+    {:ok, view, _html} = live(conn, ~p"/admin/plays/new")
 
-      view
-      |> element("form[phx-submit]")
-      |> render_submit(%{"play" => %{"title" => "", "code" => ""}})
+    html = save(view, %{"title" => "", "code" => ""})
 
-      html = render(view)
-      assert html =~ "no puede estar en blanco"
-      assert html =~ "Nueva obra"
-    end
+    assert html =~ error("can't be blank")
+    assert Catalogue.list_plays() == []
+  end
 
-    test "given existing play when editing then updated data is persisted", %{conn: conn} do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_fixture(%{"title" => "Original Title"})
+  test "an edit is saved", %{conn: conn} do
+    play = play_fixture(%{"title" => "Original Title"})
+    {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
 
-      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
+    save(view, %{"title" => "Updated Title"})
 
-      view
-      |> element("form[phx-submit]")
-      |> render_submit(%{"play" => %{"title" => "Updated Title", "code" => play.code}})
+    assert_redirect(view, ~p"/admin/plays/#{play.id}")
+    assert Catalogue.get_play!(play.id).title == "Updated Title"
+  end
 
-      assert_redirect(view, ~p"/admin/plays/#{play.id}")
-      assert Catalogue.get_play!(play.id).title == "Updated Title"
-    end
+  test "the research metadata is saved: historical time and composition date",
+       %{conn: conn} do
+    play = play_fixture()
+    {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
 
-    test "given a historical time when saving then it is persisted", %{conn: conn} do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_fixture()
+    save(view, %{
+      "historical_time" => "siglo_xvii",
+      "historical_time_note" => "Contemporary. Reign of Philip IV.",
+      "composition_date_from" => "1606",
+      "composition_date_to" => "1607",
+      "composition_date_note" => "1606; 1607"
+    })
 
-      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
+    saved = Catalogue.get_play!(play.id)
 
-      assert has_element?(view, "select[name='play[historical_time]']")
-      assert has_element?(view, "textarea[name='play[historical_time_note]']")
+    assert {saved.historical_time, saved.historical_time_note} ==
+             {"siglo_xvii", "Contemporary. Reign of Philip IV."}
 
-      view
-      |> element("form[phx-submit]")
-      |> render_submit(%{
-        "play" => %{
-          "title" => play.title,
-          "code" => play.code,
-          "historical_time" => "siglo_xvii",
-          "historical_time_note" => "Contemporary. Reign of Philip IV."
-        }
-      })
+    assert {saved.composition_date_from, saved.composition_date_to, saved.composition_date_note} ==
+             {1606, 1607, "1606; 1607"}
+  end
 
-      updated = Catalogue.get_play!(play.id)
-      assert updated.historical_time == "siglo_xvii"
-      assert updated.historical_time_note == "Contemporary. Reign of Philip IV."
-    end
+  test "half a composition date is refused", %{conn: conn} do
+    play = play_fixture()
+    {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
 
-    test "saves a composition date", %{conn: conn} do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_fixture()
+    html = save(view, %{"composition_date_from" => "1606"})
 
-      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
-
-      view
-      |> element("form[phx-submit]")
-      |> render_submit(%{
-        "play" => %{
-          "title" => play.title,
-          "code" => play.code,
-          "composition_date_from" => "1606",
-          "composition_date_to" => "1607",
-          "composition_date_note" => "1606; 1607"
-        }
-      })
-
-      updated = Catalogue.get_play!(play.id)
-      assert updated.composition_date_from == 1606
-      assert updated.composition_date_to == 1607
-      assert updated.composition_date_note == "1606; 1607"
-    end
-
-    test "rejects a lone start year", %{conn: conn} do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_fixture()
-
-      {:ok, view, _html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
-
-      view
-      |> element("form[phx-submit]")
-      |> render_submit(%{
-        "play" => %{
-          "title" => play.title,
-          "code" => play.code,
-          "composition_date_from" => "1606"
-        }
-      })
-
-      html = render(view)
-      assert html =~ "must be given together with the end year"
-    end
-
-    test "renders the composition date inputs", %{conn: conn} do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_fixture()
-
-      {:ok, _view, html} = live(conn, ~p"/admin/plays/#{play.id}/edit")
-
-      assert html =~ ~s(name="play[composition_date_from]")
-      assert html =~ ~s(name="play[composition_date_to]")
-      assert html =~ ~s(name="play[composition_date_note]")
-    end
+    assert html =~ error("must be given together with the end year")
+    assert Catalogue.get_play!(play.id).composition_date_from == nil
   end
 end

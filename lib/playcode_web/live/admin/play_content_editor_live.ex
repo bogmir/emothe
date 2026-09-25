@@ -1514,7 +1514,10 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
             :for={div <- @divisions}
             class="rounded-box border border-base-300 bg-base-100 shadow-sm overflow-hidden"
           >
-            <div class="flex items-center justify-between px-4 py-3 bg-base-200/30">
+            <div
+              id={"division-#{div.id}"}
+              class="flex items-center justify-between px-4 py-3 bg-base-200/30"
+            >
               <div class="flex items-center gap-2">
                 <.icon name="hero-folder-mini" class="size-4 text-base-content/40" />
                 <span class="font-semibold">{division_label(div)}</span>
@@ -1534,6 +1537,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
                   phx-click="edit_division"
                   phx-value-id={div.id}
                   class="btn btn-ghost btn-xs tooltip"
+                  aria-label={gettext("Edit metadata")}
                   data-tip={gettext("Edit metadata")}
                 >
                   <.icon name="hero-cog-6-tooth-mini" class="size-4" />
@@ -1543,6 +1547,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
                   phx-value-id={div.id}
                   data-confirm={gettext("Delete this division and all its content?")}
                   class="btn btn-ghost btn-xs text-error tooltip"
+                  aria-label={gettext("Delete")}
                   data-tip={gettext("Delete")}
                 >
                   <.icon name="hero-trash-mini" class="size-4" />
@@ -1553,6 +1558,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
             <div :if={div.children != []} class="divide-y divide-base-300/50">
               <div
                 :for={child <- div.children}
+                id={"division-#{child.id}"}
                 class="flex items-center justify-between px-4 py-2 pl-8 transition-colors hover:bg-base-200/30"
               >
                 <button
@@ -1580,6 +1586,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
                     phx-click="edit_division"
                     phx-value-id={child.id}
                     class="btn btn-ghost btn-xs tooltip"
+                    aria-label={gettext("Edit metadata")}
                     data-tip={gettext("Edit metadata")}
                   >
                     <.icon name="hero-cog-6-tooth-mini" class="size-4" />
@@ -1589,6 +1596,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
                     phx-value-id={child.id}
                     data-confirm={gettext("Delete this scene and all its content?")}
                     class="btn btn-ghost btn-xs text-error tooltip"
+                    aria-label={gettext("Delete")}
                     data-tip={gettext("Delete")}
                   >
                     <.icon name="hero-trash-mini" class="size-4" />
@@ -2406,6 +2414,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
             phx-click="edit_element"
             phx-value-id={@element.id}
             class="btn btn-ghost btn-xs tooltip"
+            aria-label={gettext("Edit")}
             data-tip={gettext("Edit")}
           >
             <.icon name="hero-pencil-mini" class="size-4" />
@@ -2415,6 +2424,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
             phx-value-id={@element.id}
             data-confirm={gettext("Delete this element and its children?")}
             class="btn btn-ghost btn-xs text-error tooltip"
+            aria-label={gettext("Delete")}
             data-tip={gettext("Delete")}
           >
             <.icon name="hero-trash-mini" class="size-4" />
@@ -2609,6 +2619,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
     ~H"""
     <h3 class="text-lg font-bold mb-4">{editing_label(@editing)} {gettext("Division")}</h3>
     <.form
+      id="division-form"
       for={@form}
       as={:division}
       phx-change="validate_form"
@@ -2644,6 +2655,7 @@ defmodule PlaycodeWeb.Admin.PlayContentEditorLive do
       {editing_label(@editing)} {element_type_label(@modal_element_type)}
     </h3>
     <.form
+      id="element-form"
       for={@form}
       as={:element}
       phx-change="validate_form"

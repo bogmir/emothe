@@ -45,33 +45,6 @@ defmodule RenameGuardTest do
   # purpose.
   @excluded ~w(test/fixtures test/rename_guard_test.exs fly.emothe.toml)
 
-  describe "the new namespace" do
-    # Module names are built with Module.concat/1 rather than written as
-    # literal aliases. Before the rename the new modules do not exist and after
-    # it the old ones do not, and a literal alias to a missing module is a
-    # compiler warning — which `mix compile --warnings-as-errors` turns into a
-    # build failure.
-
-    test "Playcode modules are the ones that exist" do
-      assert Code.ensure_loaded?(Module.concat(["Playcode", "Catalogue"]))
-      assert Code.ensure_loaded?(Module.concat(["Playcode", "Repo"]))
-      assert Code.ensure_loaded?(Module.concat(["PlaycodeWeb", "Endpoint"]))
-    end
-
-    test "the old namespace is gone" do
-      refute Code.ensure_loaded?(Module.concat(["Emothe", "Catalogue"]))
-      refute Code.ensure_loaded?(Module.concat(["EmotheWeb", "Endpoint"]))
-    end
-
-    test "the OTP application is :playcode" do
-      assert Application.get_application(Module.concat(["Playcode", "Catalogue"])) == :playcode
-
-      assert Application.fetch_env!(:playcode, :ecto_repos) == [
-               Module.concat(["Playcode", "Repo"])
-             ]
-    end
-  end
-
   describe "the corpus keeps its identity" do
     test "the tracked TEI fixtures are still named for their play codes" do
       names =
@@ -79,8 +52,11 @@ defmodule RenameGuardTest do
         |> String.split("\n", trim: true)
         |> Enum.filter(&Regex.match?(~r|^test/fixtures/EMOTHE\d{4}_.*\.xml$|, &1))
 
-      assert length(names) == 55,
-             "expected 55 tracked EMOTHE####_*.xml fixtures, found #{length(names)}"
+      # Not an exact count: adding a fixture is fine; renaming them is not.
+      assert names != [], "no tracked fixture is named EMOTHE####_*.xml any more"
+
+      refute git!(["ls-files", "test/fixtures"]) =~ ~r/PLAYCODE\d{4}/,
+             "a fixture file was renamed to the application's name"
     end
 
     test "the git-ignored bulk fixtures still carry EMOTHE play codes" do

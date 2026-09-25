@@ -4,48 +4,41 @@ defmodule PlaycodeWeb.Admin.LayoutTest do
   import Phoenix.LiveViewTest
   import Playcode.TestFixtures
 
-  describe "admin sidebar" do
-    test "given an admin then every group is rendered", %{conn: conn} do
-      {:ok, _lv, html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays")
+  @admin_only ~w(/admin/filemaker /admin/export /admin/activity-log /admin/users /admin/dashboard)
 
-      assert html =~ ~p"/admin/plays/import"
-      assert html =~ ~p"/admin/filemaker"
-      assert html =~ ~p"/admin/export"
-      assert html =~ ~p"/admin/activity-log"
-      assert html =~ ~p"/admin/users"
-      assert html =~ "/admin/dashboard"
+  defp sidebar_links?(lv, paths), do: Enum.map(paths, &has_element?(lv, "aside a[href='#{&1}']"))
+
+  describe "admin sidebar" do
+    test "an admin is offered every section", %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays")
+
+      assert Enum.all?(sidebar_links?(lv, ["/admin/plays/import" | @admin_only]))
     end
 
-    test "given a researcher then only the content group is rendered", %{conn: conn} do
-      {:ok, _lv, html} =
+    # The same sections the authorization matrix refuses a researcher.
+    test "a researcher is offered the content sections only", %{conn: conn} do
+      {:ok, lv, _html} =
         live(log_in_user(conn, user_fixture(role: :researcher)), ~p"/admin/plays")
 
-      assert html =~ ~p"/admin/plays/import"
-      refute html =~ ~p"/admin/filemaker"
-      refute html =~ ~p"/admin/users"
-      refute html =~ ~p"/admin/activity-log"
-      refute html =~ "/admin/dashboard"
+      assert has_element?(lv, "aside a[href='/admin/plays/import']")
+      refute Enum.any?(sidebar_links?(lv, @admin_only))
     end
 
-    test "given the import page then only its entry is marked active", %{conn: conn} do
-      {:ok, _lv, html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays/import")
+    test "only the current page's entry is marked as current", %{conn: conn} do
+      {:ok, lv, _html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays/import")
 
-      assert html =~ ~r/href="#{~p"/admin/plays/import"}"[^>]*class="active"/
-      refute html =~ ~r/href="#{~p"/admin/plays"}"[^>]*class="active"/
+      assert has_element?(lv, "aside a[href='/admin/plays/import'][aria-current=page]")
+      refute has_element?(lv, "aside a[href='/admin/plays'][aria-current=page]")
     end
 
-    test "given a play page then the sidebar starts collapsed", %{conn: conn} do
-      play = play_fixture()
+    test "starts collapsed on a play's pages and open elsewhere", %{conn: conn} do
+      conn = log_in_user(conn, admin_fixture())
 
-      {:ok, _lv, html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays/#{play.id}")
+      {:ok, play_page, _html} = live(conn, ~p"/admin/plays/#{play_fixture().id}")
+      assert has_element?(play_page, "#admin-sidebar[checked]")
 
-      assert html =~ ~r/id="admin-sidebar"[^>]*checked/
-    end
-
-    test "given a non-play page then the sidebar starts open", %{conn: conn} do
-      {:ok, _lv, html} = live(log_in_user(conn, admin_fixture()), ~p"/admin/plays")
-
-      refute html =~ ~r/id="admin-sidebar"[^>]*checked/
+      {:ok, list_page, _html} = live(conn, ~p"/admin/plays")
+      refute has_element?(list_page, "#admin-sidebar[checked]")
     end
   end
 end

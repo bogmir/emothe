@@ -251,9 +251,9 @@ defmodule Playcode.Import.TeiParser do
     end
 
     # Recompute verse_count from actual verse_line elements (the TEI header
-    # <extent> value is often inaccurate or includes non-verse lines)
-    Playcode.Catalogue.update_verse_count(play.id)
-
+    # <extent> value is often inaccurate or includes non-verse lines), and return
+    # the play as that left it rather than the stale struct from before.
+    {:ok, play} = Playcode.Catalogue.update_verse_count(play.id)
     play
   end
 
@@ -1379,7 +1379,7 @@ defmodule Playcode.Import.TeiParser do
 
   # --- Stage direction ---
 
-  defp import_stage_direction({_name, _attrs, _children} = stage, play, division, parent_id, pos) do
+  defp import_stage_direction({_name, attrs, _children} = stage, play, division, parent_id, pos) do
     content = text_content(stage)
 
     case PlayContent.create_element(%{
@@ -1388,6 +1388,7 @@ defmodule Playcode.Import.TeiParser do
            parent_id: parent_id,
            type: "stage_direction",
            content: content,
+           stage_type: attr_value(attrs, "type"),
            position: pos
          }) do
       {:ok, _el} -> :ok

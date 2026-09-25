@@ -176,24 +176,35 @@ defmodule Playcode.TestFixtures do
   def valid_user_password, do: @valid_user_password
 
   @doc """
-  Inserts a user directly. Defaults to an active researcher.
+  A user, made the way users are made: invited, then accepting the invitation.
+  Defaults to an active researcher.
 
-  Accepts `:email`, `:role`, `:password`, `:confirmed_at`, `:deactivated_at`.
-  Pass `confirmed_at: nil` for an unconfirmed user.
+  Accepts `:email`, `:role`, `:password`, and two states:
+  `confirmed_at: nil` stops at the invitation (no password, not yet confirmed);
+  any `:deactivated_at` deactivates the account afterwards.
   """
   def user_fixture(attrs \\ %{}) do
     attrs = Enum.into(attrs, %{})
+    email = Map.get(attrs, :email, "user-#{System.unique_integer([:positive])}@example.com")
 
-    %Playcode.Accounts.User{
-      email: Map.get(attrs, :email, "user-#{System.unique_integer([:positive])}@example.com"),
-      role: Map.get(attrs, :role, :researcher),
-      confirmed_at: Map.get(attrs, :confirmed_at, DateTime.utc_now(:second)),
-      deactivated_at: Map.get(attrs, :deactivated_at)
-    }
-    |> Playcode.Accounts.User.password_changeset(%{
-      password: Map.get(attrs, :password, @valid_user_password)
-    })
-    |> Playcode.Repo.insert!()
+    {:ok, user, _token} =
+      Playcode.Accounts.invite_user(email, Map.get(attrs, :role, :researcher), nil)
+
+    user =
+      if Map.has_key?(attrs, :confirmed_at) and is_nil(attrs.confirmed_at) do
+        user
+      else
+        password = Map.get(attrs, :password, @valid_user_password)
+        {:ok, user} = Playcode.Accounts.accept_invite(user, %{"password" => password})
+        user
+      end
+
+    if Map.get(attrs, :deactivated_at) do
+      {:ok, user} = Playcode.Accounts.deactivate_user(user)
+      user
+    else
+      user
+    end
   end
 
   def admin_fixture(attrs \\ %{}) do

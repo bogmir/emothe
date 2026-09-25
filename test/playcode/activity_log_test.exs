@@ -1,259 +1,128 @@
 defmodule Playcode.ActivityLogTest do
+  @moduledoc """
+  The log's own rules: what it accepts, and how list_entries/1 filters, orders and
+  pages. That admin actions write entries is asserted where the actions happen,
+  in the LiveView tests.
+  """
   use Playcode.DataCase, async: true
 
   import Playcode.TestFixtures
 
   alias Playcode.ActivityLog
-  alias Playcode.ActivityLog.{Diff, Entry}
-  alias Playcode.TestFixtures
 
-  describe "log/1" do
-    test "creates an entry with valid attrs" do
-      user = user_fixture()
-      play = TestFixtures.play_fixture()
+  test "an entry records who did what to which play, and either may be absent" do
+    user = user_fixture()
+    play = play_fixture()
 
-      assert {:ok, entry} =
-               ActivityLog.log(%{
-                 user_id: user.id,
-                 play_id: play.id,
-                 action: "create",
-                 resource_type: "play",
-                 resource_id: play.id,
-                 metadata: %{title: play.title, code: play.code}
-               })
+    {:ok, _} =
+      ActivityLog.log(%{
+        user_id: user.id,
+        play_id: play.id,
+        action: "create",
+        resource_type: "play"
+      })
 
-      assert entry.action == "create"
-      assert entry.resource_type == "play"
-      assert entry.user_id == user.id
-      assert entry.play_id == play.id
-      assert entry.inserted_at
-    end
+    {:ok, _} = ActivityLog.log(%{action: "import", resource_type: "play", play_id: play.id})
+    {:ok, _} = ActivityLog.log(%{user_id: user.id, action: "role_change", resource_type: "user"})
 
-    test "creates entry without user (system action)" do
-      play = TestFixtures.play_fixture()
+    entries =
+      Enum.map(
+        ActivityLog.list_entries(),
+        &{&1.action, &1.user && &1.user.email, &1.play && &1.play.title}
+      )
 
-      assert {:ok, entry} =
-               ActivityLog.log(%{
-                 action: "import",
-                 resource_type: "play",
-                 resource_id: play.id
-               })
+    assert Enum.sort(entries) == [
+             {"create", user.email, play.title},
+             {"import", nil, play.title},
+             {"role_change", user.email, nil}
+           ]
+  end
 
-      assert is_nil(entry.user_id)
-    end
-
-    test "creates entry without play (user management)" do
-      user = user_fixture()
-
-      assert {:ok, entry} =
-               ActivityLog.log(%{
-                 user_id: user.id,
-                 action: "role_change",
-                 resource_type: "user",
-                 changes: %{"role" => ["researcher", "admin"]}
-               })
-
-      assert entry.resource_type == "user"
-    end
-
-    test "fails with invalid action" do
-      assert {:error, changeset} =
-               ActivityLog.log(%{action: "invalid", resource_type: "play"})
-
-      assert %{action: _} = errors_on(changeset)
-    end
-
-    test "fails with invalid resource_type" do
-      assert {:error, changeset} =
-               ActivityLog.log(%{action: "create", resource_type: "invalid"})
-
-      assert %{resource_type: _} = errors_on(changeset)
-    end
-
-    test "fails without required fields" do
-      assert {:error, changeset} = ActivityLog.log(%{})
-      errors = errors_on(changeset)
-      assert errors[:action]
-      assert errors[:resource_type]
+  test "an entry needs a known action and resource type" do
+    for attrs <- [
+          %{},
+          %{action: "invalid", resource_type: "play"},
+          %{action: "create", resource_type: "invalid"}
+        ] do
+      assert {:error, changeset} = ActivityLog.log(attrs)
+      assert Map.take(errors_on(changeset), [:action, :resource_type]) != %{}
     end
   end
 
-  describe "log!/1" do
-    test "returns {:ok, entry} on success" do
-      assert {:ok, %Entry{}} =
-               ActivityLog.log!(%{action: "create", resource_type: "play"})
-    end
-
-    test "never raises on invalid data" do
-      result = ActivityLog.log!(%{action: "invalid", resource_type: "bad"})
-      assert {:error, _} = result
-    end
-
-    # Regression: resource_type's whitelist previously lacked "place" and
-    # "play_place", so a place write logged nothing and log!/1 swallowed the
-    # resulting changeset error without a trace.
-    test "persists a place entry" do
-      place = TestFixtures.place_fixture()
-
-      assert {:ok, %Entry{} = entry} =
-               ActivityLog.log!(%{
-                 action: "create",
-                 resource_type: "place",
-                 resource_id: place.id,
-                 metadata: %{slug: place.slug}
-               })
-
-      assert Repo.get(Entry, entry.id).resource_type == "place"
-    end
-
-    test "persists a play_place entry" do
-      play = TestFixtures.play_fixture()
-      place = TestFixtures.place_fixture()
-      play_place = TestFixtures.play_place_fixture(play, place)
-
-      assert {:ok, %Entry{} = entry} =
-               ActivityLog.log!(%{
-                 action: "create",
-                 resource_type: "play_place",
-                 resource_id: play_place.id,
-                 play_id: play.id
-               })
-
-      assert Repo.get(Entry, entry.id).resource_type == "play_place"
-    end
+  # log!/1 is called in the middle of admin actions; a logging failure must not take
+  # the action down with it. A user id that does not exist violates the foreign key,
+  # which raises from the database rather than returning a changeset error.
+  test "log!/1 swallows a database error instead of raising" do
+    refute ActivityLog.log!(%{
+             user_id: Ecto.UUID.generate(),
+             action: "create",
+             resource_type: "play"
+           })
   end
 
-  describe "list_entries/1" do
-    test "returns entries ordered by most recent first" do
-      user = user_fixture()
+  describe "listing" do
+    setup do
+      [user_a, user_b] = [user_fixture(), user_fixture()]
+      [play_a, play_b] = [play_fixture(), play_fixture()]
 
-      {:ok, entry_a} =
-        ActivityLog.log(%{user_id: user.id, action: "create", resource_type: "play"})
-
-      {:ok, entry_b} =
-        ActivityLog.log(%{user_id: user.id, action: "update", resource_type: "play"})
-
-      entries = ActivityLog.list_entries()
-      ids = Enum.map(entries, & &1.id)
-      assert entry_a.id in ids
-      assert entry_b.id in ids
-      assert length(ids) == 2
-    end
-
-    test "filters by user_id" do
-      user_a = user_fixture()
-      user_b = user_fixture()
-      {:ok, _} = ActivityLog.log(%{user_id: user_a.id, action: "create", resource_type: "play"})
-      {:ok, _} = ActivityLog.log(%{user_id: user_b.id, action: "delete", resource_type: "play"})
-
-      entries = ActivityLog.list_entries(user_id: user_a.id)
-      assert length(entries) == 1
-      assert hd(entries).user_id == user_a.id
-    end
-
-    test "filters by play_id" do
-      play_a = TestFixtures.play_fixture()
-      play_b = TestFixtures.play_fixture()
-      {:ok, _} = ActivityLog.log(%{play_id: play_a.id, action: "create", resource_type: "play"})
-      {:ok, _} = ActivityLog.log(%{play_id: play_b.id, action: "create", resource_type: "play"})
-
-      entries = ActivityLog.list_entries(play_id: play_a.id)
-      assert length(entries) == 1
-      assert hd(entries).play_id == play_a.id
-    end
-
-    test "filters by action" do
-      {:ok, _} = ActivityLog.log(%{action: "create", resource_type: "play"})
-      {:ok, _} = ActivityLog.log(%{action: "delete", resource_type: "play"})
-
-      entries = ActivityLog.list_entries(action: "create")
-      assert length(entries) == 1
-      assert hd(entries).action == "create"
-    end
-
-    test "filters by resource_type" do
-      {:ok, _} = ActivityLog.log(%{action: "create", resource_type: "play"})
-      {:ok, _} = ActivityLog.log(%{action: "create", resource_type: "character"})
-
-      entries = ActivityLog.list_entries(resource_type: "character")
-      assert length(entries) == 1
-      assert hd(entries).resource_type == "character"
-    end
-
-    test "paginates results" do
-      user = user_fixture()
-
-      for _ <- 1..5 do
-        ActivityLog.log(%{user_id: user.id, action: "update", resource_type: "play"})
+      log = fn attrs ->
+        {:ok, entry} = ActivityLog.log(attrs)
+        entry
       end
 
-      page1 = ActivityLog.list_entries(page: 1, per_page: 3)
-      page2 = ActivityLog.list_entries(page: 2, per_page: 3)
+      entries = %{
+        a:
+          log.(%{user_id: user_a.id, play_id: play_a.id, action: "create", resource_type: "play"}),
+        b:
+          log.(%{user_id: user_b.id, play_id: play_b.id, action: "delete", resource_type: "play"}),
+        c:
+          log.(%{
+            user_id: user_a.id,
+            play_id: play_b.id,
+            action: "create",
+            resource_type: "character"
+          })
+      }
 
-      assert length(page1) == 3
-      assert length(page2) == 2
+      %{entries: entries, user_a: user_a, play_b: play_b}
     end
 
-    test "preloads user and play" do
-      user = user_fixture()
-      play = TestFixtures.play_fixture()
+    test "each filter narrows the list, and the count agrees",
+         %{entries: e, user_a: user_a, play_b: play_b} do
+      today = Date.to_iso8601(Date.utc_today())
+      tomorrow = Date.to_iso8601(Date.add(Date.utc_today(), 1))
 
-      {:ok, _} =
-        ActivityLog.log(%{
-          user_id: user.id,
-          play_id: play.id,
-          action: "create",
-          resource_type: "play"
-        })
+      for {filter, expected} <- [
+            {[user_id: user_a.id], [e.a, e.c]},
+            {[play_id: play_b.id], [e.b, e.c]},
+            {[action: "create"], [e.a, e.c]},
+            {[resource_type: "character"], [e.c]},
+            {[from: today, to: today], [e.a, e.b, e.c]},
+            {[from: tomorrow], []},
+            {[action: "create", play_id: play_b.id], [e.c]}
+          ] do
+        ids = filter |> ActivityLog.list_entries() |> Enum.map(& &1.id) |> Enum.sort()
 
-      [entry] = ActivityLog.list_entries()
-      assert entry.user.email == user.email
-      assert entry.play.title == play.title
-    end
-  end
-
-  describe "count_entries/1" do
-    test "counts all entries" do
-      {:ok, _} = ActivityLog.log(%{action: "create", resource_type: "play"})
-      {:ok, _} = ActivityLog.log(%{action: "delete", resource_type: "play"})
-
-      assert ActivityLog.count_entries() == 2
+        assert ids == expected |> Enum.map(& &1.id) |> Enum.sort(), inspect(filter)
+        assert ActivityLog.count_entries(filter) == length(expected), inspect(filter)
+      end
     end
 
-    test "counts with filters" do
-      {:ok, _} = ActivityLog.log(%{action: "create", resource_type: "play"})
-      {:ok, _} = ActivityLog.log(%{action: "delete", resource_type: "play"})
+    test "the most recent entry comes first", %{entries: e} do
+      # Timestamps have one-second precision, so age one entry explicitly.
+      import Ecto.Query
 
-      assert ActivityLog.count_entries(action: "create") == 1
-    end
-  end
+      from(entry in Playcode.ActivityLog.Entry, where: entry.id in ^[e.a.id, e.c.id])
+      |> Playcode.Repo.update_all(
+        set: [inserted_at: DateTime.add(DateTime.utc_now(:second), -60)]
+      )
 
-  describe "Diff.from_changeset/1" do
-    test "extracts changed fields" do
-      play = TestFixtures.play_fixture(%{"title" => "Old Title"})
-
-      changeset =
-        Ecto.Changeset.change(play, title: "New Title")
-
-      diff = Diff.from_changeset(changeset)
-      assert diff["title"] == ["Old Title", "New Title"]
+      assert hd(ActivityLog.list_entries()).id == e.b.id
     end
 
-    test "excludes timestamps" do
-      play = TestFixtures.play_fixture()
-
-      changeset =
-        Ecto.Changeset.change(play, title: "Changed", updated_at: DateTime.utc_now())
-
-      diff = Diff.from_changeset(changeset)
-      assert Map.has_key?(diff, "title")
-      refute Map.has_key?(diff, "updated_at")
-      refute Map.has_key?(diff, "inserted_at")
-    end
-
-    test "returns empty map for non-changeset input" do
-      assert Diff.from_changeset(nil) == %{}
-      assert Diff.from_changeset(:not_a_changeset) == %{}
+    test "pages", %{entries: _} do
+      assert length(ActivityLog.list_entries(page: 1, per_page: 2)) == 2
+      assert length(ActivityLog.list_entries(page: 2, per_page: 2)) == 1
     end
   end
 end

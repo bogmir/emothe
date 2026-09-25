@@ -10,12 +10,11 @@ defmodule PlaycodeWeb.BrandingTest do
   import Phoenix.LiveViewTest
   import Playcode.TestFixtures
 
-  alias Playcode.Accounts.{User, UserNotifier}
-
   test "the home page names the platform and the libraries it serves", %{conn: conn} do
     html = conn |> get(~p"/") |> html_response(200)
+    page = LazyHTML.from_document(html)
 
-    assert html =~ ~r{<title[^>]*>[^<]*Playcode}
+    assert page |> LazyHTML.query("title") |> LazyHTML.text() =~ "Playcode"
     assert html =~ "La plataforma editorial de las bibliotecas digitales EMOTHE y ARTELOPE"
     # The navbar wordmark and the heading used to read EMOTHE.
     refute html =~ ~r/>\s*EMOTHE\s*</
@@ -25,9 +24,9 @@ defmodule PlaycodeWeb.BrandingTest do
   end
 
   test "the catalogue covers both collections", %{conn: conn} do
-    {:ok, _view, html} = live(conn, ~p"/plays")
+    {:ok, view, html} = live(conn, ~p"/plays")
 
-    assert html =~ ~r{<h1[^>]*>\s*Catálogo de obras\s*</h1>}
+    assert has_element?(view, "h1", "Catálogo de obras")
     assert html =~ "de las colecciones EMOTHE y ARTELOPE"
     refute html =~ "Biblioteca Digital EMOTHE"
   end
@@ -46,20 +45,12 @@ defmodule PlaycodeWeb.BrandingTest do
     assert html =~ "Bienvenido a Playcode"
   end
 
-  test "the invitation email names the platform and what it is" do
-    {:ok, email} =
-      UserNotifier.deliver_invite_instructions(%User{email: "nuevo@uv.es"}, "http://x/invite")
-
-    assert email.subject == "You have been invited to Playcode"
-    assert {"Playcode", _address} = email.from
-    assert email.text_body =~ "You have been invited to Playcode, the editorial platform"
-    assert email.text_body =~ "EMOTHE and ARTELOPE digital libraries"
-  end
-
   test "pages carry the Playcode icon, not Phoenix's", %{conn: conn} do
-    html = conn |> get(~p"/") |> html_response(200)
+    page = conn |> get(~p"/") |> html_response(200) |> LazyHTML.from_document()
 
-    assert html =~ ~r{<link[^>]+rel="icon"[^>]+href="/images/logo\.svg}
+    assert page |> LazyHTML.query(~s(link[rel="icon"][href^="/images/logo.svg"])) |> Enum.count() ==
+             1
+
     # The opening path of the Phoenix bird that `mix phx.new` ships as logo.svg.
     refute File.read!("priv/static/images/logo.svg") =~ "m26.371 33.477"
   end

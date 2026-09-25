@@ -5,18 +5,12 @@ defmodule Playcode.ApplicationTest do
   # PlaycodeWeb.Endpoint.url/0, which raises until the endpoint stores its
   # persistent term — a race the Task usually wins, but losing it creates the
   # invited admins and swallows the mail carrying their only way in.
-  test "given the supervision tree then AdminBootstrap starts after the endpoint" do
+  test "AdminBootstrap starts after both the repo and the endpoint" do
     ids = Enum.map(Playcode.Application.children(), &child_id/1)
+    position = &Enum.find_index(ids, fn id -> id == &1 end)
 
-    assert Enum.find_index(ids, &(&1 == Playcode.Accounts.AdminBootstrap)) >
-             Enum.find_index(ids, &(&1 == PlaycodeWeb.Endpoint))
-  end
-
-  test "given the supervision tree then AdminBootstrap starts after the repo" do
-    ids = Enum.map(Playcode.Application.children(), &child_id/1)
-
-    assert Enum.find_index(ids, &(&1 == Playcode.Accounts.AdminBootstrap)) >
-             Enum.find_index(ids, &(&1 == Playcode.Repo))
+    assert position.(Playcode.Accounts.AdminBootstrap) > position.(PlaycodeWeb.Endpoint)
+    assert position.(Playcode.Accounts.AdminBootstrap) > position.(Playcode.Repo)
   end
 
   defp child_id({module, _opts}), do: module

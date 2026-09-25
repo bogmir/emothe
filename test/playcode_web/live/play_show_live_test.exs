@@ -60,8 +60,7 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
 
     assert has_element?(view, "#meta-study")
     assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
-    # This suite runs in Spanish (see the "no puede estar en blanco" assertion above),
-    # so the gettext label renders translated, not as the msgid.
+    # The page renders in Spanish by default, so the vocabulary label is translated.
     assert html =~ "Antigüedad clásica"
     assert html =~ "First century BC."
   end
@@ -84,18 +83,13 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
         "composition_date_note" => "1606; 1607"
       })
 
-    {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+    {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
-    assert html =~ "1606–1607"
-    assert html =~ "1606; 1607"
-
-    # Pin the row: the dash-joined value must appear inside #meta-study, right after
-    # the "Composition" label, not merely somewhere on the page (e.g. a code or line number).
-    # This suite runs in Spanish (see the "no puede estar en blanco" assertion above), and
-    # Task 10 added the "Composition" -> "Datación" translation, so the label renders
-    # translated, not as the msgid.
-    [_, after_meta_study] = String.split(html, ~s(id="meta-study"), parts: 2)
-    assert after_meta_study =~ ~r/Datación.*?1606–1607/s
+    # Inside the study section, after its label: not merely somewhere on the page, where
+    # a code or a line number could match.
+    study = view |> element("#meta-study") |> render()
+    assert study =~ ~r/#{t("Composition")}.*?1606–1607/s
+    assert study =~ "1606; 1607"
   end
 
   test "collapses a single year", %{conn: conn} do
@@ -120,9 +114,8 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
         "composition_date_to" => 1614
       })
 
-    {:ok, view, html} = live(conn, ~p"/plays/#{play.code}")
+    {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
-    assert html =~ ~s(id="meta-study")
     assert has_element?(view, "#meta-study")
     assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
   end
@@ -136,24 +129,20 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
         "composition_date_note" => "¿1694? y ¿1605?"
       })
 
-    {:ok, view, html} = live(conn, ~p"/plays/#{play.code}")
+    {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
-    assert has_element?(view, "#meta-study")
     assert has_element?(view, "#scroll-spy-nav a[href='#meta-study']")
-    assert html =~ "¿1694? y ¿1605?"
 
-    [_, after_meta_study] = String.split(html, ~s(id="meta-study"), parts: 2)
-    assert after_meta_study =~ ~r/Datación.*?¿1694\? y ¿1605\?/s
+    assert view |> element("#meta-study") |> render() =~
+             ~r/#{t("Composition")}.*?¿1694\? y ¿1605\?/s
   end
 
   describe "the places panel" do
-    defp t(msgid), do: Gettext.gettext(PlaycodeWeb.Gettext, msgid)
-
     test "is absent when the play has no places", %{conn: conn} do
       play = Playcode.TestFixtures.play_fixture()
-      {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+      {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
-      refute html =~ "meta-places"
+      refute has_element?(view, "#meta-places")
     end
 
     test "lists settings before mentions, with breadcrumb and note", %{conn: conn} do
@@ -174,15 +163,15 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
 
       Playcode.TestFixtures.play_place_fixture(play, roma, %{"role" => "setting"})
 
-      {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
+      {:ok, view, _html} = live(conn, ~p"/plays/#{play.code}")
 
-      assert html =~ "meta-places"
-      assert html =~ "Roma, Italia"
-      assert html =~ "Named, not staged."
-      assert html =~ t("Places")
+      places = view |> element("#meta-places") |> render()
+      assert places =~ t("Places")
+      assert places =~ "Roma, Italia"
+      assert places =~ "Named, not staged."
 
       # settings first, whatever order they were linked in
-      assert :binary.match(html, "Roma") < :binary.match(html, "Miseno")
+      assert :binary.match(places, "Roma") < :binary.match(places, "Miseno")
     end
 
     test "a fictional place is marked", %{conn: conn} do
@@ -199,6 +188,37 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
 
       {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")
       assert html =~ t("Fictional")
+    end
+  end
+
+  test "shows the play's text: acts, speakers, verses and stage directions", %{conn: conn} do
+    play =
+      Playcode.ImportHelpers.import_tei!(
+        Playcode.ImportHelpers.tei(
+          body: """
+          <div1 type="acto" n="1"><head>ACTO PRIMERO</head>
+            <div2 type="escena" n="1"><head>ESCENA I</head>
+              <stage>Salen el Rey y la Reina</stage>
+              <sp><speaker>REY</speaker><lg><l n="1">Aquí comienza el verso</l></lg></sp>
+              <sp><speaker>REINA</speaker><p>Y aquí la prosa.</p></sp>
+            </div2>
+          </div1>
+          """
+        )
+      )
+
+    {:ok, _lv, html} = live(conn, ~p"/plays/#{play.code}")
+
+    for text <- [
+          "ACTO PRIMERO",
+          "ESCENA I",
+          "REY",
+          "REINA",
+          "Salen el Rey y la Reina",
+          "Aquí comienza el verso",
+          "Y aquí la prosa."
+        ] do
+      assert html =~ text
     end
   end
 end

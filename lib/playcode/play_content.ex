@@ -155,13 +155,6 @@ defmodule Playcode.PlayContent do
 
   # --- Divisions ---
 
-  def list_divisions(play_id) do
-    Division
-    |> where(play_id: ^play_id)
-    |> order_by(:position)
-    |> Repo.all()
-  end
-
   def list_top_divisions(play_id) do
     Division
     |> where(play_id: ^play_id)

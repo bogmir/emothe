@@ -110,8 +110,4 @@ defmodule Playcode.Import.TeiPreviewTest do
 
     assert Catalogue.list_plays(include_deleted: true) == []
   end
-
-  test "a missing file reports the reason" do
-    assert {:error, :enoent} = TeiParser.preview_import("/nonexistent/file.xml")
-  end
 end

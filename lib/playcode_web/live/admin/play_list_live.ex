@@ -186,7 +186,7 @@ defmodule PlaycodeWeb.Admin.PlayListLive do
             </tr>
           </thead>
           <tbody>
-            <tr :for={play <- @plays} class="hover">
+            <tr :for={play <- @plays} id={"play-#{play.id}"} class="hover">
               <td class="font-mono text-xs text-base-content/60">
                 {play.code}
                 <.icon
@@ -242,6 +242,7 @@ defmodule PlaycodeWeb.Admin.PlayListLive do
                     phx-click="restore"
                     phx-value-id={play.id}
                     class="btn btn-ghost btn-xs text-success tooltip tooltip-left"
+                    aria-label={gettext("Restore")}
                     data-tip={gettext("Restore")}
                   >
                     <.icon name="hero-arrow-uturn-left-mini" class="size-4" />
@@ -256,6 +257,7 @@ defmodule PlaycodeWeb.Admin.PlayListLive do
                       )
                     }
                     class="btn btn-ghost btn-xs text-error tooltip tooltip-left"
+                    aria-label={gettext("Archive")}
                     data-tip={gettext("Archive")}
                   >
                     <.icon name="hero-archive-box-mini" class="size-4" />

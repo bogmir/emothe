@@ -58,4 +58,51 @@ defmodule PlaycodeWeb.UserSettingsLiveTest do
       assert length(Accounts.list_user_sessions(theirs)) == 1
     end
   end
+
+  describe "changing the password" do
+    setup %{conn: conn} do
+      user = user_fixture()
+      %{conn: log_in_user(conn, user), user: user}
+    end
+
+    # The page posts the address from a hidden field; form/3 replaces the whole
+    # "user" map, so the test sends it the same way.
+    defp submit_password(lv, email, current, new) do
+      assert has_element?(lv, "#password_form input[type=hidden][name='user[email]']")
+
+      lv
+      |> form("#password_form", %{
+        "current_password" => current,
+        "user" => %{"email" => email, "password" => new, "password_confirmation" => new}
+      })
+    end
+
+    test "logs you back in with the new password, and the old one stops working",
+         %{conn: conn, user: user} do
+      {:ok, lv, _html} = live(conn, ~p"/users/settings")
+
+      form = submit_password(lv, user.email, valid_user_password(), "a brand new password")
+      render_submit(form)
+      conn = follow_trigger_action(form, conn)
+
+      assert redirected_to(conn) == ~p"/users/settings"
+      assert Phoenix.Flash.get(conn.assigns.flash, :info) == t("Password updated successfully!")
+      assert get_session(conn, :user_token)
+
+      assert Accounts.get_user_by_email_and_password(user.email, "a brand new password")
+      refute Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+    end
+
+    test "is refused with the wrong current password", %{conn: conn, user: user} do
+      {:ok, lv, _html} = live(conn, ~p"/users/settings")
+
+      html =
+        lv
+        |> submit_password(user.email, "not my password", "a brand new password")
+        |> render_submit()
+
+      assert html =~ t("is not valid")
+      assert Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+    end
+  end
 end

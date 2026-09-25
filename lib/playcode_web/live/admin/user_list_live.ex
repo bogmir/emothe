@@ -267,7 +267,7 @@ defmodule PlaycodeWeb.Admin.UserListLive do
             </tr>
           </thead>
           <tbody>
-            <tr :for={user <- @users} class="hover">
+            <tr :for={user <- @users} id={"user-#{user.id}"} class="hover">
               <td class="font-mono text-sm">
                 {user.email}
                 <span

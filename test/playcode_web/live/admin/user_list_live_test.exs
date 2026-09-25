@@ -2,6 +2,7 @@ defmodule PlaycodeWeb.Admin.UserListLiveTest do
   use PlaycodeWeb.ConnCase, async: false
 
   import Phoenix.LiveViewTest
+  import Swoosh.TestAssertions
   import Playcode.TestFixtures
 
   alias Playcode.Accounts
@@ -10,17 +11,41 @@ defmodule PlaycodeWeb.Admin.UserListLiveTest do
     %{conn: log_in_user(conn, admin_fixture())}
   end
 
-  test "given the invite form then a user is invited", %{conn: conn} do
+  defp click(lv, user, label),
+    do: lv |> element("#user-#{user.id} button", label) |> render_click()
+
+  test "given the invite form then the invitee is emailed a link to set a password",
+       %{conn: conn} do
     {:ok, lv, _html} = live(conn, ~p"/admin/users")
 
-    lv
-    |> form("#invite_form", invite: %{"email" => "nueva@uv.es", "role" => "researcher"})
-    |> render_submit()
+    html =
+      lv
+      |> form("#invite_form", invite: %{"email" => "nueva@uv.es", "role" => "researcher"})
+      |> render_submit()
 
+    assert html =~ "nueva@uv.es"
     user = Accounts.get_user_by_email("nueva@uv.es")
     assert user.role == :researcher
     refute Accounts.active?(user)
-    assert render(lv) =~ "nueva@uv.es"
+
+    # The mail names the platform and what it is for (it used to read EMOTHE).
+    assert_email_sent(fn email ->
+      assert email.to == [{"", "nueva@uv.es"}]
+      assert email.subject == "You have been invited to Playcode"
+      assert {"Playcode", _address} = email.from
+      assert email.text_body =~ "You have been invited to Playcode, the editorial platform"
+      assert email.text_body =~ "EMOTHE and ARTELOPE digital libraries"
+      assert email.text_body =~ ~r{/users/accept-invite/\S+}
+    end)
+  end
+
+  test "given an invitee who lost the mail then it can be sent again", %{conn: conn} do
+    {invitee, _token} = invited_user_fixture()
+    {:ok, lv, _html} = live(conn, ~p"/admin/users")
+
+    click(lv, invitee, t("Resend invitation"))
+
+    assert_email_sent(to: invitee.email)
   end
 
   test "given an active user then deactivating them ends their sessions", %{conn: conn} do
@@ -28,11 +53,38 @@ defmodule PlaycodeWeb.Admin.UserListLiveTest do
     Accounts.generate_user_session_token(victim)
 
     {:ok, lv, _html} = live(conn, ~p"/admin/users")
+    click(lv, victim, t("Deactivate"))
 
-    lv |> element("button[phx-value-id='#{victim.id}'][phx-click='deactivate']") |> render_click()
-
-    refute Accounts.active?(Playcode.Repo.reload!(victim))
+    refute Accounts.active?(Accounts.get_user!(victim.id))
     assert Accounts.list_user_sessions(victim) == []
+  end
+
+  test "given a deactivated user then they can be reactivated", %{conn: conn} do
+    {:ok, user} = Accounts.deactivate_user(user_fixture())
+    {:ok, lv, _html} = live(conn, ~p"/admin/users")
+
+    click(lv, user, t("Reactivate"))
+
+    assert Accounts.active?(Accounts.get_user!(user.id))
+  end
+
+  test "given a user with open sessions then forcing a logout ends them all", %{conn: conn} do
+    user = user_fixture()
+    for _ <- 1..2, do: Accounts.generate_user_session_token(user)
+    {:ok, lv, _html} = live(conn, ~p"/admin/users")
+
+    click(lv, user, t("Force logout"))
+
+    assert Accounts.list_user_sessions(user) == []
+  end
+
+  test "given a researcher then they can be promoted to admin", %{conn: conn} do
+    user = user_fixture(role: :researcher)
+    {:ok, lv, _html} = live(conn, ~p"/admin/users")
+
+    lv |> element("#user-#{user.id} button[phx-value-role=admin]") |> render_click()
+
+    assert Accounts.get_user!(user.id).role == :admin
   end
 
   test "given a protected admin then demotion is refused", %{conn: conn} do
@@ -47,7 +99,7 @@ defmodule PlaycodeWeb.Admin.UserListLiveTest do
 
     render_change(lv, "set_role", %{"id" => protected.id, "role" => "researcher"})
 
-    assert Playcode.Repo.reload!(protected).role == :admin
+    assert Accounts.get_user!(protected.id).role == :admin
   end
 
   test "given a protected admin then deactivation is refused", %{conn: conn} do
@@ -58,9 +110,11 @@ defmodule PlaycodeWeb.Admin.UserListLiveTest do
 
     {:ok, lv, _html} = live(conn, ~p"/admin/users")
 
+    # The button is hidden for a protected admin; the handler must refuse anyway.
+    refute has_element?(lv, "#user-#{protected.id} button", t("Deactivate"))
     render_click(lv, "deactivate", %{"id" => protected.id})
 
-    assert Accounts.active?(Playcode.Repo.reload!(protected))
+    assert Accounts.active?(Accounts.get_user!(protected.id))
   end
 
   # Regression: the result of deliver_invite/3 was discarded, so an SMTP relay

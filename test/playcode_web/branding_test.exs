@@ -10,8 +10,6 @@ defmodule PlaycodeWeb.BrandingTest do
   import Phoenix.LiveViewTest
   import Playcode.TestFixtures
 
-  alias Playcode.Accounts.{User, UserNotifier}
-
   test "the home page names the platform and the libraries it serves", %{conn: conn} do
     html = conn |> get(~p"/") |> html_response(200)
 
@@ -44,16 +42,6 @@ defmodule PlaycodeWeb.BrandingTest do
     {:ok, _view, html} = live(conn, ~p"/users/accept-invite/#{token}")
 
     assert html =~ "Bienvenido a Playcode"
-  end
-
-  test "the invitation email names the platform and what it is" do
-    {:ok, email} =
-      UserNotifier.deliver_invite_instructions(%User{email: "nuevo@uv.es"}, "http://x/invite")
-
-    assert email.subject == "You have been invited to Playcode"
-    assert {"Playcode", _address} = email.from
-    assert email.text_body =~ "You have been invited to Playcode, the editorial platform"
-    assert email.text_body =~ "EMOTHE and ARTELOPE digital libraries"
   end
 
   test "pages carry the Playcode icon, not Phoenix's", %{conn: conn} do

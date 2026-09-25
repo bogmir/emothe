@@ -9,7 +9,6 @@ defmodule Playcode.ActivityLogTest do
   import Playcode.TestFixtures
 
   alias Playcode.ActivityLog
-  alias Playcode.ActivityLog.Diff
 
   test "an entry records who did what to which play, and either may be absent" do
     user = user_fixture()
@@ -124,33 +123,6 @@ defmodule Playcode.ActivityLogTest do
     test "pages", %{entries: _} do
       assert length(ActivityLog.list_entries(page: 1, per_page: 2)) == 2
       assert length(ActivityLog.list_entries(page: 2, per_page: 2)) == 1
-    end
-  end
-
-  describe "Diff.from_changeset/1" do
-    test "extracts changed fields" do
-      play = play_fixture(%{"title" => "Old Title"})
-
-      changeset = Ecto.Changeset.change(play, title: "New Title")
-
-      diff = Diff.from_changeset(changeset)
-      assert diff["title"] == ["Old Title", "New Title"]
-    end
-
-    test "excludes timestamps" do
-      play = play_fixture()
-
-      changeset = Ecto.Changeset.change(play, title: "Changed", updated_at: DateTime.utc_now())
-
-      diff = Diff.from_changeset(changeset)
-      assert Map.has_key?(diff, "title")
-      refute Map.has_key?(diff, "updated_at")
-      refute Map.has_key?(diff, "inserted_at")
-    end
-
-    test "returns empty map for non-changeset input" do
-      assert Diff.from_changeset(nil) == %{}
-      assert Diff.from_changeset(:not_a_changeset) == %{}
     end
   end
 end

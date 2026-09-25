@@ -67,8 +67,7 @@ lib/
 │   ├── statistics.ex                 # Compute & cache play statistics
 │   ├── activity_log.ex                   # Activity log context (log, list, count)
 │   ├── activity_log/
-│   │   ├── entry.ex                  # Activity log entry schema
-│   │   └── diff.ex                   # Changeset diff extractor
+│   │   └── entry.ex                  # Activity log entry schema
 │   ├── statistics/
 │   │   └── play_statistic.ex         # Cached JSONB statistics per play
 │   ├── accounts.ex                   # Invitations, login, sessions, deactivation

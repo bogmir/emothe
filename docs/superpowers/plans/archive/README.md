@@ -201,3 +201,46 @@ was never published, so it is absent from the T00 index. `EMOTHE0033` has an emp
   the label renders as `Antigüedad clásica`. The plan warned about this and it happened.
 - **`mix gettext.extract --merge` fuzzy-matched again:** it proposed `"Research Metadata"` →
   `"Investigador"`. One bad entry out of 15 new strings, caught and corrected.
+
+---
+
+## Rename — `Emothe` → `Playcode`
+
+**Shipped 2026-09-25.** Plan: `2026-09-21-rename-emothe-to-playcode.md`, all 7 tasks plus operator
+runbook R1–R5. 549 tests passing.
+
+The application's code identity moved from `Emothe`/`:emothe` to `Playcode`/`:playcode`, because a
+backend serving both EMOTHE and ARTELOPE should not be named after one of them. The corpus, the
+public brand and the domain did not move: `EMOTHE####` play codes, `emothe.uv.es`,
+`plays.emothe_id`, `w3emothe` and `emothe-static` all survive, and `test/rename_guard_test.exs`
+fails if any of them is rewritten.
+
+- Fly app `playcode` (`playcode.fly.dev`) deployed by CI from `main`. The old `emothe` app has zero
+  machines but stays registered, so the `emothe.fly.dev` hostname cannot be claimed by anyone else.
+- Dev database renamed in place, `emothe_dev` → `playcode_dev`; the curated corpus was kept.
+- GitHub repository `bogmir/playcode`, working directory `~/Projects/playcode`.
+
+| Commit | |
+|---|---|
+| `b3a8579` | test: guard the Emothe -> Playcode rename boundary |
+| `68959d4` | refactor: rename the application namespace Emothe -> Playcode |
+| `cd79e2c` | docs: record rename progress through task 4 |
+| `16b79d7` | docs: describe the repo as Playcode |
+| `5b46037` | chore: point the tooling permission rules at the renamed test tree |
+| `4980e82` | docs: the release check needs MIX_TARGET=host on this machine |
+| `1b30682` | add correction |
+| `8b1ae44` | fix chromium |
+| `d88a9ae` | docs: close Task 7 of the rename and record the runbook findings |
+
+### Things this rename learned that its plan did not say
+
+- **A hand-picked list of files is a guess.** Task 5 rewrote six "live docs" and missed five more
+  in `docs/`, because the guard did not scan `docs/`. It does now. Scan for the old name; don't
+  list the files you think contain it.
+- **Fly secrets can be moved without reading them.** `fly ssh console -a <app> -C printenv` piped
+  into `fly secrets import -a <newapp>`. A `PHX_HOST` secret overrides `fly.toml`'s `[env]` and
+  would have pointed every invitation link at the old host, so it was left behind.
+- **An empty `SECRET_KEY_BASE` passes the `|| raise` guard** in `config/runtime.exs`, because `""`
+  is truthy in Elixir. `$(mix phx.gen.secret)` run outside the repo yields exactly that.
+- **Claude Code keys its project memory on the directory path**, and creates the new folder on
+  first launch there, so moving the old folder afterwards nests it. Copy the memory files instead.

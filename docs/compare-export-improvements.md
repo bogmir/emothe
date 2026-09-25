@@ -2,7 +2,7 @@
 
 ## Current Status
 
-The comparison HTML export (`Emothe.Export.CompareHtml`) already covers:
+The comparison HTML export (`Playcode.Export.CompareHtml`) already covers:
 - Self-contained HTML (CSS + JS embedded)
 - Sync scroll between panels (by act/scene/speech key)
 - 2-panel and 3-panel layouts work correctly
@@ -14,7 +14,7 @@ The comparison HTML export (`Emothe.Export.CompareHtml`) already covers:
 
 **Problem**: Exporting 4 plays produces 4 very narrow columns in a single row.
 
-**Fix**: In `comparison_css/1` (`lib/emothe/export/compare_html.ex`), when `panel_count == 4`:
+**Fix**: In `comparison_css/1` (`lib/playcode/export/compare_html.ex`), when `panel_count == 4`:
 - `grid-template-columns: repeat(2, 1fr)` (2 columns)
 - `grid-template-rows: 1fr 1fr` (2 rows)
 - Panel `height: 50vh` (half viewport per panel)

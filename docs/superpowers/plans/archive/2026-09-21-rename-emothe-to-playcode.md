@@ -34,11 +34,12 @@ Two further traps found by measurement:
 |---|---|---|
 | 1. Guard test and baseline | **done** `b3a8579` | Found three would-be silent breakages; see the task. Baseline 536 tests, 83 plays, 303,389 elements. |
 | 2. The code rename | **done** `68959d4` | 219 files, 549 tests 0 failures. **Task 3's mechanical file edits were folded in here**, because the guard checks the final state and would have left Task 2 red. `fly.emothe.toml` exists; `fly.toml` describes the playcode app. A fourth preserved token was discovered mid-task: `emothe-static`. |
-| 3. Deployment | **done through R4** | App `playcode` created under org `personal`; eight secrets imported straight from the running `emothe` machine with digests matching one for one, `SECRET_KEY_BASE` generated fresh. Deployed by hand, merged to `main` as `f64de81`, CI now owns deploys. Both hosts serve 200 and list an identical set of play codes, so the shared `DATABASE_URL` is confirmed from the outside. **R5 (`fly scale count 0 -a emothe`) is still open** and reversible with `fly scale count 1`. |
+| 3. Deployment | **done** | App `playcode` created under org `personal`; eight secrets imported straight from the running `emothe` machine with digests matching one for one, `SECRET_KEY_BASE` generated fresh. Deployed by hand, merged to `main` as `f64de81`, CI now owns deploys. Both hosts serve 200 and list an identical set of play codes, so the shared `DATABASE_URL` is confirmed from the outside. R5 done: `fly status -a emothe` lists no machines and `emothe.fly.dev` refuses the TLS handshake, the two results R5 expects. |
 | 4. Development database | **done** | `ALTER DATABASE emothe_dev RENAME TO playcode_dev`, orphaned `emothe_test` dropped. Row counts identical to baseline; 64 EMOTHE + 19 AL codes intact, zero corrupted; `/plays` and a play page both serve 200. No tracked files changed. |
 | 5. Documentation | **done** `16b79d7` | Six live docs; archive verified untouched. Also corrected the stale "Fly deployment pending" claim and removed the asdf PATH export that contradicted Running Commands. |
 | 6. Tooling settings and final verification | **done** | `mix format --check-formatted` clean, `--warnings-as-errors` clean, 549 tests 0 failures, all 4 mix tasks registered and `playcode.import.tei --dry-run` exercised end to end. Full-diff corpus scan: no `EMOTHE####` or `emothe.uv.es` lost, no `PLAYCODE####` introduced. |
-| 7. Rename the repository | **done** | Bitbucket remote removed, GitHub repo renamed to `bogmir/playcode` and `origin` repointed, directory moved to `~/Projects/playcode`. Rebuilt from an empty `_build` and `deps`: `--warnings-as-errors` clean, 549 tests 0 failures. Two steps were wrong as written. **Step 7's `mv` would have nested** the old project folder inside the new one, because `-home-bogdan-Projects-playcode` already existed (Claude Code creates it on first launch in the new path), so the four memory files were copied instead. **Step 8's `git add .claude/settings.json` adds nothing**: `/.claude/` is gitignored, so that path fix is local only and the commit carries `CLAUDE.md`. Ran ahead of R5, which is still open. |
+| 7. Rename the repository | **done** | Bitbucket remote removed, GitHub repo renamed to `bogmir/playcode` and `origin` repointed, directory moved to `~/Projects/playcode`. Rebuilt from an empty `_build` and `deps`: `--warnings-as-errors` clean, 549 tests 0 failures. Two steps were wrong as written. **Step 7's `mv` would have nested** the old project folder inside the new one, because `-home-bogdan-Projects-playcode` already existed (Claude Code creates it on first launch in the new path), so the four memory files were copied instead. **Step 8's `git add .claude/settings.json` adds nothing**: `/.claude/` is gitignored, so that path fix is local only and the commit carries `CLAUDE.md`. |
+| Final sweep | **done** | Task 5's hand-picked list of six live docs missed five more in `docs/` — `compare-export-improvements`, `fly-poc-deployment`, `release-strategy`, `render-deployment`, `word-import-feature` — because the guard never scanned `docs/`. It now scans `README.md`, `AGENTS.md`, `docs/*.md` and `docs/build_import_analysis.py`; it failed on exactly those five before the fix. The FileMaker roadmap was renamed by hand as the one exception to the archive rule, since its slices are still to be built; `doc/emothe_export.csv` keeps its name because that is the file on disk. 549 tests, 0 failures. |
 
 ## Global Constraints
 
@@ -94,7 +95,7 @@ The regression risk in this plan is not "the app fails to compile" — the compi
 - Consumes: nothing.
 - Produces: `test/rename_guard_test.exs`, which every later task re-runs. Baseline file holding the pre-rename test count and dev-database row counts.
 
-- [ ] **Step 1: Create the branch**
+- [x] **Step 1: Create the branch**
 
 ```bash
 cd /home/bogdan/Projects/emothe
@@ -102,7 +103,7 @@ git checkout -b rename-to-playcode
 git status --porcelain   # must be empty
 ```
 
-- [ ] **Step 2: Capture the baseline**
+- [x] **Step 2: Capture the baseline**
 
 ```bash
 SCRATCH=/tmp/claude-1000/-home-bogdan-Projects-emothe/3cd49bbd-6e5a-48ff-aa58-0a01bb75bc49/scratchpad
@@ -130,7 +131,7 @@ mkdir -p "$SCRATCH"
 
 Keep this output. Task 2 and Task 5 compare against it.
 
-- [ ] **Step 3: Write the failing guard test**
+- [x] **Step 3: Write the failing guard test**
 
 The committed test is `test/rename_guard_test.exs` — read it there rather than from a copy that can drift. It holds thirteen tests in three groups: the new namespace exists and the old one does not; the corpus keeps its identity; and no stale application identity survives in our own source.
 
@@ -144,7 +145,7 @@ Two scanning strategies, deliberately: source cleanliness uses `git grep`, becau
 
 All three are now exceptions in the substitution rule and assertions in the guard.
 
-- [ ] **Step 4: Run it and watch it fail**
+- [x] **Step 4: Run it and watch it fail**
 
 ```bash
 mix test test/rename_guard_test.exs
@@ -152,7 +153,7 @@ mix test test/rename_guard_test.exs
 
 Expected: failures on the namespace tests (`Playcode.Catalogue` does not exist, `Emothe.Catalogue` does) and on both `offenders/1` tests. The four corpus tests should already pass — they assert the state you are protecting.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add test/rename_guard_test.exs
@@ -180,7 +181,7 @@ Indivisible. A half-renamed Elixir application does not compile, so there is no 
 - Consumes: the guard test from Task 1.
 - Produces: `Playcode.*` and `PlaycodeWeb.*` modules, OTP app `:playcode`, mix tasks `playcode.import.tei`, `playcode.import.filemaker`, `playcode.export.site`, `playcode.invite`, databases `playcode_dev` / `playcode_test`, esbuild/tailwind profile `playcode`, session key `_playcode_key`.
 
-- [ ] **Step 1: Move the trees with `git mv` so history follows**
+- [x] **Step 1: Move the trees with `git mv` so history follows**
 
 ```bash
 cd /home/bogdan/Projects/emothe
@@ -198,7 +199,7 @@ done
 git status --short | head -20
 ```
 
-- [ ] **Step 2: Rewrite the identifiers**
+- [x] **Step 2: Rewrite the identifiers**
 
 Two rules, applied in order. The first only ever touches a capital `E`, so it cannot interfere with the second, and neither can touch upper-case `EMOTHE`.
 
@@ -216,7 +217,7 @@ Why each piece:
 - `(?!\.uv\.es)` is the only exception, and it is why this is `perl` and not `sed` — GNU sed has no lookahead.
 - `test/fixtures` is excluded because of the FileMaker table name; the guard test is excluded because it names the old identity on purpose.
 
-- [ ] **Step 3: Rewrite the gettext source references**
+- [x] **Step 3: Rewrite the gettext source references**
 
 The PO/POT files hold 934 `#:` comments pointing at `lib/emothe_web/...`. They belong in
 this task because the guard test scans `priv/gettext` — leaving them would end the task
@@ -245,7 +246,7 @@ grep -c 'msgstr "Biblioteca Digital EMOTHE"' priv/gettext/es/LC_MESSAGES/default
 
 Expected: `paths clean`, then `12`, then `1`.
 
-- [ ] **Step 4: Clear the build, including the colocated-hooks directory**
+- [x] **Step 4: Clear the build, including the colocated-hooks directory**
 
 `assets/js/app.js` imports from `phoenix-colocated/emothe`, which Phoenix generates into `_build/<env>/phoenix-colocated/<otp_app>/`. Step 2 rewrote the import; the stale directory must go or esbuild resolves the old path.
 
@@ -253,7 +254,7 @@ Expected: `paths clean`, then `12`, then `1`.
 rm -rf _build
 ```
 
-- [ ] **Step 5: Format and compile**
+- [x] **Step 5: Format and compile**
 
 ```bash
 mix format
@@ -262,7 +263,7 @@ mix compile --warnings-as-errors
 
 Expected: clean compile. If a module is reported undefined, it is almost certainly a string-built module name that the regex could not see — search for it with `git grep -n 'Module.concat\|String.to_existing_atom'`.
 
-- [ ] **Step 6: Run the full suite**
+- [x] **Step 6: Run the full suite**
 
 ```bash
 mix test
@@ -270,13 +271,13 @@ mix test
 
 Expected: the same pass/fail counts as `rename-baseline.txt` from Task 1 Step 2, and `test/rename_guard_test.exs` now fully green. The test database `playcode_test` is created automatically by the `test` alias.
 
-- [ ] **Step 7: Drop the orphaned test database**
+- [x] **Step 7: Drop the orphaned test database**
 
 ```bash
 psql -lqt | cut -d'|' -f1 | grep -w emothe_test && dropdb emothe_test || echo "already gone"
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A
@@ -321,7 +322,7 @@ Four consequences, each of which the steps below handle:
 - Consumes: release name `playcode` and module `Playcode.Release` from Task 2.
 - Produces: release binary at `/app/bin/playcode`; Fly app `playcode` as the CI deploy target; Fly app `emothe` retained, hand-deployable, and switchable off; CI database `playcode_test`.
 
-- [ ] **Step 1: Preserve the current Fly config as the legacy one**
+- [x] **Step 1: Preserve the current Fly config as the legacy one**
 
 ```bash
 cd /home/bogdan/Projects/emothe
@@ -387,7 +388,7 @@ kill_timeout = '30s'
   memory_mb = 1024
 ```
 
-- [ ] **Step 2: Point `fly.toml` at the new app**
+- [x] **Step 2: Point `fly.toml` at the new app**
 
 Change exactly four lines; leave the rest of the file identical so the two configs stay easy to diff.
 
@@ -404,7 +405,7 @@ diff fly.emothe.toml fly.toml
 
 Expected diff: the header comment block, `app`, `PHX_HOST`. Nothing else.
 
-- [ ] **Step 3: Rewrite the shared build and run files**
+- [x] **Step 3: Rewrite the shared build and run files**
 
 `Dockerfile` and `entrypoint.sh` are shared by both Fly apps, so they follow the release binary unconditionally.
 
@@ -419,7 +420,7 @@ git diff --stat Dockerfile Dockerfile.render entrypoint.sh render.yaml .gitignor
 
 Expected: `_build/prod/rel/emothe` → `.../playcode` and `/app/bin/emothe` → `/app/bin/playcode` in both Dockerfiles, both lines of `entrypoint.sh`, the `playcode-db` / `playcode-web` / `preDeployCommand` lines in `render.yaml`, and `emothe-*.tar` → `playcode-*.tar` in `.gitignore`.
 
-- [ ] **Step 4: Update CI**
+- [x] **Step 4: Update CI**
 
 The test database name follows the code. The health check follows the new Fly app.
 
@@ -432,7 +433,7 @@ grep -n 'playcode' .github/workflows/ci.yml .github/workflows/deploy-fly.yml
 
 Expected: `POSTGRES_DB: playcode_test`, the CI `DATABASE_URL` ending `/playcode_test`, and the smoke test hitting `https://playcode.fly.dev`. `--config fly.toml` in the deploy step is already correct and needs no change.
 
-- [ ] **Step 5: Verify the release builds under the new name**
+- [x] **Step 5: Verify the release builds under the new name**
 
 The only check that proves `mix release` and both Dockerfiles agree on the path.
 
@@ -455,7 +456,7 @@ Elixir build on the machine.
 
 Expected: the release builds, the binary exists at exactly that path, and every reference in the three files points at it.
 
-- [ ] **Step 6: Verify nothing stale is left**
+- [x] **Step 6: Verify nothing stale is left**
 
 ```bash
 git grep -n -P '(?<!w3)emothe(?!\.uv\.es|_id|_project_description)|\bEmothe' -- \
@@ -464,7 +465,7 @@ git grep -n -P '(?<!w3)emothe(?!\.uv\.es|_id|_project_description)|\bEmothe' -- 
 
 Expected: **no output.** `fly.emothe.toml` is deliberately absent from the path list, because it is supposed to still say `emothe`. Anything this command prints is a genuine miss. To see the legacy file's intentional hits, ask for them: `git grep -n emothe -- fly.emothe.toml`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add fly.toml fly.emothe.toml Dockerfile Dockerfile.render entrypoint.sh \
@@ -496,9 +497,9 @@ Recorded because the plan did not predict any of it:
 
 Not agent steps: `flyctl` is not installed here and needs your account credentials. Do these in order. **Do not merge to `main` until Step R3 succeeds**, because CI auto-deploys `fly.toml` on merge.
 
-- [ ] **R1. Collect the secret values.** `fly secrets list -a emothe` shows names only; Fly never returns the values. You need `DATABASE_URL`, `ADMIN_EMAILS`, `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` from your own records or from the Postgres provider's dashboard.
+- [x] **R1. Collect the secret values.** `fly secrets list -a emothe` shows names only; Fly never returns the values. You need `DATABASE_URL`, `ADMIN_EMAILS`, `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD` from your own records or from the Postgres provider's dashboard.
 
-- [ ] **R2. Create the app and give it the same database.** Pointing both apps at one database is what makes this a cutover rather than a migration — no data moves, no divergence, and rollback is "start the old machines again".
+- [x] **R2. Create the app and give it the same database.** Pointing both apps at one database is what makes this a cutover rather than a migration — no data moves, no divergence, and rollback is "start the old machines again".
 
 ```bash
 fly apps create playcode --org <your-org>
@@ -507,7 +508,7 @@ fly secrets set -a playcode   DATABASE_URL='<same value the emothe app uses>'   
 
 `ADMIN_EMAILS` unset means **zero admins** on the new app — `AdminBootstrap` reconciles it at boot. With `SMTP_HOST` unset the mailer silently falls back to the Local adapter and every invitation is dropped.
 
-- [ ] **R3. Deploy the branch by hand and verify.**
+- [x] **R3. Deploy the branch by hand and verify.**
 
 ```bash
 fly deploy --config fly.toml --remote-only
@@ -517,9 +518,9 @@ curl -s -o /dev/null -w '%{http_code}\n' https://playcode.fly.dev/plays
 
 Expected: `200` for both. Log in and confirm the admin area works, since the new `SECRET_KEY_BASE` means fresh sessions.
 
-- [ ] **R4. Merge.** CI now deploys `playcode` on every green build of `main`.
+- [x] **R4. Merge.** CI now deploys `playcode` on every green build of `main`.
 
-- [ ] **R5. Switch the old app off, once you are satisfied.** Destroying the machines is the real off switch: `auto_start_machines` cannot start a machine that does not exist.
+- [x] **R5. Switch the old app off, once you are satisfied.** Destroying the machines is the real off switch: `auto_start_machines` cannot start a machine that does not exist.
 
 ```bash
 fly scale count 0 -a emothe
@@ -541,7 +542,7 @@ Rollback at any point: `fly scale count 1 -a emothe`. Retire it permanently only
 - Consumes: `config/dev.exs`, which Task 2 already pointed at `playcode_dev`.
 - Produces: a `playcode_dev` database whose contents match the Task 1 baseline exactly.
 
-- [ ] **Step 1: Stop anything holding a connection**
+- [x] **Step 1: Stop anything holding a connection**
 
 `ALTER DATABASE ... RENAME` fails while any session is connected. Stop `mix phx.server`, any `iex -S mix`, and any open database GUI.
 
@@ -555,14 +556,14 @@ Expected: `0`. If not, close them, or terminate with:
 psql -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'emothe_dev';"
 ```
 
-- [ ] **Step 2: Rename**
+- [x] **Step 2: Rename**
 
 ```bash
 psql -d postgres -c "ALTER DATABASE emothe_dev RENAME TO playcode_dev;"
 psql -lqt | cut -d'|' -f1 | grep -w playcode_dev
 ```
 
-- [ ] **Step 3: Verify the corpus came through intact**
+- [x] **Step 3: Verify the corpus came through intact**
 
 ```bash
 mix run -e '
@@ -577,7 +578,7 @@ mix run -e '
 
 Expected: identical to the "dev database row counts" block in `rename-baseline.txt`. Diff them rather than eyeballing.
 
-- [ ] **Step 4: Verify the play codes in the database are still EMOTHE codes**
+- [x] **Step 4: Verify the play codes in the database are still EMOTHE codes**
 
 The strongest single check that no rename reached the data.
 
@@ -593,7 +594,7 @@ mix run -e '
 
 Expected: the EMOTHE-prefixed count matches the baseline, and the sample shows codes like `["AL0001", "EMOTHE0010", ...]` — **never** `PLAYCODE0010`. If you see a renamed code, stop: the substitution reached the database and you must restore from the pre-rename state.
 
-- [ ] **Step 5: Boot the application against it**
+- [x] **Step 5: Boot the application against it**
 
 ```bash
 mix phx.server
@@ -601,7 +602,7 @@ mix phx.server
 
 Visit `http://localhost:4000/plays`, confirm the catalogue lists plays, open one and confirm the text renders. Stop the server.
 
-- [ ] **Step 6: Nothing to commit**
+- [x] **Step 6: Nothing to commit**
 
 No tracked files changed. Note the completed rename in the task log and move on.
 
@@ -619,7 +620,7 @@ Update the docs that describe how to *work in* this repo. Leave the docs that *r
 - Consumes: the final command names from Tasks 2 and 4.
 - Produces: accurate onboarding instructions.
 
-- [ ] **Step 1: Rewrite the live docs**
+- [x] **Step 1: Rewrite the live docs**
 
 ```bash
 perl -pi -e 's/\bEmothe/Playcode/g; s/(?<!w3)emothe(?!\.uv\.es|_id|_project_description)/playcode/g' \
@@ -628,7 +629,7 @@ perl -pi -e 's/\bEmothe/Playcode/g; s/(?<!w3)emothe(?!\.uv\.es|_id|_project_desc
   docs/build_import_analysis.py
 ```
 
-- [ ] **Step 2: Fix what the regex cannot know**
+- [x] **Step 2: Fix what the regex cannot know**
 
 Three things in `CLAUDE.md` need a human edit, because they are prose about identity rather than identity itself:
 
@@ -668,14 +669,14 @@ code (`EMOTHE0010`), the corpus, or the public brand.
   `SMTP_USERNAME`, `SMTP_PASSWORD`. With `SMTP_HOST` unset the mailer falls back
   to the Local adapter and **every invitation is silently dropped** — use
   `bin/playcode rpc 'Playcode.Release.invite_url("...")'` instead.
-- [ ] **Render** — `render.yaml` exists but has never been applied.
+- [x] **Render** — `render.yaml` exists but has never been applied.
 ```
 
 ```bash
 grep -n 'mix playcode\.\|bin/playcode\|Playcode.Release' CLAUDE.md
 ```
 
-- [ ] **Step 3: Confirm the archive was not touched**
+- [x] **Step 3: Confirm the archive was not touched**
 
 ```bash
 git status --porcelain docs/superpowers/ || echo "archive untouched"
@@ -683,7 +684,7 @@ git status --porcelain docs/superpowers/ || echo "archive untouched"
 
 Expected: no output from `git status` for those paths.
 
-- [ ] **Step 4: Confirm the domain survived the docs pass**
+- [x] **Step 4: Confirm the domain survived the docs pass**
 
 ```bash
 git grep -c 'emothe\.uv\.es' -- CLAUDE.md docs/
@@ -691,7 +692,7 @@ git grep -c 'emothe\.uv\.es' -- CLAUDE.md docs/
 
 Expected: non-zero, and unchanged from the baseline count.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add CLAUDE.md AGENTS.md README.md docs/bare-metal-deployment.md \
@@ -716,7 +717,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 - Consumes: everything above.
 - Produces: a branch ready to merge.
 
-- [ ] **Step 1: Fix the stale test path in the permission rules**
+- [x] **Step 1: Fix the stale test path in the permission rules**
 
 `.claude/settings.json` holds absolute paths into `/home/bogdan/Projects/emothe`, which is **still the correct directory** — the repo folder is not being renamed. Only the paths *inside* the repo moved. Change just those:
 
@@ -727,7 +728,7 @@ grep -n 'Projects/emothe' .claude/settings.json
 
 Expected: `Projects/emothe` still appears (correct — the directory did not move), and no `test/emothe/` remains.
 
-- [ ] **Step 2: Full verification sweep**
+- [x] **Step 2: Full verification sweep**
 
 ```bash
 mix format --check-formatted
@@ -737,7 +738,7 @@ mix test
 
 Expected: formatted, no warnings, and the same pass count as `rename-baseline.txt` plus the new guard test's assertions.
 
-- [ ] **Step 3: Confirm the mix tasks are registered under the new names**
+- [x] **Step 3: Confirm the mix tasks are registered under the new names**
 
 ```bash
 mix help | grep playcode
@@ -745,7 +746,7 @@ mix help | grep playcode
 
 Expected: `mix playcode.export.site`, `mix playcode.import.filemaker`, `mix playcode.import.tei`, `mix playcode.invite`.
 
-- [ ] **Step 4: Exercise one task end to end**
+- [x] **Step 4: Exercise one task end to end**
 
 A registered task is not a working task. The dry-run writes nothing.
 
@@ -755,7 +756,7 @@ mix playcode.import.tei --dry-run 2>&1 | tail -20
 
 Expected: a report naming EMOTHE play codes and what it would do. The codes in that output must still read `EMOTHE####`.
 
-- [ ] **Step 5: Confirm the guard passes on the whole tree**
+- [x] **Step 5: Confirm the guard passes on the whole tree**
 
 ```bash
 mix test test/rename_guard_test.exs --trace
@@ -763,7 +764,7 @@ mix test test/rename_guard_test.exs --trace
 
 Expected: every test green, including both `offenders/1` scans.
 
-- [ ] **Step 6: Review the complete diff for corpus damage**
+- [x] **Step 6: Review the complete diff for corpus damage**
 
 The last human check. Look specifically for any line where a play code, a domain or a brand string changed.
 
@@ -773,7 +774,7 @@ git diff main...HEAD -- . ':(exclude)priv/gettext' | grep -E '^[-+].*(EMOTHE[0-9
 
 Expected: **no output**. Any `+PLAYCODE0010` or `-EMOTHE0010` line is a corrupted play code — stop and fix before merging.
 
-- [ ] **Step 7: Commit and finish the branch**
+- [x] **Step 7: Commit and finish the branch**
 
 ```bash
 git add .claude/settings.json
@@ -796,7 +797,7 @@ Run this only after Tasks 1–6 are merged and the Fly cutover (runbook R5) is d
 - Modify: `.claude/settings.json`
 - Outside the repo: the GitHub repository name, the working directory, the assistant's project-memory directory
 
-- [ ] **Step 1: Remove the stray remote**
+- [x] **Step 1: Remove the stray remote**
 
 `git remote -v` shows a `bitbucket` remote pointing at `git@bitbucket.org:c57-nl/socialplatforms.git` — an unrelated work repository. A stray `git push bitbucket` from here would publish this project into it.
 
@@ -808,11 +809,11 @@ git remote -v
 
 Expected: only `origin` remains.
 
-- [ ] **Step 2: Rename on GitHub**
+- [x] **Step 2: Rename on GitHub**
 
 Settings → Repository name → `playcode` → Rename. GitHub redirects `bogmir/emothe` to `bogmir/playcode` and keeps issues, Actions secrets and the `production` environment.
 
-- [ ] **Step 3: Point the remote at the new name**
+- [x] **Step 3: Point the remote at the new name**
 
 The redirect means the old URL keeps working, so this is hygiene rather than repair — but do it before the redirect confuses someone.
 
@@ -822,7 +823,7 @@ git remote -v
 git fetch origin
 ```
 
-- [ ] **Step 4: Rename the working directory**
+- [x] **Step 4: Rename the working directory**
 
 Close the editor and every shell sitting inside the directory first, or the move leaves them pointing at a path that no longer exists.
 
@@ -832,7 +833,7 @@ mv emothe playcode
 cd playcode
 ```
 
-- [ ] **Step 5: Rebuild from scratch**
+- [x] **Step 5: Rebuild from scratch**
 
 Elixir build artifacts and fetched dependencies embed absolute paths. Without this, compilation fails with paths under the old directory.
 
@@ -845,7 +846,7 @@ mix test
 
 Expected: full green, matching the counts in `rename-baseline.txt`.
 
-- [ ] **Step 6: Fix the absolute paths in the tooling settings**
+- [x] **Step 6: Fix the absolute paths in the tooling settings**
 
 ```bash
 perl -pi -e 's{/home/bogdan/Projects/emothe}{/home/bogdan/Projects/playcode}g' .claude/settings.json
@@ -857,7 +858,7 @@ grep -n 'Projects/' .claude/settings.json CLAUDE.md
 
 Expected: every path now reads `Projects/playcode`.
 
-- [ ] **Step 7: Move the assistant's project memory**
+- [x] **Step 7: Move the assistant's project memory**
 
 Claude Code keys its per-project memory on the directory path, so renaming the directory otherwise starts from an empty memory.
 
@@ -869,7 +870,7 @@ ls /home/bogdan/.claude/projects/-home-bogdan-Projects-playcode/memory/
 
 Expected: `MEMORY.md`, `mix-path-not-needed.md`, `places-slug-async-deadlock.md`, `sales-pitch.md`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add .claude/settings.json

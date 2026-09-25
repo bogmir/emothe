@@ -21,12 +21,12 @@ slice learned that its plan did not say. Read that before starting a new slice.
 
 ## How a sync is run
 
-Two front doors onto the same pure domain layer (`Emothe.Import.Filemaker` +
-`Emothe.Import.FilemakerSync`):
+Two front doors onto the same pure domain layer (`Playcode.Import.Filemaker` +
+`Playcode.Import.FilemakerSync`):
 
-- `mix emothe.import.filemaker [--dry-run] [--force] [--path ...]` — the terminal path, for a bulk
+- `mix playcode.import.filemaker [--dry-run] [--force] [--path ...]` — the terminal path, for a bulk
   apply against a file on the server.
-- **`/admin/filemaker`** — `EmotheWeb.Admin.FilemakerSyncLive`. Upload the NDJSON export, read the
+- **`/admin/filemaker`** — `PlaycodeWeb.Admin.FilemakerSyncLive`. Upload the NDJSON export, read the
   diff, tick individual conflicts, apply. Permission `:import_filemaker`, **admin only** and
   deliberately not researcher-level: a sync is corpus-wide and its force path overwrites curated
   research metadata across every play at once, where a TEI import replaces one named file's play.
@@ -102,13 +102,13 @@ Consequences, measured at the present 82:
 | …of which Artelope (`AL####`) | 19 | absent from this export entirely — they get nothing, ever, from FileMaker |
 | …covered by the published index | 62 | these get language, work family, credits |
 | …with a `T01` research record | 22 | hard ceiling for metadata, witnesses, bibliography, performances |
-| Imported into `emothe_dev` | 82 | all of them, since S0 |
+| Imported into `playcode_dev` | 82 | all of them, since S0 |
 
 That 62 / 22 split is why the index slice went first: it is the only one that touches most of the
 corpus, and it needed no new columns. Everything from S2 on is capped at those 22 plays, so the
 panel and the tables it fills will be empty for 60 of 82 — by design, not by omission.
 
-Per-field scale, measured 2026-08-05 against `emothe_dev` through `Filemaker.load_versions/1`.
+Per-field scale, measured 2026-08-05 against `playcode_dev` through `Filemaker.load_versions/1`.
 **Read both columns.** The left is what a slice writes today; the right is what it writes once the
 ~300 plays land. Every slice grows 10–20×, which is the difference between "an afternoon of typing
 beats an importer" and "an importer is the only sane option":
@@ -155,7 +155,7 @@ Corpus baseline, soft delete and re-importable plays, work families and language
 the commit list, and the traps each one hit: **`archive/README.md`**.
 
 The one rule they leave behind that binds everything below: **a new curated `plays` column gets
-appended to `@platform_owned` in `lib/emothe/import/tei_parser.ex`, or the next TEI re-import
+appended to `@platform_owned` in `lib/playcode/import/tei_parser.ex`, or the next TEI re-import
 erases it.** A new child table either carries `origin` or stays outside the importer's reach.
 
 ### S2 — Version metadata panel *(in progress, one field at a time)*
@@ -255,7 +255,7 @@ re-read the same header:
   decades later. Written only where `relationship_type` is nil (the family head) — 7 of 82 plays
   today, not the 18 a naive per-version write would touch.
 
-Applied to `emothe_dev`: `updated 7, failed 0` (EMOTHE0010, 0038, 0281, 0337, 0346, 0777 from the
+Applied to `playcode_dev`: `updated 7, failed 0` (EMOTHE0010, 0038, 0281, 0337, 0346, 0777 from the
 index, plus EMOTHE0341 note-only), zero conflicts, idempotent on a second run. Answered without
 waiting on the attribution question below — see open question 2.
 
@@ -290,15 +290,15 @@ column would store nothing the play row does not already imply. If the link is e
 public page it is a one-line helper, not a migration.
 
 Only 13 of 22 carried an href in any case. Those nine blanks are why `version_code/1` in
-`lib/emothe/import/filemaker.ex` falls back to `"EMOTHE" <> padded _IdTituloEmothe`, and that
+`lib/playcode/import/filemaker.ex` falls back to `"EMOTHE" <> padded _IdTituloEmothe`, and that
 fallback stays — it is what matches all 22 records, not just the published ones.
 
 #### S2f — titles *(dropped as an import 2026-08-04)*
 
-Checked against the schema, the TEI parser and `emothe_dev`: **there is nothing to import.**
+Checked against the schema, the TEI parser and `playcode_dev`: **there is nothing to import.**
 
 - Both columns exist and both are already filled from TEI — `title[@key="orden"]` → `title_sort`,
-  `title[@type="original"]` → `original_title` (`lib/emothe/import/tei_parser.ex:329-375`). Both
+  `title[@type="original"]` → `original_title` (`lib/playcode/import/tei_parser.ex:329-375`). Both
   round-trip through the exporter and both are editable on the play form.
 - `title_sort` is populated on **82 of 82** plays. `original_title` is set on 36 and blank on 46 —
   blank exactly where the play *is* the original, which is correct, not a gap.
@@ -314,7 +314,7 @@ hand fix rather than an import: EMOTHE0254 has `title_sort: "JULES CÉSAR"` (sho
 `title[@key="orden"]` in the file) and EMOTHE0341 has `"Eastward Ho"`, having lost the `!`.
 
 **"But the columns exist, so the importer can just fill them"** — it can, in about ten lines and no
-migration, and it is still wrong. Measured against `emothe_dev` on 2026-08-04:
+migration, and it is still wrong. Measured against `playcode_dev` on 2026-08-04:
 
 - `title_sort` is set on 82 of 82 plays, so fill-only never fires: **0 writes, 13 conflicts**, of
   which 11 differ only by FileMaker's comma (`"Cid, Le"` against our `"Cid Le"`). Accepting them
@@ -488,7 +488,7 @@ five-language place names are research work we would otherwise redo.
 and turned out to be a feature rather than a column: a corpus-global gazetteer with a three-layer
 place / place-name / mention model, Wikidata as a swappable authority, and TEI `<listPlace>` +
 `<setting>` in both directions. **Phase 1 shipped no FileMaker code**, on purpose, and
-`plays.place_of_action` was never created. See `Emothe.Places` in `CLAUDE.md`.
+`plays.place_of_action` was never created. See `Playcode.Places` in `CLAUDE.md`.
 
 Two things were called "Phase 2" and they are not the same work, so they are split here:
 
@@ -602,8 +602,8 @@ that can actually use them.
 
 Fixed once here so every slice looks the same:
 
-- **Module namespace:** `Emothe.Import.Filemaker` (pure parsing, no DB) and
-  `Emothe.Import.Filemaker<Thing>Sync` (reads the DB, writes the DB). Parsing modules must be
+- **Module namespace:** `Playcode.Import.Filemaker` (pure parsing, no DB) and
+  `Playcode.Import.Filemaker<Thing>Sync` (reads the DB, writes the DB). Parsing modules must be
   testable without a database.
 - **HTML parsing with `Regex`.** There is no HTML library in `mix.exs` and this is a fixed,
   machine-generated markup shape. Do not add Floki for it.
@@ -615,9 +615,9 @@ Fixed once here so every slice looks the same:
   skipped. No stub plays, ever.
 - **Never touch Artelope.** `AL####` codes are absent from the export; they must come out of every
   report as "not in index", not as an error.
-- **Every write is logged** via `Emothe.ActivityLog` with `action: "update"` and
+- **Every write is logged** via `Playcode.ActivityLog` with `action: "update"` and
   `metadata: %{source: "filemaker_index"}` — the allowed action list in
-  `Emothe.ActivityLog.Entry` is `create update delete import export role_change`, so do not invent
+  `Playcode.ActivityLog.Entry` is `create update delete import export role_change`, so do not invent
   a new action.
 - **Idempotent.** Running a sync twice changes nothing the second time; the second report is all
   "unchanged".
@@ -627,7 +627,7 @@ Fixed once here so every slice looks the same:
   conflict when they differ, overwritten only under `--force`. Introduced in S2a. This is the
   "bootstrap, not a dependency" rule made operational; without it the second import undoes a
   researcher's afternoon.
-- **New curated column ⇒ `@platform_owned`.** Append it in `lib/emothe/import/tei_parser.ex`, or
+- **New curated column ⇒ `@platform_owned`.** Append it in `lib/playcode/import/tei_parser.ex`, or
   the next TEI re-import erases it. Add the regression test in the same commit.
 
 ## Open questions
@@ -684,5 +684,5 @@ matched `T01` records have an **empty `pub_edicionWeb`** and are reachable only 
 `version_code/1`'s numeric fallback: 0211, 0281, 0286, 0305, 0337, 0341, 0346, 0502, 0542. A quick
 script that matches on the href alone silently finds 13 of 22 and understates every coverage number
 — it is how S9b was briefly and wrongly written off at "2 of 22" when the answer is 6. Use
-`Emothe.Import.Filemaker.load_versions/1`, which handles the fallback, rather than re-deriving the
+`Playcode.Import.Filemaker.load_versions/1`, which handles the fallback, rather than re-deriving the
 code in a throwaway script.

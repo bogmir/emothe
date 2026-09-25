@@ -81,7 +81,7 @@ Tags are **case-insensitive** (`{P}` = `{p}`, `{PR}` = `{pr}`, etc.).
 
 | Component | Description | Effort |
 |-----------|-------------|--------|
-| **Word parser** (`lib/emothe/import/word_parser.ex`) | Parse `.docx` (ZIP + XML), map premarcación tags to elements | Medium |
+| **Word parser** (`lib/playcode/import/word_parser.ex`) | Parse `.docx` (ZIP + XML), map premarcación tags to elements | Medium |
 | **Import content UI** on play detail page | Upload `.docx` into existing play | Small |
 | **Bulk character assignment UI** | `/admin/plays/:id/character-review` — create characters, assign to speeches | Medium-Large |
 

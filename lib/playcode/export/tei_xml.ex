@@ -589,7 +589,8 @@ defmodule Playcode.Export.TeiXml do
   end
 
   defp build_element(%{type: "stage_direction"} = el) do
-    element(:stage, build_inline_content(el.content))
+    attrs = if el.stage_type, do: %{type: el.stage_type}, else: %{}
+    element(:stage, attrs, build_inline_content(el.content))
   end
 
   defp build_element(%{type: "prose"} = el) do

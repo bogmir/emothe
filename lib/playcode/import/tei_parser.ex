@@ -1379,7 +1379,7 @@ defmodule Playcode.Import.TeiParser do
 
   # --- Stage direction ---
 
-  defp import_stage_direction({_name, _attrs, _children} = stage, play, division, parent_id, pos) do
+  defp import_stage_direction({_name, attrs, _children} = stage, play, division, parent_id, pos) do
     content = text_content(stage)
 
     case PlayContent.create_element(%{
@@ -1388,6 +1388,7 @@ defmodule Playcode.Import.TeiParser do
            parent_id: parent_id,
            type: "stage_direction",
            content: content,
+           stage_type: attr_value(attrs, "type"),
            position: pos
          }) do
       {:ok, _el} -> :ok

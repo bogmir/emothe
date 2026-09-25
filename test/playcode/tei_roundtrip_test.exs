@@ -404,6 +404,35 @@ defmodule Playcode.TeiRoundtripTest do
       assert xml_elements(xml, "div2") == []
     end
 
+    # The export used to write every stage direction as a bare <stage>, dropping the
+    # corpus's exit, entrance, business, location, setting, mixed and delivery types.
+    test "a stage direction keeps its type" do
+      xml =
+        roundtrip(
+          tei(
+            body:
+              scene("""
+              <stage type="entrance">Sale el REY</stage>
+              <sp><speaker>REY</speaker>
+                <stage type="delivery">[En aparté]</stage>
+                <lg><l n="1"><seg type="aside">Ay de mí</seg></l></lg>
+                <stage type="business">Se sienta</stage>
+              </sp>
+              <stage>Suena música</stage>
+              <stage type="exit">Vase</stage>
+              """)
+          )
+        )
+
+      assert xml_elements(xml, "stage") == [
+               {%{"type" => "entrance"}, "Sale el REY"},
+               {%{"type" => "delivery"}, "[En aparté]"},
+               {%{"type" => "business"}, "Se sienta"},
+               {%{}, "Suena música"},
+               {%{"type" => "exit"}, "Vase"}
+             ]
+    end
+
     test "split verses keep their part, id and indentation" do
       xml =
         roundtrip(

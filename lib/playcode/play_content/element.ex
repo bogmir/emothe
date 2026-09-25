@@ -15,6 +15,7 @@ defmodule Playcode.PlayContent.Element do
     field :part, :string
     field :is_aside, :boolean, default: false
     field :rend, :string
+    field :stage_type, :string
     field :position, :integer, default: 0
 
     belongs_to :play, Playcode.Catalogue.Play
@@ -51,6 +52,7 @@ defmodule Playcode.PlayContent.Element do
       :part,
       :is_aside,
       :rend,
+      :stage_type,
       :position,
       :play_id,
       :division_id,

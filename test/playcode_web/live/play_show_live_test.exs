@@ -199,4 +199,35 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
       assert html =~ t("Fictional")
     end
   end
+
+  test "shows the play's text: acts, speakers, verses and stage directions", %{conn: conn} do
+    play =
+      Playcode.ImportHelpers.import_tei!(
+        Playcode.ImportHelpers.tei(
+          body: """
+          <div1 type="acto" n="1"><head>ACTO PRIMERO</head>
+            <div2 type="escena" n="1"><head>ESCENA I</head>
+              <stage>Salen el Rey y la Reina</stage>
+              <sp><speaker>REY</speaker><lg><l n="1">Aquí comienza el verso</l></lg></sp>
+              <sp><speaker>REINA</speaker><p>Y aquí la prosa.</p></sp>
+            </div2>
+          </div1>
+          """
+        )
+      )
+
+    {:ok, _lv, html} = live(conn, ~p"/plays/#{play.code}")
+
+    for text <- [
+          "ACTO PRIMERO",
+          "ESCENA I",
+          "REY",
+          "REINA",
+          "Salen el Rey y la Reina",
+          "Aquí comienza el verso",
+          "Y aquí la prosa."
+        ] do
+      assert html =~ text
+    end
+  end
 end

@@ -69,7 +69,7 @@ defmodule PlaycodeWeb.PlayCatalogueLive do
         )}
       </p>
 
-      <form phx-change="search" phx-submit="search" class="mb-8">
+      <form id="catalogue-search" phx-change="search" phx-submit="search" class="mb-8">
         <input
           type="text"
           name="search"

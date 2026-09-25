@@ -55,4 +55,20 @@ defmodule PlaycodeWeb.Admin.PlayDetailLiveTest do
                "THE SCENE: SMITHFIELD"
     end
   end
+
+  test "marking a play complete publishes it in the catalogue, and back to draft withdraws it",
+       %{conn: conn, play: play} do
+    {:ok, catalogue, _html} = live(conn, ~p"/plays")
+    refute render(catalogue) =~ play.title
+
+    {:ok, lv, _html} = live(conn, ~p"/admin/plays/#{play.id}")
+    assert lv |> element("button", t("Draft")) |> render_click() =~ t("Marked as complete.")
+
+    {:ok, _catalogue, html} = live(conn, ~p"/plays")
+    assert html =~ play.title
+
+    assert lv |> element("button", t("Complete")) |> render_click() =~ t("Marked as draft.")
+    {:ok, _catalogue, html} = live(conn, ~p"/plays")
+    refute html =~ play.title
+  end
 end

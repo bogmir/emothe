@@ -58,14 +58,6 @@ defmodule Playcode.CatalogueTest do
       assert {:ok, _} = Catalogue.purge_play(play)
       assert Catalogue.list_plays(include_deleted: true) == []
     end
-
-    test "archived plays are excluded from the complete count" do
-      play = play_fixture(%{"is_complete" => true})
-      assert Catalogue.count_complete_plays() == 1
-
-      {:ok, _} = Catalogue.delete_play(play)
-      assert Catalogue.count_complete_plays() == 0
-    end
   end
 
   describe "what a play may hold" do

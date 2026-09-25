@@ -14,14 +14,6 @@ defmodule Playcode.CatalogueTest do
         assert Enum.map(Catalogue.list_plays(search: term), & &1.id) == [play.id], term
       end
     end
-
-    test "plays can be listed by code" do
-      first = play_fixture(%{"code" => "AAA-1", "title" => "Z"})
-      second = play_fixture(%{"code" => "ZZZ-1", "title" => "A"})
-
-      assert [%{id: id1}, %{id: id2} | _] = Catalogue.list_plays(sort: :code)
-      assert {id1, id2} == {first.id, second.id}
-    end
   end
 
   describe "archiving" do

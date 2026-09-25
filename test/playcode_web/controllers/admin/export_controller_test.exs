@@ -1,43 +1,56 @@
 defmodule PlaycodeWeb.Admin.ExportControllerTest do
   use PlaycodeWeb.ConnCase, async: true
 
-  alias Playcode.TestFixtures
+  import Playcode.TestFixtures
+  import Playcode.ImportHelpers
 
-  defp log_in_admin(conn) do
-    log_in_user(conn, Playcode.TestFixtures.admin_fixture())
+  setup %{conn: conn} do
+    %{
+      conn: log_in_user(conn, user_fixture(role: :researcher)),
+      play: play_with_metadata_fixture()
+    }
   end
 
-  describe "Export endpoints behaviors" do
-    test "given a play when requesting TEI export then XML is returned as attachment", %{
-      conn: conn
-    } do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_with_metadata_fixture()
+  defp attachment(conn), do: conn |> get_resp_header("content-disposition") |> List.first()
 
-      conn = get(conn, ~p"/admin/plays/#{play.id}/export/tei")
+  test "TEI and HTML downloads are named after the play, and each is logged",
+       %{conn: conn, play: play} do
+    tei = get(conn, ~p"/admin/plays/#{play.id}/export/tei")
+    assert xml_texts(response(tei, 200), "title", within: "titleStmt") |> Enum.member?(play.title)
+    assert get_resp_header(tei, "content-type") |> List.first() =~ "application/xml"
+    assert attachment(tei) == ~s(attachment; filename="#{play.code}.xml")
 
-      assert response(conn, 200) =~ "<TEI"
-      assert get_resp_header(conn, "content-type") |> List.first() =~ "application/xml"
+    html = get(conn, ~p"/admin/plays/#{play.id}/export/html")
+    assert response(html, 200) =~ play.title
+    assert attachment(html) == ~s(attachment; filename="#{play.code}.html")
 
-      assert get_resp_header(conn, "content-disposition") |> List.first() =~
-               "attachment; filename=\"#{play.code}.xml\""
-    end
+    formats =
+      [action: "export", play_id: play.id]
+      |> Playcode.ActivityLog.list_entries()
+      |> Enum.map(& &1.metadata["format"])
+      |> Enum.sort()
 
-    test "given a play when requesting HTML export then standalone HTML is returned", %{
-      conn: conn
-    } do
-      conn = log_in_admin(conn)
-      play = TestFixtures.play_with_metadata_fixture()
+    assert formats == ["html", "tei"]
+  end
 
-      conn = get(conn, ~p"/admin/plays/#{play.id}/export/html")
+  test "the EPUB download is an e-book with the play's title", %{conn: conn, play: play} do
+    conn = get(conn, ~p"/admin/plays/#{play.id}/export/epub")
 
-      body = response(conn, 200)
-      assert body =~ "<!DOCTYPE html>"
-      assert body =~ play.title
-      assert get_resp_header(conn, "content-type") |> List.first() =~ "text/html"
+    assert {:ok, files} = :zip.unzip(response(conn, 200), [:memory])
+    assert Enum.any?(files, fn {_name, content} -> content =~ play.title end)
+    assert attachment(conn) == ~s(attachment; filename="#{play.code}.epub")
+  end
 
-      assert get_resp_header(conn, "content-disposition") |> List.first() =~
-               "attachment; filename=\"#{play.code}.html\""
-    end
+  test "two plays compared side by side download as one page", %{conn: conn, play: play} do
+    other = play_fixture(%{"title" => "La otra versión"})
+
+    conn = get(conn, ~p"/admin/plays/compare/export/html?#{[plays: "#{play.id},#{other.id}"]}")
+
+    body = response(conn, 200)
+    assert body =~ play.title
+    assert body =~ "La otra versión"
+
+    assert attachment(conn) ==
+             ~s(attachment; filename="compare_#{play.code}_vs_#{other.code}.html")
   end
 end

@@ -310,7 +310,7 @@ comm -23 /tmp/code_strings.txt /tmp/po_strings.txt
 ## Getting Started
 
 ```bash
-cd ~/Projects/emothe   # the directory is still named emothe; see Task 7 of the rename plan
+cd ~/Projects/playcode
 mix deps.get
 mix ecto.create
 mix ecto.migrate

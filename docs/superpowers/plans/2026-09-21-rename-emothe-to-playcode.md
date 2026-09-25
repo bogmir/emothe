@@ -34,11 +34,11 @@ Two further traps found by measurement:
 |---|---|---|
 | 1. Guard test and baseline | **done** `b3a8579` | Found three would-be silent breakages; see the task. Baseline 536 tests, 83 plays, 303,389 elements. |
 | 2. The code rename | **done** `68959d4` | 219 files, 549 tests 0 failures. **Task 3's mechanical file edits were folded in here**, because the guard checks the final state and would have left Task 2 red. `fly.emothe.toml` exists; `fly.toml` describes the playcode app. A fourth preserved token was discovered mid-task: `emothe-static`. |
-| 3. Deployment | **runbook only** | The file edits are already committed in Task 2. What remains is the operator runbook at the end of that task — create the Fly app, move the secrets, deploy, cut over. Needs `flyctl` and account credentials. |
+| 3. Deployment | **done through R4** | App `playcode` created under org `personal`; eight secrets imported straight from the running `emothe` machine with digests matching one for one, `SECRET_KEY_BASE` generated fresh. Deployed by hand, merged to `main` as `f64de81`, CI now owns deploys. Both hosts serve 200 and list an identical set of play codes, so the shared `DATABASE_URL` is confirmed from the outside. **R5 (`fly scale count 0 -a emothe`) is still open** and reversible with `fly scale count 1`. |
 | 4. Development database | **done** | `ALTER DATABASE emothe_dev RENAME TO playcode_dev`, orphaned `emothe_test` dropped. Row counts identical to baseline; 64 EMOTHE + 19 AL codes intact, zero corrupted; `/plays` and a play page both serve 200. No tracked files changed. |
 | 5. Documentation | **done** `16b79d7` | Six live docs; archive verified untouched. Also corrected the stale "Fly deployment pending" claim and removed the asdf PATH export that contradicted Running Commands. |
 | 6. Tooling settings and final verification | **done** | `mix format --check-formatted` clean, `--warnings-as-errors` clean, 549 tests 0 failures, all 4 mix tasks registered and `playcode.import.tei --dry-run` exercised end to end. Full-diff corpus scan: no `EMOTHE####` or `emothe.uv.es` lost, no `PLAYCODE####` introduced. |
-| 7. Rename the repository | pending | Optional, last, after the Fly cutover. |
+| 7. Rename the repository | **done** | Bitbucket remote removed, GitHub repo renamed to `bogmir/playcode` and `origin` repointed, directory moved to `~/Projects/playcode`. Rebuilt from an empty `_build` and `deps`: `--warnings-as-errors` clean, 549 tests 0 failures. Two steps were wrong as written. **Step 7's `mv` would have nested** the old project folder inside the new one, because `-home-bogdan-Projects-playcode` already existed (Claude Code creates it on first launch in the new path), so the four memory files were copied instead. **Step 8's `git add .claude/settings.json` adds nothing**: `/.claude/` is gitignored, so that path fix is local only and the commit carries `CLAUDE.md`. Ran ahead of R5, which is still open. |
 
 ## Global Constraints
 
@@ -482,6 +482,15 @@ not the app name. Render is out of scope: its blueprint was never applied
 mechanical rename only, to avoid stranding dead /app/bin/emothe references.
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
+
+#### What the runbook actually hit
+
+Recorded because the plan did not predict any of it:
+
+1. **Five secrets the plan never listed** — `ECTO_IPV6`, `SMTP_PORT`, `MAIL_FROM`, `POOL_SIZE`, `PHX_HOST`. `ECTO_IPV6` is load-bearing: Fly's internal Postgres is IPv6-only.
+2. **`PHX_HOST` is set as a secret, which overrides `fly.toml`'s `[env]`.** Copying it to the new app would have made every generated URL — invitation links, password resets — point back at `emothe.fly.dev`. Excluded from the import, along with `POOL_SIZE`, which `fly.toml` also owns.
+3. **Fly secrets are readable from inside a running machine** even though the API will not return them: `fly ssh console -a <app> -C printenv` piped into `fly secrets import -a <newapp>` moves them across without anyone seeing a value. `fly ssh console` does **not** auto-start a suspended machine, unlike an HTTP request — `fly machine start` first.
+4. **`SECRET_KEY_BASE="$(mix phx.gen.secret)"` run outside the repo silently sets an empty secret.** asdf has no `.tool-versions` there, `mix` fails, the subshell yields `""`, and Fly accepts it. `config/runtime.exs` guards with `System.get_env(...) || raise`, and an empty string is truthy in Elixir, so the guard does not fire — the app dies later on `secret_key_base must be at least 64 bytes`. Use `openssl rand -base64 64 | tr -d '\n'`, and verify the digest changes.
 
 #### Operator runbook — human steps, before this branch merges
 

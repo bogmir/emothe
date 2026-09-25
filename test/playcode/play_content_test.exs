@@ -4,45 +4,10 @@ defmodule Playcode.PlayContentTest do
   alias Playcode.PlayContent
   alias Playcode.TestFixtures
 
-  # The editor's renumbering helpers. They have no caller outside
-  # PlayContentEditorLive, which has no test yet; these stay until it does.
+  # Edge cases of the editor's renumbering, much simpler to set up here than through
+  # the editor. The plain cases (insert above, delete) are asserted through the
+  # editor in test/playcode_web/live/admin/play_content_editor_live_test.exs.
   describe "shift_element_positions/3" do
-    test "shifts positions of elements at and after the given position" do
-      %{play: play, scene: scene} = TestFixtures.play_with_structure_fixture()
-
-      # Create 3 top-level elements at positions 10, 20, 30
-      {:ok, e1} =
-        PlayContent.create_element(%{
-          play_id: play.id,
-          division_id: scene.id,
-          type: "speech",
-          position: 10
-        })
-
-      {:ok, e2} =
-        PlayContent.create_element(%{
-          play_id: play.id,
-          division_id: scene.id,
-          type: "speech",
-          position: 20
-        })
-
-      {:ok, e3} =
-        PlayContent.create_element(%{
-          play_id: play.id,
-          division_id: scene.id,
-          type: "speech",
-          position: 30
-        })
-
-      # Shift positions >= 20 (should affect e2 and e3, not e1)
-      PlayContent.shift_element_positions(scene.id, nil, 20)
-
-      assert PlayContent.get_element!(e1.id).position == 10
-      assert PlayContent.get_element!(e2.id).position == 21
-      assert PlayContent.get_element!(e3.id).position == 31
-    end
-
     test "only shifts elements within the same parent" do
       %{play: play, scene: scene, speech: speech} = TestFixtures.play_with_structure_fixture()
 
@@ -74,40 +39,6 @@ defmodule Playcode.PlayContentTest do
   end
 
   describe "shift_line_numbers/2" do
-    test "shifts all verse line numbers >= given number in the play" do
-      %{play: play, scene: scene, line_group: line_group} =
-        TestFixtures.play_with_structure_fixture()
-
-      # The fixture already has a verse_line at line_number 1. Add more.
-      {:ok, v2} =
-        PlayContent.create_element(%{
-          play_id: play.id,
-          division_id: scene.id,
-          parent_id: line_group.id,
-          type: "verse_line",
-          content: "v2",
-          line_number: 2,
-          position: 2
-        })
-
-      {:ok, v3} =
-        PlayContent.create_element(%{
-          play_id: play.id,
-          division_id: scene.id,
-          parent_id: line_group.id,
-          type: "verse_line",
-          content: "v3",
-          line_number: 3,
-          position: 3
-        })
-
-      # Shift all >= 2
-      PlayContent.shift_line_numbers(play.id, 2)
-
-      assert PlayContent.get_element!(v2.id).line_number == 3
-      assert PlayContent.get_element!(v3.id).line_number == 4
-    end
-
     test "preserves split verse groupings (same line_number shifted together)" do
       %{play: play, scene: scene, line_group: line_group} =
         TestFixtures.play_with_structure_fixture()

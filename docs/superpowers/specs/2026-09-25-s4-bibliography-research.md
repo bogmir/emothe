@@ -324,7 +324,7 @@ witnesses belong. Secondary bibliography is not a source.
 **For us:**
 
 5. **Per version or per work?** FileMaker attaches bibliography to versions, and 84 of the
-   129 versions carrying any bibliography are English originals. Should a translation's
+   129 versions carrying any bibliography are English-language versions. Should a translation's
    page also show its family head's list, through `parent_play_id`?
 6. **Order.** Is it automatic year-descending, as FileMaker does it, or do curators want a
    hand order? A hand order brings back `position` and a reorder UI for lists that run to

@@ -1,32 +1,19 @@
 defmodule Playcode.RoundtripTest do
-  use Playcode.DataCase, async: false
-
-  require Logger
+  use Playcode.DataCase, async: true
 
   @moduledoc """
   Roundtrip tests using real-world TEI fixture files from the EMOTHE corpus.
   Verifies that import → export preserves structural integrity:
   verses, speeches, stage directions, characters, acts/scenes, etc.
 
-  Fixture files are in test/fixtures/tei_files/ (UTF-16 encoded TEI P5 XML).
+  Fixtures: the tracked test/fixtures/*.xml, plus the git-ignored
+  test/fixtures/tei_files/ when present (UTF-16 encoded TEI P5 XML).
   """
 
-  @fixtures_dir Path.expand("../fixtures/tei_files", __DIR__)
+  @tracked_dir Path.expand("../fixtures", __DIR__)
+  @corpus_dir Path.expand("../fixtures/tei_files", __DIR__)
   @fields ~w(acts scenes characters speeches verses line_groups stage_dirs asides
              split_parts verse_type_attrs hidden_chars heads front_notes speaker_refs)a
-
-  @warn_fields ~w()a
-
-  _ = @fields
-  _ = @warn_fields
-
-  defp ms_since(t0_native) do
-    System.convert_time_unit(System.monotonic_time() - t0_native, :native, :millisecond)
-  end
-
-  defp roundtrip_log(code, msg) do
-    IO.puts("[roundtrip #{code}] #{msg}")
-  end
 
   # Read a possibly UTF-16 file and return UTF-8 string
   defp read_original(path) do
@@ -445,233 +432,83 @@ defmodule Playcode.RoundtripTest do
     end
   end
 
-  test "roundtrip helper functions smoke" do
-    sample_xml = """
-    <TEI><text><front><div type=\"dedicatoria\"><p>Nota</p></div><div type=\"elenco\"><castList><castItem ana=\"oculto\"><role>Don X</role></castItem></castList></div></front><body><div1><head>Acto I</head><div2><head>Escena I</head><sp who=\"#X\"><speaker>X</speaker><l n=\"1\" xml:id=\"l1\" part=\"I\"><seg type=\"aside\">Aparte</seg></l></sp><lg type=\"redondilla\"><l n=\"2\" xml:id=\"l2\">linea</l></lg><stage>Sale</stage></div2></div1></body></text></TEI>
-    """
-
-    t0 = System.monotonic_time()
-    assert ms_since(t0) >= 0
-    roundtrip_log("SMOKE", "helpers")
-
-    tmp =
-      Path.join(System.tmp_dir!(), "roundtrip-smoke-#{System.unique_integer([:positive])}.xml")
-
-    File.write!(tmp, sample_xml)
-    assert read_original(tmp) =~ "<TEI>"
-    File.rm!(tmp)
-
-    body = extract_body(sample_xml)
-    front = extract_front(sample_xml)
-
-    assert count_tag(body, "l") == 2
-    assert count_stage_dirs(body) == 1
-    assert count_part_attrs(body) == 1
-    assert count_who_attrs(body) == 1
-    assert count_verse_type_attrs(body) == 1
-    assert count_hidden_chars(front) == 1
-    assert count_front_note_divs(front) == 1
-    assert count_heads_in_body(body) == 2
-    assert count_aside_elements(body) == 1
-
-    counts = structural_counts(sample_xml)
-    assert counts.verses == 2
-    assert counts.speeches == 1
-    assert counts.scenes == 1
-    assert counts.acts == 1
-
-    assert xml_escape("A & B") == "A &amp; B"
-    assert_export_includes_text("SMOKE", "<x>abc</x>", "plain", "abc")
-    assert_export_includes_text("SMOKE", "<x></x>", "nil", nil)
-
-    assert normalize_ws("  a\n\tb  ") == "a b"
-    assert strip_tags("<p> Hola <b>mundo</b> </p>") == "Hola mundo"
-    assert extract_between("<a>z</a>", "<a>", "<\\/a>") == "z"
-    assert character_roles_in_order(sample_xml) == ["Don X"]
-
-    source_xml =
-      "<sourceDesc><bibl><title>Fuente A</title></bibl><bibl><title>Fuente B</title></bibl></sourceDesc>"
-
-    assert source_titles_in_order(source_xml) == ["Fuente A", "Fuente B"]
-
-    tokens = verse_line_tokens_in_order(sample_xml)
-    assert length(tokens) == 2
-    assert distinct_verse_numbers(sample_xml) == 2
-
-    assert_order_preserved("SMOKE", "order", [1, 2], [1, 2])
-
-    play = %{
-      verse_count: 2,
-      is_verse: true,
-      title: "Titulo",
-      author_name: "Autor",
-      code: "COD",
-      original_title: nil,
-      pub_place: nil,
-      publication_date: nil,
-      licence_url: nil,
-      sources: [],
-      edition_title: nil,
-      author_attribution: nil,
-      editors: [],
-      sponsor: nil,
-      funder: nil,
-      language: "es"
-    }
-
-    exported_xml =
-      "<TEI><title>Titulo</title><author>Autor</author><idno>COD</idno><extent>2 versos</extent><language ident=\"es-ES\">Español</language></TEI>"
-
-    assert_derived_verse_fields("SMOKE", play, sample_xml, exported_xml)
-    assert_metadata_roundtrip("SMOKE", play, exported_xml)
-  end
-
-  # Files that already pass roundtrip — skip them to speed up iteration.
-  # Move files back out of this list when re-verifying the full suite.
-  @passing_files ~w(
-    AL0514_ElAusenteEnElLugar.xml
-    AL0569_LaCoronaMerecida.xml
-    AL0590_LaDiscretaEnamorada.xml
-    AL0606_LosRamilletesDeMadrid.xml
-    AL0611_ElloDira.xml
-    AL0641_LaFuerzaLastimosa.xml
-    AL0644_ElGallardoCatalan.xml
-    AL0711_ElLlegarEnOcasion.xml
-    AL0718_LosLocosPorElCielo.xml
-    AL0731_ElMasGalanPortuguesDuqueDeBerganza.xml
-    AL0749_MiradAQuienAlabais.xml
-    AL0750_LaMocedadDeRoldan.xml
-    AL0758_LasMujeresSinHombres.xml
-    AL0770_LaNinezDeSanIsidro.xml
-    AL0784_LaOcasionPerdida.xml
-    AL0788_LosPalaciosDeGaliana.xml
-    AL0790_LaPalomaDeToledo.xml
-    AL0845_LaQuintaDeFlorencia.xml
-    AL2000_LaEstrellaDeSevilla.xml
-    EMOTHE0008_LeCid.xml
-    EMOTHE0010_TheTragedyOfHamletPrinceOfDenmark_test.xml
-    EMOTHE0020_LaVidaEsSueno.xml
-    EMOTHE0033_Athalie.xml
-    EMOTHE0038_AntonyAndCleopatra.xml
-    EMOTHE0050_Amleto.xml
-    EMOTHE0052_AntonioYCleopatra.xml
-    EMOTHE0053_Hamlet.xml
-    EMOTHE0059_LaTragiqueHistoireDeHamletPrinceDeDanemark.xml
-    EMOTHE0084_AntoineEtCleopatre.xml
-    EMOTHE0139_AntonioECleopatra.xml
-    EMOTHE0254_JulesCesar.xml
-    EMOTHE0281_AChasteMaidInCheapside.xml
-    EMOTHE0647_ElReyLear.xml
-    EMOTHE0648_LeRoiLear.xml
-    EMOTHE0663_LaSilvia.xml
-    EMOTHE0670_LasMocedadesDelCidComediaSegunda.xml
-    EMOTHE0703_RicardoIii.xml
-    EMOTHE0744_ComediaDeLosVillalpandos.xml
-    EMOTHE0756_LaDianaComedia.xml
-    EMOTHE0761_TheWonderOfWomenOrSophonisba.xml
-    EMOTHE0775_TheCoffer.xml
+  # Two tracked fixtures run on every `mix test`, so CI exercises real corpus
+  # files end to end: one verse play with scenes, heads, asides, split lines and
+  # verse types, one prose play. The rest of the tracked fixtures, plus the git-ignored
+  # corpus under test/fixtures/tei_files/ when present, run with
+  # `mix test --include slow`.
+  @default_fixtures ~w(
+    EMOTHE0746_LesOccasionsPerdues.xml
+    EMOTHE0776_LosRivales.xml
   )
 
-  # Unused when the corpus directory is absent (fresh clone), same as @fields above.
-  _ = @passing_files
+  @fixture_paths (Path.wildcard(Path.join(@tracked_dir, "*.xml")) ++
+                    Path.wildcard(Path.join(@corpus_dir, "*.xml")))
+                 |> Enum.uniq_by(&Path.basename/1)
+                 |> Enum.sort_by(&Path.basename/1)
 
-  if File.dir?(@fixtures_dir) do
-    for file <-
-          @fixtures_dir
-          |> File.ls!()
-          |> Enum.filter(&String.ends_with?(&1, ".xml"))
-          |> Enum.reject(&(&1 in @passing_files))
-          |> Enum.sort() do
-      @file_name file
-      @code String.replace_suffix(file, ".xml", "")
+  for path <- @fixture_paths do
+    @path path
+    @code Path.basename(path, ".xml")
 
-      @tag capture_log: false
-      @tag timeout: 120_000
-      test "roundtrip: #{@code}" do
-        path = Path.join(@fixtures_dir, @file_name)
-        original_xml = read_original(path)
-        orig_counts = structural_counts(original_xml)
+    if Path.basename(path) not in @default_fixtures do
+      @tag :slow
+    end
 
-        Logger.metadata(roundtrip_code: @code, tei_file: @file_name)
-        roundtrip_log(@code, "START file=#{@file_name}")
+    @tag timeout: 120_000
+    test "roundtrip: #{@code}" do
+      original_xml = read_original(@path)
+      orig_counts = structural_counts(original_xml)
 
-        import_t0 = System.monotonic_time()
-        roundtrip_log(@code, "IMPORT start")
+      assert {:ok, play} = Playcode.Import.TeiParser.import_file(@path),
+             "Failed to import #{@path}"
 
-        assert {:ok, play} = Playcode.Import.TeiParser.import_file(path),
-               "Failed to import #{@file_name}"
+      play_full = Playcode.Catalogue.get_play_with_all!(play.id)
+      exported_xml = Playcode.Export.TeiXml.generate(play_full)
+      export_counts = structural_counts(exported_xml)
 
-        roundtrip_log(@code, "IMPORT ok play_id=#{play.id} (#{ms_since(import_t0)}ms)")
-
-        export_t0 = System.monotonic_time()
-        roundtrip_log(@code, "EXPORT start")
-
-        play_full = Playcode.Catalogue.get_play_with_all!(play.id)
-        exported_xml = Playcode.Export.TeiXml.generate(play_full)
-        export_counts = structural_counts(exported_xml)
-
-        roundtrip_log(@code, "EXPORT ok (#{ms_since(export_t0)}ms)")
-
-        # Structural counts: collect all mismatches and assert once
-        mismatches =
-          for field <- @fields,
-              orig_val = Map.fetch!(orig_counts, field),
-              export_val = Map.fetch!(export_counts, field),
-              orig_val != export_val do
-            "  #{field}: original=#{orig_val} exported=#{export_val}"
-          end
-
-        assert mismatches == [],
-               "#{@code} structural mismatches:\n#{Enum.join(mismatches, "\n")}" <>
-                 "\n\noriginal=#{inspect(orig_counts)}\nexported=#{inspect(export_counts)}"
-
-        # Warn-only fields: log mismatches without failing
-        for field <- @warn_fields do
-          orig_val = Map.fetch!(orig_counts, field)
-          export_val = Map.fetch!(export_counts, field)
-
-          if orig_val != export_val do
-            roundtrip_log(
-              @code,
-              "WARN #{field}: original=#{orig_val} exported=#{export_val} (delta=#{orig_val - export_val})"
-            )
-          end
+      mismatches =
+        for field <- @fields,
+            orig_val = Map.fetch!(orig_counts, field),
+            export_val = Map.fetch!(export_counts, field),
+            orig_val != export_val do
+          "  #{field}: original=#{orig_val} exported=#{export_val}"
         end
 
-        # Metadata fidelity: verify key play fields survive the roundtrip
-        assert_metadata_roundtrip(@code, play_full, exported_xml)
+      assert mismatches == [],
+             "#{@code} structural mismatches:\n#{Enum.join(mismatches, "\n")}" <>
+               "\n\noriginal=#{inspect(orig_counts)}\nexported=#{inspect(export_counts)}"
 
-        # Ordering + derived values
-        assert_order_preserved(
-          @code,
-          "characters (castList role text)",
-          character_roles_in_order(original_xml),
-          character_roles_in_order(exported_xml)
-        )
+      assert_metadata_roundtrip(@code, play_full, exported_xml)
 
-        assert_order_preserved(
-          @code,
-          "sources (sourceDesc/bibl/title)",
-          source_titles_in_order(original_xml),
-          source_titles_in_order(exported_xml)
-        )
+      assert_order_preserved(
+        @code,
+        "characters (castList role text)",
+        character_roles_in_order(original_xml),
+        character_roles_in_order(exported_xml)
+      )
 
-        assert_order_preserved(
-          @code,
-          "verse lines (<l> attrs)",
-          verse_line_tokens_in_order(original_xml),
-          verse_line_tokens_in_order(exported_xml)
-        )
+      assert_order_preserved(
+        @code,
+        "sources (sourceDesc/bibl/title)",
+        source_titles_in_order(original_xml),
+        source_titles_in_order(exported_xml)
+      )
 
-        assert_derived_verse_fields(@code, play_full, original_xml, exported_xml)
+      assert_order_preserved(
+        @code,
+        "verse lines (<l> attrs)",
+        verse_line_tokens_in_order(original_xml),
+        verse_line_tokens_in_order(exported_xml)
+      )
 
-        roundtrip_log(@code, "OK")
+      assert_derived_verse_fields(@code, play_full, original_xml, exported_xml)
+
+      # The corpus predates <settingDesc>: a file without one must leave the
+      # gazetteer empty, or the places branch of the parser fired on nothing.
+      unless original_xml =~ "<settingDesc" do
+        assert Playcode.Places.list_places() == []
       end
-    end
-  else
-    @tag skip: "Roundtrip TEI fixtures not available (expected at test/fixtures/tei_files)."
-    test "roundtrip fixtures missing" do
-      :ok
     end
   end
 
@@ -741,20 +578,5 @@ defmodule Playcode.RoundtripTest do
 
     defp settings(xml), do: Regex.scan(~r/ref="#([^"]+)" ana="([^"]+)"/, xml)
     defp place_ids(xml), do: Regex.scan(~r/<place xml:id="([^"]+)"/, xml)
-
-    @places_fixture Path.join(@fixtures_dir, "AL0514_ElAusenteEnElLugar.xml")
-
-    # Guarded like the generated roundtrips above: test/fixtures/tei_files/ is git-ignored,
-    # so on a fresh clone the corpus is absent and this test would fail on :enoent.
-    if File.exists?(@places_fixture) do
-      test "the real fixtures still produce no places" do
-        # Every corpus fixture predates <settingDesc>, so importing one must leave the
-        # gazetteer empty. This is the guard against the new parser branch firing on a
-        # file that has no places in it.
-        {:ok, _play} = Playcode.Import.TeiParser.import_file(@places_fixture)
-
-        assert Playcode.Places.list_places() == []
-      end
-    end
   end
 end

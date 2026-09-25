@@ -147,8 +147,6 @@ defmodule PlaycodeWeb.PlayShowLiveTest do
   end
 
   describe "the places panel" do
-    defp t(msgid), do: Gettext.gettext(PlaycodeWeb.Gettext, msgid)
-
     test "is absent when the play has no places", %{conn: conn} do
       play = Playcode.TestFixtures.play_fixture()
       {:ok, _view, html} = live(conn, ~p"/plays/#{play.code}")

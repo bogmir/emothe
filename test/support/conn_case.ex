@@ -37,6 +37,12 @@ defmodule PlaycodeWeb.ConnCase do
   end
 
   @doc """
+  The UI text for `msgid` in the test process's locale (the app default, "es").
+  Assert on what the user reads, not on the English msgid.
+  """
+  def t(msgid, bindings \\ []), do: Gettext.gettext(PlaycodeWeb.Gettext, msgid, bindings)
+
+  @doc """
   Puts a valid session token for `user` into `conn`.
   """
   def log_in_user(conn, user) do

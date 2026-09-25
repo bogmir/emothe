@@ -353,8 +353,4 @@ defmodule PlaycodeWeb.Admin.FilemakerSyncLiveTest do
                "Roma"
     end
   end
-
-  defp t(msgid, bindings \\ []) do
-    Gettext.gettext(PlaycodeWeb.Gettext, msgid, bindings)
-  end
 end

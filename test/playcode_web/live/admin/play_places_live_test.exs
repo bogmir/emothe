@@ -6,8 +6,6 @@ defmodule PlaycodeWeb.Admin.PlayPlacesLiveTest do
   alias Playcode.Places
   alias Playcode.TestFixtures
 
-  defp t(msgid), do: Gettext.gettext(PlaycodeWeb.Gettext, msgid)
-
   defp setup_play(conn) do
     conn = log_in_user(conn, TestFixtures.user_fixture(role: :researcher))
     play = TestFixtures.play_fixture()

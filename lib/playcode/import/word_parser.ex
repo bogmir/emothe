@@ -6,10 +6,8 @@ defmodule Playcode.Import.WordParser do
   of each paragraph to annotate structural elements of a play text.
   """
 
-  @doc """
-  Extracts paragraphs from a .docx file as a list of strings.
-  """
-  def extract_paragraphs(path) do
+  # Extracts paragraphs from a .docx file as a list of strings.
+  defp extract_paragraphs(path) do
     with {:ok, zip_handle} <- open_zip(path),
          {:ok, document_xml} <- read_zip_entry(zip_handle, ~c"word/document.xml") do
       paragraphs = extract_paragraphs_from_xml(document_xml)
@@ -57,14 +55,12 @@ defmodule Playcode.Import.WordParser do
     end)
   end
 
-  @doc """
-  Parses a single line of premarcado text into a list of tagged segments.
-
-  Returns a list of `{tag, text}` tuples where tag is one of:
-  :scene, :stage_direction, :aside, :speaker, :verse, :verse_initial,
-  :verse_middle, :verse_final, :prose, :stanza, or :text (untagged).
-  """
-  def parse_line(line) do
+  # Parses a single line of premarcado text into a list of tagged segments.
+  #
+  # Returns a list of `{tag, text}` tuples where tag is one of:
+  # :scene, :stage_direction, :aside, :speaker, :verse, :verse_initial,
+  # :verse_middle, :verse_final, :prose, :stanza, or :text (untagged).
+  defp parse_line(line) do
     line
     |> split_into_tag_segments()
     |> Enum.map(fn {tag, text} -> {tag_to_atom(tag), String.trim(text)} end)
@@ -129,13 +125,11 @@ defmodule Playcode.Import.WordParser do
   defp tag_to_atom("a"), do: :act
   defp tag_to_atom("text"), do: :text
 
-  @doc """
-  Parses a list of paragraph strings into a structured representation
-  of acts, scenes, and elements (without DB interaction).
-
-  Returns `{:ok, %{acts: [...], warnings: [...]}}` or `{:error, reason}`.
-  """
-  def parse_content(paragraphs) do
+  # Parses a list of paragraph strings into a structured representation
+  # of acts, scenes, and elements (without DB interaction).
+  #
+  # Returns `{:ok, %{acts: [...], warnings: [...]}}` or `{:error, reason}`.
+  defp parse_content(paragraphs) do
     parsed_lines = Enum.map(paragraphs, &parse_line/1)
 
     # Split front matter (before first {e} or {A} tag) from play content

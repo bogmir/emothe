@@ -62,6 +62,35 @@ defmodule Playcode.ImportHelpers do
     path
   end
 
+  @doc """
+  A minimal .docx whose body is one Word paragraph per string, as the
+  "premarcado" Word importer reads it. Returns the temp file's path.
+  """
+  def docx(paragraphs) do
+    body =
+      Enum.map_join(paragraphs, "\n", fn text ->
+        escaped =
+          text
+          |> String.replace("&", "&amp;")
+          |> String.replace("<", "&lt;")
+          |> String.replace(">", "&gt;")
+
+        ~s(<w:p><w:r><w:t xml:space="preserve">#{escaped}</w:t></w:r></w:p>)
+      end)
+
+    document = """
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+      <w:body>#{body}</w:body>
+    </w:document>
+    """
+
+    {:ok, {_name, zip}} =
+      :zip.create(~c"play.docx", [{~c"word/document.xml", document}], [:memory])
+
+    write_tmp!(zip, ".docx")
+  end
+
   @doc "Imports `xml` and returns the play as stored, with its associations."
   def import_tei!(xml) do
     {:ok, play} = xml |> write_tmp!() |> TeiParser.import_file()
@@ -88,6 +117,46 @@ defmodule Playcode.ImportHelpers do
     |> collect(tag, [])
     |> Enum.filter(fn {_attrs, _text, ancestors} -> is_nil(within) or within in ancestors end)
     |> Enum.map(fn {attrs, text, _ancestors} -> {attrs, text} end)
+  end
+
+  @doc """
+  The body's shape: one `{div1 attributes, head, [{div2 attributes, head}]}` per
+  top-level division. A division with no head has `nil`.
+  """
+  def outline(xml) do
+    xml
+    |> parse()
+    |> descendants("body")
+    |> List.first()
+    |> children_named("div1")
+    |> Enum.map(fn div1 ->
+      scenes = div1 |> children_named("div2") |> Enum.map(&{attrs(&1), head(&1)})
+      {attrs(div1), head(div1), scenes}
+    end)
+  end
+
+  defp parse(xml) do
+    {:ok, root} =
+      xml |> String.replace(~r/^\s*<\?xml[^?]*\?>/, "") |> Saxy.SimpleForm.parse_string()
+
+    root
+  end
+
+  defp descendants({name, _, children} = el, tag) do
+    own = if name == tag, do: [el], else: []
+    own ++ Enum.flat_map(children, &descendants(&1, tag))
+  end
+
+  defp descendants(_text, _tag), do: []
+
+  defp children_named({_, _, children}, tag), do: Enum.filter(children, &match?({^tag, _, _}, &1))
+  defp attrs({_, attrs, _}), do: Map.new(attrs)
+
+  defp head(el) do
+    case children_named(el, "head") do
+      [h | _] -> text(h)
+      [] -> nil
+    end
   end
 
   @doc "The text of every `tag` element, in document order."

@@ -24,7 +24,7 @@ defmodule Playcode.ImportHelpers do
   `:profile_desc`, `:front`, `:body`.
   """
   def tei(opts \\ []) do
-    code = Keyword.get_lazy(opts, :code, &unique_code/0)
+    code = Keyword.get_lazy(opts, :code, &tei_code/0)
 
     """
     <?xml version="1.0" encoding="UTF-8"?>
@@ -52,7 +52,9 @@ defmodule Playcode.ImportHelpers do
     """
   end
 
-  def unique_code, do: "T#{System.unique_integer([:positive])}"
+  # The importer strips hyphens from a code, so TestFixtures.unique_code/0 ("PLAY-1")
+  # would be stored as something else.
+  defp tei_code, do: "T#{System.unique_integer([:positive])}"
 
   @doc "Writes `contents` to a temp file removed when the test exits."
   def write_tmp!(contents, ext \\ ".xml") do

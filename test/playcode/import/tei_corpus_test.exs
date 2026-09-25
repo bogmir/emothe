@@ -1,4 +1,6 @@
 defmodule Playcode.Import.TeiCorpusTest do
+  # Which file stands for each code when the corpus spans directories. Importing them
+  # is asserted through `mix playcode.import.tei` in test/mix/tasks_test.exs.
   use Playcode.DataCase, async: true
 
   alias Playcode.Import.TeiCorpus
@@ -32,35 +34,6 @@ defmodule Playcode.Import.TeiCorpusTest do
       File.write!(Path.join(dir, "EMOTHE0050_Amleto.xml"), "<TEI/>")
 
       assert [{"EMOTHE0050", _}] = TeiCorpus.collect_files([dir, "/nonexistent/path"])
-    end
-  end
-
-  describe "import_all/2" do
-    @minimal_tei """
-    <?xml version="1.0" encoding="UTF-8"?>
-    <TEI>
-      <teiHeader>
-        <fileDesc>
-          <titleStmt>
-            <title key="archivo">EMOTHE9001_TestPlay</title>
-            <title>Test Play</title>
-          </titleStmt>
-          <publicationStmt><idno>EMOTHE9001</idno></publicationStmt>
-        </fileDesc>
-      </teiHeader>
-      <text><front></front><body></body></text>
-    </TEI>
-    """
-
-    test "imports a file once and skips it on a second run" do
-      dir = tmp_dir("import")
-      File.write!(Path.join(dir, "EMOTHE9001_TestPlay.xml"), @minimal_tei)
-      files = TeiCorpus.collect_files([dir])
-
-      assert [{:ok, "EMOTHE9001", play}] = TeiCorpus.import_all(files)
-      assert play.code == "EMOTHE9001_TestPlay"
-
-      assert [{:skipped, "EMOTHE9001"}] = TeiCorpus.import_all(files)
     end
   end
 end

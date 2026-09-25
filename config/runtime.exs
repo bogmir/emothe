@@ -81,7 +81,13 @@ if config_env() == :prod do
 
   config :playcode, ChromicPDF,
     no_sandbox: true,
-    discard_stderr: false,
+    # Chrome's stderr here is a desktop browser discovering it is on a server:
+    # no D-Bus, no UPower, no Google push service. None of it touches rendering,
+    # and it drowns the request log. Real failures still reach us either way —
+    # print_to_pdf/2 returns {:error, _} to Playcode.Export.Pdf. Set to false to
+    # debug Chrome itself. config/test.exs deliberately keeps it false, because a
+    # failing PDF test is exactly when that output is worth having.
+    discard_stderr: true,
     chrome_args: "--disable-dev-shm-usage",
     session_pool: [size: 1, timeout: 60_000, checkout_timeout: 60_000, init_timeout: 30_000]
 
